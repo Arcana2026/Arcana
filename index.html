@@ -1,11 +1,194 @@
-<style>
-    .grid-bg {
-        position: fixed;
-        width: 200%; height: 100%;
-        background-image: linear-gradient(0deg, transparent 24%, rgba(188, 19, 254, 0.2) 25%, rgba(188, 19, 254, 0.2) 26%, transparent 27%),
-                          linear-gradient(90deg, transparent 24%, rgba(188, 19, 254, 0.2) 25%, rgba(188, 19, 254, 0.2) 26%, transparent 27%);
-        background-size: 50px 50px;
-        transform: perspective(500px) rotateX(60deg);
-        animation: scroll 2s linear infinite;
-    }
-</style>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcana | Cyber Casino</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #05000a;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Animation d'arrière-plan : Particules violettes */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a0033 0%, #05000a 100%);
+        }
+
+        .neon-card {
+            background: rgba(0, 0, 0, 0.85);
+            border: 3px solid #bc13fe;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 20px #bc13fe, inset 0 0 15px #bc13fe;
+            max-width: 400px;
+            width: 85%;
+            backdrop-filter: blur(5px);
+            animation: glow-pulse 3s infinite alternate;
+        }
+
+        .logo {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 3px solid #00f2ff;
+            box-shadow: 0 0 20px #00f2ff;
+            margin-bottom: 20px;
+            transition: 0.5s;
+        }
+
+        .logo:hover { transform: scale(1.1) rotate(5deg); }
+
+        h1 {
+            font-family: 'Monoton', cursive;
+            color: #bc13fe;
+            font-size: 3rem;
+            margin: 10px 0;
+            text-shadow: 0 0 10px #bc13fe, 0 0 20px #bc13fe, 0 0 40px #8a2be2;
+        }
+
+        .tagline {
+            color: #00f2ff;
+            text-shadow: 0 0 5px #00f2ff;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .btn-neon {
+            background: transparent;
+            color: #bc13fe;
+            border: 2px solid #bc13fe;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 0 10px #bc13fe;
+            transition: 0.3s;
+        }
+
+        .btn-neon:hover {
+            background: #bc13fe;
+            color: #fff;
+            box-shadow: 0 0 30px #bc13fe;
+        }
+
+        #balance-box {
+            margin-top: 25px;
+            padding: 15px;
+            border: 2px solid #00f2ff;
+            box-shadow: 0 0 15px #00f2ff;
+            display: none;
+            background: rgba(0, 242, 255, 0.05);
+        }
+
+        @keyframes glow-pulse {
+            from { box-shadow: 0 0 15px #bc13fe; }
+            to { box-shadow: 0 0 35px #bc13fe; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="neon-card">
+        <img src="https://raw.githubusercontent.com/arcana2026/arcana2026.github.io/main/1769247109491.png" alt="Arcana" class="logo">
+        
+        <h1>ARCANA</h1>
+        <div class="tagline">Cyber Crypto Casino</div>
+
+        <button class="btn-neon" onclick="connect()">Connecter Wallet</button>
+
+        <div id="balance-box">
+            <div style="font-size: 0.7rem; color: #00f2ff;">BANQUE PRIVÉE</div>
+            <div style="font-size: 1.5rem; color: #fff;"><span id="balance">0</span> $ARCANA</div>
+        </div>
+    </div>
+
+    <script>
+        // --- Animation d'arrière-plan (Particules) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = '#bc13fe';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- Connexion Web3 ---
+        async function connect() {
+            if (window.ethereum) {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = await provider.getSigner();
+                const address = await signer.getAddress();
+                
+                const contractAddress = "0x5b16E755bFF0F20E822761320851D203ddDf6d56";
+                const abi = ["function balanceOf(address) view returns (uint256)"];
+                const contract = new ethers.Contract(contractAddress, abi, provider);
+                
+                const balance = await contract.balanceOf(address);
+                document.getElementById('balance').innerText = parseInt(ethers.formatUnits(balance, 18)).toLocaleString();
+                document.getElementById('balance-box').style.display = "block";
+            } else {
+                alert("Utilisez le navigateur MetaMask !");
+            }
+        }
+    </script>
+</body>
+</html>
