@@ -3,58 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BLOCK ARCANA | Decentralized Casino</title>
+    <title>Block Arcana | Exclusive Lobby</title>
     <style>
         body {
-            background-color: #050505;
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* L'effet Mosaïque avec ton logo */
+            background-image: url('logo.png');
+            background-repeat: repeat;
+            background-size: 100px; /* Taille de chaque petit logo dans la mosaïque */
+            background-color: #08080a; /* Couleur de fond derrière les logos */
+            
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            min-height: 100vh;
         }
+
+        /* Une couche sombre par-dessus la mosaïque pour que le texte ressorte bien */
+        .overlay {
+            background: rgba(8, 8, 10, 0.85); 
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
         .header {
+            font-size: 3em;
+            font-weight: 800;
             text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
-            font-size: 2.5em;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
+
         .jackpot-container {
+            background: rgba(0, 0, 0, 0.6);
             border: 2px solid #00ffff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px #00ffff;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
             display: inline-block;
-            margin-top: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
         }
+
+        #jackpotValue {
+            color: #00ff00;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+        }
+
         .game-card {
-            background: #111;
+            background: rgba(18, 18, 20, 0.9);
+            border-radius: 25px;
             border: 1px solid #ff00ff;
-            margin: 20px auto;
-            padding: 15px;
-            max-width: 300px;
-            border-radius: 10px;
+            margin: 30px auto;
+            padding: 40px;
+            max-width: 350px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
         }
+
         .btn-bet {
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            background: linear-gradient(135deg, #ff00ff, #7000ff);
             border: none;
-            padding: 10px 25px;
+            padding: 20px 50px;
             color: white;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 15px;
             cursor: pointer;
-            box-shadow: 0 0 10px #ff00ff;
+            font-size: 1.2em;
+            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.5);
+            transition: 0.3s;
         }
-        /* Style du bouton Support */
+
+        .btn-bet:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 0, 255, 0.7);
+        }
+
         .support-btn {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(255, 0, 255, 0.2);
+            bottom: 30px;
+            right: 30px;
+            background: #000;
             border: 1px solid #00ffff;
             color: #00ffff;
             text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+
+        .legal-footer {
+            margin-top: 50px;
+            font-size: 0.7em;
+            color: #777;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay">
+    <h1 class="header">Block Arcana</h1>
+    
+    <div class="jackpot-container">
+        <p style="color: #00ffff; letter-spacing: 3px;">MAIN JACKPOT</p>
+        <h2 id="jackpotValue">0.0500 POL</h2>
+    </div>
+
+    <div class="game-card">
+        <h2 style="color: #ff00ff; margin-bottom: 20px;">Ultimate 777</h2>
+        <p style="color: #ccc;">Entry: 0.05 POL</p>
+        <button class="btn-bet" onclick="playGame()">SPIN NOW</button>
+    </div>
+
+    <a href="mailto:blockarcana-admin@proton.me" class="support-btn">📩 SUPPORT</a>
+
+    <div class="legal-footer">
+        <p>Decentralized Protocol by Arcana2026. Play responsibly.</p>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script>
+    let currentJackpot = 0.0500;
+    async function playGame() {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                if (window.navigator.vibrate) window.navigator.vibrate(50);
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+
+                const tx = {
+                    to: "0x8E25e9858679f29193233F7D5D9939105408d257",
+                    value: ethers.utils.parseEther("0.05"),
+                    maxPriorityFeePerGas: ethers.utils.parseUnits('45', 'gwei')
+                };
+
+                const transaction = await signer.sendTransaction(tx);
+                await transaction.wait();
+
+                const luck = Math.floor(Math.random() * 50) + 1;
+                if (luck === 7) {
+                    alert("🎰 JACKPOT!");
+                } else {
+                    alert("Try again!");
+                    currentJackpot += 0.05;
+                    document.getElementById('jackpotValue').innerText = currentJackpot.toFixed(4) + " POL";
+                }
+            } catch (e) { alert("Failed."); }
+        }
+    }
+</script>
+
+</body>
+</html>
             font-size: 0.9em;
             backdrop-filter: blur(5px);
             transition: 0.3s;
