@@ -5,35 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Block Arcana | Live Casino</title>
     <style>
+        /* Fond fixe pour éviter les répétitions lors du défilement */
         body {
             background-color: #050505;
             background: radial-gradient(circle at center, #111111 0%, #050505 100%);
+            background-attachment: fixed;
             color: #ffffff;
             font-family: 'Segoe UI', Roboto, sans-serif;
-            text-align: center; margin: 0; padding: 0; min-height: 100vh;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
+
+        /* Barre de statistiques en haut */
         .stats-header {
             background: rgba(0, 255, 255, 0.08);
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
-            padding: 12px; font-size: 0.85em;
-            display: flex; justify-content: space-around;
-            backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 100;
+            padding: 12px;
+            font-size: 0.85em;
+            display: flex;
+            justify-content: space-around;
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .overlay { padding: 30px 20px; }
+
+        .overlay { padding: 40px 20px; }
+
         .header {
-            font-family: "Georgia", serif; font-style: italic; font-size: 3.2em;
+            font-family: "Georgia", serif;
+            font-style: italic;
+            font-size: 3.2em;
             background: linear-gradient(to right, #ffffff, #ff00ff, #00ffff, #ffffff);
-            background-size: 200% auto; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; animation: shine 5s linear infinite;
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite;
+            margin: 10px 0;
         }
+
         @keyframes shine { to { background-position: 200% center; } }
+
         .jackpot-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px; padding: 30px 20px;
-            margin: 20px auto; max-width: 320px;
+            border-radius: 30px;
+            padding: 30px 20px;
+            margin: 20px auto;
+            max-width: 320px;
         }
+
         #jackpotValue { 
+            color: #00ff00;
+            font-size: 2.8em;
+            font-weight: bold; 
+            text-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
+            margin: 10px 0;
+        }
+
+        .btn-bet {
+            background: linear-gradient(135deg, #ff00ff, #7000ff);
+            border: none;
+            padding: 20px 55px;
+            color: white;
+            font-weight: bold;
+            border-radius: 60px;
+            cursor: pointer;
+            font-size: 1.3em;
+            box-shadow: 0 10px 25px rgba(255, 0, 255, 0.4);
+            text-transform: uppercase;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 0.75em;
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="stats-header">
+    <span>👥 <span id="online-players">20</span> EN LIGNE</span>
+    <span>👁️ LIVE VISITES</span>
+</div>
+
+<div class="overlay">
+    <div style="color: #00ff00; font-size: 0.7em; font-weight: bold; letter-spacing: 2px;">● SESSION ACTIVE</div>
+    <h1 class="header">Block Arcana</h1>
+    
+    <div class="jackpot-card">
+        <div style="color: #00ffff; font-size: 0.8em; letter-spacing: 2px;">CURRENT JACKPOT</div>
+        <h2 id="jackpotValue">0.0500 POL</h2>
+        <div style="font-size: 0.9em; color: #ff00ff; font-weight: bold; margin-top: 5px;">Ultimate 777</div>
+        <div style="font-size: 0.8em; color: #888; margin-top: 10px;">Entry: 0.05 POL</div>
+    </div>
+
+    <button class="btn-bet" onclick="playGame()">SPIN & BET</button>
+
+    <div class="footer">
+        POWERED BY POLYGON NETWORK<br>
+        © 2026 Block Arcana Protocol. Play responsibly.
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    let currentJackpot = 0.0500;
+
+    function updateStats() {
+        document.getElementById("online-players").innerText = Math.floor(Math.random() * 6) + 18;
+    }
+    setInterval(updateStats, 7000);
+
+    async function playGame() {
+        if (typeof window.ethereum !== "undefined") {
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const tx = { to: "0x8e25e9858679f29193233f7d5d9939105408d257", value: ethers.utils.parseEther("0.05") };
+                const transaction = await signer.sendTransaction(tx);
+                await transaction.wait();
+                
+                if (Math.floor(Math.random() * 50) + 1 === 7) {
+                    confetti({ particleCount: 150, spread: 70 });
+                    alert("🎰 JACKPOT !");
+                } else {
+                    alert("Pas cette fois !");
+                    currentJackpot += 0.05;
+                    document.getElementById("jackpotValue").innerText = currentJackpot.toFixed(4) + " POL";
+                }
+            } catch (e) { alert("Transaction annulée."); }
+        } else {
+            alert("Veuillez utiliser un navigateur Web3 (MetaMask, Rabby).");
+        }
+    }
+</script>
+</body>
+</html>
             color: #00ff00; font-size: 2.8em; font-weight: bold; 
             text-shadow: 0 0 25px rgba(0, 255, 0, 0.5); margin: 10px 0;
         }
