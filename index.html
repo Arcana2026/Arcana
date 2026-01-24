@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Block Arcana | Exclusive Lobby</title>
+    <title>Block Arcana | Decentralized Casino</title>
     <style>
         body {
-            /* L'effet Mosaïque avec ton logo */
-            background-image: url('logo.png');
+            /* On utilise le nom exact de ton fichier image ici */
+            background-image: url('1769247109491.png');
             background-repeat: repeat;
-            background-size: 100px; /* Taille de chaque petit logo dans la mosaïque */
-            background-color: #08080a; /* Couleur de fond derrière les logos */
-            
+            background-size: 120px; /* Taille des jetons en fond */
+            background-color: #08080a;
             color: #ffffff;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             text-align: center;
@@ -20,9 +19,9 @@
             min-height: 100vh;
         }
 
-        /* Une couche sombre par-dessus la mosaïque pour que le texte ressorte bien */
+        /* Couche sombre pour que le texte reste lisible sur les jetons */
         .overlay {
-            background: rgba(8, 8, 10, 0.85); 
+            background: rgba(8, 8, 10, 0.88); 
             min-height: 100vh;
             padding: 40px 20px;
         }
@@ -34,6 +33,132 @@
             margin-bottom: 10px;
         }
 
+        .jackpot-container {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ffff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+            display: inline-block;
+            margin: 20px 0;
+            backdrop-filter: blur(8px);
+        }
+
+        #jackpotValue {
+            color: #00ff00;
+            font-size: 2.2em;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .game-card {
+            background: rgba(18, 18, 20, 0.95);
+            border-radius: 20px;
+            border: 1px solid #ff00ff;
+            margin: 30px auto;
+            padding: 35px;
+            max-width: 340px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+        }
+
+        .btn-bet {
+            background: linear-gradient(135deg, #ff00ff, #7000ff);
+            border: none;
+            padding: 18px 45px;
+            color: white;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1em;
+            box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
+            transition: 0.3s;
+        }
+
+        .support-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #1a1a1c;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .legal-footer {
+            margin-top: 60px;
+            font-size: 0.7em;
+            color: #555;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay">
+    <h1 class="header">Block Arcana</h1>
+    
+    <div class="jackpot-container">
+        <p style="color: #00ffff; font-size: 0.8em; letter-spacing: 2px;">MAIN JACKPOT (POL)</p>
+        <h2 id="jackpotValue">0.0500 POL</h2>
+    </div>
+
+    <div class="game-card">
+        <h2 style="color: #ff00ff; margin-bottom: 15px;">Ultimate 777</h2>
+        <p style="color: #aaa;">Entry: 0.05 POL</p>
+        <button class="btn-bet" onclick="playGame()">SPIN & BET</button>
+    </div>
+
+    <a href="mailto:blockarcana-admin@proton.me" class="support-btn">📩 SUPPORT</a>
+
+    <div class="legal-footer">
+        <p>Decentralized Protocol by Arcana2026. Play responsibly.</p>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script>
+    let currentJackpot = 0.0500;
+    async function playGame() {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                if (window.navigator.vibrate) window.navigator.vibrate(50);
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+
+                const tx = {
+                    to: "0x8E25e9858679f29193233F7D5D9939105408d257",
+                    value: ethers.utils.parseEther("0.05"),
+                    maxPriorityFeePerGas: ethers.utils.parseUnits('45', 'gwei'),
+                    maxFeePerGas: ethers.utils.parseUnits('70', 'gwei')
+                };
+
+                const transaction = await signer.sendTransaction(tx);
+                document.body.style.backgroundColor = "#1a0b2e";
+                await transaction.wait();
+                document.body.style.backgroundColor = "#08080a";
+
+                const luck = Math.floor(Math.random() * 50) + 1;
+                if (luck === 7) {
+                    alert("🎰 JACKPOT! YOU WON!");
+                    document.body.style.backgroundColor = "#00ff00";
+                    setTimeout(() => document.body.style.backgroundColor = "#08080a", 1000);
+                } else {
+                    alert("Try again!");
+                    currentJackpot += 0.05;
+                    document.getElementById('jackpotValue').innerText = currentJackpot.toFixed(4) + " POL";
+                }
+            } catch (e) { alert("Transaction failed."); }
+        }
+    }
+</script>
+
+</body>
+</html>
         .jackpot-container {
             background: rgba(0, 0, 0, 0.6);
             border: 2px solid #00ffff;
