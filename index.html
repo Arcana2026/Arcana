@@ -3,231 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcana Elite | Cyber Casino & Wheel</title>
+    <title>Arcana Elite | Casino & Wheel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Exo+2:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --neon-purple: #bc13fe;
-            --neon-cyan: #00f2ff;
-        }
-
-        body {
-            margin: 0; padding: 0;
-            background: #05000a;
-            color: #fff;
-            font-family: 'Exo 2', sans-serif;
-            display: flex; align-items: center; justify-content: center;
-            min-height: 100vh; overflow-x: hidden;
-        }
-
-        #bg-canvas {
-            position: fixed; top: 0; left: 0; z-index: -1;
-            background: radial-gradient(circle at center, #1a0033 0%, #05000a 100%);
-        }
-
+        :root { --neon-purple: #bc13fe; --neon-cyan: #00f2ff; }
+        body { margin: 0; background: #05000a; color: #fff; font-family: 'Exo 2', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; background: radial-gradient(circle at center, #1a0033 0%, #05000a 100%); }
+        
         .casino-container {
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             border: 2px solid var(--neon-purple);
             border-radius: 25px;
             padding: 60px 20px 40px;
             text-align: center;
             box-shadow: 0 0 40px rgba(188, 19, 254, 0.4);
-            max-width: 450px; width: 90%;
-            position: relative;
-            margin: 80px 0;
+            max-width: 420px; width: 90%;
+            position: relative; margin: 80px 0;
         }
 
+        /* LOGO JETON (L'oeil original) */
         .main-logo {
-            width: 140px; height: 140px;
-            position: absolute; top: -70px; left: 50%;
+            width: 150px; height: 150px;
+            position: absolute; top: -75px; left: 50%;
             transform: translateX(-50%);
-            filter: drop-shadow(0 0 20px var(--neon-cyan));
+            filter: drop-shadow(0 0 15px var(--neon-cyan));
             border-radius: 50%;
-            background: #000;
-            z-index: 10;
         }
 
         h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            margin: 20px 0 5px;
+            font-family: 'Orbitron', sans-serif; font-size: 3.2rem; margin: 25px 0 5px;
             background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-purple) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 10px rgba(188, 19, 254, 0.5));
         }
 
-        .tagline {
-            color: var(--neon-cyan);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 0.7rem;
-            margin-bottom: 20px;
-        }
+        .tagline { color: var(--neon-cyan); text-transform: uppercase; letter-spacing: 3px; font-size: 0.75rem; margin-bottom: 25px; }
 
-        /* BOUTONS */
         .btn-neon {
-            background: transparent;
-            color: #fff;
-            border: 2px solid var(--neon-purple);
-            padding: 12px 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 0 10px var(--neon-purple);
+            background: transparent; color: #fff; border: 2px solid var(--neon-purple);
+            padding: 12px 35px; font-size: 1rem; font-weight: bold; border-radius: 10px;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px var(--neon-purple);
             text-transform: uppercase;
         }
+        .btn-neon:hover { background: var(--neon-purple); box-shadow: 0 0 35px var(--neon-purple); }
 
-        .btn-neon:hover {
-            background: var(--neon-purple);
-            box-shadow: 0 0 30px var(--neon-purple);
-        }
-
-        /* SECTION JEU (Cachée au début) */
-        #game-area {
-            display: none;
-            margin-top: 30px;
-            animation: fadeIn 1s;
-        }
-
-        /* LA ROUE */
-        .wheel-box {
-            position: relative;
-            width: 280px; height: 280px;
-            margin: 20px auto;
-        }
-
+        /* ZONE DE JEU ROUE */
+        #game-area { display: none; margin-top: 30px; animation: fadeIn 0.8s; }
+        .wheel-box { position: relative; width: 280px; height: 280px; margin: 25px auto; }
         .pointer {
-            position: absolute; top: -15px; left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid var(--neon-cyan);
-            z-index: 20;
-            filter: drop-shadow(0 0 10px var(--neon-cyan));
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent;
+            border-top: 25px solid var(--neon-cyan); z-index: 20; filter: drop-shadow(0 0 8px var(--neon-cyan));
         }
-
         #wheel {
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            border: 5px solid var(--neon-purple);
-            box-shadow: 0 0 20px var(--neon-purple);
+            width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--neon-purple);
             transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
-            background: conic-gradient(
-                #1a0033 0deg 45deg, #05000a 45deg 90deg,
-                #1a0033 90deg 135deg, #05000a 135deg 180deg,
-                #1a0033 180deg 225deg, #05000a 225deg 270deg,
-                #1a0033 270deg 315deg, #05000a 315deg 360deg
-            );
-            position: relative;
+            background: conic-gradient(#1a0033 0deg 45deg, #05000a 45deg 90deg, #1a0033 90deg 135deg, #05000a 135deg 180deg, #1a0033 180deg 225deg, #05000a 225deg 270deg, #1a0033 270deg 315deg, #05000a 315deg 360deg);
         }
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--neon-cyan); background: #000; z-index: 15; }
 
-        .wheel-label {
-            position: absolute; width: 50%; height: 50%;
-            transform-origin: 100% 100%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 0.9rem; color: var(--neon-cyan);
-        }
-
-        .wheel-center-logo {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px; height: 50px;
-            z-index: 15; border-radius: 50%;
-            border: 2px solid var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-            background: #000;
-        }
-
-        #balance-info {
-            margin-top: 20px; color: var(--neon-cyan); font-size: 1.2rem; font-weight: 900;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-
     <canvas id="bg-canvas"></canvas>
-
     <div class="casino-container">
-        <img src="https://raw.githubusercontent.com/arcana2026/arcana2026.github.io/main/1769247109491.png" alt="Arcana Logo" class="main-logo">
-        
+        <img src="https://raw.githubusercontent.com/arcana2026/arcana2026.github.io/main/1769247109491.png" alt="Logo Arcana" class="main-logo">
         <h1>ARCANA</h1>
         <div class="tagline">Cyber Crypto Casino</div>
-
-        <button id="connectBtn" class="btn-neon" onclick="connect()">Connecter Wallet</button>
+        <button id="connectBtn" class="btn-neon" onclick="connect()">Entrer dans le Casino</button>
 
         <div id="game-area">
-            <div id="balance-info">SOLDE : <span id="balance">0</span> $ARCANA</div>
-            
+            <div style="color: var(--neon-cyan); font-weight: bold; margin-bottom: 10px;">VOTRE SOLDE : <span id="balance">0</span> $ARCANA</div>
             <div class="wheel-box">
                 <div class="pointer"></div>
-                <img src="https://raw.githubusercontent.com/arcana2026/arcana2026.github.io/main/1769247109491.png" class="wheel-center-logo">
-                <div id="wheel">
-                    <div class="wheel-label" style="transform: rotate(22deg) translate(20px, 20px);">x2</div>
-                    <div class="wheel-label" style="transform: rotate(67deg) translate(20px, 20px);">0</div>
-                    <div class="wheel-label" style="transform: rotate(112deg) translate(20px, 20px);">x5</div>
-                    <div class="wheel-label" style="transform: rotate(157deg) translate(20px, 20px);">0</div>
-                    <div class="wheel-label" style="transform: rotate(202deg) translate(20px, 20px);">x10</div>
-                    <div class="wheel-label" style="transform: rotate(247deg) translate(20px, 20px);">0</div>
-                    <div class="wheel-label" style="transform: rotate(292deg) translate(20px, 20px);">JACKPOT</div>
-                    <div class="wheel-label" style="transform: rotate(337deg) translate(20px, 20px);">0</div>
-                </div>
+                <div class="wheel-center"></div>
+                <div id="wheel"></div>
             </div>
-
-            <button class="btn-neon" onclick="spinWheel()" style="border-color: var(--neon-cyan); color: var(--neon-cyan);">SPIN !</button>
+            <button class="btn-neon" onclick="spin()" style="border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan);">SPIN !</button>
         </div>
     </div>
 
     <script>
-        // --- Fond étoilé animé ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize); resize();
         class P { constructor() { this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height; this.s=Math.random()*2; this.vx=Math.random()*0.4-0.2; this.vy=Math.random()*0.4-0.2; } update() { this.x+=this.vx; this.y+=this.vy; if(this.x>canvas.width)this.x=0; if(this.y>canvas.height)this.y=0; } draw() { ctx.fillStyle='#bc13fe'; ctx.beginPath(); ctx.arc(this.x,this.y,this.s,0,Math.PI*2); ctx.fill(); } }
-        for(let i=0;i<70;i++) particles.push(new P());
+        for(let i=0;i<60;i++) particles.push(new P());
         function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(anim); } anim();
 
-        // --- Web3 ---
-        let currentRotation = 0;
-        const contractAddr = "0x5b16E755bFF0F20E822761320851D203ddDf6d56";
-
+        let deg = 0;
         async function connect() {
             if (window.ethereum) {
                 const provider = new ethers.BrowserProvider(window.ethereum);
                 await provider.send("eth_requestAccounts", []);
                 const signer = await provider.getSigner();
                 const address = await signer.getAddress();
-                const contract = new ethers.Contract(contractAddr, ["function balanceOf(address) view returns (uint256)"], provider);
+                const contract = new ethers.Contract("0x5b16E755bFF0F20E822761320851D203ddDf6d56", ["function balanceOf(address) view returns (uint256)"], provider);
                 const bal = await contract.balanceOf(address);
                 document.getElementById('balance').innerText = parseInt(ethers.formatUnits(bal, 18)).toLocaleString();
-                
                 document.getElementById('connectBtn').style.display = "none";
                 document.getElementById('game-area').style.display = "block";
-            } else {
-                alert("Ouvrez MetaMask !");
             }
         }
-
-        // --- Logique de la Roue ---
-        function spinWheel() {
-            const wheel = document.getElementById('wheel');
-            const spins = (Math.floor(Math.random() * 5) + 7) * 360; // 7 à 12 tours
-            const extraDegrees = Math.floor(Math.random() * 360);
-            currentRotation += spins + extraDegrees;
-            
-            wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-            setTimeout(() => {
-                alert("La chance tourne ! Résultat bientôt lié à la blockchain...");
-            }, 4100);
+        function spin() {
+            deg += Math.floor(Math.random() * 360) + 2160;
+            document.getElementById('wheel').style.transform = `rotate(${deg}deg)`;
         }
     </script>
 </body>
