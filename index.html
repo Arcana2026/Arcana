@@ -3,112 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Block Arcana | L'Elite du Casino</title>
+    <title>Block Arcana | Grand Casino</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Bungee+Shade&display=swap" rel="stylesheet">
     <style>
         body {
-            background: radial-gradient(circle at center, #1a1300 0%, #000 100%);
+            background: #050505;
             color: #fff;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
             overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* Animation des symboles de casino en fond */
+        .bg-elements {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .symbol {
+            position: absolute;
+            color: rgba(212, 175, 55, 0.15);
+            font-size: 2rem;
+            animation: float 10s linear infinite;
         }
 
         .casino-card {
-            background: rgba(20, 20, 20, 0.95);
-            border: 2px solid #d4af37;
-            border-radius: 20px;
-            padding: 40px;
+            background: linear-gradient(145deg, #111, #000);
+            border: 3px solid #d4af37;
+            border-radius: 30px;
+            padding: 50px;
             text-align: center;
-            box-shadow: 0 0 50px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(212, 175, 55, 0.1);
-            max-width: 450px;
-            width: 90%;
-            animation: fadeIn 1.5s ease-out;
+            box-shadow: 0 0 80px rgba(212, 175, 55, 0.4);
+            position: relative;
         }
 
-        .logo-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 20px;
+        /* Le néon autour de la carte */
+        .casino-card::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 35px;
+            background: linear-gradient(45deg, #d4af37, #fcf6ba, #d4af37);
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.5;
         }
 
         .logo {
-            width: 160px;
-            height: 160px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
-            border: 4px solid #d4af37;
-            object-fit: cover;
-            box-shadow: 0 0 30px #d4af37;
+            border: 5px solid #d4af37;
+            box-shadow: 0 0 40px #d4af37;
+            margin-bottom: 20px;
+            transition: 0.5s;
         }
+
+        .logo:hover { transform: rotateY(180deg); }
 
         h1 {
-            font-family: 'Cinzel', serif;
+            font-family: 'Bungee Shade', cursive;
             color: #d4af37;
-            font-size: 2.5em;
-            margin: 10px 0;
-            text-shadow: 2px 2px 10px rgba(0,0,0,1);
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 0 0 10px #d4af37;
         }
 
-        p { color: #aaa; font-style: italic; margin-bottom: 30px; }
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 5px;
+            color: #fff;
+            margin-bottom: 30px;
+        }
 
-        .btn-gold {
-            background: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+        .btn-play {
+            background: #d4af37;
             color: #000;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            font-weight: 700;
-            border-radius: 5px;
+            padding: 20px 50px;
+            font-size: 1.5em;
+            font-weight: 900;
+            border-radius: 10px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: 0.4s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 0 #8a6d1d;
+            transition: 0.1s;
         }
 
-        .btn-gold:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.6);
-            letter-spacing: 1px;
+        .btn-play:active {
+            transform: translateY(5px);
+            box-shadow: 0 5px 0 #8a6d1d;
         }
 
         #balance-display {
-            margin-top: 25px;
-            padding: 15px;
-            background: rgba(212, 175, 55, 0.1);
-            border-radius: 10px;
-            border: 1px dashed #d4af37;
+            margin-top: 30px;
+            font-size: 1.5em;
             display: none;
+            border-top: 2px solid #d4af37;
+            padding-top: 20px;
         }
 
-        .amount { color: #fcf6ba; font-weight: bold; font-size: 1.4em; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float {
+            from { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            to { transform: translateY(-10vh) rotate(360deg); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="casino-card">
-        <div class="logo-container">
-            <img src="https://raw.githubusercontent.com/arcana2026/arcana2026.github.io/main/1769247109491.png" alt="Logo Arcana" class="logo">
-        </div>
-        
-        <h1>BLOCK ARCANA</h1>
-        <p>L'exclusivité sur la blockchain Polygon</p>
+    <div class="bg-elements" id="symbols"></div>
 
-        <button class="btn-gold" id="connectBtn" onclick="connect()">Entrer dans l'Arcana</button>
+    <div class="casino-card">
+        <img src="https://raw.githubusercontent.com/arcana2026/arcana2026.github.io/main/1769247109491.png" alt="Logo Arcana" class="logo">
+        
+        <h1>ARCANA</h1>
+        <div class="subtitle">GRAND CASINO</div>
+
+        <button class="btn-play" onclick="connect()">Connecter & Jouer</button>
 
         <div id="balance-display">
-            <div style="font-size: 0.9em; color: #d4af37;">VOTRE FORTUNE</div>
-            <div class="amount"><span id="balance">0</span> $ARCANA</div>
+            VOTRE BANQUE : <br>
+            <span style="color:#d4af37; font-size: 1.5em;" id="balance">0</span> $ARCANA
         </div>
     </div>
 
     <script>
+        // Création des symboles flottants
+        const symbols = ['♠', '♥', '♣', '♦', '💰', '🎲', '🎰'];
+        const container = document.getElementById('symbols');
+        for(let i=0; i<30; i++) {
+            let div = document.createElement('div');
+            div.className = 'symbol';
+            div.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+            div.style.left = Math.random() * 100 + 'vw';
+            div.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            div.style.animationDelay = (Math.random() * 5) + 's';
+            container.appendChild(div);
+        }
+
         async function connect() {
             if (window.ethereum) {
                 const provider = new ethers.BrowserProvider(window.ethereum);
@@ -121,11 +161,8 @@
                 const contract = new ethers.Contract(contractAddress, abi, provider);
                 
                 const balance = await contract.balanceOf(address);
-                document.getElementById('balance').innerText = ethers.formatUnits(balance, 18);
+                document.getElementById('balance').innerText = parseInt(ethers.formatUnits(balance, 18)).toLocaleString();
                 document.getElementById('balance-display').style.display = "block";
-                document.getElementById('connectBtn').style.display = "none";
-            } else {
-                alert("Ouvrez ce site dans le navigateur de MetaMask !");
             }
         }
     </script>
