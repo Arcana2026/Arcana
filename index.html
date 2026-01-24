@@ -1,150 +1,19 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcana Neon Casino</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --neon-gold: #ffdf00;
-            --neon-pink: #ff00ff;
-            --neon-blue: #00f2ff;
-        }
-
-        body {
-            background-color: #050505;
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            background-image: 
-                linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
-                repeating-linear-gradient(0deg, transparent 0, rgba(0, 242, 255, 0.05) 1px, transparent 2px);
-        }
-
-        .neon-card {
-            background: rgba(0, 0, 0, 0.9);
-            border: 4px solid var(--neon-gold);
-            border-radius: 20px;
-            padding: 50px;
-            text-align: center;
-            box-shadow: 0 0 20px var(--neon-gold), inset 0 0 20px var(--neon-gold);
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-        }
-
-        .logo {
-            width: 170px;
-            height: 170px;
-            border-radius: 50%;
-            border: 4px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue);
-            margin-bottom: 25px;
-            animation: flicker 4s infinite alternate;
-        }
-
-        h1 {
-            font-family: 'Monoton', cursive;
-            color: var(--neon-gold);
-            font-size: 3.5rem;
-            margin: 0;
-            text-shadow: 0 0 10px var(--neon-gold), 0 0 20px var(--neon-gold), 0 0 40px #ffae00;
-            letter-spacing: 5px;
-        }
-
-        .neon-text {
-            color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--neon-blue), 0 0 15px var(--neon-blue);
-            font-size: 1rem;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        .btn-neon {
-            background: transparent;
-            color: var(--neon-gold);
-            border: 3px solid var(--neon-gold);
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            cursor: pointer;
-            border-radius: 10px;
-            box-shadow: 0 0 10px var(--neon-gold);
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-neon:hover {
-            background: var(--neon-gold);
-            color: #000;
-            box-shadow: 0 0 40px var(--neon-gold);
-        }
-
-        #balance-display {
-            margin-top: 30px;
-            padding: 20px;
-            border: 2px solid var(--neon-pink);
-            box-shadow: 0 0 10px var(--neon-pink);
-            display: none;
-            animation: neon-pulse 1.5s infinite;
-        }
-
-        .amount { color: var(--neon-pink); font-size: 1.8rem; text-shadow: 0 0 10px var(--neon-pink); }
-
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
-            20%, 24%, 55% { opacity: 0.7; }
-        }
-
-        @keyframes neon-pulse {
-            0% { box-shadow: 0 0 5px var(--neon-pink); }
-            50% { box-shadow: 0 0 20px var(--neon-pink); }
-            100% { box-shadow: 0 0 5px var(--neon-pink); }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="neon-card">
-        <img src="https://raw.githubusercontent.com/arcana2026/arcana2026.github.io/main/1769247109491.png" alt="Logo Arcana" class="logo">
-        
-        <h1>ARCANA</h1>
-        <div class="neon-text">Neon Crypto Casino</div>
-
-        <button class="btn-neon" onclick="connect()">Connecter Wallet</button>
-
-        <div id="balance-display">
-            <div style="font-size: 0.8rem;">SOLDE DISPONIBLE</div>
-            <div class="amount"><span id="balance">0</span> $ARCANA</div>
-        </div>
-    </div>
-
-    <script>
-        async function connect() {
-            if (window.ethereum) {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                const signer = await provider.getSigner();
-                const address = await signer.getAddress();
-                
-                const contractAddress = "0x5b16E755bFF0F20E822761320851D203ddDf6d56";
-                const abi = ["function balanceOf(address) view returns (uint256)"];
-                const contract = new ethers.Contract(contractAddress, abi, provider);
-                
-                const balance = await contract.balanceOf(address);
-                document.getElementById('balance').innerText = parseInt(ethers.formatUnits(balance, 18)).toLocaleString();
-                document.getElementById('balance-display').style.display = "block";
-            }
-        }
-    </script>
-</body>
-</html>
+<style>
+    body {
+        background: radial-gradient(circle at center, #1a0033 0%, #05000a 100%);
+        overflow: hidden;
+    }
+    h1 {
+        color: #bc13fe;
+        text-shadow: 0 0 10px #bc13fe, 0 0 20px #bc13fe, 0 0 40px #8a2be2;
+        font-family: 'Monoton', cursive;
+    }
+    /* Animation de fond : Particules */
+    .particle {
+        position: absolute;
+        background: #bc13fe;
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: move 20s linear infinite;
+    }
+</style>
