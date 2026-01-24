@@ -8,7 +8,7 @@
         :root { --neon: #00ffff; --gold: #ff00ff; --win: #00ff00; --bg: #050505; }
         body {
             background: radial-gradient(circle at center, #111 0%, var(--bg) 100%);
-            color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden;
+            color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; padding-bottom: 80px;
         }
         .nav-header {
             background: rgba(0,0,0,0.9); padding: 15px 25px; display: flex; 
@@ -25,147 +25,23 @@
         }
         .game-card:hover { transform: translateY(-10px); border-color: var(--neon); box-shadow: 0 0 30px rgba(0,255,255,0.1); }
         
+        /* Barre d'activité Live */
+        .live-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
+            background: rgba(0, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border-top: 1px solid var(--neon); display: flex; align-items: center;
+            justify-content: center; font-size: 0.75em; z-index: 3000;
+            color: var(--neon); font-weight: bold; overflow: hidden;
+        }
+        .live-dot { width: 8px; height: 8px; background: var(--win); border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px var(--win); animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
         /* Modal de Jeu */
         .game-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 2000; backdrop-filter: blur(10px);
             flex-direction: column; align-items: center; justify-content: center;
         }
-        .game-window {
-            background: #111; border: 2px solid var(--neon); padding: 40px;
-            border-radius: 30px; position: relative; max-width: 400px; width: 90%;
-        }
+        .game-window { background: #111; border: 2px solid var(--neon); padding: 40px; border-radius: 30px; position: relative; max-width: 400px; width: 90%; }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 2em; cursor: pointer; color: #555; }
-        
-        .btn-action {
-            background: linear-gradient(135deg, var(--gold), #7000ff);
-            border: none; padding: 15px 40px; color: white; font-weight: bold;
-            border-radius: 40px; cursor: pointer; width: 100%; margin: 10px 0;
-        }
-        #status-msg { color: var(--neon); font-weight: bold; margin: 15px 0; min-height: 20px; }
-    </style>
-</head>
-<body>
-
-<div class="nav-header">
-    <div style="font-family: serif; font-style: italic; color: var(--neon); font-size: 1.5em;">BLOCK ARCANA</div>
-    <appkit-button></appkit-button>
-</div>
-
-<div style="text-align: center; padding: 30px 10px;">
-    <h1>Le Salon des Maîtres</h1>
-    <p style="color: #666;">Choisissez votre table et défiez le hasard sur Polygon.</p>
-</div>
-
-<div class="lobby-container">
-    <div class="game-card">
-        <span style="font-size: 3em;">🎰</span>
-        <h3>Arcana Slot</h3>
-        <p style="font-size: 0.8em; color: #888;">1/50 chance de rafler le jackpot progressif.</p>
-        <div style="color: var(--win); margin: 15px 0; font-weight: bold;">MISES : 0.05 POL</div>
-        <button class="btn-action" onclick="openGame('slot')">JOUER</button>
-    </div>
-
-    <div class="game-card">
-        <span style="font-size: 3em;">🎲</span>
-        <h3>Dice Royale</h3>
-        <p style="font-size: 0.8em; color: #888;">Pile ou Face. Doublez votre mise ou perdez tout.</p>
-        <div style="color: var(--neon); margin: 15px 0; font-weight: bold;">MISES : 0.10 POL</div>
-        <button class="btn-action" onclick="openGame('dice')">JOUER</button>
-    </div>
-
-    <div class="game-card" style="opacity: 0.7;">
-        <span style="font-size: 3em;">🎡</span>
-        <h3>Neon Roulette</h3>
-        <p style="font-size: 0.8em; color: #888;">La reine du casino. Bientôt disponible.</p>
-        <div style="color: #ff4444; margin: 15px 0; font-weight: bold; font-size: 0.7em;">MAINTENANCE</div>
-        <button class="btn-action" style="background: #333;" disabled>BIENTÔT</button>
-    </div>
-</div>
-
-<div id="gameOverlay" class="game-overlay">
-    <div class="game-window">
-        <span class="close-btn" onclick="closeGame()">&times;</span>
-        <h2 id="modalTitle">Jeu</h2>
-        <div id="gameContent">
-            </div>
-        <div id="status-msg"></div>
-        <button id="confirmBet" class="btn-action">CONFIRMER LE PARI</button>
-    </div>
-</div>
-
-<script type="module">
-    import { createAppKit } from 'https://esm.sh/@reown/appkit'
-    import { EthersAdapter } from 'https://esm.sh/@reown/appkit-adapter-ethers'
-    import { polygon } from 'https://esm.sh/@reown/appkit/networks'
-
-    const projectId = 'A26c2cef0fcf1c593197f7465d71c07e';
-    const modal = createAppKit({
-        adapters: [new EthersAdapter()],
-        networks: [polygon],
-        metadata: { name: 'Block Arcana', url: 'https://arcana2026.github.io/Arcana/' },
-        projectId
-    });
-
-    let currentGame = '';
-
-    window.openGame = (type) => {
-        const { isConnected } = modal.getAccount();
-        if (!isConnected) return modal.open();
-
-        currentGame = type;
-        document.getElementById("gameOverlay").style.display = "flex";
-        
-        if(type === 'slot') {
-            document.getElementById("modalTitle").innerText = "Arcana Slot";
-            document.getElementById("gameContent").innerHTML = "<p>Mise fixe : 0.05 POL<br>Tentative de Jackpot 1/50</p>";
-        } else {
-            document.getElementById("modalTitle").innerText = "Dice Royale";
-            document.getElementById("gameContent").innerHTML = "<p>Mise : 0.10 POL<br>Choisissez votre camp :</p><select id='side' style='width:100%; padding:10px; border-radius:10px;'><option value='pile'>PILE (Double ou rien)</option><option value='face'>FACE (Double ou rien)</option></select>";
-        }
-    }
-
-    window.closeGame = () => {
-        document.getElementById("gameOverlay").style.display = "none";
-        document.getElementById("status-msg").innerText = "";
-    }
-
-    document.getElementById("confirmBet").onclick = async () => {
-        const status = document.getElementById("status-msg");
-        const amount = currentGame === 'slot' ? "0.05" : "0.10";
-        
-        try {
-            status.innerText = "SIGNATURE REQUISE...";
-            const walletProvider = modal.getWalletProvider();
-            const provider = new ethers.providers.Web3Provider(walletProvider);
-            const signer = provider.getSigner();
-
-            const tx = {
-                to: "0x8e25e9858679f29193233f7d5d9939105408d257",
-                value: ethers.utils.parseEther(amount)
-            };
-
-            const transaction = await signer.sendTransaction(tx);
-            status.innerText = "TRANSACTION EN COURS...";
-            await transaction.wait();
-
-            status.innerText = "RÉSULTAT EN COURS...";
-            setTimeout(() => {
-                const win = Math.random() > 0.5;
-                if(win) {
-                    status.style.color = "var(--win)";
-                    status.innerText = "FÉLICITATIONS ! VOUS AVEZ GAGNÉ !";
-                } else {
-                    status.style.color = "var(--gold)";
-                    status.innerText = "PAS CETTE FOIS. ESSAYEZ ENCORE !";
-                }
-            }, 2000);
-
-        } catch (e) {
-            status.innerText = "ANNULÉ OU ERREUR";
-        }
-    }
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-</body>
-</html>
+        .btn-action { background: linear-gradient(135deg, var(--gold), #7000ff); border: none; padding: 15px 40px; color: white; font-weight: bold; border-radius:
