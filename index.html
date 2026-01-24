@@ -3,152 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Block Arcana | Grand Casino</title>
+    <title>Arcana Neon Casino</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Bungee+Shade&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --neon-gold: #ffdf00;
+            --neon-pink: #ff00ff;
+            --neon-blue: #00f2ff;
+        }
+
         body {
-            background: #050505;
+            background-color: #050505;
             color: #fff;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Orbitron', sans-serif;
             margin: 0;
-            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            height: 100vh;
             overflow: hidden;
-            perspective: 1000px;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
+                repeating-linear-gradient(0deg, transparent 0, rgba(0, 242, 255, 0.05) 1px, transparent 2px);
         }
 
-        /* Animation des symboles de casino en fond */
-        .bg-elements {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .symbol {
-            position: absolute;
-            color: rgba(212, 175, 55, 0.15);
-            font-size: 2rem;
-            animation: float 10s linear infinite;
-        }
-
-        .casino-card {
-            background: linear-gradient(145deg, #111, #000);
-            border: 3px solid #d4af37;
-            border-radius: 30px;
+        .neon-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 4px solid var(--neon-gold);
+            border-radius: 20px;
             padding: 50px;
             text-align: center;
-            box-shadow: 0 0 80px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 20px var(--neon-gold), inset 0 0 20px var(--neon-gold);
+            max-width: 500px;
+            width: 90%;
             position: relative;
         }
 
-        /* Le néon autour de la carte */
-        .casino-card::after {
-            content: '';
-            position: absolute;
-            inset: -5px;
-            border-radius: 35px;
-            background: linear-gradient(45deg, #d4af37, #fcf6ba, #d4af37);
-            z-index: -1;
-            filter: blur(10px);
-            opacity: 0.5;
-        }
-
         .logo {
-            width: 180px;
-            height: 180px;
+            width: 170px;
+            height: 170px;
             border-radius: 50%;
-            border: 5px solid #d4af37;
-            box-shadow: 0 0 40px #d4af37;
-            margin-bottom: 20px;
-            transition: 0.5s;
+            border: 4px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue);
+            margin-bottom: 25px;
+            animation: flicker 4s infinite alternate;
         }
-
-        .logo:hover { transform: rotateY(180deg); }
 
         h1 {
-            font-family: 'Bungee Shade', cursive;
-            color: #d4af37;
-            font-size: 3em;
+            font-family: 'Monoton', cursive;
+            color: var(--neon-gold);
+            font-size: 3.5rem;
             margin: 0;
-            text-shadow: 0 0 10px #d4af37;
-        }
-
-        .subtitle {
-            font-family: 'Cinzel', serif;
+            text-shadow: 0 0 10px var(--neon-gold), 0 0 20px var(--neon-gold), 0 0 40px #ffae00;
             letter-spacing: 5px;
-            color: #fff;
+        }
+
+        .neon-text {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue), 0 0 15px var(--neon-blue);
+            font-size: 1rem;
             margin-bottom: 30px;
-        }
-
-        .btn-play {
-            background: #d4af37;
-            color: #000;
-            border: none;
-            padding: 20px 50px;
-            font-size: 1.5em;
-            font-weight: 900;
-            border-radius: 10px;
-            cursor: pointer;
             text-transform: uppercase;
-            box-shadow: 0 10px 0 #8a6d1d;
-            transition: 0.1s;
         }
 
-        .btn-play:active {
-            transform: translateY(5px);
-            box-shadow: 0 5px 0 #8a6d1d;
+        .btn-neon {
+            background: transparent;
+            color: var(--neon-gold);
+            border: 3px solid var(--neon-gold);
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--neon-gold);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-neon:hover {
+            background: var(--neon-gold);
+            color: #000;
+            box-shadow: 0 0 40px var(--neon-gold);
         }
 
         #balance-display {
             margin-top: 30px;
-            font-size: 1.5em;
+            padding: 20px;
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
             display: none;
-            border-top: 2px solid #d4af37;
-            padding-top: 20px;
+            animation: neon-pulse 1.5s infinite;
         }
 
-        @keyframes float {
-            from { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-            to { transform: translateY(-10vh) rotate(360deg); opacity: 1; }
+        .amount { color: var(--neon-pink); font-size: 1.8rem; text-shadow: 0 0 10px var(--neon-pink); }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.7; }
+        }
+
+        @keyframes neon-pulse {
+            0% { box-shadow: 0 0 5px var(--neon-pink); }
+            50% { box-shadow: 0 0 20px var(--neon-pink); }
+            100% { box-shadow: 0 0 5px var(--neon-pink); }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-elements" id="symbols"></div>
-
-    <div class="casino-card">
+    <div class="neon-card">
         <img src="https://raw.githubusercontent.com/arcana2026/arcana2026.github.io/main/1769247109491.png" alt="Logo Arcana" class="logo">
         
         <h1>ARCANA</h1>
-        <div class="subtitle">GRAND CASINO</div>
+        <div class="neon-text">Neon Crypto Casino</div>
 
-        <button class="btn-play" onclick="connect()">Connecter & Jouer</button>
+        <button class="btn-neon" onclick="connect()">Connecter Wallet</button>
 
         <div id="balance-display">
-            VOTRE BANQUE : <br>
-            <span style="color:#d4af37; font-size: 1.5em;" id="balance">0</span> $ARCANA
+            <div style="font-size: 0.8rem;">SOLDE DISPONIBLE</div>
+            <div class="amount"><span id="balance">0</span> $ARCANA</div>
         </div>
     </div>
 
     <script>
-        // Création des symboles flottants
-        const symbols = ['♠', '♥', '♣', '♦', '💰', '🎲', '🎰'];
-        const container = document.getElementById('symbols');
-        for(let i=0; i<30; i++) {
-            let div = document.createElement('div');
-            div.className = 'symbol';
-            div.innerText = symbols[Math.floor(Math.random()*symbols.length)];
-            div.style.left = Math.random() * 100 + 'vw';
-            div.style.animationDuration = (Math.random() * 5 + 5) + 's';
-            div.style.animationDelay = (Math.random() * 5) + 's';
-            container.appendChild(div);
-        }
-
         async function connect() {
             if (window.ethereum) {
                 const provider = new ethers.BrowserProvider(window.ethereum);
