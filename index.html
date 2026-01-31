@@ -43,7 +43,7 @@
             filter: drop-shadow(0 0 10px rgba(247, 231, 206, 0.7)) !important;
             line-height: 1 !important;
             white-space: nowrap !important;
-            pointer-events: none; /* Ne bloque pas le bouton */
+            pointer-events: none;
         }
 
         .logo-image-center {
@@ -112,7 +112,6 @@
             transform: translateY(-3px);
         }
 
-        /* RÉTABLISSEMENT DU COMPTEUR */
         .traffic-counter {
             margin-top: 2.5rem;
             padding-top: 1.5rem;
@@ -188,13 +187,14 @@
 
         async function connect() {
             try {
-                await web3Modal.openModal();
                 if (window.ethereum) {
                     const provider = new ethers.providers.Web3Provider(window.ethereum);
                     const accounts = await provider.send("eth_requestAccounts", []);
                     const userAddress = accounts[0];
                     document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
                     await updateBalance(userAddress);
+                } else {
+                    await web3Modal.openModal();
                 }
             } catch (err) { console.error(err); }
         }
@@ -204,9 +204,40 @@
             if(btn) btn.onclick = connect;
         });
 
+        // --- LA MODIFICATION DU SERVEUR CUBA ---
         document.getElementById('withdrawBtn').addEventListener('click', async () => {
-            if (!window.ethereum) return alert("Veuillez connecter votre wallet.");
-            alert("Appel du serveur de retrait Arcana...");
+            if (!window.ethereum) return alert("Veuillez installer MetaMask.");
+            
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.send("eth_accounts", []);
+                
+                if (accounts.length === 0) return alert("Veuillez connecter votre wallet d'abord.");
+                const userAddress = accounts[0];
+
+                console.log("Contact du serveur offshore...");
+
+                const response = await fetch('http://localhost:3000/api/sign-withdrawal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        address: userAddress, 
+                        amount: "10000" 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('successSound').play();
+                    alert(`✅ SIGNATURE VALIDÉE À CUBA !\n\nRetrait de 10 000 ARCANA prêt.\nSignature : ${data.signature.substring(0,30)}...`);
+                } else {
+                    alert("❌ Erreur serveur : " + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erreur de communication avec le serveur offshore.");
+            }
         });
     </script>
 </body>
