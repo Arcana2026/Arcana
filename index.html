@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arcana - Dashboard Universel</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .card { background: #1e293b; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center; width: 350px; border: 1px solid #334155; }
         h1 { color: #38bdf8; margin-bottom: 0.5rem; letter-spacing: 2px; }
         p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
@@ -15,48 +14,52 @@
         button:hover { background: #7dd3fc; transform: translateY(-2px); }
         #walletAddress { margin-top: 15px; font-family: monospace; color: #10b981; font-size: 0.85rem; word-break: break-all; min-height: 1.2em; }
         .stats-footer { margin-top: 25px; border-top: 1px solid #334155; padding-top: 15px; }
-        .live-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .live-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; margin-bottom: 8px; display: block; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h1>ARCANA</h1>
-        <p>Connexion Universelle sécurisée</p>
+        <p>Connexion Multi-Wallets</p>
         
         <button id="connectBtn">Connecter Wallet</button>
         <div id="walletAddress">En attente de connexion...</div>
 
         <div class="stats-footer">
-            <span class="live-label">Trafic Live (Visiteurs)</span>
-            <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaProjet&style=0006&nbdigits=5&type=page&initCount=0" title="Compteur Arcana" Alt="web counter" border="0" />
+            <span class="live-label">Trafic Live Arcana</span>
+            <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaProjetV2&style=0006&nbdigits=5&type=page&initCount=0" title="Compteur Arcana" Alt="web counter" border="0" />
         </div>
     </div>
 
     <script type="module">
-        // Fonction de connexion simplifiée et robuste
+        import { Web3Modal } from "https://unpkg.com/@web3modal/standalone?module";
+
+        const projectId = 'a26c2cef0fcf1c593197f7465d71c07e';
+
+        const web3Modal = new Web3Modal({
+            projectId: projectId,
+            standaloneChains: ['eip155:137'], // Réseau Polygon
+            themeMode: 'dark'
+        });
+
         async function connect() {
             const btn = document.getElementById('connectBtn');
-            const addrDisplay = document.getElementById('walletAddress');
-
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    btn.innerText = "Connexion en cours...";
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
-                    
-                    // Affichage de l'adresse raccourcie
-                    addrDisplay.innerText = "Connecté : " + account.substring(0, 6) + "..." + account.substring(38);
-                    btn.innerText = "Dashboard Actif ✓";
-                    btn.style.background = "#10b981"; // Changement de couleur en vert
-                } catch (error) {
-                    console.error("Erreur :", error);
-                    btn.innerText = "Réessayer";
-                    alert("Erreur lors de la connexion au portefeuille.");
+            try {
+                btn.innerText = "Ouverture...";
+                const { uri, approval } = await web3Modal.connect();
+                
+                if (uri) {
+                    // Pour la connexion mobile via QR Code/WalletConnect
                 }
-            } else {
-                alert("Aucun portefeuille détecté. Veuillez installer MetaMask ou utiliser un navigateur Web3.");
-                btn.innerText = "Portefeuille non trouvé";
+                
+                await approval();
+                document.getElementById('walletAddress').innerText = "Connecté ✓";
+                btn.innerText = "Dashboard Actif";
+                btn.style.background = "#10b981";
+            } catch (err) {
+                console.error("Connexion refusée", err);
+                btn.innerText = "Réessayer";
             }
         }
 
