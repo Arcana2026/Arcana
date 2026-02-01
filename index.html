@@ -160,6 +160,11 @@
             transform: translateY(-2px);
         }
 
+        .btn-buy-now:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
         /* --- HEADER MOBILE --- */
         @media (max-width: 768px) {
             .navbar {
@@ -266,7 +271,11 @@
 
     <script type="module">
         const contractAddress = "0x29D8898950882798e36e65B150A6c7a723821141";
-        const RENDER_URL = "https://arcana-server.onrender.com"; 
+        const RENDER_URL = "https://arcana-server.onrender.com";
+        const TREASURY_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
+        const POLYGON_CHAIN_ID = 137;
+        const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+        const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
         
         const abi = [
             "function withdraw(uint256 amount, uint256 nonce, bytes memory signature)",
@@ -338,6 +347,75 @@
         const PRICE_PER_ARCANA = 0.00025;
         const ARCANA_PER_USD = 1 / PRICE_PER_ARCANA;
 
+        const ERC20_ABI = [
+            "function approve(address spender, uint256 amount) returns (bool)",
+            "function transfer(address to, uint256 amount) returns (bool)"
+        ];
+
+        async function buyNow() {
+            if (!window.ethereum) return alert("Veuillez installer MetaMask !");
+            if (!userAddress) return alert("Veuillez connecter votre wallet !");
+            
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            const token = document.getElementById('tokenSelect').value;
+            
+            if (!amount || amount <= 0) return alert("Veuillez entrer un montant valide.");
+
+            let provider = new ethers.providers.Web3Provider(window.ethereum);
+            let network = await provider.getNetwork();
+            if (network.chainId !== POLYGON_CHAIN_ID) {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x89' }]
+                    });
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                } catch (e) {
+                    return alert("Veuillez basculer sur le réseau Polygon pour effectuer l'achat.");
+                }
+            }
+
+            const signer = provider.getSigner();
+            const amountWei = ethers.utils.parseUnits(amount.toString(), token === "POL" ? 18 : 6);
+
+            try {
+                document.getElementById('buyBtn').disabled = true;
+                document.getElementById('buyBtn').innerText = "Transaction en cours...";
+
+                if (token === "POL") {
+                    const tx = await signer.sendTransaction({
+                        to: TREASURY_ADDRESS,
+                        value: amountWei
+                    });
+                    await tx.wait();
+                } else {
+                    const tokenAddress = token === "USDT" ? USDT_POLYGON : USDC_POLYGON;
+                    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+                    const tx = await tokenContract.transfer(TREASURY_ADDRESS, amountWei);
+                    await tx.wait();
+                }
+
+                document.getElementById('successSound').play();
+                alert("✅ Votre paiement a été envoyé avec succès vers la trésorerie !");
+
+                const updateRes = await fetch(`${RENDER_URL}/api/presale-update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: amount })
+                });
+                const updateData = await updateRes.json();
+                if (updateData.success) await updateUI();
+
+                document.getElementById('amountInput').value = "";
+                updateReceiveText();
+            } catch (err) {
+                alert("Erreur : " + (err.message || err.reason || "Transaction échouée"));
+            } finally {
+                document.getElementById('buyBtn').disabled = false;
+                document.getElementById('buyBtn').innerText = "Acheter maintenant";
+            }
+        }
+
         function updateReceiveText() {
             const amount = parseFloat(document.getElementById('amountInput').value) || 0;
             const arcana = Math.floor(amount * ARCANA_PER_USD);
@@ -351,10 +429,7 @@
             document.getElementById('amountInput').addEventListener('input', updateReceiveText);
             document.getElementById('amountInput').addEventListener('keyup', updateReceiveText);
             document.getElementById('tokenSelect').addEventListener('change', updateReceiveText);
-            document.getElementById('buyBtn').onclick = () => {
-                if (!userAddress) return alert("Veuillez connecter votre wallet !");
-                alert("Fonction d'achat à connecter au contrat de presale.");
-            };
+            document.getElementById('buyBtn').onclick = buyNow;
         });
     </script>
 </body>
