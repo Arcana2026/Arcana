@@ -165,6 +165,26 @@
             cursor: not-allowed;
         }
 
+        .btn-claim {
+            background: linear-gradient(135deg, #00ffcc, #00d4aa) !important;
+            color: #0a0e1a !important;
+            border: none !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: 0.4s;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+
+        .btn-claim:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-claim:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
         /* --- HEADER MOBILE --- */
         @media (max-width: 768px) {
             .navbar {
@@ -236,6 +256,7 @@
             </div>
             
             <div class="flex flex-col gap-4 mt-6">
+                <button id="claimBtn" class="btn btn-claim btn-lg w-full">Réclamer mes jetons Arcana</button>
                 <button id="withdrawBtn" class="btn btn-withdraw btn-lg w-full">Effectuer un Retrait</button>
 
                 <div class="collapse collapse-arrow bg-black/40 border border-[#F7E7CE]/20 text-left">
@@ -270,16 +291,26 @@
     </div>
 
     <script type="module">
-        const contractAddress = "0x29D8898950882798e36e65B150A6c7a723821141";
         const RENDER_URL = "https://arcana-server.onrender.com";
-        const TREASURY_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
+        const PRESALE_VAULT = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
+        const CONTRACT_WITHDRAW = "0x29D8898950882798e36e65B150A6c7a723821141";
         const POLYGON_CHAIN_ID = 137;
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
-        
-        const abi = [
+
+        const abiWithdraw = [
             "function withdraw(uint256 amount, uint256 nonce, bytes memory signature)",
             "function balanceOf(address owner) view returns (uint256)"
+        ];
+
+        const abiPresale = [
+            "function balanceOf(address owner) view returns (uint256)",
+            "function buyWithPOL() payable",
+            "function buyWithNative() payable",
+            "function buyWithUSDT(uint256 amount)",
+            "function buyWithUSDC(uint256 amount)",
+            "function buyWithToken(address token, uint256 amount)",
+            "function claim()"
         ];
 
         let userAddress = null;
@@ -288,8 +319,8 @@
             try {
                 if (window.ethereum) {
                     const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const contract = new ethers.Contract(contractAddress, abi, provider);
-                    const target = userAddress ? userAddress : contractAddress;
+                    const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
+                    const target = userAddress ? userAddress : PRESALE_VAULT;
                     const balance = await contract.balanceOf(target);
                     const formatted = ethers.utils.formatUnits(balance, 18);
                     document.getElementById('balanceDisplay').innerText = parseFloat(formatted).toLocaleString('fr-FR');
@@ -335,7 +366,7 @@
                 if (!data.success) throw new Error(data.error);
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
-                const contract = new ethers.Contract(contractAddress, abi, signer);
+                const contract = new ethers.Contract(CONTRACT_WITHDRAW, abiWithdraw, signer);
                 const tx = await contract.withdraw(ethers.utils.parseUnits(data.amount, 18), data.nonce, data.signature);
                 await tx.wait();
                 document.getElementById('successSound').play();
@@ -382,21 +413,34 @@
                 document.getElementById('buyBtn').disabled = true;
                 document.getElementById('buyBtn').innerText = "Transaction en cours...";
 
+                const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, signer);
+
                 if (token === "POL") {
-                    const tx = await signer.sendTransaction({
-                        to: TREASURY_ADDRESS,
-                        value: amountWei
-                    });
+                    let tx;
+                    try {
+                        tx = await presaleContract.buyWithPOL({ value: amountWei });
+                    } catch (e) {
+                        tx = await presaleContract.buyWithNative({ value: amountWei });
+                    }
                     await tx.wait();
                 } else {
                     const tokenAddress = token === "USDT" ? USDT_POLYGON : USDC_POLYGON;
                     const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
-                    const tx = await tokenContract.transfer(TREASURY_ADDRESS, amountWei);
-                    await tx.wait();
+                    const approveTx = await tokenContract.approve(PRESALE_VAULT, amountWei);
+                    await approveTx.wait();
+                    let buyTx;
+                    try {
+                        buyTx = token === "USDT"
+                            ? await presaleContract.buyWithUSDT(amountWei)
+                            : await presaleContract.buyWithUSDC(amountWei);
+                    } catch (e) {
+                        buyTx = await presaleContract.buyWithToken(tokenAddress, amountWei);
+                    }
+                    await buyTx.wait();
                 }
 
                 document.getElementById('successSound').play();
-                alert("✅ Votre paiement a été envoyé avec succès vers la trésorerie !");
+                alert("✅ Votre achat a été enregistré ! Les fonds ont été envoyés vers la trésorerie.");
 
                 const updateRes = await fetch(`${RENDER_URL}/api/presale-update`, {
                     method: 'POST',
@@ -422,9 +466,48 @@
             document.getElementById('receiveText').innerText = `Tu recevras : ${arcana.toLocaleString('fr-FR')} Arcana`;
         }
 
+        async function claim() {
+            if (!window.ethereum) return alert("Veuillez installer MetaMask !");
+            if (!userAddress) return alert("Veuillez connecter votre wallet !");
+
+            let provider = new ethers.providers.Web3Provider(window.ethereum);
+            let network = await provider.getNetwork();
+            if (network.chainId !== POLYGON_CHAIN_ID) {
+                try {
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                } catch (e) {
+                    return alert("Veuillez basculer sur le réseau Polygon.");
+                }
+            }
+
+            try {
+                document.getElementById('claimBtn').disabled = true;
+                document.getElementById('claimBtn').innerText = "Réclamation en cours...";
+                const signer = provider.getSigner();
+                const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, signer);
+                const tx = await presaleContract.claim();
+                await tx.wait();
+                document.getElementById('successSound').play();
+                alert("🎉 Vos jetons Arcana ont été réclamés avec succès !");
+                await updateUI();
+            } catch (err) {
+                const msg = err.message || err.reason || "Transaction échouée";
+                if (msg.includes("no tokens") || msg.includes("nothing to claim") || msg.includes("revert")) {
+                    alert("Aucun jeton à réclamer pour le moment. La libération des fonds n'a pas encore été activée.");
+                } else {
+                    alert("Erreur : " + msg);
+                }
+            } finally {
+                document.getElementById('claimBtn').disabled = false;
+                document.getElementById('claimBtn').innerText = "Réclamer mes jetons Arcana";
+            }
+        }
+
         window.addEventListener('load', () => {
             updateUI();
             document.getElementById('connectBtn').onclick = connect;
+            document.getElementById('claimBtn').onclick = claim;
             document.getElementById('withdrawBtn').onclick = withdraw;
             document.getElementById('amountInput').addEventListener('input', updateReceiveText);
             document.getElementById('amountInput').addEventListener('keyup', updateReceiveText);
