@@ -122,6 +122,44 @@
             box-shadow: 0 0 15px rgba(0, 255, 204, 0.3), 0 4px 20px rgba(0, 255, 204, 0.15);
         }
 
+        .presale-box {
+            border: 1px solid #D4AF37;
+            border-radius: 16px;
+            padding: 1.5rem;
+            background: rgba(0,0,0,0.3);
+            margin: 1.5rem 0;
+        }
+
+        .presale-box input, .presale-box select {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #D4AF37;
+            color: #F7E7CE;
+            border-radius: 8px;
+        }
+
+        .presale-box input:focus, .presale-box select:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+        }
+
+        .btn-buy-now {
+            background: linear-gradient(135deg, #00ffcc, #00d4aa) !important;
+            color: #0a0e1a !important;
+            border: none !important;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.5), 0 0 50px rgba(0, 255, 204, 0.2);
+        }
+
+        .btn-buy-now:hover {
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.7), 0 0 60px rgba(0, 255, 204, 0.3);
+            transform: translateY(-2px);
+        }
+
         /* --- HEADER MOBILE --- */
         @media (max-width: 768px) {
             .navbar {
@@ -173,8 +211,23 @@
                 <span>Objectif : 100 000 $</span>
                 <span id="progressText">Récolté : 5 $</span>
             </div>
+            <p id="remainingTokens" class="text-sm text-[#00ffcc] mb-2">Jetons Arcana restants : 400 000 000</p>
             <div class="progress-container">
                 <div id="progressBar" class="progress-bar"></div>
+            </div>
+
+            <div class="presale-box">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-4">Zone de Vente</h3>
+                <div class="flex gap-2 mb-3">
+                    <select id="tokenSelect" class="flex-1 px-4 py-2">
+                        <option value="POL">POL</option>
+                        <option value="USDT">USDT</option>
+                        <option value="USDC">USDC</option>
+                    </select>
+                    <input type="number" id="amountInput" placeholder="Montant" min="0" step="0.01" class="flex-1 px-4 py-2" />
+                </div>
+                <p id="receiveText" class="text-[#00ffcc] mb-4 font-medium">Tu recevras : 0 Arcana</p>
+                <button id="buyBtn" class="btn-buy-now">Acheter maintenant</button>
             </div>
             
             <div class="flex flex-col gap-4 mt-6">
@@ -239,6 +292,9 @@
                 const percent = Math.max(2, (data.totalRaised / data.target) * 100);
                 document.getElementById('progressBar').style.width = percent + "%";
                 document.getElementById('progressText').innerText = `Récolté : ${data.totalRaised} $`;
+                const ARCANA_SOLD = data.totalRaised / PRICE_PER_ARCANA;
+                const remaining = Math.max(0, Math.floor(400000000 - ARCANA_SOLD));
+                document.getElementById('remainingTokens').innerText = `Jetons Arcana restants : ${remaining.toLocaleString('fr-FR')}`;
             } catch (err) { console.error("Erreur UI:", err); }
         }
 
@@ -279,10 +335,26 @@
             } catch (err) { alert("Erreur : " + err.message); }
         }
 
+        const PRICE_PER_ARCANA = 0.00025;
+        const ARCANA_PER_USD = 1 / PRICE_PER_ARCANA;
+
+        function updateReceiveText() {
+            const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+            const arcana = Math.floor(amount * ARCANA_PER_USD);
+            document.getElementById('receiveText').innerText = `Tu recevras : ${arcana.toLocaleString('fr-FR')} Arcana`;
+        }
+
         window.addEventListener('load', () => {
             updateUI();
             document.getElementById('connectBtn').onclick = connect;
             document.getElementById('withdrawBtn').onclick = withdraw;
+            document.getElementById('amountInput').addEventListener('input', updateReceiveText);
+            document.getElementById('amountInput').addEventListener('keyup', updateReceiveText);
+            document.getElementById('tokenSelect').addEventListener('change', updateReceiveText);
+            document.getElementById('buyBtn').onclick = () => {
+                if (!userAddress) return alert("Veuillez connecter votre wallet !");
+                alert("Fonction d'achat à connecter au contrat de presale.");
+            };
         });
     </script>
 </body>
