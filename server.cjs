@@ -14,7 +14,7 @@ app.use(express.json());
 // --- 1. DONNÉES DE LA PRÉVENTE ---
 let presaleData = {
     totalRaised: 5,
-    target: 250
+    target: 100000
 };
 
 // --- 2. ROUTE POUR LA BARRE DE PROGRESSION ---
