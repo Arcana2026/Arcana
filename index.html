@@ -136,7 +136,6 @@
     </div>
 
     <script type="module">
-        // CONFIGURATION DU CONTRAT ET DU SERVEUR
         const contractAddress = "0x29D8898950882798e36e65B150A6c7a723821141";
         const abi = [
             "function withdraw(uint256 amount, uint256 nonce, bytes memory signature)",
@@ -145,27 +144,28 @@
 
         let userAddress = null;
 
-        // Fonction pour afficher le solde (soit le coffre, soit l'utilisateur)
         async function updateUI() {
             try {
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const contract = new ethers.Contract(contractAddress, abi, provider);
-                
-                // Si non connecté, on montre les 900M du coffre
-                // Si connecté, on montre le solde de l'utilisateur
                 const target = userAddress ? userAddress : contractAddress;
                 const balance = await contract.balanceOf(target);
-                
                 const formatted = ethers.utils.formatUnits(balance, 18);
                 document.getElementById('balanceDisplay').innerText = parseFloat(formatted).toLocaleString('fr-FR');
-                
-                if(userAddress) {
-                    document.getElementById('balanceTitle').innerText = "Votre Solde Privé";
-                }
+                if(userAddress) { document.getElementById('balanceTitle').innerText = "Votre Solde Privé"; }
             } catch (err) { console.error(err); }
         }
 
+        // --- LA FONCTION CONNECT MISE À JOUR ---
         async function connect() {
+            // 1. AJOUT DU DEEP LINK MOBILE (Ouverture automatique de l'appli)
+            if (!window.ethereum && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+                const dappUrl = window.location.href.replace(/^https?:\/\//, '');
+                window.location.href = "https://metamask.app.link/dapp/" + dappUrl;
+                return;
+            }
+
+            // 2. LOGIQUE DE CONNEXION STANDARD
             if (window.ethereum) {
                 try {
                     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -174,14 +174,14 @@
                     document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
                     await updateUI();
                 } catch (err) { console.error(err); }
-            } else { alert("Installez MetaMask !"); }
+            } else { 
+                alert("Veuillez installer MetaMask !"); 
+            }
         }
 
         async function withdraw() {
             if (!userAddress) return alert("Veuillez connecter votre wallet d'abord !");
-            
             try {
-                // 1. Demander la signature au serveur à Cuba
                 const response = await fetch('http://localhost:3000/api/sign-withdrawal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -190,7 +190,6 @@
                 const data = await response.json();
                 if (!data.success) throw new Error(data.error);
 
-                // 2. Envoyer la transaction à Polygon
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
                 const contract = new ethers.Contract(contractAddress, abi, signer);
@@ -200,27 +199,21 @@
                     data.nonce,
                     data.signature
                 );
-
-                alert("Séquence de retrait initiée sur la Blockchain...");
+                alert("Séquence de retrait initiée...");
                 await tx.wait();
-                
                 document.getElementById('successSound').play();
-                alert("🥂 CHAMPAGNE ! Les 10 000 ARCANA sont dans votre coffre.");
+                alert("🥂 CHAMPAGNE ! Les 10 000 ARCANA sont arrivés.");
                 await updateUI();
             } catch (err) {
-                console.error(err);
                 alert("Erreur de protocole : " + err.message);
             }
         }
 
-        // Initialisation au chargement
         window.addEventListener('load', async () => {
-            if (window.ethereum) {
-                await updateUI(); // Affiche les 900M dès le départ
-            }
+            if (window.ethereum) { await updateUI(); }
             document.getElementById('connectBtn').onclick = connect;
             document.getElementById('withdrawBtn').onclick = withdraw;
         });
     </script>
 </body>
-</html> 
+</html>
