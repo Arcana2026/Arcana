@@ -3,220 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCANA - Premium Platform</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
+    <title>Arcana - Banque Numérique</title>
     <style>
-        body {
-            background-color: #1a0f0a;
-            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
-            color: #F7E7CE;
-            font-family: 'Playfair Display', serif;
-            min-height: 100vh;
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        /* NAVBAR AVEC PRIORITÉS DE CLIC */
-        .navbar {
-            background: linear-gradient(to bottom, #2c1810, #1a0f0a);
-            border-bottom: 2px solid #F7E7CE;
-            padding: 0.5rem 2rem;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            height: 115px;
-            position: relative;
-            z-index: 50;
-        }
-
-        .logo-text-arcana {
-            font-family: 'Great Vibes', cursive !important;
-            font-size: 3.5rem !important;
-            background: linear-gradient(to bottom, #fef9e7, #f7e7ce, #d4af37) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            filter: drop-shadow(0 0 10px rgba(247, 231, 206, 0.7)) !important;
-            line-height: 1 !important;
-            white-space: nowrap !important;
-            pointer-events: none;
-        }
-
-        .logo-image-center {
-            height: 100px;
-            width: auto;
-            border-radius: 50%;
-            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
-            position: relative;
-            z-index: 60;
-        }
-
-        .wallet-address {
-            font-family: monospace;
-            background: rgba(0,0,0,0.5);
-            padding: 12px 20px;
-            border-radius: 10px;
-            border: 1px solid #F7E7CE;
-            color: #F7E7CE;
-            cursor: pointer !important;
-            justify-self: end;
-            z-index: 100;
-            position: relative;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: bold;
-        }
-
-        .wallet-address:hover {
-            background: rgba(247, 231, 206, 0.15);
-            box-shadow: 0 0 15px rgba(247, 231, 206, 0.4);
-            transform: translateY(-1px);
-        }
-
-        /* DASHBOARD CARD */
-        .card {
-            background: linear-gradient(145deg, #3d2b1f, #2c1810) !important;
-            border: 1px solid #F7E7CE !important;
-            box-shadow: 25px 25px 50px #0e0805;
-            border-radius: 25px;
-        }
-
-        .stat-value {
-            color: #F7E7CE !important;
-            text-shadow: 0 0 25px rgba(247, 231, 206, 0.8);
-            font-size: 3.8rem !important;
-            font-weight: bold;
-            animation: glowPulse 4s infinite ease-in-out;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { filter: brightness(1); transform: scale(1); }
-            50% { filter: brightness(1.25); transform: scale(1.02); }
-        }
-
-        .btn-withdraw {
-            background: linear-gradient(135deg, #F7E7CE, #E3D1B4) !important;
-            color: #1a0f0a !important;
-            border: none !important;
-            font-weight: bold;
-            letter-spacing: 2px;
-            transition: 0.4s;
-            text-transform: uppercase;
-        }
-
-        .btn-withdraw:hover:not(:disabled) {
-            box-shadow: 0 0 30px #F7E7CE;
-            transform: translateY(-3px);
-        }
-
-        .traffic-counter {
-            margin-top: 2.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(247, 231, 206, 0.15);
-        }
-
-        .traffic-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            opacity: 0.6;
-            margin-bottom: 10px;
-        }
+        :root { --gold: #d4af37; --dark: #1a1a1a; --white: #ffffff; }
+        body { background-color: var(--dark); color: var(--white); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; }
+        .container { border: 2px solid var(--gold); padding: 30px; border-radius: 20px; display: inline-block; background: rgba(255, 255, 255, 0.05); box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+        h1 { color: var(--gold); font-size: 3em; margin-bottom: 10px; }
+        .balance-box { margin: 20px 0; padding: 15px; border-bottom: 1px solid var(--gold); }
+        .amount { font-size: 2.5em; color: var(--gold); font-weight: bold; }
+        button { background: var(--gold); color: var(--dark); border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 10px; cursor: pointer; font-weight: bold; margin: 10px; transition: transform 0.2s; }
+        button:hover { transform: scale(1.05); background: #f1c40f; }
+        .status { color: #888; font-size: 0.9em; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
 
-    <nav class="navbar">
-        <div class="logo-text-arcana">Arcana</div>
-        
-        <div class="flex justify-center">
-            <img src="https://raw.githubusercontent.com/Arcana2026/Arcana/main/1769247109491.png" 
-                 alt="Arcana Logo" 
-                 class="logo-image-center">
+    <div class="container">
+        <h1>ARCANA</h1>
+        <p>Le Coffre-fort Numérique</p>
+
+        <div class="balance-box">
+            <p>RÉSERVE TOTALE DU COFFRE</p>
+            <div class="amount"><span id="vaultBalance">900 000 000</span></div>
+            <p>ARCANA</p>
         </div>
-        
-        <button id="connectBtn" class="wallet-address">Connecter Wallet</button>
-    </nav>
 
-    <main class="container mx-auto px-4 py-16 text-center">
-        <div class="max-w-md mx-auto card p-10">
-            <h2 class="text-xl mb-4 opacity-70 uppercase tracking-[0.2em]">Votre Solde Privé</h2>
-            
-            <div class="stat-value my-8">
-                <span id="balanceDisplay">0</span> <span class="text-xl">ARCANA</span>
-            </div>
-            
-            <div class="flex flex-col gap-6 mt-6">
-                <button id="withdrawBtn" class="btn btn-withdraw btn-lg">Effectuer un Retrait</button>
-            </div>
-
-            <div class="traffic-counter">
-                <p class="traffic-label">Réseau Arcana Live</p>
-                <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaPremiumFinalV2&style=0006&nbdigits=5&type=page&initCount=0" border="0" />
-            </div>
+        <div class="balance-box">
+            <p>VOTRE PORTEFEUILLE</p>
+            <div class="amount" style="font-size: 1.5em;"><span id="userBalance">0</span> ARC</div>
         </div>
-    </main>
 
-    <script type="module">
-        import { Web3Modal } from "https://unpkg.com/@web3modal/standalone?module";
+        <button id="connectBtn">🔗 CONNECTER METAMASK</button><br>
+        <button id="withdrawBtn" style="display:none;">🥂 CHAMPAGNE (RETRAIT 10k)</button>
 
-        const projectId = 'a26c2cef0fcf1c593197f7465d71c07e';
-        const contractAddress = "0x5b16E755bFF0F20E822761320851D203ddDf6d56";
-        const abi = ["function balanceOf(address owner) view returns (uint256)"];
+        <p class="status" id="walletAddr">Non connecté</p>
+    </div>
 
-        const web3Modal = new Web3Modal({
-            projectId: projectId,
-            standaloneChains: ['eip155:137'], 
-            themeMode: 'dark',
-            themeVariables: { '--w3m-accent-color': '#F7E7CE' }
-        });
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
 
-        async function updateBalance(address) {
-            try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const contract = new ethers.Contract(contractAddress, abi, provider);
-                const balance = await contract.balanceOf(address);
-                const formatted = ethers.utils.formatUnits(balance, 18);
-                document.getElementById('balanceDisplay').innerText = parseFloat(formatted).toLocaleString('fr-FR');
-            } catch (err) { console.error(err); }
-        }
+    <script>
+        // CONFIGURATION
+        const contractAddress = "0x29D8898950882798e36e65B150A6c7a723821141";
+        const contractABI = [
+            "function withdraw(uint256 amount, uint256 nonce, bytes memory signature)",
+            "function balanceOf(address owner) view returns (uint256)",
+            "function decimals() view returns (uint8)"
+        ];
 
-        async function connect() {
-            try {
-                if (window.ethereum) {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const accounts = await provider.send("eth_requestAccounts", []);
-                    const userAddress = accounts[0];
-                    document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
-                    await updateBalance(userAddress);
-                } else {
-                    await web3Modal.openModal();
+        let userAddress;
+        let provider;
+        let signer;
+
+        // FONCTION DE CONNEXION
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    
+                    document.getElementById('walletAddr').innerText = "Connecté : " + userAddress;
+                    document.getElementById('connectBtn').style.display = 'none';
+                    document.getElementById('withdrawBtn').style.display = 'inline-block';
+                    
+                    updateBalances();
+                } catch (err) {
+                    console.error(err);
+                    alert("Erreur de connexion");
                 }
-            } catch (err) { console.error(err); }
+            } else {
+                alert("Veuillez installer MetaMask !");
+            }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('connectBtn');
-            if(btn) btn.onclick = connect;
-        });
-
-        // --- LA MODIFICATION DU SERVEUR CUBA ---
-        document.getElementById('withdrawBtn').addEventListener('click', async () => {
-            if (!window.ethereum) return alert("Veuillez installer MetaMask.");
-            
+        // MISE À JOUR DES SOLDES (900M et Utilisateur)
+        async function updateBalances() {
+            const contract = new ethers.Contract(contractAddress, contractABI, provider);
             try {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const accounts = await provider.send("eth_accounts", []);
-                
-                if (accounts.length === 0) return alert("Veuillez connecter votre wallet d'abord.");
-                const userAddress = accounts[0];
+                // On lit le solde du contrat lui-même
+                const vBal = await contract.balanceOf(contractAddress);
+                document.getElementById('vaultBalance').innerText = Number(ethers.utils.formatUnits(vBal, 18)).toLocaleString();
 
-                console.log("Contact du serveur offshore...");
+                // On lit le solde de l'utilisateur
+                const uBal = await contract.balanceOf(userAddress);
+                document.getElementById('userBalance').innerText = Number(ethers.utils.formatUnits(uBal, 18)).toLocaleString();
+            } catch (err) {
+                console.error("Erreur de lecture :", err);
+            }
+        }
 
+        // FONCTION DE RETRAIT (COMMUNICATION AVEC CUBA)
+        async function withdrawTokens() {
+            try {
+                // 1. Appel au serveur Node.js (Cuba)
                 const response = await fetch('http://localhost:3000/api/sign-withdrawal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -225,20 +105,32 @@
                         amount: "10000" 
                     })
                 });
-
+                
                 const data = await response.json();
+                if (!data.success) throw new Error(data.error);
 
-                if (data.success) {
-                    document.getElementById('successSound').play();
-                    alert(`✅ SIGNATURE VALIDÉE À CUBA !\n\nRetrait de 10 000 ARCANA prêt.\nSignature : ${data.signature.substring(0,30)}...`);
-                } else {
-                    alert("❌ Erreur serveur : " + data.error);
-                }
+                // 2. Envoi de la signature à la Blockchain
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                const tx = await contract.withdraw(
+                    ethers.utils.parseUnits(data.amount, 18), 
+                    data.nonce, 
+                    data.signature
+                );
+
+                alert("🚀 Sabrage en cours... Patientez !");
+                await tx.wait(); // Attente de la validation Polygon
+
+                alert("🥂 CHAMPAGNE ! 10 000 ARCANA livrés !");
+                updateBalances();
             } catch (err) {
                 console.error(err);
-                alert("Erreur de communication avec le serveur offshore.");
+                alert("Erreur : " + (err.data?.message || err.message));
             }
-        });
+        }
+
+        // Événements
+        document.getElementById('connectBtn').addEventListener('click', connectWallet);
+        document.getElementById('withdrawBtn').addEventListener('click', withdrawTokens);
     </script>
 </body>
 </html>
