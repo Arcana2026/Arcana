@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcana — Tableau de bord Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0a0e1a;
+            background-image: linear-gradient(rgba(0,20,40,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0,20,40,0.3) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: #F7E7CE;
+            font-family: 'Playfair Display', serif;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: linear-gradient(145deg, #131b2e, #0f1629);
+            border: 1px solid #D4AF37;
+            box-shadow: 20px 20px 40px rgba(0,0,0,0.5);
+            border-radius: 20px;
+        }
+        .stat-big {
+            color: #F7E7CE;
+            text-shadow: 0 0 20px rgba(247, 231, 206, 0.9);
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        .progress-container {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid #D4AF37;
+            border-radius: 50px;
+            height: 24px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #00ffcc, #00d4aa);
+            height: 100%;
+            transition: width 0.6s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+        .badge-open { background: rgba(0, 255, 204, 0.2); color: #00ffcc; border: 1px solid #00ffcc; }
+        .badge-closed { background: rgba(212, 175, 55, 0.2); color: #D4AF37; border: 1px solid #D4AF37; }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-12 max-w-2xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl uppercase tracking-widest text-[#D4AF37]">Tableau de bord Admin</h1>
+            <a href="index.html" class="text-sm text-[#F7E7CE]/70 hover:text-[#D4AF37]">← Retour au site</a>
+        </div>
+
+        <div id="loginBox" class="card p-8 text-center">
+            <p class="text-[#F7E7CE]/80 mb-4">Accès réservé aux administrateurs.</p>
+            <input type="password" id="adminKey" placeholder="Clé d'accès" class="w-full max-w-xs mx-auto px-4 py-2 rounded-lg bg-black/40 border border-[#D4AF37] text-[#F7E7CE] placeholder-[#F7E7CE]/50" />
+            <button id="loginBtn" class="mt-4 px-6 py-2 rounded-lg font-bold bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30">Accéder</button>
+            <p id="loginError" class="mt-2 text-red-400 text-sm hidden">Clé incorrecte.</p>
+        </div>
+
+        <div id="dashboard" class="hidden space-y-6">
+            <div class="card p-8">
+                <h2 class="text-sm uppercase tracking-widest text-[#D4AF37] mb-6">Vue en temps réel</h2>
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <p class="text-xs uppercase text-[#F7E7CE]/60 mb-1">Nombre d'acheteurs</p>
+                        <p id="statBuyers" class="stat-big">—</p>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase text-[#F7E7CE]/60 mb-1">Total récolté</p>
+                        <p id="statRaised" class="stat-big">—</p>
+                    </div>
+                </div>
+                <div class="mb-2 flex justify-between text-sm">
+                    <span>Objectif : <span id="statTarget">100 000</span> $</span>
+                    <span id="statPercent">0 %</span>
+                </div>
+                <div class="progress-container">
+                    <div id="adminProgressBar" class="progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="mt-4 flex items-center gap-2">
+                    <span class="text-xs uppercase text-[#F7E7CE]/60">Statut</span>
+                    <span id="statStatus" class="px-3 py-1 rounded-full text-sm font-medium badge-closed">Prévente en cours</span>
+                </div>
+            </div>
+            <p class="text-center text-[#F7E7CE]/50 text-xs">Rafraîchissement automatique toutes les 5 secondes.</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://arcana-server.onrender.com';
+        const STORAGE_KEY = 'arcana_admin_key';
+
+        function getStoredKey() {
+            const params = new URLSearchParams(location.search);
+            return params.get('key') || localStorage.getItem(STORAGE_KEY) || '';
+        }
+
+        function setStoredKey(key) {
+            localStorage.setItem(STORAGE_KEY, key);
+        }
+
+        async function fetchStats(token) {
+            const res = await fetch(`${API_BASE}/api/admin/stats`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Non autorisé');
+            return res.json();
+        }
+
+        function showDashboard(data) {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('statBuyers').textContent = data.buyerCount ?? '—';
+            document.getElementById('statRaised').textContent = (data.totalRaised ?? 0).toLocaleString('fr-FR') + ' $';
+            document.getElementById('statTarget').textContent = (data.target ?? 100000).toLocaleString('fr-FR');
+            const pct = Math.min(100, data.percent ?? 0);
+            document.getElementById('statPercent').textContent = pct.toFixed(1) + ' %';
+            document.getElementById('adminProgressBar').style.width = pct + '%';
+            const statusEl = document.getElementById('statStatus');
+            if (data.claimOpen) {
+                statusEl.textContent = 'Coffre ouvert';
+                statusEl.className = 'px-3 py-1 rounded-full text-sm font-medium badge-open';
+            } else {
+                statusEl.textContent = 'Prévente en cours';
+                statusEl.className = 'px-3 py-1 rounded-full text-sm font-medium badge-closed';
+            }
+        }
+
+        function showError() {
+            document.getElementById('loginError').classList.remove('hidden');
+        }
+
+        document.getElementById('loginBtn').onclick = async () => {
+            const key = document.getElementById('adminKey').value.trim() || getStoredKey();
+            if (!key) return showError();
+            try {
+                const data = await fetchStats(key);
+                setStoredKey(key);
+                document.getElementById('loginError').classList.add('hidden');
+                showDashboard(data);
+                setInterval(async () => {
+                    try {
+                        const d = await fetchStats(key);
+                        showDashboard(d);
+                    } catch (_) {}
+                }, 5000);
+            } catch (_) {
+                showError();
+            }
+        };
+
+        const urlKey = new URLSearchParams(location.search).get('key');
+        if (urlKey) {
+            document.getElementById('adminKey').value = urlKey;
+            document.getElementById('loginBtn').click();
+        }
+    </script>
+</body>
+</html>

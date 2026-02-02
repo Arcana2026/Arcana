@@ -11,16 +11,72 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// --- 1. DONNÉES DE LA PRÉVENTE ---
+// --- 1. DONNÉES DE LA PRÉVENTE (sync avec objectif 100 000 $) ---
+const TARGET_USD = 100000;
 let presaleData = {
     totalRaised: 5,
-    target: 100000
+    target: TARGET_USD,
+    buyerCount: 0,
+    claimOpen: false,
+    buyers: new Set()
 };
 
-// --- 2. ROUTE POUR LA BARRE DE PROGRESSION ---
-// Cette route permet à ton site d'afficher les 5$
+function updateClaimStatus() {
+    presaleData.claimOpen = presaleData.totalRaised >= presaleData.target;
+}
+
+// --- 2. ROUTE POUR LA BARRE DE PROGRESSION (site + contrat) ---
 app.get('/api/presale-status', (req, res) => {
-    res.json(presaleData);
+    updateClaimStatus();
+    res.json({
+        totalRaised: presaleData.totalRaised,
+        target: presaleData.target,
+        claimOpen: presaleData.claimOpen,
+        buyerCount: presaleData.buyers.size
+    });
+});
+
+// --- 2b. ROUTE POUR METTRE À JOUR LE TOTAL RÉCOLTÉ APRÈS UN ACHAT (envoie l'adresse pour compter les acheteurs) ---
+app.post('/api/presale-update', (req, res) => {
+    try {
+        const { amount, address } = req.body;
+        const addAmount = parseFloat(amount);
+        if (isNaN(addAmount) || addAmount <= 0) {
+            return res.status(400).json({ success: false, error: "Montant invalide" });
+        }
+        presaleData.totalRaised += addAmount;
+        if (address && typeof address === 'string' && ethers.utils.isAddress(address)) {
+            presaleData.buyers.add(address.toLowerCase());
+        }
+        updateClaimStatus();
+        res.json({
+            success: true,
+            totalRaised: presaleData.totalRaised,
+            claimOpen: presaleData.claimOpen,
+            buyerCount: presaleData.buyers.size
+        });
+    } catch (error) {
+        console.error("Erreur mise à jour presale:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// --- 2c. API ADMIN : tableau de bord (nombre d'acheteurs en temps réel) ---
+const ADMIN_SECRET = process.env.ADMIN_SECRET || process.env.ARCANA_ADMIN_SECRET || 'arcana-admin-secret';
+app.get('/api/admin/stats', (req, res) => {
+    const authHeader = req.headers.authorization;
+    const token = (authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null) || req.query.key || req.query.token;
+    if (token !== ADMIN_SECRET) {
+        return res.status(401).json({ error: 'Non autorisé' });
+    }
+    updateClaimStatus();
+    res.json({
+        totalRaised: presaleData.totalRaised,
+        target: presaleData.target,
+        buyerCount: presaleData.buyers.size,
+        claimOpen: presaleData.claimOpen,
+        percent: Math.min(100, (presaleData.totalRaised / presaleData.target) * 100)
+    });
 });
 
 // --- 3. CONFIGURATION BLOCKCHAIN (RETRAITS) ---

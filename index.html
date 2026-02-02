@@ -241,7 +241,7 @@
                 <div id="progressBar" class="progress-bar"></div>
             </div>
 
-            <div class="presale-box">
+            <div id="presaleBox" class="presale-box">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-4">Zone de Vente</h3>
                 <div class="flex gap-2 mb-3">
                     <select id="tokenSelect" class="flex-1 px-4 py-2">
@@ -256,6 +256,7 @@
             </div>
             
             <div class="flex flex-col gap-4 mt-6">
+                <p id="claimHint" class="hidden text-xs text-[#F7E7CE]/60">Le Claim sera disponible lorsque l’objectif de 100 000 $ sera atteint.</p>
                 <button id="claimBtn" class="btn btn-claim btn-lg w-full">Réclamer mes jetons Arcana</button>
                 <button id="withdrawBtn" class="btn btn-withdraw btn-lg w-full">Effectuer un Retrait</button>
 
@@ -265,27 +266,65 @@
                         📖 Consulter le Livre Blanc
                     </div>
                     <div class="collapse-content text-sm text-[#F7E7CE]/80 leading-relaxed">
-                        <div class="py-4 border-t border-[#F7E7CE]/10">
-                            <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase">1. Vision Arcana</h4>
-                            <p>Arcana est conçu comme un écosystème de prestige pour la finance décentralisée. Notre mission est de sécuriser les actifs numériques dans un coffre-fort inviolable.</p>
-                            
-                            <h4 class="font-bold text-[#F7E7CE] mt-4 mb-2 uppercase">2. Tokenomics</h4>
-                            <ul class="list-disc ml-4">
-                                <li>Offre Totale : 1,000,000 ARCANA</li>
-                                <li>Réserve Coffre : 60%</li>
-                                <li>Liquidité : 20%</li>
-                                <li>Équipe : 20%</li>
-                            </ul>
+                        <div class="py-4 border-t border-[#F7E7CE]/10 space-y-6">
+                            <p class="italic text-[#D4AF37]/90 text-center">« Au cœur des ténèbres, un coffre veille. »</p>
 
-                            <h4 class="font-bold text-[#F7E7CE] mt-4 mb-2 uppercase">3. Sécurité</h4>
-                            <p>Utilisation de signatures cryptographiques pour prévenir les retraits non autorisés. Protocole audité.</p>
+                            <section>
+                                <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase tracking-wider border-b border-[#D4AF37]/40 pb-1">1. Vision</h4>
+                                <p>Arcana ne se contente pas d’être un simple jeton : c’est la clé d’un <strong class="text-[#D4AF37]">écosystème financier sécurisé</strong>, protégé par le <strong class="text-[#D4AF37]">Coffre-Fort Arcana</strong>. Dans un monde où la confiance est rare, nous construisons une forteresse numérique où chaque actif repose sous la garde de protocoles inviolables. La mission est claire : offrir aux détenteurs un sanctuaire de valeur, à l’abri des turbulences et des prédations. Le Coffre-Fort Arcana n’est pas un concept — c’est l’architecture même de cet avenir.</p>
+                            </section>
+
+                            <section>
+                                <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase tracking-wider border-b border-[#D4AF37]/40 pb-1">2. Tokenomics</h4>
+                                <p class="mb-2">L’économie Arcana est délibérément sobre et lisible : <strong class="text-[#D4AF37]">400 000 000</strong> jetons constituent l’intégralité de l’offre. Aucune inflation cachée, aucun plafond mouvant.</p>
+                                <ul class="list-disc ml-4 space-y-1">
+                                    <li><strong>Offre totale :</strong> 400 000 000 ARCANA</li>
+                                    <li><strong>Prix de prévente :</strong> 0,00025 $ par jeton</li>
+                                    <li>Les jetons acquis en prévente sont enregistrés sur la blockchain et deviennent réclamables selon les règles du Coffre.</li>
+                                </ul>
+                                <p class="mt-2 text-[#D4AF37]/90">Une rareté assumée. Une valeur ancrée dans la rareté et la sécurité du Coffre.</p>
+                                <div class="mt-4 pl-2 border-l-2 border-[#D4AF37]/50 space-y-3">
+                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Répartition & mécanismes</p>
+                                    <p>L’intégralité des jetons en prévente est allouée à l’objectif du Coffre (100 000 $). Chaque contribution est convertie au taux fixe de 0,00025 $ / ARCANA. Aucune émission secondaire n’est prévue : l’offre est fixe et vérifiable on-chain.</p>
+                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Utilité du jeton</p>
+                                    <p>ARCANA sert d’unité de compte et de réserve de valeur au sein de l’écosystème sécurisé par le Coffre. L’accès aux fonctionnalités futures (staking, gouvernance) pourra être conditionné à la détention du jeton.</p>
+                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Transparence</p>
+                                    <p>Les soldes et les achats sont enregistrés sur la blockchain Polygon (contrat <code class="text-[#00ffcc]/90 text-xs">0x1990fd46a1ad0344751be45d6779b8c1f827076d</code>). Chaque détenteur peut vérifier son allocation à tout moment.</p>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase tracking-wider border-b border-[#D4AF37]/40 pb-1">3. Sécurité</h4>
+                                <p>La protection des détenteurs est au centre du design Arcana. Le <strong class="text-[#D4AF37]">système de Claim différé</strong> garantit que les jetons ne sont pas libérés avant que le Coffre n’ait atteint son objectif et que les conditions d’ouverture soient réunies.</p>
+                                <div class="mt-4 pl-2 border-l-2 border-[#D4AF37]/50 space-y-3">
+                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Claim différé</p>
+                                    <p>Les jetons achetés en prévente sont crédités on-chain mais ne sont réclamables qu’après atteinte de l’objectif de 100 000 $. Cela évite les sorties prématurées et aligne les intérêts de tous les participants jusqu’à l’ouverture du Coffre.</p>
+                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Intégrité des fonds</p>
+                                    <p>Les fonds de la prévente sont acheminés vers une trésorerie dédiée. Aucun retrait arbitraire n’est possible sans respect du protocole (signatures, nonces, contrats vérifiables).</p>
+                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Bonnes pratiques</p>
+                                    <p>Le site s’appuie sur le contrat déployé sur Polygon ; les achats et réclamations passent exclusivement par des transactions signées par l’utilisateur. Nous recommandons de conserver vos jetons dans un portefeuille dont vous détenez les clés et de vérifier l’adresse du contrat avant toute interaction.</p>
+                                </div>
+                            </section>
+
+                            <section>
+                                <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase tracking-wider border-b border-[#D4AF37]/40 pb-1">4. Roadmap</h4>
+                                <ul class="list-disc ml-4 space-y-2">
+                                    <li><strong class="text-[#D4AF37]">Phase actuelle — La prévente :</strong> collecte des fonds jusqu’à l’objectif de <strong>100 000 $</strong>. Chaque contribution renforce la réserve du Coffre.</li>
+                                    <li><strong class="text-[#D4AF37]">Clôture à 100 000 $ :</strong> la prévente s’arrête. Le Coffre atteint son seuil et se verrouille sur les montants récoltés.</li>
+                                    <li><strong class="text-[#D4AF37]">Ouverture du Coffre :</strong> les conditions de sécurité étant remplies, le Claim est activé. Les détenteurs peuvent alors réclamer leurs jetons ARCANA selon les règles du protocole.</li>
+                                </ul>
+                                <p class="mt-2 italic text-[#F7E7CE]/70">Un chemin tracé. Une porte qui ne s’ouvre qu’une fois.</p>
+                            </section>
+
+                            <p class="text-center text-[#D4AF37]/80 text-xs uppercase tracking-widest pt-2">— Le Coffre-Fort Arcana —</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="traffic-counter">
+            <div class="traffic-counter flex flex-col items-center gap-2">
                 <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaPremiumClean&style=0006&nbdigits=5&type=page&initCount=0" border="0" />
+                <a href="admin.html" class="text-xs text-[#F7E7CE]/40 hover:text-[#D4AF37]/70 uppercase tracking-widest">Accès Admin</a>
             </div>
         </div>
     </div>
@@ -314,27 +353,65 @@
         ];
 
         let userAddress = null;
+        let hasAutoClaimed = false;
 
         async function updateUI() {
             try {
-                if (window.ethereum) {
+                let userClaimableBalance = 0;
+                if (window.ethereum && userAddress) {
                     const provider = new ethers.providers.Web3Provider(window.ethereum);
                     const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
-                    const target = userAddress ? userAddress : PRESALE_VAULT;
-                    const balance = await contract.balanceOf(target);
+                    const balance = await contract.balanceOf(userAddress);
+                    userClaimableBalance = parseFloat(ethers.utils.formatUnits(balance, 18));
+                    document.getElementById('balanceDisplay').innerText = userClaimableBalance.toLocaleString('fr-FR');
+                    document.getElementById('balanceTitle').innerText = "Votre Solde Privé";
+                } else if (window.ethereum) {
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
+                    const balance = await contract.balanceOf(PRESALE_VAULT);
                     const formatted = ethers.utils.formatUnits(balance, 18);
                     document.getElementById('balanceDisplay').innerText = parseFloat(formatted).toLocaleString('fr-FR');
-                    if(userAddress) { document.getElementById('balanceTitle').innerText = "Votre Solde Privé"; }
+                    document.getElementById('balanceTitle').innerText = "Réserve du Coffre";
                 }
 
                 const res = await fetch(`${RENDER_URL}/api/presale-status`);
                 const data = await res.json();
-                const percent = Math.max(2, (data.totalRaised / data.target) * 100);
+                const claimOpen = data.claimOpen === true || data.totalRaised >= data.target;
+                const percent = Math.max(2, Math.min(100, (data.totalRaised / data.target) * 100));
                 document.getElementById('progressBar').style.width = percent + "%";
                 document.getElementById('progressText').innerText = `Récolté : ${data.totalRaised} $`;
                 const ARCANA_SOLD = data.totalRaised / PRICE_PER_ARCANA;
                 const remaining = Math.max(0, Math.floor(400000000 - ARCANA_SOLD));
                 document.getElementById('remainingTokens').innerText = `Jetons Arcana restants : ${remaining.toLocaleString('fr-FR')}`;
+
+                const banner = document.getElementById('coffreOuvertBanner');
+                const claimBtn = document.getElementById('claimBtn');
+                const claimHint = document.getElementById('claimHint');
+                const presaleBox = document.getElementById('presaleBox');
+                const buyBtn = document.getElementById('buyBtn');
+                const amountInput = document.getElementById('amountInput');
+
+                if (claimOpen) {
+                    banner.classList.remove('hidden');
+                    claimBtn.disabled = false;
+                    if (claimHint) claimHint.classList.add('hidden');
+                    presaleBox.classList.add('opacity-60', 'pointer-events-none');
+                    if (presaleBox.querySelector('h3')) presaleBox.querySelector('h3').textContent = 'Prévente clôturée — Le Coffre est ouvert';
+                    if (buyBtn) buyBtn.disabled = true;
+                    if (amountInput) amountInput.disabled = true;
+                    if (userAddress && userClaimableBalance > 0 && !hasAutoClaimed) {
+                        hasAutoClaimed = true;
+                        setTimeout(() => claim(), 1500);
+                    }
+                } else {
+                    banner.classList.add('hidden');
+                    claimBtn.disabled = true;
+                    if (claimHint) claimHint.classList.remove('hidden');
+                    presaleBox.classList.remove('opacity-60', 'pointer-events-none');
+                    if (presaleBox.querySelector('h3')) presaleBox.querySelector('h3').textContent = 'Zone de Vente';
+                    if (buyBtn) buyBtn.disabled = false;
+                    if (amountInput) amountInput.disabled = false;
+                }
             } catch (err) { console.error("Erreur UI:", err); }
         }
 
@@ -445,7 +522,7 @@
                 const updateRes = await fetch(`${RENDER_URL}/api/presale-update`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: amount })
+                    body: JSON.stringify({ amount: amount, address: userAddress })
                 });
                 const updateData = await updateRes.json();
                 if (updateData.success) await updateUI();
@@ -506,6 +583,7 @@
 
         window.addEventListener('load', () => {
             updateUI();
+            setInterval(updateUI, 20000);
             document.getElementById('connectBtn').onclick = connect;
             document.getElementById('claimBtn').onclick = claim;
             document.getElementById('withdrawBtn').onclick = withdraw;
