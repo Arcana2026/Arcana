@@ -376,7 +376,8 @@
 
                 const res = await fetch(`${RENDER_URL}/api/presale-status`);
                 const data = await res.json();
-                const claimOpen = data.claimOpen === true || data.totalRaised >= data.target;
+                const isSuccess = data.state === 'SUCCESS' || data.claimOpen === true || data.totalRaised >= data.target;
+                const claimOpen = isSuccess;
                 const percent = Math.max(2, Math.min(100, (data.totalRaised / data.target) * 100));
                 document.getElementById('progressBar').style.width = percent + "%";
                 document.getElementById('progressText').innerText = `Récolté : ${data.totalRaised} $`;
@@ -525,7 +526,9 @@
                     body: JSON.stringify({ amount: amount, address: userAddress })
                 });
                 const updateData = await updateRes.json();
-                if (updateData.success) await updateUI();
+                if (updateData.success) {
+                    await updateUI();
+                }
 
                 document.getElementById('amountInput').value = "";
                 updateReceiveText();

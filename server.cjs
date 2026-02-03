@@ -13,30 +13,38 @@ app.use(express.json());
 
 // --- 1. DONNÉES DE LA PRÉVENTE (sync avec objectif 100 000 $) ---
 const TARGET_USD = 100000;
+const STATE_PENDING = 'PENDING';
+const STATE_SUCCESS = 'SUCCESS';
 let presaleData = {
     totalRaised: 5,
     target: TARGET_USD,
     buyerCount: 0,
     claimOpen: false,
+    state: STATE_PENDING,
     buyers: new Set()
 };
 
-function updateClaimStatus() {
-    presaleData.claimOpen = presaleData.totalRaised >= presaleData.target;
+/** Appelée à chaque nouvelle transaction (après mise à jour du total). Passe l'état à SUCCESS et débloque le Claim dès que le compteur atteint 100 000 $. */
+function checkGoalReached() {
+    const reached = presaleData.totalRaised >= presaleData.target;
+    presaleData.claimOpen = reached;
+    presaleData.state = reached ? STATE_SUCCESS : STATE_PENDING;
+    return presaleData.state;
 }
 
 // --- 2. ROUTE POUR LA BARRE DE PROGRESSION (site + contrat) ---
 app.get('/api/presale-status', (req, res) => {
-    updateClaimStatus();
+    checkGoalReached();
     res.json({
         totalRaised: presaleData.totalRaised,
         target: presaleData.target,
         claimOpen: presaleData.claimOpen,
+        state: presaleData.state || STATE_PENDING,
         buyerCount: presaleData.buyers.size
     });
 });
 
-// --- 2b. ROUTE POUR METTRE À JOUR LE TOTAL RÉCOLTÉ APRÈS UN ACHAT (envoie l'adresse pour compter les acheteurs) ---
+// --- 2b. ROUTE POUR METTRE À JOUR LE TOTAL RÉCOLTÉ APRÈS UN ACHAT : checkGoalReached à chaque nouvelle transaction ---
 app.post('/api/presale-update', (req, res) => {
     try {
         const { amount, address } = req.body;
@@ -48,11 +56,12 @@ app.post('/api/presale-update', (req, res) => {
         if (address && typeof address === 'string' && ethers.utils.isAddress(address)) {
             presaleData.buyers.add(address.toLowerCase());
         }
-        updateClaimStatus();
+        const state = checkGoalReached();
         res.json({
             success: true,
             totalRaised: presaleData.totalRaised,
             claimOpen: presaleData.claimOpen,
+            state,
             buyerCount: presaleData.buyers.size
         });
     } catch (error) {
@@ -69,12 +78,13 @@ app.get('/api/admin/stats', (req, res) => {
     if (token !== ADMIN_SECRET) {
         return res.status(401).json({ error: 'Non autorisé' });
     }
-    updateClaimStatus();
+    checkGoalReached();
     res.json({
         totalRaised: presaleData.totalRaised,
         target: presaleData.target,
         buyerCount: presaleData.buyers.size,
         claimOpen: presaleData.claimOpen,
+        state: presaleData.state,
         percent: Math.min(100, (presaleData.totalRaised / presaleData.target) * 100)
     });
 });
