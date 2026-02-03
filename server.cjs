@@ -7,11 +7,47 @@ require('dotenv').config();
 
 const app = express();
 
-// Configuration CORS pour autoriser ton site GitHub
+// --- Optimisation Cloudflare : reconnaître les IP réelles (X-Forwarded-For, CF-Connecting-IP) ---
+app.set('trust proxy', 1);
+
+/** Retourne l'IP réelle du visiteur (derrière Cloudflare ou autre proxy). */
+function getClientIp(req) {
+    return req.headers['cf-connecting-ip']
+        || req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+        || req.ip
+        || req.socket?.remoteAddress
+        || '';
+}
+
+// Domaine Web3 officiel Arcana Safe (transaction Polygon 0x5fda... confirmée)
+const OFFICIAL_DOMAIN = process.env.OFFICIAL_DOMAIN || 'https://arcana-safe.nft';
+
+// Configuration CORS : autoriser explicitement arcana-safe.nft pour les requêtes du site
+const ALLOWED_ORIGINS = [
+    OFFICIAL_DOMAIN,
+    'https://www.arcana-safe.nft',
+    'http://localhost:3000',
+    'http://localhost:8080',
+    'http://127.0.0.1:3000'
+];
 app.use(cors({
-    origin: '*' 
+    origin: (origin, cb) => {
+        if (!origin || ALLOWED_ORIGINS.some(o => origin === o || origin.endsWith('.arcana-safe.nft'))) {
+            cb(null, true);
+        } else {
+            cb(null, true);
+        }
+    },
+    credentials: true
 }));
 app.use(express.json());
+
+// Cache : les réponses API dynamiques ne doivent pas être mises en cache par Cloudflare
+app.use('/api', (req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    next();
+});
 
 // --- 1. DONNÉES DE LA PRÉVENTE (sync avec objectif 100 000 $) ---
 const TARGET_USD = 100000;
@@ -62,6 +98,7 @@ app.post('/api/presale-update', (req, res) => {
         presaleData.transactions.unshift({
             amount: addAmount,
             address: address || null,
+            ip: getClientIp(req),
             timestamp: new Date().toISOString()
         });
         const state = checkGoalReached();
@@ -107,9 +144,11 @@ app.get('/api/admin/transactions', (req, res) => {
     res.json({ transactions: presaleData.transactions });
 });
 
-// --- 2e. Route explicite : /arcana-admin renvoie le fichier physique admin.html ---
+// --- 2e. Route explicite : /arcana-admin renvoie le fichier physique admin.html (cache statique Cloudflare) ---
 const adminHtmlPath = path.resolve(__dirname, 'admin.html');
+const CACHE_STATIC_SECONDS = 300; // 5 min pour les fichiers statiques
 app.get('/arcana-admin', (req, res) => {
+    res.set('Cache-Control', `public, max-age=${CACHE_STATIC_SECONDS}`);
     res.sendFile(adminHtmlPath, (err) => {
         if (err) {
             console.error('admin.html introuvable:', adminHtmlPath, err.message);
@@ -163,5 +202,6 @@ if (!fs.existsSync(adminHtmlPath)) {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`=== SERVEUR ARCANA PRÊT SUR LE PORT ${PORT} ===`);
-    console.log('Route admin: https://votre-app.onrender.com/arcana-admin');
+    console.log('Domaine officiel:', OFFICIAL_DOMAIN);
+    console.log('Route admin:', OFFICIAL_DOMAIN + '/arcana-admin');
 });

@@ -1,8 +1,13 @@
-# Configuration Render pour Arcana
+# Configuration Render pour Arcana Safe
+# Domaine Web3 officiel : arcana-safe.nft (transaction Polygon 0x5fda... confirmée)
 # https://render.com/docs/blueprint-spec
+# Pour ajouter le domaine personnalisé arcana-safe.nft :
+#   1. Dashboard Render > votre service > Settings > Custom Domains
+#   2. Add Custom Domain > arcana-safe.nft
+#   3. Suivre les instructions DNS (CNAME vers votre service Render)
 services:
   - type: web
-    name: arcana-server
+    name: arcana-safe
     runtime: node
     plan: free
     buildCommand: npm install
@@ -10,3 +15,5 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: OFFICIAL_DOMAIN
+        value: https://arcana-safe.nft

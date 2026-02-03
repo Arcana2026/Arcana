@@ -47,9 +47,12 @@
 </head>
 <body>
     <div class="container mx-auto px-4 py-12 max-w-2xl">
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex justify-between items-center mb-8 flex-wrap gap-2">
             <h1 class="text-2xl uppercase tracking-widest text-[#D4AF37]">Tableau de bord Admin</h1>
-            <a href="/" class="text-sm text-[#F7E7CE]/70 hover:text-[#D4AF37]">← Retour au site</a>
+            <div class="flex items-center gap-4">
+                <span class="text-xs px-2 py-1 rounded border border-[#D4AF37]/60 text-[#D4AF37]/90 bg-[#D4AF37]/10">Adresse certifiée : arcana-safe.nft</span>
+                <a href="https://arcana-safe.nft" class="text-sm text-[#F7E7CE]/70 hover:text-[#D4AF37]">← Retour au site</a>
+            </div>
         </div>
 
         <div id="loginBox" class="card p-8 text-center">
@@ -62,6 +65,7 @@
         <div id="dashboard" class="hidden space-y-6">
             <div class="card p-8">
                 <h2 class="text-sm uppercase tracking-widest text-[#D4AF37] mb-6">Vue en temps réel</h2>
+                <p class="text-xs text-[#00ffcc]/80 mb-4">Suivi en direct depuis <strong>arcana-safe.nft</strong> — vos ventes (ex. 5 $ de test) sont enregistrées ici.</p>
                 <div class="grid grid-cols-2 gap-6 mb-6">
                     <div>
                         <p class="text-xs uppercase text-[#F7E7CE]/60 mb-1">Nombre d'acheteurs</p>
@@ -92,11 +96,12 @@
                             <tr class="border-b border-[#D4AF37]/40">
                                 <th class="py-2 text-[#D4AF37]/80 uppercase tracking-wider">Date</th>
                                 <th class="py-2 text-[#D4AF37]/80 uppercase tracking-wider">Adresse</th>
+                                <th class="py-2 text-[#D4AF37]/80 uppercase tracking-wider">IP / Origine</th>
                                 <th class="py-2 text-[#D4AF37]/80 uppercase tracking-wider text-right">Montant ($)</th>
                             </tr>
                         </thead>
                         <tbody id="transactionsBody" class="text-[#F7E7CE]/90">
-                            <tr><td colspan="3" class="py-4 text-center text-[#F7E7CE]/50">Chargement…</td></tr>
+                            <tr><td colspan="4" class="py-4 text-center text-[#F7E7CE]/50">Chargement…</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -107,7 +112,8 @@
     </div>
 
     <script>
-        const API_BASE = window.location.origin || '';
+        // Adresse certifiée Web3 officielle Arcana
+        const API_BASE = 'https://arcana-safe.nft';
         const STORAGE_KEY = 'arcana_admin_key';
 
         function getStoredKey() {
@@ -151,7 +157,7 @@
             const tbody = document.getElementById('transactionsBody');
             const emptyEl = document.getElementById('transactionsEmpty');
             if (!transactions || transactions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-[#F7E7CE]/50">Aucune transaction</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-[#F7E7CE]/50">Aucune transaction</td></tr>';
                 emptyEl.classList.remove('hidden');
                 return;
             }
@@ -160,6 +166,7 @@
                 <tr class="border-b border-[#F7E7CE]/10">
                     <td class="py-2">${formatDate(t.timestamp)}</td>
                     <td class="py-2 font-mono text-xs">${formatAddress(t.address)}</td>
+                    <td class="py-2 font-mono text-xs text-[#00ffcc]/80">${(t.ip || '—')}</td>
                     <td class="py-2 text-right font-medium">${(t.amount ?? 0).toLocaleString('fr-FR')} $</td>
                 </tr>
             `).join('');

@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <style>html { scroll-behavior: smooth; }</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCANA - Premium Platform</title>
-    
+    <title>Arcana Safe — Domaine Web3 Officiel arcana-safe.nft</title>
+    <meta name="description" content="Arcana Safe : écosystème financier sécurisé par le Coffre-Fort Arcana. Domaine Web3 officiel arcana-safe.nft (transaction Polygon confirmée).">
+    <meta name="keywords" content="Arcana Safe, arcana-safe.nft, Web3, prévente, ARCANA, Polygon">
+    <meta property="og:title" content="Arcana Safe — arcana-safe.nft">
+    <meta property="og:description" content="Domaine Web3 officiel Arcana Safe. Écosystème sécurisé par le Coffre-Fort Arcana.">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://arcana-safe.nft">
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ethers.js : chargé via CDN (également dépendance du projet dans package.json) pour connexion MetaMask et Polygon -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
     <style>
@@ -185,6 +192,62 @@
             cursor: not-allowed;
         }
 
+        .banner-official-domain {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(184, 134, 11, 0.18) 50%, rgba(212, 175, 55, 0.28) 100%);
+            border-bottom: 2px solid rgba(212, 175, 55, 0.6);
+            color: #F7E7CE;
+            padding: 0.6rem 1.25rem;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .banner-official-domain .domain { color: #D4AF37; text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.5); transition: color 0.2s, border-color 0.2s; }
+        .banner-official-domain .domain:hover { color: #F7E7CE; border-bottom-color: #D4AF37; }
+
+        .badge-verified-blockchain {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #D4AF37;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            border-radius: 6px;
+            white-space: nowrap;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-cta-invest {
+            background: linear-gradient(135deg, #D4AF37, #B8860B);
+            color: #0a0e1a;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.08em;
+            padding: 1rem 1.5rem;
+            border-radius: 14px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 4px 20px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: cta-glow 2.5s ease-in-out infinite;
+        }
+        .btn-cta-invest:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.8), 0 6px 24px rgba(212, 175, 55, 0.4);
+            color: #0a0e1a;
+        }
+        @keyframes cta-glow {
+            0%, 100% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 4px 20px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255,255,255,0.3); }
+            50% { box-shadow: 0 0 38px rgba(212, 175, 55, 0.75), 0 4px 24px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255,255,255,0.3); }
+        }
+
         /* --- HEADER MOBILE --- */
         @media (max-width: 768px) {
             .navbar {
@@ -218,16 +281,30 @@
     <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
 
     <div class="navbar">
-        <div class="logo-text-arcana">Arcana</div>
+        <div class="logo-text-arcana">Arcana Safe</div>
         <div class="flex justify-center items-center">
-            <img src="logo.png" alt="Arcana Logo" class="logo-image-center" style="width: 60px; height: auto;">
+            <img src="logo.png" alt="Arcana Safe Logo" class="logo-image-center" style="width: 60px; height: auto;">
         </div>
         <button id="connectBtn" class="wallet-address">Connecter Wallet</button>
     </div>
 
+    <div class="banner-official-domain">
+        Domaine Web3 Officiel : <a href="https://arcana-safe.nft" class="domain" rel="noopener">arcana-safe.nft</a> <span class="text-[#D4AF37]/80 text-xs ml-1">(transaction 0x5fda… confirmée)</span>
+    </div>
+
     <div class="container mx-auto px-4 py-16 text-center">
+        <button type="button" id="cta-invest" class="btn-cta-invest block w-full max-w-md mx-auto mb-8 border-0 cursor-pointer">
+            Investir dans le Coffre-Fort
+        </button>
         <div class="max-w-md mx-auto card p-10">
-            <h2 id="balanceTitle" class="text-xl mb-4 opacity-80 uppercase tracking-widest">Réserve du Coffre</h2>
+            <h2 id="balanceTitle" class="text-xl mb-4 opacity-80 uppercase tracking-widest">Réserve du Coffre Arcana Safe</h2>
+            <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80 mb-2">Adresse de réception (Polygon)</p>
+            <div class="flex items-center justify-center gap-2 mb-2 flex-wrap">
+                <code id="receptionAddress" class="text-[#00ffcc]/95 font-mono text-sm px-3 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/50 break-all">0x1990fd46a1ad0344751be45d6779b8c1f827076d</code>
+                <span class="badge-verified-blockchain" title="Contrat vérifié sur Polygon">Vérifié sur la Blockchain</span>
+                <button type="button" id="copyAddressBtn" class="px-3 py-2 rounded-lg border border-[#D4AF37]/60 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition" title="Copier l'adresse">Copier</button>
+            </div>
+            <p class="text-[#F7E7CE]/60 text-xs mb-4">Les fonds de la prévente sont envoyés vers cette adresse. Vérifiez-la sur Polygonscan.</p>
             <div class="stat-value my-8">
                 <span id="balanceDisplay">...</span> <span class="text-lg">ARCANA</span>
             </div>
@@ -236,13 +313,14 @@
                 <span>Objectif : 100 000 $</span>
                 <span id="progressText">Récolté : 5 $</span>
             </div>
-            <p id="remainingTokens" class="text-sm text-[#00ffcc] mb-2">Jetons Arcana restants : 400 000 000</p>
+            <p id="remainingTokens" class="text-sm text-[#00ffcc] mb-2">Jetons ARCANA restants : 400 000 000</p>
             <div class="progress-container">
                 <div id="progressBar" class="progress-bar"></div>
             </div>
 
+            <div id="zone-investissement">
             <div id="presaleBox" class="presale-box">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-4">Zone de Vente</h3>
+                <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-4">Zone de Vente Arcana Safe</h3>
                 <div class="flex gap-2 mb-3">
                     <select id="tokenSelect" class="flex-1 px-4 py-2">
                         <option value="POL">POL</option>
@@ -251,13 +329,14 @@
                     </select>
                     <input type="number" id="amountInput" placeholder="Montant" min="0" step="0.01" class="flex-1 px-4 py-2" />
                 </div>
-                <p id="receiveText" class="text-[#00ffcc] mb-4 font-medium">Tu recevras : 0 Arcana</p>
+                <p id="receiveText" class="text-[#00ffcc] mb-4 font-medium">Tu recevras : 0 ARCANA</p>
                 <button id="buyBtn" class="btn-buy-now">Acheter maintenant</button>
+            </div>
             </div>
             
             <div class="flex flex-col gap-4 mt-6">
                 <p id="claimHint" class="hidden text-xs text-[#F7E7CE]/60">Le Claim sera disponible lorsque l’objectif de 100 000 $ sera atteint.</p>
-                <button id="claimBtn" class="btn btn-claim btn-lg w-full">Réclamer mes jetons Arcana</button>
+                <button id="claimBtn" class="btn btn-claim btn-lg w-full">Réclamer mes jetons Arcana Safe</button>
                 <button id="withdrawBtn" class="btn btn-withdraw btn-lg w-full">Effectuer un Retrait</button>
 
                 <div class="collapse collapse-arrow bg-black/40 border border-[#F7E7CE]/20 text-left">
@@ -324,16 +403,18 @@
 
             <div class="traffic-counter flex flex-col items-center gap-2">
                 <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaPremiumClean&style=0006&nbdigits=5&type=page&initCount=0" border="0" />
-                <a href="admin.html" class="text-xs text-[#F7E7CE]/40 hover:text-[#D4AF37]/70 uppercase tracking-widest">Accès Admin</a>
+                <a href="https://arcana-safe.nft/arcana-admin" class="text-xs text-[#F7E7CE]/40 hover:text-[#D4AF37]/70 uppercase tracking-widest">Accès Admin</a>
             </div>
         </div>
     </div>
 
     <script type="module">
-        const RENDER_URL = "https://arcana-server.onrender.com";
+        const RENDER_URL = "https://arcana-safe.nft";
         const PRESALE_VAULT = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
+        const RECEPTION_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
         const CONTRACT_WITHDRAW = "0x29D8898950882798e36e65B150A6c7a723821141";
         const POLYGON_CHAIN_ID = 137;
+        const POL_USD_APPROX = 0.4;
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
 
@@ -383,7 +464,7 @@
                 document.getElementById('progressText').innerText = `Récolté : ${data.totalRaised} $`;
                 const ARCANA_SOLD = data.totalRaised / PRICE_PER_ARCANA;
                 const remaining = Math.max(0, Math.floor(400000000 - ARCANA_SOLD));
-                document.getElementById('remainingTokens').innerText = `Jetons Arcana restants : ${remaining.toLocaleString('fr-FR')}`;
+                document.getElementById('remainingTokens').innerText = `Jetons ARCANA restants : ${remaining.toLocaleString('fr-FR')}`;
 
                 const banner = document.getElementById('coffreOuvertBanner');
                 const claimBtn = document.getElementById('claimBtn');
@@ -543,7 +624,7 @@
         function updateReceiveText() {
             const amount = parseFloat(document.getElementById('amountInput').value) || 0;
             const arcana = Math.floor(amount * ARCANA_PER_USD);
-            document.getElementById('receiveText').innerText = `Tu recevras : ${arcana.toLocaleString('fr-FR')} Arcana`;
+            document.getElementById('receiveText').innerText = `Tu recevras : ${arcana.toLocaleString('fr-FR')} ARCANA`;
         }
 
         async function claim() {
@@ -580,7 +661,7 @@
                 }
             } finally {
                 document.getElementById('claimBtn').disabled = false;
-                document.getElementById('claimBtn').innerText = "Réclamer mes jetons Arcana";
+                document.getElementById('claimBtn').innerText = "Réclamer mes jetons Arcana Safe";
             }
         }
 
@@ -594,6 +675,11 @@
             document.getElementById('amountInput').addEventListener('keyup', updateReceiveText);
             document.getElementById('tokenSelect').addEventListener('change', updateReceiveText);
             document.getElementById('buyBtn').onclick = buyNow;
+            document.getElementById('cta-invest').onclick = investDirect;
+            document.getElementById('copyAddressBtn').onclick = () => {
+                const addr = document.getElementById('receptionAddress').textContent;
+                navigator.clipboard.writeText(addr).then(() => { document.getElementById('copyAddressBtn').textContent = 'Copié !'; setTimeout(() => { document.getElementById('copyAddressBtn').textContent = 'Copier'; }, 2000); }).catch(() => alert('Copiez manuellement : ' + addr));
+            };
         });
     </script>
 </body>
