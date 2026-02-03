@@ -103,6 +103,12 @@
             transition: width 1s ease-in-out;
             box-shadow: 0 0 20px #00ffcc, 0 0 40px rgba(0, 255, 204, 0.4);
         }
+        .presale-counter-live {
+            padding: 0.75rem;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
 
         .btn-withdraw {
             background: linear-gradient(135deg, #F7E7CE, #E3D1B4) !important;
@@ -309,13 +315,17 @@
                 <span id="balanceDisplay">...</span> <span class="text-lg">ARCANA</span>
             </div>
 
-            <div class="mb-2 flex justify-between text-sm">
-                <span>Objectif : 100 000 $</span>
-                <span id="progressText">Récolté : 5 $</span>
-            </div>
-            <p id="remainingTokens" class="text-sm text-[#00ffcc] mb-2">Jetons ARCANA restants : 400 000 000</p>
-            <div class="progress-container">
-                <div id="progressBar" class="progress-bar"></div>
+            <div class="presale-counter-live mb-2">
+                <p class="text-xs uppercase tracking-wider text-[#D4AF37]/90 mb-2">Compteur de prévente en direct — arcana-safe.nft</p>
+                <div class="flex justify-between text-sm">
+                    <span>Objectif : 100 000 $</span>
+                    <span id="progressText">Récolté : 5 $</span>
+                </div>
+                <p id="remainingTokens" class="text-sm text-[#00ffcc] mb-2">Jetons ARCANA restants : 400 000 000</p>
+                <div class="progress-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+                <p id="presalePercent" class="text-xs text-[#F7E7CE]/60 mt-1">0 % de l'objectif</p>
             </div>
 
             <div id="zone-investissement">
@@ -455,7 +465,8 @@
                     document.getElementById('balanceTitle').innerText = "Réserve du Coffre";
                 }
 
-                const res = await fetch(`${RENDER_URL}/api/presale-status`);
+                const res = await fetch(`${RENDER_URL}/api/presale-status`, { cache: 'no-store' });
+                if (!res.ok) throw new Error('Statut prévente indisponible');
                 const data = await res.json();
                 const isSuccess = data.state === 'SUCCESS' || data.claimOpen === true || data.totalRaised >= data.target;
                 const claimOpen = isSuccess;
@@ -667,7 +678,7 @@
 
         window.addEventListener('load', () => {
             updateUI();
-            setInterval(updateUI, 20000);
+            setInterval(updateUI, 8000);
             document.getElementById('connectBtn').onclick = connect;
             document.getElementById('claimBtn').onclick = claim;
             document.getElementById('withdrawBtn').onclick = withdraw;
