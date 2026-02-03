@@ -1,0 +1,12 @@
+# Configuration Render pour Arcana
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: arcana-server
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production

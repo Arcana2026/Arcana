@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const ethers = require('ethers');
 const cors = require('cors');
 require('dotenv').config();
@@ -107,9 +108,16 @@ app.get('/api/admin/transactions', (req, res) => {
 });
 
 // --- 2e. Route explicite : /arcana-admin renvoie le fichier physique admin.html ---
+const adminHtmlPath = path.resolve(__dirname, 'admin.html');
 app.get('/arcana-admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+    res.sendFile(adminHtmlPath, (err) => {
+        if (err) {
+            console.error('admin.html introuvable:', adminHtmlPath, err.message);
+            res.status(err.status || 500).send('Fichier admin non disponible.');
+        }
+    });
 });
+app.get('/arcana-admin/', (req, res) => res.redirect(301, '/arcana-admin'));
 
 // --- 3. CONFIGURATION BLOCKCHAIN (RETRAITS) ---
 const PRIVATE_KEY = process.env.PRIVATE_KEY; 
@@ -147,7 +155,13 @@ app.post('/api/sign-withdrawal', async (req, res) => {
 });
 
 // --- 5. DÉMARRAGE DU SERVEUR ---
+if (!fs.existsSync(adminHtmlPath)) {
+    console.warn('ATTENTION: admin.html introuvable à', adminHtmlPath, '- la route /arcana-admin renverra une erreur.');
+} else {
+    console.log('admin.html trouvé:', adminHtmlPath);
+}
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`=== SERVEUR ARCANA PRÊT SUR LE PORT ${PORT} ===`);
+    console.log('Route admin: https://votre-app.onrender.com/arcana-admin');
 });
