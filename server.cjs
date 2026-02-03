@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const ethers = require('ethers');
 const cors = require('cors');
 require('dotenv').config();
@@ -21,7 +22,8 @@ let presaleData = {
     buyerCount: 0,
     claimOpen: false,
     state: STATE_PENDING,
-    buyers: new Set()
+    buyers: new Set(),
+    transactions: []
 };
 
 /** Appelée à chaque nouvelle transaction (après mise à jour du total). Passe l'état à SUCCESS et débloque le Claim dès que le compteur atteint 100 000 $. */
@@ -56,6 +58,11 @@ app.post('/api/presale-update', (req, res) => {
         if (address && typeof address === 'string' && ethers.utils.isAddress(address)) {
             presaleData.buyers.add(address.toLowerCase());
         }
+        presaleData.transactions.unshift({
+            amount: addAmount,
+            address: address || null,
+            timestamp: new Date().toISOString()
+        });
         const state = checkGoalReached();
         res.json({
             success: true,
@@ -87,6 +94,21 @@ app.get('/api/admin/stats', (req, res) => {
         state: presaleData.state,
         percent: Math.min(100, (presaleData.totalRaised / presaleData.target) * 100)
     });
+});
+
+// --- 2d. API ADMIN : liste des transactions ---
+app.get('/api/admin/transactions', (req, res) => {
+    const authHeader = req.headers.authorization;
+    const token = (authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null) || req.query.key || req.query.token;
+    if (token !== ADMIN_SECRET) {
+        return res.status(401).json({ error: 'Non autorisé' });
+    }
+    res.json({ transactions: presaleData.transactions });
+});
+
+// --- 2e. PAGE ADMIN à l'URL /arcana-admin ---
+app.get('/arcana-admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
 // --- 3. CONFIGURATION BLOCKCHAIN (RETRAITS) ---

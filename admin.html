@@ -49,7 +49,7 @@
     <div class="container mx-auto px-4 py-12 max-w-2xl">
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-2xl uppercase tracking-widest text-[#D4AF37]">Tableau de bord Admin</h1>
-            <a href="index.html" class="text-sm text-[#F7E7CE]/70 hover:text-[#D4AF37]">← Retour au site</a>
+            <a href="/" class="text-sm text-[#F7E7CE]/70 hover:text-[#D4AF37]">← Retour au site</a>
         </div>
 
         <div id="loginBox" class="card p-8 text-center">
@@ -84,12 +84,30 @@
                     <span id="statStatus" class="px-3 py-1 rounded-full text-sm font-medium badge-closed">Prévente en cours</span>
                 </div>
             </div>
+            <div class="card p-8">
+                <h2 class="text-sm uppercase tracking-widest text-[#D4AF37] mb-4">Liste des transactions</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-[#D4AF37]/40">
+                                <th class="py-2 text-[#D4AF37]/80 uppercase tracking-wider">Date</th>
+                                <th class="py-2 text-[#D4AF37]/80 uppercase tracking-wider">Adresse</th>
+                                <th class="py-2 text-[#D4AF37]/80 uppercase tracking-wider text-right">Montant ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody" class="text-[#F7E7CE]/90">
+                            <tr><td colspan="3" class="py-4 text-center text-[#F7E7CE]/50">Chargement…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p id="transactionsEmpty" class="hidden mt-4 text-center text-[#F7E7CE]/50 text-sm">Aucune transaction pour le moment.</p>
+            </div>
             <p class="text-center text-[#F7E7CE]/50 text-xs">Rafraîchissement automatique toutes les 5 secondes.</p>
         </div>
     </div>
 
     <script>
-        const API_BASE = 'https://arcana-server.onrender.com';
+        const API_BASE = window.location.origin || '';
         const STORAGE_KEY = 'arcana_admin_key';
 
         function getStoredKey() {
@@ -107,6 +125,44 @@
             });
             if (!res.ok) throw new Error('Non autorisé');
             return res.json();
+        }
+
+        async function fetchTransactions(token) {
+            const res = await fetch(`${API_BASE}/api/admin/transactions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) return [];
+            const data = await res.json();
+            return data.transactions || [];
+        }
+
+        function formatAddress(addr) {
+            if (!addr) return '—';
+            return addr.slice(0, 6) + '…' + addr.slice(-4);
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showTransactions(transactions) {
+            const tbody = document.getElementById('transactionsBody');
+            const emptyEl = document.getElementById('transactionsEmpty');
+            if (!transactions || transactions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="py-4 text-center text-[#F7E7CE]/50">Aucune transaction</td></tr>';
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            emptyEl.classList.add('hidden');
+            tbody.innerHTML = transactions.map(t => `
+                <tr class="border-b border-[#F7E7CE]/10">
+                    <td class="py-2">${formatDate(t.timestamp)}</td>
+                    <td class="py-2 font-mono text-xs">${formatAddress(t.address)}</td>
+                    <td class="py-2 text-right font-medium">${(t.amount ?? 0).toLocaleString('fr-FR')} $</td>
+                </tr>
+            `).join('');
         }
 
         function showDashboard(data) {
@@ -140,12 +196,15 @@
                 setStoredKey(key);
                 document.getElementById('loginError').classList.add('hidden');
                 showDashboard(data);
-                setInterval(async () => {
+                const refresh = async () => {
                     try {
-                        const d = await fetchStats(key);
+                        const [d, txList] = await Promise.all([fetchStats(key), fetchTransactions(key)]);
                         showDashboard(d);
+                        showTransactions(txList);
                     } catch (_) {}
-                }, 5000);
+                };
+                await fetchTransactions(key).then(showTransactions);
+                setInterval(refresh, 5000);
             } catch (_) {
                 showError();
             }
