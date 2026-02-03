@@ -106,7 +106,7 @@ app.get('/api/admin/transactions', (req, res) => {
     res.json({ transactions: presaleData.transactions });
 });
 
-// --- 2e. PAGE ADMIN à l'URL /arcana-admin ---
+// --- 2e. Route explicite : /arcana-admin renvoie le fichier physique admin.html ---
 app.get('/arcana-admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
