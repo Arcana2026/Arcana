@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <script>
+      if (typeof window !== 'undefined' && window.location.hostname === 'arcana-safe.nft') {
+        var p = (window.location.pathname || '/').replace(/^\//, '') || 'index.html';
+        window.location.replace('https://arcana-ezl.pages.dev/' + p + (window.location.search ? window.location.search : ''));
+      }
+    </script>
     <style>html { scroll-behavior: smooth; }</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcana Safe — Domaine Web3 Officiel arcana-safe.nft</title>
-    <meta name="description" content="Arcana Safe : écosystème financier sécurisé par le Coffre-Fort Arcana. Domaine Web3 officiel arcana-safe.nft (transaction Polygon confirmée).">
-    <meta name="keywords" content="Arcana Safe, arcana-safe.nft, Web3, prévente, ARCANA, Polygon">
-    <meta property="og:title" content="Arcana Safe — arcana-safe.nft">
+    <title>Arcana Safe — Site officiel arcana-ezl.pages.dev</title>
+    <meta name="description" content="Arcana Safe : écosystème financier sécurisé par le Coffre-Fort Arcana. Site officiel hébergé sur arcana-ezl.pages.dev (arcana-safe.nft).">
+    <meta name="keywords" content="Arcana Safe, arcana-safe.nft, arcana-ezl.pages.dev, Web3, prévente, ARCANA, Polygon">
+    <meta property="og:title" content="Arcana Safe — arcana-ezl.pages.dev">
     <meta property="og:description" content="Domaine Web3 officiel Arcana Safe. Écosystème sécurisé par le Coffre-Fort Arcana.">
     <meta property="og:type" content="website">
-    <link rel="canonical" href="https://arcana-safe.nft">
+    <link rel="canonical" href="https://arcana-ezl.pages.dev">
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -289,14 +295,14 @@
     <div class="navbar">
         <div class="logo-text-arcana">Arcana Safe</div>
         <div class="flex justify-center items-center gap-4">
-            <a href="arcade.html" class="text-[#D4AF37] hover:text-[#F7E7CE] text-sm uppercase tracking-wider">Arcade</a>
+            <a href="https://arcana-ezl.pages.dev/arcade.html" class="text-[#D4AF37] hover:text-[#F7E7CE] text-sm uppercase tracking-wider">Arcade</a>
             <img src="logo.png" alt="Arcana Safe Logo" class="logo-image-center" style="width: 60px; height: auto;">
         </div>
         <button id="connectBtn" class="wallet-address">Connecter Wallet</button>
     </div>
 
     <div class="banner-official-domain">
-        Domaine Web3 Officiel : <a href="https://arcana-safe.nft" class="domain" rel="noopener">arcana-safe.nft</a> <span class="text-[#D4AF37]/80 text-xs ml-1">(transaction 0x5fda… confirmée)</span>
+        Domaine Web3 Officiel : <a href="https://arcana-ezl.pages.dev" class="domain" rel="noopener">arcana-safe.nft</a> → <a href="https://arcana-ezl.pages.dev" class="domain" rel="noopener">arcana-ezl.pages.dev</a> <span class="text-[#D4AF37]/80 text-xs ml-1">(transaction 0x5fda… confirmée)</span>
     </div>
 
     <div class="container mx-auto px-4 py-16 text-center">
@@ -317,7 +323,7 @@
             </div>
 
             <div class="presale-counter-live mb-2">
-                <p class="text-xs uppercase tracking-wider text-[#D4AF37]/90 mb-2">Compteur de prévente en direct — arcana-safe.nft</p>
+                <p class="text-xs uppercase tracking-wider text-[#D4AF37]/90 mb-2">Compteur de prévente en direct — arcana-ezl.pages.dev</p>
                 <div class="flex justify-between text-sm">
                     <span>Objectif : 100 000 $</span>
                     <span id="progressText">Récolté : 5 $</span>
@@ -427,9 +433,11 @@
     </div>
 
     <script type="module">
-        const RENDER_URL = "https://arcana-safe.nft";
+        const SITE_URL = "https://arcana-ezl.pages.dev";
+        const RENDER_URL = "https://arcana-ezl.pages.dev";
         const PRESALE_VAULT = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
-        const RECEPTION_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
+        const RECEPTION_ADDRESS = "0x1990fD46a1ad0344751be45d6779b8c1f827076d";
+        // Bouton Investir : envoi des fonds vers RECEPTION_ADDRESS (ci-dessus) sur Polygon.
         const CONTRACT_WITHDRAW = "0x29D8898950882798e36e65B150A6c7a723821141";
         const POLYGON_CHAIN_ID = 137;
         const POL_USD_APPROX = 0.4;

@@ -16,13 +16,16 @@
         .modal.open { display: flex; }
         .wheel-segment { fill: var(--c); }
         .reel { display: inline-block; width: 60px; height: 80px; border: 2px solid #D4AF37; border-radius: 8px; margin: 0 4px; font-size: 2rem; line-height: 80px; text-align: center; }
+        /* Toast Sync Error (discret, non bloquant) */
+        #syncErrorToast { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%) translateY(120%); z-index: 200; padding: 0.6rem 1.2rem; background: rgba(180,60,60,0.95); color: #fff; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: transform 0.3s ease; pointer-events: none; }
+        #syncErrorToast.show { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body class="p-4 md:p-8">
     <div class="max-w-6xl mx-auto">
         <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
             <div>
-                <a href="index.html" class="text-[#D4AF37] hover:underline">← Arcana Safe</a>
+                <a href="https://arcana-ezl.pages.dev/" class="text-[#D4AF37] hover:underline">← Arcana Safe</a>
                 <h1 class="text-2xl md:text-3xl font-bold text-[#D4AF37] mt-2">Arcade</h1>
             </div>
             <div class="flex items-center gap-4">
@@ -55,6 +58,9 @@
         </div>
     </div>
 
+    <!-- Toast Sync Error (discret) -->
+    <div id="syncErrorToast" aria-live="polite">Sync Error — Vérifiez votre connexion.</div>
+
     <!-- Modal jeu -->
     <div id="gameModal" class="modal">
         <div class="card max-w-lg w-full max-h-[90vh] overflow-auto p-6 relative">
@@ -71,23 +77,100 @@
         const POLYGON_CHAIN_ID = 137;
         const WELCOME_FREE_SPINS = 5;
         const STORAGE_FREE_SPINS = "arcana_wheel_freespins";
+        const STORAGE_ARCADE_STATE = "arcana_arcade_state";
+        // RPC silencieux (lecture seule, pas de popup). Pour Alchemy: window.ARCANA_RPC_URL = "https://polygon-mainnet.g.alchemy.com/v2/VOTRE_CLE";
+        const SILENT_RPC = window.ARCANA_RPC_URL || "https://polygon-rpc.com";
+        const SILENT_REFRESH_INTERVAL_MS = 25000;
+        const SYNC_ERROR_TOAST_DURATION_MS = 4000;
 
         let userAddress = null;
-        let playBalance = 0;
+        let chainBalance = 0;
+        let localDelta = 0;
+        let silentRefreshFailCount = 0;
+        let silentProvider = null;
+        let silentContract = null;
 
-        async function updateArcadeBalance() {
+        function getDisplayBalance() { return Math.max(0, chainBalance + localDelta); }
+        function getChainBalance() { return chainBalance; }
+        function getLocalDelta() { return localDelta; }
+
+        /** Optimistic UI : applique immédiatement le gain/perte et met à jour l'affichage sans attendre la chaîne. */
+        function applyGameDelta(amount) {
+            localDelta += amount;
+            persistArcadeState();
+            renderDisplayBalance();
+        }
+
+        function renderDisplayBalance() {
             const el = document.getElementById('arcadeBalance');
-            if (window.ethereum && userAddress) {
-                try {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
-                    const balance = await contract.balanceOf(userAddress);
-                    playBalance = parseFloat(ethers.utils.formatUnits(balance, 18));
-                } catch (_) { playBalance = 0; }
-            } else {
-                playBalance = 0;
+            if (el) el.textContent = getDisplayBalance().toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+        }
+
+        /** LocalStorage : persister l'état pour garder le solde correct après rafraîchissement. */
+        function persistArcadeState() {
+            if (!userAddress) return;
+            try {
+                const state = { address: userAddress, chainBalance, localDelta, updatedAt: Date.now() };
+                localStorage.setItem(STORAGE_ARCADE_STATE, JSON.stringify(state));
+            } catch (_) {}
+        }
+
+        function loadArcadeState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_ARCADE_STATE);
+                if (!raw) return;
+                const state = JSON.parse(raw);
+                if (state.address && state.address.toLowerCase() === (userAddress || '').toLowerCase()) {
+                    chainBalance = Number(state.chainBalance) || 0;
+                    localDelta = Number(state.localDelta) || 0;
+                    renderDisplayBalance();
+                }
+            } catch (_) {}
+        }
+
+        /** Silent RPC : mise à jour de la balance en arrière-plan sans popup. */
+        function ensureSilentProvider() {
+            if (silentContract && silentProvider) return true;
+            try {
+                silentProvider = new ethers.providers.JsonRpcProvider(SILENT_RPC);
+                silentContract = new ethers.Contract(PRESALE_VAULT, abiPresale, silentProvider);
+                return true;
+            } catch (_) { return false; }
+        }
+
+        async function refreshChainBalanceSilent() {
+            if (!userAddress || !ensureSilentProvider()) return;
+            try {
+                const balance = await silentContract.balanceOf(userAddress);
+                const next = parseFloat(ethers.utils.formatUnits(balance, 18));
+                chainBalance = next;
+                silentRefreshFailCount = 0;
+                persistArcadeState();
+                renderDisplayBalance();
+            } catch (e) {
+                silentRefreshFailCount++;
+                if (silentRefreshFailCount >= 2) showSyncError();
             }
-            el.textContent = playBalance.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+        }
+
+        let silentRefreshTimer = null;
+        function startSilentRefresh() {
+            if (silentRefreshTimer) clearInterval(silentRefreshTimer);
+            refreshChainBalanceSilent();
+            silentRefreshTimer = setInterval(refreshChainBalanceSilent, SILENT_REFRESH_INTERVAL_MS);
+        }
+
+        /** Message discret "Sync Error" sans bloquer le jeu. */
+        function showSyncError() {
+            const toast = document.getElementById('syncErrorToast');
+            if (!toast) return;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), SYNC_ERROR_TOAST_DURATION_MS);
+        }
+
+        /** Rétrocompatibilité : les jeux utilisent playBalance pour les vérifications (solde affiché). */
+        function updateArcadeBalance() {
+            renderDisplayBalance();
         }
 
         function getFreeSpins() {
@@ -121,14 +204,14 @@
             container.innerHTML = '<p class="mb-2">Mise (ARCANA): <input type="number" id="diceBet" value="10" min="1" class="w-24 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><p class="mb-2">Choisir: <label><input type="radio" name="diceChoice" value="over" checked> Over 50</label> <label class="ml-2"><input type="radio" name="diceChoice" value="under"> Under 50</label></p><button id="diceRoll" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Lancer</button><p id="diceResult" class="mt-2 text-[#00ffcc]"></p>';
             document.getElementById('diceRoll').onclick = () => {
                 const bet = parseFloat(document.getElementById('diceBet').value) || 0;
-                if (bet > playBalance && !userAddress) { document.getElementById('diceResult').textContent = "Connectez le wallet."; return; }
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('diceResult').textContent = "Connectez le wallet."; return; }
                 const choice = document.querySelector('input[name="diceChoice"]:checked').value;
                 const roll = Math.floor(Math.random() * 100) + 1;
                 const win = (choice === 'over' && roll > 50) || (choice === 'under' && roll < 50);
                 const mult = win ? 1.95 : 0;
-                playBalance += win ? bet * mult - bet : -bet;
+                const delta = win ? (bet * mult - bet) : -bet;
+                applyGameDelta(delta);
                 document.getElementById('diceResult').textContent = `Résultat: ${roll}. ${win ? "Gagné +" + (bet * mult - bet).toFixed(0) + " ARCANA" : "Perdu -" + bet + " ARCANA"}`;
-                updateArcadeBalance();
             };
         }
 
@@ -137,14 +220,15 @@
             container.innerHTML = '<div class="flex justify-center gap-2 my-4"><span id="r1" class="reel">?</span><span id="r2" class="reel">?</span><span id="r3" class="reel">?</span></div><p class="mb-2">Mise: <input type="number" id="slotsBet" value="5" min="1" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><button id="slotsSpin" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Tourner</button><p id="slotsResult" class="mt-2 text-[#00ffcc]"></p>';
             document.getElementById('slotsSpin').onclick = () => {
                 const bet = parseFloat(document.getElementById('slotsBet').value) || 0;
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('slotsResult').textContent = "Connectez le wallet."; return; }
                 const r1 = syms[Math.floor(Math.random()*syms.length)], r2 = syms[Math.floor(Math.random()*syms.length)], r3 = syms[Math.floor(Math.random()*syms.length)];
                 document.getElementById('r1').textContent = r1; document.getElementById('r2').textContent = r2; document.getElementById('r3').textContent = r3;
                 const same = (r1===r2&&r2===r3); const two = (r1===r2||r2===r3||r1===r3);
                 let win = 0;
                 if (same) win = bet * 10; else if (two) win = bet * 2;
-                playBalance += win - bet;
+                const delta = win - bet;
+                applyGameDelta(delta);
                 document.getElementById('slotsResult').textContent = same ? "Jackpot! +" + win + " ARCANA" : two ? "+" + (win-bet) + " ARCANA" : "Perdu -" + bet + " ARCANA";
-                updateArcadeBalance();
             };
         }
 
@@ -164,16 +248,16 @@
                 const useFree = useFreeSpin();
                 document.getElementById('wheelSpins').textContent = getFreeSpins();
                 const bet = useFree ? 0 : (parseFloat(document.getElementById('wheelBet').value) || 0);
-                if (!useFree && bet > playBalance) { document.getElementById('wheelResult').textContent = "Solde insuffisant ou connectez le wallet."; return; }
+                if (!useFree && bet > getDisplayBalance()) { document.getElementById('wheelResult').textContent = "Solde insuffisant ou connectez le wallet."; return; }
                 const idx = Math.floor(Math.random() * segments.length);
                 const mult = segments[idx];
                 angle += 360 * 3 + idx * 36;
                 svg.style.transform = `rotate(${angle}deg)`; svg.style.transition = 'transform 4s cubic-bezier(0.2,0.8,0.2,1)';
                 setTimeout(() => {
                     const win = (useFree ? 5 : bet) * mult;
-                    playBalance += win - (useFree ? 0 : bet);
+                    const delta = win - (useFree ? 0 : bet);
+                    applyGameDelta(delta);
                     document.getElementById('wheelResult').textContent = (useFree ? "Spin gratuit! " : "") + "Multiplicateur " + mult + "x. Gain: +" + win + " ARCANA";
-                    updateArcadeBalance();
                 }, 4000);
             };
         }
@@ -183,32 +267,34 @@
             let hand = [], sum = () => hand.reduce((a,c)=>a+Math.min(c,10),0);
             const deal = () => { hand = [Math.floor(Math.random()*13)+1, Math.floor(Math.random()*13)+1]; document.getElementById('bjPlayer').textContent = hand.join(', '); document.getElementById('bjSum').textContent = sum(); document.getElementById('bjResult').textContent = ''; };
             deal();
-            document.getElementById('bjHit').onclick = () => { hand.push(Math.floor(Math.random()*13)+1); document.getElementById('bjPlayer').textContent = hand.join(', '); document.getElementById('bjSum').textContent = sum(); if (sum()>21) { const bet = parseFloat(document.getElementById('bjBet').value)||0; playBalance-=bet; document.getElementById('bjResult').textContent = "Bust! -"+bet; updateArcadeBalance(); } };
-            document.getElementById('bjStand').onclick = () => { const dealer = Math.floor(Math.random()*11)+16; const bet = parseFloat(document.getElementById('bjBet').value)||0; const s = sum(); let win = (s>dealer||dealer>21) ? bet*2 : (s===dealer ? 0 : -bet); playBalance += win - (win>0?0:bet); document.getElementById('bjResult').textContent = "Dealer: "+dealer+". "+(win>0?"Gagné +"+win:"Perdu -"+bet); updateArcadeBalance(); };
+            document.getElementById('bjHit').onclick = () => { hand.push(Math.floor(Math.random()*13)+1); document.getElementById('bjPlayer').textContent = hand.join(', '); document.getElementById('bjSum').textContent = sum(); if (sum()>21) { const bet = parseFloat(document.getElementById('bjBet').value)||0; applyGameDelta(-bet); document.getElementById('bjResult').textContent = "Bust! -"+bet; } };
+            document.getElementById('bjStand').onclick = () => { const dealer = Math.floor(Math.random()*11)+16; const bet = parseFloat(document.getElementById('bjBet').value)||0; const s = sum(); let win = (s>dealer||dealer>21) ? bet*2 : (s===dealer ? 0 : -bet); const delta = win - (win>0?0:bet); applyGameDelta(delta); document.getElementById('bjResult').textContent = "Dealer: "+dealer+". "+(win>0?"Gagné +"+win:"Perdu -"+bet); };
         }
 
         function runRoulette(container) {
             container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="rlBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><p class="mb-2"><label><input type="radio" name="rlChoice" value="red" checked> Rouge</label> <label class="ml-2"><input type="radio" name="rlChoice" value="black"> Noir</label></p><button id="rlSpin" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Tourner</button><p id="rlResult" class="mt-2 text-[#00ffcc]"></p>';
             document.getElementById('rlSpin').onclick = () => {
+                const bet = parseFloat(document.getElementById('rlBet').value)||0;
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('rlResult').textContent = "Connectez le wallet."; return; }
                 const n = Math.floor(Math.random()*37); const red = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]; const isRed = red.includes(n);
                 const choice = document.querySelector('input[name="rlChoice"]:checked').value;
-                const bet = parseFloat(document.getElementById('rlBet').value)||0;
                 const win = (choice==='red'&&isRed)||(choice==='black'&&!isRed&&n!==0) ? bet*2 : n===0 ? -bet : -bet;
-                playBalance += (choice==='red'&&isRed)||(choice==='black'&&!isRed&&n!==0) ? bet : -bet;
+                const delta = (choice==='red'&&isRed)||(choice==='black'&&!isRed&&n!==0) ? bet : -bet;
+                applyGameDelta(delta);
                 document.getElementById('rlResult').textContent = "Numéro "+n+" ("+(isRed?"Rouge":"Noir")+"). "+(win>0?"Gagné +"+win:"Perdu -"+bet);
-                updateArcadeBalance();
             };
         }
 
         function runPlinko(container) {
             container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="plBet" value="5" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><button id="plDrop" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Lancer la bille</button><p id="plResult" class="mt-2 text-[#00ffcc]"></p>';
             document.getElementById('plDrop').onclick = () => {
-                const mult = [0.5,1,2,5,10,2,1,0.5][Math.floor(Math.random()*8)];
                 const bet = parseFloat(document.getElementById('plBet').value)||0;
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('plResult').textContent = "Connectez le wallet."; return; }
+                const mult = [0.5,1,2,5,10,2,1,0.5][Math.floor(Math.random()*8)];
                 const win = bet * mult;
-                playBalance += win - bet;
+                const delta = win - bet;
+                applyGameDelta(delta);
                 document.getElementById('plResult').textContent = "Multiplicateur "+mult+"x. Gain: +"+(win-bet).toFixed(0)+" ARCANA";
-                updateArcadeBalance();
             };
         }
 
@@ -216,13 +302,13 @@
             container.innerHTML = '<p>Video Poker (simplifié). Mise: <input type="number" id="pkBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><button id="pkDeal" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Distribution</button><p id="pkCards" class="my-2"></p><p id="pkResult" class="text-[#00ffcc]"></p>';
             document.getElementById('pkDeal').onclick = () => {
                 const bet = parseFloat(document.getElementById('pkBet').value)||0;
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('pkResult').textContent = "Connectez le wallet."; return; }
                 const cards = Array.from({length:5}, () => Math.floor(Math.random()*13)+1);
                 document.getElementById('pkCards').textContent = "Cartes: "+cards.join(", ");
                 const pair = cards.some(c=>cards.filter(x=>x===c).length>=2);
-                const win = pair ? bet * 2 : -bet;
-                playBalance += pair ? bet : -bet;
+                const delta = pair ? bet : -bet;
+                applyGameDelta(delta);
                 document.getElementById('pkResult').textContent = pair ? "Paire! +"+bet+" ARCANA" : "Perdu -"+bet+" ARCANA";
-                updateArcadeBalance();
             };
         }
 
@@ -230,34 +316,36 @@
             container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="crBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><p id="crMultiplier" class="text-2xl font-bold text-[#00ffcc]">1.00x</p><button id="crPlay" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold mt-2">Jouer</button> <button id="crCash" class="px-4 py-2 rounded bg-[#00ffcc] text-[#0a0e1a] font-bold mt-2 hidden">Cash out</button><p id="crResult" class="mt-2 text-[#00ffcc]"></p>';
             let crashId = null, mult = 1;
             document.getElementById('crPlay').onclick = () => {
+                const bet = parseFloat(document.getElementById('crBet').value)||0;
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('crResult').textContent = "Connectez le wallet."; return; }
                 mult = 1; document.getElementById('crCash').classList.remove('hidden'); document.getElementById('crResult').textContent = '';
                 crashId = setInterval(() => {
                     mult += 0.1; document.getElementById('crMultiplier').textContent = mult.toFixed(2)+"x";
-                    if (Math.random() < 0.02) { clearInterval(crashId); const bet = parseFloat(document.getElementById('crBet').value)||0; playBalance -= bet; document.getElementById('crResult').textContent = "Crash! Perdu -"+bet; document.getElementById('crCash').classList.add('hidden'); updateArcadeBalance(); }
+                    if (Math.random() < 0.02) { clearInterval(crashId); const b = parseFloat(document.getElementById('crBet').value)||0; applyGameDelta(-b); document.getElementById('crResult').textContent = "Crash! Perdu -"+b; document.getElementById('crCash').classList.add('hidden'); }
                 }, 200);
             };
             document.getElementById('crCash').onclick = () => {
                 if (!crashId) return; clearInterval(crashId); crashId = null;
                 const bet = parseFloat(document.getElementById('crBet').value)||0;
                 const win = bet * mult;
-                playBalance += win - bet;
+                applyGameDelta(win - bet);
                 document.getElementById('crResult').textContent = "Cash out! +"+(win-bet).toFixed(0)+" ARCANA";
                 document.getElementById('crCash').classList.add('hidden');
-                updateArcadeBalance();
             };
         }
 
         function runBaccarat(container) {
             container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="bcBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><p class="mb-2"><label><input type="radio" name="bcChoice" value="player" checked> Joueur</label> <label class="ml-2"><input type="radio" name="bcChoice" value="banker"> Banque</label></p><button id="bcDeal" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Jouer</button><p id="bcResult" class="mt-2 text-[#00ffcc]"></p>';
             document.getElementById('bcDeal').onclick = () => {
+                const bet = parseFloat(document.getElementById('bcBet').value)||0;
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('bcResult').textContent = "Connectez le wallet."; return; }
                 const p = (Math.floor(Math.random()*9)+1 + Math.floor(Math.random()*9)+1) % 10;
                 const b = (Math.floor(Math.random()*9)+1 + Math.floor(Math.random()*9)+1) % 10;
                 const choice = document.querySelector('input[name="bcChoice"]:checked').value;
-                const bet = parseFloat(document.getElementById('bcBet').value)||0;
                 const win = (choice==='player'&&p>b)||(choice==='banker'&&b>p) ? bet*2 : (p===b ? 0 : -bet);
-                playBalance += (choice==='player'&&p>b)||(choice==='banker'&&b>p) ? bet : (p===b ? 0 : -bet);
+                const delta = (choice==='player'&&p>b)||(choice==='banker'&&b>p) ? bet : (p===b ? 0 : -bet);
+                applyGameDelta(delta);
                 document.getElementById('bcResult').textContent = "Joueur "+p+" - Banque "+b+". "+(win>0?"Gagné +"+win:"Perdu -"+bet);
-                updateArcadeBalance();
             };
         }
 
@@ -271,10 +359,11 @@
                     cell.className = 'w-10 h-10 rounded border border-[#D4AF37]/50 ' + (revealed[i] ? 'bg-[#00ffcc]/20' : 'bg-black/40');
                     cell.textContent = revealed[i] ? (mines[i] ? '💣' : '✅') : '?';
                     cell.onclick = () => {
-                        if (!started) { mines = Array(size).fill(0); for (let m=0; m<5; m++) mines[Math.floor(Math.random()*size)]=1; started = true; }
+                        const bet = parseFloat(document.getElementById('mnBet').value) || 0;
+                        if (!started) { if (bet > getDisplayBalance() && !userAddress) { document.getElementById('mnResult').textContent = "Connectez le wallet."; return; } mines = Array(size).fill(0); for (let m=0; m<5; m++) mines[Math.floor(Math.random()*size)]=1; started = true; }
                         if (revealed[i]) return; revealed[i]=1; render();
-                        if (mines[i]) { const bet = parseFloat(document.getElementById('mnBet').value)||0; playBalance-=bet; document.getElementById('mnResult').textContent = "Mine! -"+bet; updateArcadeBalance(); started=false; revealed=[]; mines=[]; setTimeout(render,500); }
-                        else { const count = revealed.filter((_,j)=>!mines[j]).length; const bet = parseFloat(document.getElementById('mnBet').value)||0; const win = bet * (1 + count * 0.2); playBalance += win - bet; document.getElementById('mnResult').textContent = "Sûr! +"+(win-bet).toFixed(0)+" ARCANA. Continuez ou relancez."; updateArcadeBalance(); }
+                        if (mines[i]) { applyGameDelta(-bet); document.getElementById('mnResult').textContent = "Mine! -"+bet; started=false; revealed=[]; mines=[]; setTimeout(render,500); }
+                        else { const count = revealed.filter((_,j)=>!mines[j]).length; const win = bet * (1 + count * 0.2); applyGameDelta(win - bet); document.getElementById('mnResult').textContent = "Sûr! +"+(win-bet).toFixed(0)+" ARCANA. Continuez ou relancez."; }
                     };
                     g.appendChild(cell);
                 }
@@ -304,12 +393,24 @@
                 const network = await provider.getNetwork();
                 if (network.chainId !== POLYGON_CHAIN_ID) await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
                 userAddress = (await provider.listAccounts())[0];
-                await updateArcadeBalance();
+                loadArcadeState();
+                await refreshChainBalanceSilent();
+                startSilentRefresh();
+                renderDisplayBalance();
             } catch (e) { console.error(e); }
         };
 
-        if (window.ethereum) window.ethereum.on('accountsChanged', () => { userAddress = null; updateArcadeBalance(); });
-        updateArcadeBalance();
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', () => {
+                userAddress = null;
+                if (silentRefreshTimer) clearInterval(silentRefreshTimer);
+                silentRefreshTimer = null;
+                chainBalance = 0;
+                localDelta = 0;
+                renderDisplayBalance();
+            });
+        }
+        renderDisplayBalance();
     </script>
 </body>
 </html>
