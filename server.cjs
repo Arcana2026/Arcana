@@ -19,6 +19,11 @@ function getClientIp(req) {
         || '';
 }
 
+// ========== CONFIGURATION ADMIN & VAULT (UNIQUE) ==========
+// Seule cette adresse est ADMIN et VAULT : elle perçoit tous les profits et gère les fonds.
+// Aucune autre adresse ne peut recevoir les pertes Arcade ni gérer le coffre.
+const ADMIN_VAULT_ADDRESS = (process.env.ARCANA_ADMIN_VAULT || '0x1990fD46a1ad0344751be45d6779b8c1f827076d').toLowerCase();
+
 // Domaine Web3 officiel Arcana Safe (transaction Polygon 0x5fda... confirmée)
 const OFFICIAL_DOMAIN = process.env.OFFICIAL_DOMAIN || 'https://arcana-ezl.pages.dev';
 
@@ -171,11 +176,11 @@ app.get('/api/arcade-leaderboard', (req, res) => {
     res.json({ leaderboard: today.slice(0, LEADERBOARD_MAX) });
 });
 
-// --- Réserve du coffre Arcade : 5% = Max Bet, 0 = Maintenance ---
-const VAULT_ADDRESS = (process.env.ARCANA_VAULT_ADDRESS || '0x1990fD46a1ad0344751be45d6779b8c1f827076d').toLowerCase();
+// --- Réserve du coffre Arcade (même adresse ADMIN/VAULT) : Max Bet = 5% réserve, 0 = Maintenance ---
+const VAULT_ADDRESS = ADMIN_VAULT_ADDRESS;
 const ARCANA_TOKEN_ABI = ['function balanceOf(address owner) view returns (uint256)'];
 const ARCANA_TOKEN_ADDRESS = process.env.ARCANA_TOKEN_ADDRESS || VAULT_ADDRESS;
-const MAX_BET_PERCENT = 0.05;
+const MAX_BET_PERCENT = 0.05; // Limite 5% de la réserve pour protéger le capital
 let arcadeTokenContract = null;
 try {
     arcadeTokenContract = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ARCANA_TOKEN_ABI, provider);
@@ -199,7 +204,7 @@ app.get('/api/arcade-vault-reserve', async (req, res) => {
     }
 });
 
-// --- Settlement Arcade : gains → wallet gagnant, pertes → coffre 0x1990fD46 (à brancher sur le contrat quand prêt) ---
+// --- Settlement Arcade : AUTOMATISATION — gains du coffre vers joueur, pertes verrouillées dans le coffre (ADMIN_VAULT) ---
 app.post('/api/arcade-settle', async (req, res) => {
     try {
         const { address, bet, winAmount, game } = req.body;
@@ -220,8 +225,7 @@ app.post('/api/arcade-settle', async (req, res) => {
                 timestamp: new Date().toISOString()
             });
         }
-        // TODO: quand le contrat Arcade sera déployé : appeler payWinner(address, amount) pour les gains
-        // et enregistrer les pertes côté contrat (transfert vers VAULT_ADDRESS). Pour l’instant enregistrement côté serveur uniquement.
+        // Gains = transfert depuis ADMIN_VAULT vers address ; pertes = restent dans ADMIN_VAULT. Pour l’instant enregistrement côté serveur uniquement.
         res.json({ success: true, recorded: true });
     } catch (e) {
         console.error('Erreur arcade-settle:', e);

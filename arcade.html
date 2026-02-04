@@ -264,7 +264,6 @@
                 const choice = document.querySelector('input[name="diceChoice"]:checked').value;
                 const roll = Math.floor(Math.random() * 100) + 1;
                 const win = (choice === 'over' && roll > 50) || (choice === 'under' && roll < 50);
-                const rawProfit = win ? bet * 0.95 : -bet;
                 const delta = win ? applyRTP(bet * 0.95) : -bet;
                 const winAmount = win ? bet + delta : 0;
                 applyGameDelta(delta);
@@ -346,8 +345,9 @@
                 const rawWin = (s>dealer||dealer>21) ? bet*2 : (s===dealer ? bet : 0);
                 const profit = rawWin - bet;
                 const delta = profit > 0 ? applyRTP(profit) : (s===dealer ? 0 : -bet);
+                const winAmount = s===dealer ? bet : (profit > 0 ? bet + applyRTP(profit) : 0);
                 applyGameDelta(delta);
-                notifySettle(bet, bet + (profit > 0 ? applyRTP(profit) : 0), 'Blackjack');
+                notifySettle(bet, winAmount, 'Blackjack');
                 document.getElementById('bjResult').textContent = "Dealer: "+dealer+". "+(delta>0?"Gagné +"+delta.toFixed(2):delta<0?"Perdu -"+bet:"Égalité");
             };
         }
@@ -443,7 +443,7 @@
                 const won = (choice==='player'&&p>b)||(choice==='banker'&&b>p);
                 const rawProfit = won ? bet : (p===b ? 0 : -bet);
                 const delta = won ? applyRTP(bet) : rawProfit;
-                const winAmount = won ? bet + delta : 0;
+                const winAmount = won ? bet + delta : (p===b ? bet : 0);
                 applyGameDelta(delta);
                 notifySettle(bet, winAmount, 'Baccarat');
                 document.getElementById('bcResult').textContent = "Joueur "+p+" - Banque "+b+". "+(won?"Gagné +"+delta.toFixed(2)+" ARCANA (RTP 97%)":(p===b?"Égalité":"Perdu -"+bet+" ARCANA"));
@@ -477,6 +477,7 @@
                 const id = card.getAttribute('data-game');
                 const game = games[id];
                 if (!game) return;
+                fetchVaultState();
                 document.getElementById('gameTitle').textContent = game.name;
                 document.getElementById('gameContent').innerHTML = '';
                 game.run(document.getElementById('gameContent'));
@@ -511,6 +512,7 @@
                 renderDisplayBalance();
             });
         }
+        fetchVaultState();
         renderDisplayBalance();
     </script>
 </body>
