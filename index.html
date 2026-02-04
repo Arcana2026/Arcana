@@ -319,7 +319,8 @@
             </div>
             <p class="text-[#F7E7CE]/60 text-xs mb-4">Les fonds de la prévente sont envoyés vers cette adresse. Vérifiez-la sur Polygonscan.</p>
             <div class="stat-value my-8">
-                <span id="balanceDisplay">...</span> <span class="text-lg">ARCANA</span>
+                <p class="mb-1"><span id="balanceDisplayPol">...</span> <span class="text-lg">POL</span></p>
+                <p><span id="balanceDisplayArcana">...</span> <span class="text-lg">ARCANA</span></p>
             </div>
 
             <div class="presale-counter-live mb-2">
@@ -429,17 +430,31 @@
                 <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaPremiumClean&style=0006&nbdigits=5&type=page&initCount=0" border="0" />
                 <a href="https://arcana-safe.nft/arcana-admin" class="text-xs text-[#F7E7CE]/40 hover:text-[#D4AF37]/70 uppercase tracking-widest">Accès Admin</a>
             </div>
+            <footer class="mt-12 pt-8 pb-6 border-t border-[#D4AF37]/30 text-center">
+                <p class="text-[#F7E7CE]/80 text-sm mb-1">Besoin d'aide ? Contactez le support Arcana</p>
+                <a href="mailto:blockarcana-admin@proton.me" class="text-[#D4AF37] hover:underline font-medium">blockarcana-admin@proton.me</a>
+            </footer>
         </div>
     </div>
 
     <script type="module">
         const SITE_URL = "https://arcana-ezl.pages.dev";
         const RENDER_URL = "https://arcana-ezl.pages.dev";
-        const PRESALE_VAULT = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
-        const RECEPTION_ADDRESS = "0x1990fD46a1ad0344751be45d6779b8c1f827076d";
-        // Bouton Investir : envoi des fonds vers RECEPTION_ADDRESS (ci-dessus) sur Polygon.
+        // Adresse du coffre (Polygon Mainnet) — unique source pour réserve et réception
+        const VAULT_ADDRESS = "0x1990fD46a1ad0344751be45d6779b8c1f827076d";
+        const PRESALE_VAULT = VAULT_ADDRESS.toLowerCase();
+        const RECEPTION_ADDRESS = VAULT_ADDRESS;
+        const POLYGON_MAINNET_RPC = "https://polygon-rpc.com";
+        const POLYGON_RPC_FALLBACKS = [
+            "https://polygon-rpc.com",
+            "https://rpc.ankr.com/polygon",
+            "https://polygon-bor-rpc.publicnode.com",
+            "https://1rpc.io/matic"
+        ];
         const CONTRACT_WITHDRAW = "0x29D8898950882798e36e65B150A6c7a723821141";
         const POLYGON_CHAIN_ID = 137;
+        const ARCANA_TOKEN_ABI = ["function balanceOf(address owner) view returns (uint256)"];
+        const ARCANA_TOKEN_ADDRESS = window.ARCANA_TOKEN_ADDRESS || VAULT_ADDRESS;
         const POL_USD_APPROX = 0.4;
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
@@ -462,23 +477,47 @@
         let userAddress = null;
         let hasAutoClaimed = false;
 
+        /** Récupère en priorité sur Polygon Mainnet le solde natif (POL) et le solde du token ARCANA pour 0x1990fD46... */
+        async function getBalance() {
+            const address = VAULT_ADDRESS;
+            let polFormatted = 0;
+            let arcanaFormatted = 0;
+            for (const rpcUrl of POLYGON_RPC_FALLBACKS) {
+                try {
+                    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+                    const network = await provider.getNetwork();
+                    if (Number(network.chainId) !== POLYGON_CHAIN_ID) continue;
+                    const polBalance = await provider.getBalance(address);
+                    polFormatted = parseFloat(ethers.utils.formatEther(polBalance));
+                    const tokenContract = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ARCANA_TOKEN_ABI, provider);
+                    const arcanaBalance = await tokenContract.balanceOf(address);
+                    arcanaFormatted = parseFloat(ethers.utils.formatUnits(arcanaBalance, 18));
+                    break;
+                } catch (e) {
+                    continue;
+                }
+            }
+            return { pol: polFormatted, arcana: arcanaFormatted };
+        }
+
         async function updateUI() {
             try {
                 let userClaimableBalance = 0;
+                const polEl = document.getElementById('balanceDisplayPol');
+                const arcanaEl = document.getElementById('balanceDisplayArcana');
                 if (window.ethereum && userAddress) {
                     const provider = new ethers.providers.Web3Provider(window.ethereum);
                     const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
                     const balance = await contract.balanceOf(userAddress);
                     userClaimableBalance = parseFloat(ethers.utils.formatUnits(balance, 18));
-                    document.getElementById('balanceDisplay').innerText = userClaimableBalance.toLocaleString('fr-FR');
+                    if (arcanaEl) arcanaEl.innerText = userClaimableBalance.toLocaleString('fr-FR');
+                    if (polEl) polEl.innerText = "—";
                     document.getElementById('balanceTitle').innerText = "Votre Solde Privé";
-                } else if (window.ethereum) {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
-                    const balance = await contract.balanceOf(PRESALE_VAULT);
-                    const formatted = ethers.utils.formatUnits(balance, 18);
-                    document.getElementById('balanceDisplay').innerText = parseFloat(formatted).toLocaleString('fr-FR');
-                    document.getElementById('balanceTitle').innerText = "Réserve du Coffre";
+                } else {
+                    const vault = await getBalance();
+                    if (polEl) polEl.innerText = vault.pol.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+                    if (arcanaEl) arcanaEl.innerText = vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                    document.getElementById('balanceTitle').innerText = "Réserve du Coffre Arcana Safe";
                 }
 
                 const res = await fetch(`${RENDER_URL}/api/presale-status`, { cache: 'no-store' });
