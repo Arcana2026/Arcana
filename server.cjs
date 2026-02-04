@@ -181,26 +181,31 @@ const VAULT_ADDRESS = ADMIN_VAULT_ADDRESS;
 const ARCANA_TOKEN_ABI = ['function balanceOf(address owner) view returns (uint256)'];
 const ARCANA_TOKEN_ADDRESS = process.env.ARCANA_TOKEN_ADDRESS || VAULT_ADDRESS;
 const MAX_BET_PERCENT = 0.05; // Limite 5% de la réserve pour protéger le capital
+// Réserve de départ (311 POL + 10 000 ARC) : active les jeux même si la chaîne renvoie 0 en attendant le transfert des 5M
+const FALLBACK_RESERVE_ARCANA = parseFloat(process.env.ARCANA_ARCADE_FALLBACK_RESERVE || '10000');
 let arcadeTokenContract = null;
 try {
     arcadeTokenContract = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ARCANA_TOKEN_ABI, provider);
 } catch (e) {
-    console.warn('Arcade: contrat token non initialisé, réserve en maintenance:', e.message);
+    console.warn('Arcade: contrat token non initialisé, utilisation réserve de départ:', e.message);
 }
 
 app.get('/api/arcade-vault-reserve', async (req, res) => {
     try {
-        if (!arcadeTokenContract) {
-            return res.json({ reserve: 0, maxBet: 0, maintenance: true });
+        let reserve = 0;
+        if (arcadeTokenContract) {
+            try {
+                const raw = await arcadeTokenContract.balanceOf(VAULT_ADDRESS);
+                reserve = parseFloat(ethers.utils.formatUnits(raw, 18));
+            } catch (_) {}
         }
-        const raw = await arcadeTokenContract.balanceOf(VAULT_ADDRESS);
-        const reserve = parseFloat(ethers.utils.formatUnits(raw, 18));
+        if (reserve <= 0) reserve = FALLBACK_RESERVE_ARCANA;
         const maxBet = Math.floor(reserve * MAX_BET_PERCENT * 1000) / 1000;
-        const maintenance = reserve <= 0;
+        const maintenance = false;
         res.json({ reserve, maxBet, maintenance });
     } catch (e) {
         console.error('Erreur réserve arcade:', e.message);
-        res.json({ reserve: 0, maxBet: 0, maintenance: true });
+        res.json({ reserve: FALLBACK_RESERVE_ARCANA, maxBet: Math.floor(FALLBACK_RESERVE_ARCANA * MAX_BET_PERCENT * 1000) / 1000, maintenance: false });
     }
 });
 
