@@ -171,6 +171,64 @@ app.get('/api/arcade-leaderboard', (req, res) => {
     res.json({ leaderboard: today.slice(0, LEADERBOARD_MAX) });
 });
 
+// --- Réserve du coffre Arcade : 5% = Max Bet, 0 = Maintenance ---
+const VAULT_ADDRESS = (process.env.ARCANA_VAULT_ADDRESS || '0x1990fD46a1ad0344751be45d6779b8c1f827076d').toLowerCase();
+const ARCANA_TOKEN_ABI = ['function balanceOf(address owner) view returns (uint256)'];
+const ARCANA_TOKEN_ADDRESS = process.env.ARCANA_TOKEN_ADDRESS || VAULT_ADDRESS;
+const MAX_BET_PERCENT = 0.05;
+let arcadeTokenContract = null;
+try {
+    arcadeTokenContract = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ARCANA_TOKEN_ABI, provider);
+} catch (e) {
+    console.warn('Arcade: contrat token non initialisé, réserve en maintenance:', e.message);
+}
+
+app.get('/api/arcade-vault-reserve', async (req, res) => {
+    try {
+        if (!arcadeTokenContract) {
+            return res.json({ reserve: 0, maxBet: 0, maintenance: true });
+        }
+        const raw = await arcadeTokenContract.balanceOf(VAULT_ADDRESS);
+        const reserve = parseFloat(ethers.utils.formatUnits(raw, 18));
+        const maxBet = Math.floor(reserve * MAX_BET_PERCENT * 1000) / 1000;
+        const maintenance = reserve <= 0;
+        res.json({ reserve, maxBet, maintenance });
+    } catch (e) {
+        console.error('Erreur réserve arcade:', e.message);
+        res.json({ reserve: 0, maxBet: 0, maintenance: true });
+    }
+});
+
+// --- Settlement Arcade : gains → wallet gagnant, pertes → coffre 0x1990fD46 (à brancher sur le contrat quand prêt) ---
+app.post('/api/arcade-settle', async (req, res) => {
+    try {
+        const { address, bet, winAmount, game } = req.body;
+        const betNum = parseFloat(bet);
+        const winNum = parseFloat(winAmount);
+        if (!address || typeof address !== 'string' || !ethers.utils.isAddress(address)) {
+            return res.status(400).json({ success: false, error: 'Adresse invalide' });
+        }
+        if (isNaN(betNum) || betNum < 0) {
+            return res.status(400).json({ success: false, error: 'Mise invalide' });
+        }
+        const netWin = winNum - betNum;
+        if (netWin > 0) {
+            arcadeWins.push({
+                address: address.toLowerCase(),
+                amount: netWin,
+                game: (game && typeof game === 'string') ? game.slice(0, 50) : 'Arcade',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // TODO: quand le contrat Arcade sera déployé : appeler payWinner(address, amount) pour les gains
+        // et enregistrer les pertes côté contrat (transfert vers VAULT_ADDRESS). Pour l’instant enregistrement côté serveur uniquement.
+        res.json({ success: true, recorded: true });
+    } catch (e) {
+        console.error('Erreur arcade-settle:', e);
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
 // --- 2d. API ADMIN : liste des transactions ---
 app.get('/api/admin/transactions', (req, res) => {
     const authHeader = req.headers.authorization;
