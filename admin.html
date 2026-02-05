@@ -67,7 +67,7 @@
             <div class="card p-8">
                 <h2 class="text-sm uppercase tracking-widest text-[#D4AF37] mb-6">Vue en temps réel</h2>
                 <p class="text-xs text-[#00ffcc]/80 mb-2">Adresse unique <strong>ADMIN &amp; VAULT</strong> (seule adresse autorisée à percevoir les profits et gérer les fonds) :</p>
-                <code class="block text-[#00ffcc] text-xs mb-4 break-all bg-black/40 px-2 py-1 rounded border border-[#D4AF37]/40">0x1990fD46a1ad0344751be45d6779b8c1f827076d</code>
+                <code class="block text-[#00ffcc] text-xs mb-4 break-all bg-black/40 px-2 py-1 rounded border border-[#D4AF37]/40">0x29D61511C84E332635E296e375f22Eb4fB514147</code>
                 <p class="text-xs text-[#00ffcc]/80 mb-4">Suivi en direct depuis <strong>arcana-safe.nft</strong> — vos ventes sont enregistrées ici.</p>
                 <div class="grid grid-cols-2 gap-6 mb-6">
                     <div>
@@ -132,17 +132,20 @@
             const res = await fetch(`${API_BASE}/api/admin/stats`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Non autorisé');
-            return res.json();
+            const text = await res.text();
+            if (!res.ok) throw new Error('Non autorise (HTTP ' + res.status + ')');
+            if (!text || !text.trim()) throw new Error('Reponse vide du serveur');
+            try { return JSON.parse(text); } catch (e) { throw new Error('Reponse JSON invalide: ' + e.message); }
         }
 
         async function fetchTransactions(token) {
             const res = await fetch(`${API_BASE}/api/admin/transactions`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            const text = await res.text();
             if (!res.ok) return [];
-            const data = await res.json();
-            return data.transactions || [];
+            if (!text || !text.trim()) return [];
+            try { const data = JSON.parse(text); return data.transactions || []; } catch (e) { return []; }
         }
 
         function formatAddress(addr) {
