@@ -314,7 +314,7 @@
             <h2 id="balanceTitle" class="text-xl mb-4 opacity-80 uppercase tracking-widest">Réserve du Coffre Arcana Safe</h2>
             <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80 mb-2">Adresse de réception (Polygon)</p>
             <div class="flex items-center justify-center gap-2 mb-2 flex-wrap">
-                <code id="receptionAddress" class="text-[#00ffcc]/95 font-mono text-sm px-3 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/50 break-all">0x29D61511C84E332635E296e375f22Eb4fB514147</code>
+                <code id="receptionAddress" class="text-[#00ffcc]/95 font-mono text-sm px-3 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/50 break-all">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>
                 <span class="badge-verified-blockchain" title="Contrat vérifié sur Polygon">Vérifié sur la Blockchain</span>
                 <button type="button" id="copyAddressBtn" class="px-3 py-2 rounded-lg border border-[#D4AF37]/60 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition" title="Copier l'adresse">Copier</button>
             </div>
@@ -387,7 +387,7 @@
                                     <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Utilité du jeton</p>
                                     <p>ARCANA sert d’unité de compte et de réserve de valeur au sein de l’écosystème sécurisé par le Coffre. L’accès aux fonctionnalités futures (staking, gouvernance) pourra être conditionné à la détention du jeton.</p>
                                     <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Transparence</p>
-                                    <p>Les soldes et les achats sont enregistrés sur la blockchain Polygon (contrat <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e375f22Eb4fB514147</code>). Chaque détenteur peut vérifier son allocation à tout moment.</p>
+                                    <p>Les soldes et les achats sont enregistrés sur la blockchain Polygon (contrat <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>). Chaque détenteur peut vérifier son allocation à tout moment.</p>
                                 </div>
                             </section>
 
@@ -422,7 +422,7 @@
 
             <div class="mb-6 card p-4 border-2 border-[#D4AF37]/60">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-2">🎁 Welcome Bonus</h3>
-                <p class="text-sm text-[#F7E7CE]/90 mb-1">• <strong>100%</strong> sur votre premier dépôt vers le Coffre : <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e375f22Eb4fB514147</code></p>
+                <p class="text-sm text-[#F7E7CE]/90 mb-1">• <strong>100%</strong> sur votre premier dépôt vers le Coffre : <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e37bf22Eb4fB514147</code></p>
                 <p class="text-sm text-[#F7E7CE]/90">• <strong>5 spins gratuits</strong> sur la Roue de la Fortune dans l'Arcade.</p>
                 <a href="arcade.html" class="inline-block mt-2 px-4 py-2 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30 text-sm font-medium">Accéder à l'Arcade</a>
             </div>
@@ -441,7 +441,7 @@
     <script type="module">
         const SITE_URL = "https://arcana-ezl.pages.dev";
         const RENDER_URL = "https://arcana-ezl.pages.dev";
-        const ARCANA_VAULT_ADDRESS = "0x29D61511C84E332635E296e375f22Eb4fB514147";
+        const ARCANA_VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
         const PRESALE_VAULT = ARCANA_VAULT_ADDRESS.toLowerCase();
         const VAULT_ADDRESS = ARCANA_VAULT_ADDRESS;
         const RECEPTION_ADDRESS = ARCANA_VAULT_ADDRESS;
@@ -455,6 +455,7 @@
         const CONTRACT_WITHDRAW = ARCANA_VAULT_ADDRESS;
         const POLYGON_CHAIN_ID = 137;
         const ARCANA_TOKEN_ABI = ["function balanceOf(address owner) view returns (uint256)"];
+        /** Pour l'instant, le token ARCANA affiché (solde coffre) est le même que le Vault. */
         const ARCANA_TOKEN_ADDRESS = window.ARCANA_TOKEN_ADDRESS || ARCANA_VAULT_ADDRESS;
         const POL_USD_APPROX = 0.4;
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
@@ -482,16 +483,26 @@
         let userAddress = null;
         let hasAutoClaimed = false;
 
+        /** Évite le crash "Unexpected end of JSON input" : ne jamais utiliser response.json() sur une réponse vide ou non-JSON. */
         async function safeFetchJson(url, options) {
-            const res = await fetch(url, options);
-            const text = await res.text();
+            let text;
+            try {
+                const res = await fetch(url, options);
+                text = await res.text();
+            } catch (e) {
+                throw new Error("Impossible de joindre le serveur. Vérifiez votre connexion.");
+            }
             if (!text || text.trim() === "") {
-                throw new Error("Reponse vide du serveur");
+                throw new Error("Le serveur n'a renvoyé aucune donnée. Réessayez plus tard.");
             }
             try {
                 return JSON.parse(text);
             } catch (e) {
-                throw new Error("Reponse JSON invalide");
+                const msg = (e && e.message) || String(e);
+                if (/Unexpected end of JSON|JSON|invalid/i.test(msg)) {
+                    throw new Error("Réponse du serveur invalide (pas du JSON). L'API peut être indisponible.");
+                }
+                throw new Error("Réponse du serveur invalide. Réessayez plus tard.");
             }
         }
 
@@ -584,7 +595,11 @@
                 }
             } catch (err) {
                 console.error("Erreur UI:", err);
-                if (document.getElementById('progressText')) document.getElementById('progressText').innerText = "Erreur: " + (err.message || "chargement");
+                const msg = (err && err.message) ? err.message : String(err);
+                const friendly = /JSON|Unexpected end|invalide|serveur/i.test(msg)
+                    ? "Réponse serveur invalide — réessayez plus tard"
+                    : ("Erreur: " + (msg || "chargement"));
+                if (document.getElementById('progressText')) document.getElementById('progressText').innerText = friendly;
             }
         }
 
@@ -746,17 +761,30 @@
                 await tx.wait();
                 document.getElementById('successSound').play();
                 alert("🎉 Vos jetons Arcana ont été réclamés avec succès !");
-                try { await updateUI(); } catch (e) { console.warn("Rafraîchissement après claim:", e.message); }
+                try { await updateUI(); } catch (e) {
+                    console.warn("Rafraîchissement après claim:", e.message);
+                    if (document.getElementById('progressText')) document.getElementById('progressText').innerText = "Données non rafraîchies — " + (e.message || "réessayez");
+                }
             } catch (err) {
                 const msg = (err && (err.message || err.reason)) || String(err) || "Transaction echouee";
                 if (msg.includes("no tokens") || msg.includes("nothing to claim") || msg.includes("revert") || msg.includes("Claim not open")) {
                     alert("Aucun jeton à réclamer pour le moment. La libération des fonds n'a pas encore été activée.");
+                } else if (/JSON|Unexpected end|invalide|serveur/i.test(msg)) {
+                    alert("Erreur de communication avec le serveur (réponse invalide). Réessayez dans quelques instants.");
                 } else {
                     alert("Erreur : " + msg);
                 }
             } finally {
                 document.getElementById('claimBtn').disabled = false;
                 document.getElementById('claimBtn').innerText = "Réclamer mes jetons Arcana Safe";
+            }
+        }
+
+        /** Scroll fluide vers la zone d'investissement au clic sur "Investir dans le Coffre-Fort". */
+        function investDirect() {
+            const zone = document.getElementById('zone-investissement');
+            if (zone) {
+                zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
