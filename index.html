@@ -18,7 +18,7 @@
     <meta property="og:type" content="website">
     <link rel="canonical" href="https://arcana-ezl.pages.dev">
     <link rel="icon" type="image/png" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- ethers.js : chargé via CDN (également dépendance du projet dans package.json) pour connexion MetaMask et Polygon -->
@@ -29,7 +29,7 @@
         body {
             background-color: #0b0e11;
             color: #F7E7CE;
-            font-family: 'Inter', 'Manrope', -apple-system, sans-serif;
+            font-family: 'Inter', 'Montserrat', -apple-system, sans-serif;
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
@@ -41,12 +41,12 @@
             overflow: hidden;
         }
 
-        /* Sidebar latérale */
+        /* Sidebar Ultra-Pro : noir profond, bordure dorée fine à droite */
         .app-sidebar {
             width: 72px;
             min-width: 72px;
-            background: rgba(11, 14, 17, 0.98);
-            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            background: #0a0a0a;
+            border-right: 1px solid rgba(212, 175, 55, 0.35);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -66,7 +66,7 @@
             border-radius: 12px;
             border: none;
             background: transparent;
-            color: rgba(255, 255, 255, 0.7);
+            color: #ffffff;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -75,11 +75,11 @@
             gap: 4px;
             font-size: 0.65rem;
             font-weight: 600;
-            font-family: 'Inter', 'Manrope', sans-serif;
+            font-family: 'Inter', 'Montserrat', sans-serif;
             transition: color 0.2s ease;
         }
-        .app-sidebar-btn:hover { color: rgba(255, 255, 255, 1); }
-        .app-sidebar-btn.active { color: rgba(255, 255, 255, 1); }
+        .app-sidebar-btn:hover { color: #ffffff; opacity: 1; }
+        .app-sidebar-btn.active { color: #ffffff; opacity: 1; }
         .app-sidebar-btn .icon { width: 22px; height: 22px; line-height: 1; display: flex; align-items: center; justify-content: center; }
         .app-sidebar-btn .icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -94,17 +94,18 @@
         .app-topbar {
             flex-shrink: 0;
             height: 56px;
-            padding: 0 1.25rem;
-            background: rgba(11, 14, 17, 0.98);
+            padding: 0 1.5rem;
+            background: #0a0a0a;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
             gap: 1rem;
         }
         .app-topbar-balance {
-            font-size: 0.9rem;
-            color: rgba(247, 231, 206, 0.9);
+            font-size: 0.95rem;
+            font-family: 'Inter', 'Montserrat', sans-serif;
+            color: #ffffff;
         }
         .app-topbar-balance span { color: #D4AF37; font-weight: 700; }
         .app-content {
@@ -132,6 +133,12 @@
         .app-card:hover {
             border-color: rgba(255, 255, 255, 0.09);
         }
+        .reserve-coffre-block {
+            background: linear-gradient(135deg, rgba(34, 100, 160, 0.25) 0%, rgba(15, 30, 50, 0.9) 100%);
+            border: 1px solid rgba(34, 150, 220, 0.35);
+        }
+        .reserve-coffre-block #balanceTitle,
+        .reserve-coffre-block .address-field-value { color: rgba(255,255,255,0.95); }
         .casino-games-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -213,17 +220,24 @@
         .theatre-sidebar .recent-bets-table { font-size: 0.75rem; }
         .theatre-sidebar .recent-bets-table th, .theatre-sidebar .recent-bets-table td { padding: 0.35rem 0.25rem; }
 
-        /* Panneau Tokenomics (Glassmorphism) */
+        /* Panneau Tokenomics : bordure dorée encadrante, 3 cartes alignées horizontalement */
+        .tokenomics-panel {
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.25);
+        }
         .tokenomics-row {
             display: flex;
             flex-wrap: wrap;
             gap: 1.25rem;
             justify-content: center;
-            margin-bottom: 1.5rem;
+            align-items: stretch;
         }
         .tokenomics-card {
             flex: 1;
-            min-width: 200px;
+            min-width: 180px;
             max-width: 320px;
             padding: 1.25rem 1.5rem;
             border-radius: 12px;
@@ -235,46 +249,48 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', 'Montserrat', sans-serif;
         }
         .tokenomics-card-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
-            margin-bottom: 20px;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            opacity: 0.9;
         }
         .tokenomics-card-title {
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 700;
-            margin: 0 0 0.25rem 0;
+            margin: 0 0 0.35rem 0;
             letter-spacing: 0.02em;
         }
         .tokenomics-card-sub {
             font-size: 0.8rem;
-            opacity: 0.85;
+            color: #ffffff;
             margin: 0;
+            opacity: 0.9;
         }
         .tokenomics-card--cyan .tokenomics-card-icon,
         .tokenomics-card--cyan .tokenomics-card-title {
             color: #22d3ee;
-            text-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+            text-shadow: 0 0 16px rgba(34, 211, 238, 0.5);
         }
-        .tokenomics-card--cyan { border-color: rgba(34, 211, 238, 0.2); box-shadow: 0 0 30px rgba(34, 211, 238, 0.08); }
+        .tokenomics-card--cyan { border-color: rgba(34, 211, 238, 0.2); }
         .tokenomics-card--violet .tokenomics-card-icon,
         .tokenomics-card--violet .tokenomics-card-title {
             color: #a78bfa;
-            text-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+            text-shadow: 0 0 16px rgba(167, 139, 250, 0.5);
         }
-        .tokenomics-card--violet { border-color: rgba(167, 139, 250, 0.2); box-shadow: 0 0 30px rgba(167, 139, 250, 0.08); }
+        .tokenomics-card--violet { border-color: rgba(167, 139, 250, 0.2); }
         .tokenomics-card--green .tokenomics-card-icon,
         .tokenomics-card--green .tokenomics-card-title {
             color: #34d399;
-            text-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+            text-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
         }
-        .tokenomics-card--green { border-color: rgba(52, 211, 153, 0.2); box-shadow: 0 0 30px rgba(52, 211, 153, 0.08); }
+        .tokenomics-card--green { border-color: rgba(52, 211, 153, 0.2); }
         .tokenomics-recycle {
             display: inline-block;
             font-size: 1rem;
@@ -284,7 +300,8 @@
         }
         @keyframes tokenomics-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
-            .tokenomics-row { flex-direction: column; align-items: stretch; margin-bottom: 1rem; }
+            .tokenomics-panel { padding: 1rem; }
+            .tokenomics-row { flex-direction: column; align-items: stretch; margin-bottom: 0; }
             .tokenomics-card { max-width: none; margin-bottom: 15px; }
             .tokenomics-card:last-child { margin-bottom: 0; }
         }
@@ -302,7 +319,7 @@
         }
 
         .logo-text-arcana {
-            font-family: 'Inter', 'Manrope', sans-serif !important;
+            font-family: 'Inter', 'Montserrat', sans-serif !important;
             font-size: 3.5rem !important;
             background: linear-gradient(to bottom, #fef9e7, #f7e7ce, #d4af37) !important;
             -webkit-background-clip: text !important;
@@ -323,17 +340,18 @@
         }
 
         .wallet-address {
-            font-family: monospace;
-            background: rgba(255,255,255,0.05);
-            padding: 8px 16px;
+            font-family: 'Inter', 'Montserrat', sans-serif;
+            background: rgba(212, 175, 55, 0.15);
+            padding: 10px 20px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #F7E7CE;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: #D4AF37;
             cursor: pointer !important;
             transition: 0.2s ease;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
-        .wallet-address:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+        .wallet-address:hover { background: rgba(212, 175, 55, 0.25); border-color: #D4AF37; color: #f7e7ce; }
 
         .card {
             background: linear-gradient(145deg, #131b2e, #0f1629) !important;
@@ -961,7 +979,7 @@
             text-align: center;
             font-size: 0.95rem;
             font-weight: 600;
-            font-family: 'Inter', 'Manrope', sans-serif;
+            font-family: 'Inter', 'Montserrat', sans-serif;
             letter-spacing: 0.08em;
             box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
@@ -1020,25 +1038,25 @@
         }
 
         .btn-cta-invest {
-            background: linear-gradient(135deg, #D4AF37, #B8860B);
-            color: #0a0e1a;
+            background: #0b0e11;
+            color: #ffffff;
             font-weight: 700;
             font-size: 1.1rem;
-            font-family: 'Inter', 'Manrope', sans-serif;
+            font-family: 'Inter', 'Montserrat', sans-serif;
             letter-spacing: 0.08em;
-            padding: 1rem 1.5rem;
+            padding: 1rem 2rem;
             border-radius: 12px;
             text-align: center;
             text-decoration: none;
-            border: 1px solid rgba(212, 175, 55, 0.9);
-            box-shadow: none;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            border: 2px solid #D4AF37;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
         }
         .btn-cta-invest:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
-            border-color: #D4AF37;
-            color: #0a0e1a;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.08);
+            color: #ffffff;
         }
 
         /* --- HEADER MOBILE --- */
@@ -1110,7 +1128,8 @@
     <main id="app-main">
         <!-- Section Dashboard (affichée par défaut) -->
         <section id="section-dashboard" class="section-panel active">
-            <div class="tokenomics-row">
+            <div class="tokenomics-panel">
+                <div class="tokenomics-row">
                 <div class="tokenomics-card tokenomics-card--cyan">
                     <div class="tokenomics-card-icon">🕹️<span class="tokenomics-recycle" title="Rachat déflationniste">♻️</span></div>
                     <h3 class="tokenomics-card-title">Arcana Games</h3>
@@ -1126,17 +1145,18 @@
                     <h3 class="tokenomics-card-title">Smart Contract</h3>
                     <p class="tokenomics-card-sub">Vérifié & Audité</p>
                 </div>
+                </div>
             </div>
             <div class="banner-official-domain app-card mb-4">
                 Domaine Web3 Officiel : <a href="https://arcana-ezl.pages.dev" class="domain" rel="noopener">arcana-safe.nft</a> → <a href="https://arcana-ezl.pages.dev" class="domain" rel="noopener">arcana-ezl.pages.dev</a> <span class="text-[#D4AF37]/80 text-xs ml-1">(transaction 0x5fda… confirmée)</span>
             </div>
             <div class="text-center">
-        <button type="button" id="cta-invest" class="btn-cta-invest block w-full max-w-md mx-auto mb-8 border-0 cursor-pointer">
+        <button type="button" id="cta-invest" class="btn-cta-invest block w-full max-w-xl mx-auto mb-8 border-0 cursor-pointer">
             Investir dans le Coffre-Fort
         </button>
             </div>
-        <div class="max-w-md mx-auto card app-card p-10">
-            <h2 id="balanceTitle" class="text-xl mb-4 opacity-80 uppercase tracking-widest">Réserve du Coffre Arcana Safe</h2>
+        <div class="max-w-xl mx-auto card app-card reserve-coffre-block p-8">
+            <h2 id="balanceTitle" class="text-xl mb-4 opacity-90 uppercase tracking-widest font-semibold">Réserve du Coffre</h2>
             <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80 mb-2">Adresse de réception (Polygon)</p>
             <div class="flex items-center justify-center gap-2 mb-2 flex-wrap">
                 <div class="address-field-wrap">
@@ -1270,6 +1290,7 @@
         <!-- Section Casino : une seule section visible à la fois -->
         <section id="section-casino" class="section-panel">
             <div id="casino-section" class="px-2">
+                <div class="tokenomics-panel">
                 <div class="tokenomics-row">
                     <div class="tokenomics-card tokenomics-card--cyan">
                         <div class="tokenomics-card-icon">🕹️<span class="tokenomics-recycle" title="Rachat déflationniste">♻️</span></div>
@@ -1286,6 +1307,7 @@
                         <h3 class="tokenomics-card-title">Smart Contract</h3>
                         <p class="tokenomics-card-sub">Vérifié & Audité</p>
                     </div>
+                </div>
                 </div>
                 <h2 class="casino-title-neon text-center mb-6">ARCANA CASINO</h2>
                 <p class="casino-liquidite-mention mb-6">10% des profits sont réinjectés dans la liquidité ARCANA.</p>
