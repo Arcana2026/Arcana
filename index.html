@@ -314,7 +314,7 @@
             <h2 id="balanceTitle" class="text-xl mb-4 opacity-80 uppercase tracking-widest">Réserve du Coffre Arcana Safe</h2>
             <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80 mb-2">Adresse de réception (Polygon)</p>
             <div class="flex items-center justify-center gap-2 mb-2 flex-wrap">
-                <code id="receptionAddress" class="text-[#00ffcc]/95 font-mono text-sm px-3 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/50 break-all">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>
+                <code id="receptionAddress" class="text-[#00ffcc]/95 font-mono text-sm px-3 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/50 break-all">0x29D61511C84E332635E296e375f22Eb4fB514147</code>
                 <span class="badge-verified-blockchain" title="Contrat vérifié sur Polygon">Vérifié sur la Blockchain</span>
                 <button type="button" id="copyAddressBtn" class="px-3 py-2 rounded-lg border border-[#D4AF37]/60 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition" title="Copier l'adresse">Copier</button>
             </div>
@@ -387,7 +387,7 @@
                                     <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Utilité du jeton</p>
                                     <p>ARCANA sert d’unité de compte et de réserve de valeur au sein de l’écosystème sécurisé par le Coffre. L’accès aux fonctionnalités futures (staking, gouvernance) pourra être conditionné à la détention du jeton.</p>
                                     <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Transparence</p>
-                                    <p>Les soldes et les achats sont enregistrés sur la blockchain Polygon (contrat <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>). Chaque détenteur peut vérifier son allocation à tout moment.</p>
+                                    <p>Les soldes et les achats sont enregistrés sur la blockchain Polygon (contrat <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e375f22Eb4fB514147</code>). Chaque détenteur peut vérifier son allocation à tout moment.</p>
                                 </div>
                             </section>
 
@@ -422,7 +422,7 @@
 
             <div class="mb-6 card p-4 border-2 border-[#D4AF37]/60">
                 <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-2">🎁 Welcome Bonus</h3>
-                <p class="text-sm text-[#F7E7CE]/90 mb-1">• <strong>100%</strong> sur votre premier dépôt vers le Coffre : <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e37bf22Eb4fB514147</code></p>
+                <p class="text-sm text-[#F7E7CE]/90 mb-1">• <strong>100%</strong> sur votre premier dépôt vers le Coffre : <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e375f22Eb4fB514147</code></p>
                 <p class="text-sm text-[#F7E7CE]/90">• <strong>5 spins gratuits</strong> sur la Roue de la Fortune dans l'Arcade.</p>
                 <a href="arcade.html" class="inline-block mt-2 px-4 py-2 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30 text-sm font-medium">Accéder à l'Arcade</a>
             </div>
@@ -440,9 +440,8 @@
 
     <script type="module">
         const SITE_URL = "https://arcana-ezl.pages.dev";
-        /** URL de l'API sur Render — collez votre lien ici (ex: https://votre-api.onrender.com) */
-        const RENDER_URL = "https://votre-api.onrender.com";
-        const ARCANA_VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
+        const RENDER_URL = "https://arcana-server.onrender.com";
+        const ARCANA_VAULT_ADDRESS = "0x29D61511C84E332635E296e375f22Eb4fB514147";
         const PRESALE_VAULT = ARCANA_VAULT_ADDRESS.toLowerCase();
         const VAULT_ADDRESS = ARCANA_VAULT_ADDRESS;
         const RECEPTION_ADDRESS = ARCANA_VAULT_ADDRESS;
@@ -531,10 +530,12 @@
         }
 
         async function updateUI() {
+            let userClaimableBalance = 0;
+            const polEl = document.getElementById('balanceDisplayPol');
+            const arcanaEl = document.getElementById('balanceDisplayArcana');
+
+            // 1. Affichage des soldes blockchain (toujours exécuté, indépendant de l’API)
             try {
-                let userClaimableBalance = 0;
-                const polEl = document.getElementById('balanceDisplayPol');
-                const arcanaEl = document.getElementById('balanceDisplayArcana');
                 if (window.ethereum && userAddress) {
                     const provider = new ethers.providers.Web3Provider(window.ethereum);
                     const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
@@ -549,26 +550,25 @@
                     if (arcanaEl) arcanaEl.innerText = vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
                     document.getElementById('balanceTitle').innerText = "Réserve du Coffre Arcana Safe";
                 }
+            } catch (err) {
+                console.warn("Erreur solde blockchain:", err);
+                if (polEl) polEl.innerText = "—";
+                if (arcanaEl) arcanaEl.innerText = "—";
+            }
 
-                let data;
-                let serverUnavailable = false;
-                try {
-                    data = await safeFetchJson(`${RENDER_URL}/api/presale-status`, { cache: 'no-store' });
-                } catch (e) {
-                    serverUnavailable = true;
-                    data = { totalRaised: 0, target: 100000, claimOpen: false, state: 'PENDING' };
-                }
-                if (!data || typeof data.totalRaised === 'undefined') {
-                    data = { totalRaised: 0, target: 100000, claimOpen: false, state: 'PENDING' };
-                    serverUnavailable = true;
-                }
-                const isSuccess = data.state === 'SUCCESS' || data.claimOpen === true || data.totalRaised >= data.target;
-                const claimOpen = isSuccess;
-                const percent = Math.max(2, Math.min(100, (data.totalRaised / data.target) * 100));
+            // 2. Appel /api/presale-status : si le serveur est en veille, le reste du script continue
+            try {
+                const data = await safeFetchJson(`${RENDER_URL}/api/presale-status`, { cache: 'no-store' });
+                const valid = data && typeof data.totalRaised !== 'undefined';
+                const totalRaised = valid ? data.totalRaised : 0;
+                const target = valid ? data.target : 100000;
+                const claimOpen = valid && (data.state === 'SUCCESS' || data.claimOpen === true || totalRaised >= target);
+                const percent = Math.max(2, Math.min(100, (totalRaised / target) * 100));
+
                 document.getElementById('progressBar').style.width = percent + "%";
                 const progressEl = document.getElementById('progressText');
-                if (progressEl) progressEl.innerText = serverUnavailable ? "Serveur en pause" : `Récolté : ${data.totalRaised} $`;
-                const ARCANA_SOLD = data.totalRaised / PRICE_PER_ARCANA;
+                if (progressEl) progressEl.innerText = `Récolté : ${totalRaised} $`;
+                const ARCANA_SOLD = totalRaised / PRICE_PER_ARCANA;
                 const remaining = Math.max(0, Math.floor(400000000 - ARCANA_SOLD));
                 document.getElementById('remainingTokens').innerText = `Jetons ARCANA restants : ${remaining.toLocaleString('fr-FR')}`;
 
@@ -600,13 +600,18 @@
                     if (buyBtn) buyBtn.disabled = false;
                     if (amountInput) amountInput.disabled = false;
                 }
-            } catch (err) {
-                console.error("Erreur UI:", err);
-                const msg = (err && err.message) ? err.message : String(err);
-                const friendly = /JSON|Unexpected end|invalide|serveur/i.test(msg)
-                    ? "Réponse serveur invalide — réessayez plus tard"
-                    : ("Erreur: " + (msg || "chargement"));
-                if (document.getElementById('progressText')) document.getElementById('progressText').innerText = friendly;
+            } catch (e) {
+                // Serveur en veille ou réponse non JSON : on n’interrompt pas le script, on affiche un message
+                console.warn("API presale-status indisponible:", e);
+                const progressEl = document.getElementById('progressText');
+                if (progressEl) progressEl.innerText = "Serveur en pause";
+                document.getElementById('progressBar').style.width = "2%";
+                const remainingEl = document.getElementById('remainingTokens');
+                if (remainingEl) remainingEl.innerText = "Jetons ARCANA restants : 400 000 000";
+                const claimBtn = document.getElementById('claimBtn');
+                if (claimBtn) claimBtn.disabled = true;
+                const claimHint = document.getElementById('claimHint');
+                if (claimHint) claimHint.classList.remove('hidden');
             }
         }
 
