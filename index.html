@@ -440,7 +440,8 @@
 
     <script type="module">
         const SITE_URL = "https://arcana-ezl.pages.dev";
-        const RENDER_URL = "https://arcana-ezl.pages.dev";
+        /** URL de l'API sur Render — collez votre lien ici (ex: https://votre-api.onrender.com) */
+        const RENDER_URL = "https://votre-api.onrender.com";
         const ARCANA_VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
         const PRESALE_VAULT = ARCANA_VAULT_ADDRESS.toLowerCase();
         const VAULT_ADDRESS = ARCANA_VAULT_ADDRESS;
@@ -550,17 +551,23 @@
                 }
 
                 let data;
+                let serverUnavailable = false;
                 try {
                     data = await safeFetchJson(`${RENDER_URL}/api/presale-status`, { cache: 'no-store' });
                 } catch (e) {
+                    serverUnavailable = true;
                     data = { totalRaised: 0, target: 100000, claimOpen: false, state: 'PENDING' };
                 }
-                if (!data || typeof data.totalRaised === 'undefined') data = { totalRaised: 0, target: 100000, claimOpen: false, state: 'PENDING' };
+                if (!data || typeof data.totalRaised === 'undefined') {
+                    data = { totalRaised: 0, target: 100000, claimOpen: false, state: 'PENDING' };
+                    serverUnavailable = true;
+                }
                 const isSuccess = data.state === 'SUCCESS' || data.claimOpen === true || data.totalRaised >= data.target;
                 const claimOpen = isSuccess;
                 const percent = Math.max(2, Math.min(100, (data.totalRaised / data.target) * 100));
                 document.getElementById('progressBar').style.width = percent + "%";
-                document.getElementById('progressText').innerText = `Récolté : ${data.totalRaised} $`;
+                const progressEl = document.getElementById('progressText');
+                if (progressEl) progressEl.innerText = serverUnavailable ? "Serveur en pause" : `Récolté : ${data.totalRaised} $`;
                 const ARCANA_SOLD = data.totalRaised / PRICE_PER_ARCANA;
                 const remaining = Math.max(0, Math.floor(400000000 - ARCANA_SOLD));
                 document.getElementById('remainingTokens').innerText = `Jetons ARCANA restants : ${remaining.toLocaleString('fr-FR')}`;
