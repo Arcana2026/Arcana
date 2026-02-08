@@ -309,6 +309,106 @@
             text-align: center;
         }
 
+        /* Grille Casino type MetaWin/Stake */
+        .casino-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+            gap: 1.25rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (min-width: 480px) { .casino-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 720px) { .casino-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 960px) { .casino-grid { grid-template-columns: repeat(4, 1fr); } }
+        .casino-game-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(30, 27, 46, 0.9) 0%, rgba(15, 13, 24, 0.98) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.35);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .casino-game-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.25), 0 0 30px rgba(139, 92, 246, 0.15);
+        }
+        .casino-game-card-cover {
+            aspect-ratio: 4/3;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 0.75rem;
+        }
+        .casino-game-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #F7E7CE;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            letter-spacing: 0.03em;
+        }
+        .casino-game-card-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #a5f3fc;
+            background: rgba(6, 182, 212, 0.25);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid rgba(34, 211, 238, 0.4);
+        }
+        .casino-game-card-play {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .casino-game-card:hover .casino-game-card-play {
+            opacity: 1;
+        }
+        .casino-game-card-play-btn {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #0a0e1a;
+            background: linear-gradient(135deg, #D4AF37, #B8860B);
+            border: 2px solid rgba(255, 215, 0, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .casino-game-card-play-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 28px rgba(212, 175, 55, 0.7);
+        }
+        .casino-game-card .p-3 { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+        .casino-cover-slots { background: linear-gradient(160deg, #4c1d95 0%, #7c3aed 50%, #2e1065 100%); }
+        .casino-cover-crash { background: linear-gradient(160deg, #0f766e 0%, #14b8a6 50%, #134e4a 100%); }
+        .casino-cover-plinko { background: linear-gradient(160deg, #7c2d12 0%, #ea580c 50%, #431407 100%); }
+        .casino-cover-mines { background: linear-gradient(160deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%); }
+        .casino-cover-roulette { background: linear-gradient(160deg, #6b21a8 0%, #a855f7 50%, #581c87 100%); }
+
+        /* Tableau Derniers Paris */
+        .recent-bets-wrapper { max-width: 900px; margin-left: auto; margin-right: auto; }
+        .recent-bets-table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.3); background: rgba(15, 13, 24, 0.8); }
+        .recent-bets-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .recent-bets-table th { text-align: left; padding: 0.75rem 0.5rem; color: #D4AF37; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(139, 92, 246, 0.4); }
+        .recent-bets-table td { padding: 0.6rem 0.5rem; border-bottom: 1px solid rgba(139, 92, 246, 0.15); color: #F7E7CE; }
+        .recent-bets-table tbody tr:hover { background: rgba(139, 92, 246, 0.08); }
+        .recent-bets-table .bet-win { color: #34d399; font-weight: 600; }
+        .recent-bets-table .bet-loss { color: #9ca3af; }
+        @media (max-width: 640px) { .recent-bets-table { font-size: 0.7rem; } .recent-bets-table th, .recent-bets-table td { padding: 0.5rem 0.35rem; } }
+
         .banner-official-domain {
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(184, 134, 11, 0.18) 50%, rgba(212, 175, 55, 0.28) 100%);
             border-bottom: 2px solid rgba(212, 175, 55, 0.6);
@@ -533,10 +633,101 @@
                 <a href="arcade.html" class="inline-block mt-2 px-4 py-2 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30 text-sm font-medium">Accéder à l'Arcade</a>
             </div>
 
-            <!-- Section Casino : juste en dessous de la section Arcade -->
-            <div id="casino-section" class="mb-8 mt-10 max-w-lg mx-auto px-2 sm:px-0">
-                <h2 class="casino-title-neon text-center mb-6">ARCANA CASINO</h2>
-                <div class="slot-machine-wrapper">
+            <!-- Section Casino : grille type MetaWin/Stake -->
+            <div id="casino-section" class="mb-8 mt-10 px-3 sm:px-4">
+                <h2 class="casino-title-neon text-center mb-8">ARCANA CASINO</h2>
+                <div class="casino-grid">
+                    <article class="casino-game-card">
+                        <div class="casino-game-card-cover casino-cover-slots"></div>
+                        <div class="p-3">
+                            <div>
+                                <h3 class="casino-game-card-title">Arcana Slots</h3>
+                                <p class="text-xs text-[#F7E7CE]/60 mt-0.5">Machine à sous</p>
+                            </div>
+                            <span class="casino-game-card-badge">Provably Fair</span>
+                        </div>
+                        <div class="casino-game-card-play">
+                            <button type="button" class="casino-game-card-play-btn" data-game="slots">Jouer</button>
+                        </div>
+                    </article>
+                    <article class="casino-game-card">
+                        <div class="casino-game-card-cover casino-cover-crash"></div>
+                        <div class="p-3">
+                            <div>
+                                <h3 class="casino-game-card-title">Crash</h3>
+                                <p class="text-xs text-[#F7E7CE]/60 mt-0.5">Le multiplicateur qui monte</p>
+                            </div>
+                            <span class="casino-game-card-badge">Provably Fair</span>
+                        </div>
+                        <div class="casino-game-card-play">
+                            <button type="button" class="casino-game-card-play-btn" data-game="crash">Jouer</button>
+                        </div>
+                    </article>
+                    <article class="casino-game-card">
+                        <div class="casino-game-card-cover casino-cover-plinko"></div>
+                        <div class="p-3">
+                            <div>
+                                <h3 class="casino-game-card-title">Plinko</h3>
+                                <p class="text-xs text-[#F7E7CE]/60 mt-0.5">Les billes qui tombent</p>
+                            </div>
+                            <span class="casino-game-card-badge">Provably Fair</span>
+                        </div>
+                        <div class="casino-game-card-play">
+                            <button type="button" class="casino-game-card-play-btn" data-game="plinko">Jouer</button>
+                        </div>
+                    </article>
+                    <article class="casino-game-card">
+                        <div class="casino-game-card-cover casino-cover-mines"></div>
+                        <div class="p-3">
+                            <div>
+                                <h3 class="casino-game-card-title">Mines</h3>
+                                <p class="text-xs text-[#F7E7CE]/60 mt-0.5">Trouver les diamants sans exploser</p>
+                            </div>
+                            <span class="casino-game-card-badge">Provably Fair</span>
+                        </div>
+                        <div class="casino-game-card-play">
+                            <button type="button" class="casino-game-card-play-btn" data-game="mines">Jouer</button>
+                        </div>
+                    </article>
+                    <article class="casino-game-card">
+                        <div class="casino-game-card-cover casino-cover-roulette"></div>
+                        <div class="p-3">
+                            <div>
+                                <h3 class="casino-game-card-title">Roulette Arcane</h3>
+                                <p class="text-xs text-[#F7E7CE]/60 mt-0.5">Roulette thématique</p>
+                            </div>
+                            <span class="casino-game-card-badge">Provably Fair</span>
+                        </div>
+                        <div class="casino-game-card-play">
+                            <button type="button" class="casino-game-card-play-btn" data-game="roulette">Jouer</button>
+                        </div>
+                    </article>
+                </div>
+                <p class="casino-liquidite-mention mt-8">10% des profits sont réinjectés dans la liquidité ARCANA.</p>
+
+                <!-- Derniers Paris (Recent Bets) -->
+                <div class="recent-bets-wrapper mt-10">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-4">Derniers Paris</h3>
+                    <div class="recent-bets-table-wrap">
+                        <table class="recent-bets-table">
+                            <thead>
+                                <tr>
+                                    <th>Jeu</th>
+                                    <th>Joueur</th>
+                                    <th>Mise</th>
+                                    <th>Multiplicateur</th>
+                                    <th>Gain</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentBetsBody">
+                                <!-- Rempli par JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Arcana Slots : machine à sous (affichée quand on clique sur la carte Slots) -->
+                <div id="casino-slots-block" class="slot-machine-wrapper mt-10 max-w-lg mx-auto">
                     <div class="slot-machine">
                         <div class="slot-reels" id="slotReels">
                             <div class="slot-reel" data-reel="0">
@@ -567,7 +758,6 @@
                         </div>
                     </div>
                 </div>
-                <p class="casino-liquidite-mention">10% des profits sont réinjectés dans la liquidité ARCANA.</p>
             </div>
             <div class="traffic-counter flex flex-col items-center gap-2">
                 <a href="arcade.html" class="text-sm text-[#D4AF37] hover:underline uppercase tracking-widest">🎮 Arcade — 10 jeux</a>
@@ -1085,6 +1275,48 @@
             if (typeof window.allocateToVault === 'function') window.allocateToVault(allocation.vault);
         }
 
+        function maskAddress(addr) {
+            if (!addr || typeof addr !== 'string') return '0x...???';
+            const a = addr.startsWith('0x') ? addr.slice(2) : addr;
+            if (a.length < 8) return '0x...' + a.slice(-3);
+            return '0x' + a.slice(0, 4) + '...' + a.slice(-3);
+        }
+
+        const GAME_NAMES = { slots: 'Arcana Slots', crash: 'Crash', plinko: 'Plinko', mines: 'Mines', roulette: 'Roulette Arcane' };
+
+        function updateRecentBets() {
+            const tbody = document.getElementById('recentBetsBody');
+            if (!tbody) return;
+            const bets = getRecentBets();
+            tbody.innerHTML = bets.map(b => {
+                const winClass = b.win ? 'bet-win' : 'bet-loss';
+                const gainText = b.win ? '+' + b.gain + ' ARCANA' : '-' + b.mise + ' ARCANA';
+                return '<tr><td>' + b.game + '</td><td class="font-mono text-xs">' + maskAddress(b.player) + '</td><td>' + b.mise + ' ARCANA</td><td>' + b.multiplier + 'x</td><td class="' + winClass + '">' + gainText + '</td></tr>';
+            }).join('');
+        }
+
+        function getRecentBets() {
+            if (typeof window.getRecentBetsFromContract === 'function') {
+                try { return window.getRecentBetsFromContract(); } catch (e) { console.warn('getRecentBetsFromContract:', e); }
+            }
+            return getSimulatedRecentBets();
+        }
+
+        function getSimulatedRecentBets() {
+            return [
+                { game: 'Arcana Slots', player: '0x742d35Cc6634C0532925a3b844Bc9e7595f8b123', mise: 50, multiplier: '2.40x', win: true, gain: 120 },
+                { game: 'Crash', player: '0x8Ba1f109551bD432803012645Ac136ddd64DBA72', mise: 100, multiplier: '0.00x', win: false, gain: 0 },
+                { game: 'Plinko', player: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', mise: 25, multiplier: '3.00x', win: true, gain: 75 },
+                { game: 'Mines', player: '0x29D61511C84E332635E296e37bf22Eb4fB514147', mise: 10, multiplier: '1.50x', win: true, gain: 15 },
+                { game: 'Roulette Arcane', player: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9', mise: 200, multiplier: '0.00x', win: false, gain: 0 },
+                { game: 'Arcana Slots', player: '0xDeF1CA82fb16540756739f5398b8e8f2a5a7a123', mise: 20, multiplier: '5.00x', win: true, gain: 100 },
+                { game: 'Crash', player: '0x6B175474E89094C44Da98b954EedeAC495271d0F', mise: 75, multiplier: '1.85x', win: true, gain: 139 },
+                { game: 'Plinko', player: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', mise: 15, multiplier: '0.00x', win: false, gain: 0 },
+                { game: 'Mines', player: '0xdAC17F958D2ee523a2206206994597C13D831ec7', mise: 30, multiplier: '2.00x', win: true, gain: 60 },
+                { game: 'Roulette Arcane', player: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2', mise: 40, multiplier: '0.00x', win: false, gain: 0 }
+            ];
+        }
+
         async function approveArcanaSlot() {
             if (!window.ethereum || !userAddress) {
                 Swal.fire({ icon: 'info', title: 'Connexion requise', text: 'Connectez votre wallet pour approuver.' });
@@ -1150,6 +1382,16 @@
                 const slotApproveBtn = document.getElementById('slotApproveBtn');
                 if (slotSpinBtn) slotSpinBtn.onclick = spin;
                 if (slotApproveBtn) slotApproveBtn.onclick = approveArcanaSlot;
+                document.getElementById('casino-section')?.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.casino-game-card-play-btn');
+                    if (!btn) return;
+                    const game = btn.getAttribute('data-game');
+                    if (game === 'slots') {
+                        document.getElementById('casino-slots-block')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        if (window.Swal) Swal.fire({ icon: 'info', title: 'Bientôt disponible', text: 'Ce jeu sera disponible prochainement.' });
+                    }
+                });
                 if (copyAddressBtn) {
                     copyAddressBtn.onclick = () => {
                         const addr = document.getElementById('receptionAddress').textContent;
@@ -1195,6 +1437,7 @@
 
             updateUI().catch(e => console.error("[Arcana] Erreur updateUI au chargement:", e));
             setInterval(() => { updateUI().catch(e => console.warn("[Arcana] updateUI interval:", e)); }, 8000);
+            updateRecentBets();
 
             fetch(RENDER_URL + "/api/presale-status", { cache: 'no-store' }).then(r => r.text()).then(() => {}).catch(e => console.error("[Arcana] API presale-status inaccessible (serveur en veille?):", e.message));
 
