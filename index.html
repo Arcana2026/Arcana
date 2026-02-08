@@ -302,57 +302,73 @@
         }
         .btn-approve-slot:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* Jeu Crash */
+        /* Jeu Crash — style Stake/MetaWin : fond sombre, néon violet */
         .crash-game-wrapper {
             padding: clamp(1rem, 4vw, 1.5rem);
             border-radius: 20px;
-            background: linear-gradient(135deg, rgba(15, 118, 110, 0.2) 0%, rgba(20, 184, 166, 0.15) 50%, rgba(19, 78, 74, 0.25) 100%);
-            box-shadow: 0 0 50px rgba(20, 184, 166, 0.25), 0 0 100px rgba(20, 184, 166, 0.1), inset 0 0 60px rgba(15, 118, 110, 0.08);
-            border: 2px solid rgba(20, 184, 166, 0.5);
+            background: #1a1a1a;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), 0 0 80px rgba(168, 85, 247, 0.08), inset 0 0 40px rgba(0,0,0,0.3);
+            border: 2px solid rgba(168, 85, 247, 0.6);
             backdrop-filter: blur(12px);
             max-width: 560px;
             margin-left: auto;
             margin-right: auto;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .crash-game-wrapper:hover {
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.35), 0 0 100px rgba(168, 85, 247, 0.15);
         }
         .crash-game-box {
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 13, 24, 0.95) 100%);
+            background: #1a1a1a;
             border-radius: 16px;
             padding: clamp(1rem, 3vw, 1.5rem);
-            border: 1px solid rgba(20, 184, 166, 0.4);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
         }
+        .crash-mult-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .crash-chart-wrap { position: relative; width: 100%; margin-bottom: 0.5rem; }
         #crashCanvas {
             display: block;
             width: 100%;
             height: 220px;
             border-radius: 12px;
-            background: rgba(0, 0, 0, 0.45);
-            border: 1px solid rgba(20, 184, 166, 0.35);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(168, 85, 247, 0.4);
         }
         .crash-mult-display {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 800;
-            color: #14b8a6;
-            text-shadow: 0 0 15px rgba(20, 184, 166, 0.8);
+            color: #a78bfa;
+            text-shadow: 0 0 20px rgba(167, 139, 250, 0.9);
             letter-spacing: 0.05em;
         }
         .crash-mult-display.crashed { color: #ef4444; text-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
         .crash-mult-display.won { color: #34d399; text-shadow: 0 0 15px rgba(52, 211, 153, 0.8); }
         .btn-crash-bet {
-            background: linear-gradient(135deg, #14b8a6, #0d9488);
-            color: #0a0e1a;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: #fff;
             font-weight: 800;
             letter-spacing: 0.1em;
             padding: 0.75rem 1.5rem;
             border-radius: 12px;
-            border: 2px solid rgba(20, 184, 166, 0.7);
-            box-shadow: 0 0 20px rgba(20, 184, 166, 0.4);
+            border: 2px solid rgba(168, 85, 247, 0.7);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .btn-crash-bet:hover:not(:disabled) {
             transform: scale(1.03);
-            box-shadow: 0 0 28px rgba(20, 184, 166, 0.6);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
         }
         .btn-crash-bet.cash-out {
             background: linear-gradient(135deg, #34d399, #10b981);
@@ -362,6 +378,7 @@
         }
         .btn-crash-bet:disabled { opacity: 0.7; cursor: not-allowed; }
         @keyframes crash-cashout-pulse { 0%, 100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.5); } 50% { box-shadow: 0 0 30px rgba(52, 211, 153, 0.8); } }
+        .crash-liquidite-rule { font-size: 0.75rem; color: rgba(196, 181, 255, 0.85); margin-top: 0.5rem; }
 
         /* Jeu Plinko */
         .plinko-game-wrapper {
@@ -448,6 +465,129 @@
             box-shadow: 0 0 28px rgba(234, 88, 12, 0.6);
         }
         .btn-plinko-drop:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* Jeu Keno — style Stake/MetaWin : fond sombre, néon violet */
+        .keno-game-wrapper {
+            padding: clamp(1rem, 4vw, 1.5rem);
+            border-radius: 20px;
+            background: #1a1a1a;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), 0 0 80px rgba(168, 85, 247, 0.08), inset 0 0 40px rgba(0,0,0,0.3);
+            border: 2px solid rgba(168, 85, 247, 0.6);
+            backdrop-filter: blur(12px);
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .keno-game-wrapper:hover {
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.35), 0 0 100px rgba(168, 85, 247, 0.15);
+        }
+        .keno-game-box {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+        }
+        .keno-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+        .keno-num {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            background: #1a1a1a;
+            color: #F7E7CE;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .keno-num:hover {
+            border-color: rgba(168, 85, 247, 0.8);
+            background: rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        }
+        .keno-num.selected {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(124, 58, 237, 0.9));
+            border-color: #a78bfa;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(168, 85, 247, 0.4);
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+        .keno-num.hit {
+            animation: keno-hit 0.5s ease;
+            box-shadow: 0 0 24px rgba(34, 197, 94, 0.9);
+        }
+        @keyframes keno-hit { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .keno-draw-area {
+            min-height: 72px;
+            padding: 0.75rem;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .keno-ball {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #0a0e1a;
+            background: radial-gradient(circle at 35% 35%, #fef9e7, #D4AF37);
+            box-shadow: 0 0 14px rgba(212, 175, 55, 0.7), inset 0 2px 0 rgba(255,255,255,0.5);
+            animation: keno-ball-drop 0.4s ease-out;
+        }
+        @keyframes keno-ball-drop {
+            0% { transform: translateY(-30px); opacity: 0; }
+            70% { transform: translateY(4px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .keno-payout-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-top: 0.75rem;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+        .keno-payout-table th, .keno-payout-table td { padding: 0.4rem 0.5rem; text-align: center; }
+        .keno-payout-table th { background: rgba(139, 92, 246, 0.25); color: #c4b5fd; font-weight: 700; }
+        .keno-payout-table td { background: rgba(26, 26, 26, 0.9); color: #F7E7CE; border-bottom: 1px solid rgba(168, 85, 247, 0.15); }
+        .keno-payout-table tr:last-child td { border-bottom: none; }
+        .btn-keno-draw {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(168, 85, 247, 0.7);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-keno-draw:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+        }
+        .btn-keno-draw:disabled { opacity: 0.7; cursor: not-allowed; }
+        .keno-liquidite-rule { font-size: 0.75rem; color: rgba(196, 181, 255, 0.85); margin-top: 0.5rem; }
 
         .casino-liquidite-mention {
             margin-top: 1rem;
@@ -545,6 +685,7 @@
         .casino-cover-plinko { background: linear-gradient(160deg, #7c2d12 0%, #ea580c 50%, #431407 100%); }
         .casino-cover-mines { background: linear-gradient(160deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%); }
         .casino-cover-roulette { background: linear-gradient(160deg, #6b21a8 0%, #a855f7 50%, #581c87 100%); }
+        .casino-cover-keno { background: linear-gradient(160deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%); }
 
         /* Tableau Derniers Paris */
         .recent-bets-wrapper { max-width: 900px; margin-left: auto; margin-right: auto; }
@@ -850,6 +991,19 @@
                             <button type="button" class="casino-game-card-play-btn" data-game="roulette">Jouer</button>
                         </div>
                     </article>
+                    <article class="casino-game-card">
+                        <div class="casino-game-card-cover casino-cover-keno"></div>
+                        <div class="p-3">
+                            <div>
+                                <h3 class="casino-game-card-title">Keno</h3>
+                                <p class="text-xs text-[#F7E7CE]/60 mt-0.5">Choisissez jusqu'à 10 numéros</p>
+                            </div>
+                            <span class="casino-game-card-badge">Provably Fair</span>
+                        </div>
+                        <div class="casino-game-card-play">
+                            <button type="button" class="casino-game-card-play-btn" data-game="keno">Jouer</button>
+                        </div>
+                    </article>
                 </div>
                 <p class="casino-liquidite-mention mt-8">10% des profits sont réinjectés dans la liquidité ARCANA.</p>
 
@@ -907,23 +1061,28 @@
                     </div>
                 </div>
 
-                <!-- Jeu Crash : courbe multiplicateur + Parier / Cash Out -->
+                <!-- Jeu Crash : graphique dynamique, Mise, Parier / Cash Out, multiplicateur au centre -->
                 <div id="casino-crash-block" class="crash-game-wrapper mt-10">
                     <div class="crash-game-box">
-                        <h3 class="text-lg font-bold text-[#14b8a6] mb-3 uppercase tracking-wider">Crash</h3>
-                        <div class="mb-3 flex items-center justify-center gap-2">
+                        <h3 class="text-lg font-bold text-[#a78bfa] mb-3 uppercase tracking-wider">Crash</h3>
+                        <p class="text-xs text-[#F7E7CE]/80 mb-2">Mises en jetons <strong>ARCANA</strong>. Cliquez sur Cash Out avant le crash.</p>
+                        <div class="crash-chart-wrap">
+                            <canvas id="crashCanvas" width="520" height="220"></canvas>
+                            <div id="crashMultCenter" class="crash-mult-center crash-mult-display" aria-hidden="true">1.00x</div>
+                        </div>
+                        <div class="mb-2 flex items-center justify-center gap-2">
                             <span class="text-[#F7E7CE]/80 text-sm">Multiplicateur</span>
                             <span id="crashMultDisplay" class="crash-mult-display">1.00x</span>
                         </div>
-                        <canvas id="crashCanvas" width="520" height="220"></canvas>
-                        <div class="crash-controls mt-5 flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <div class="crash-controls mt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
                             <div class="flex items-center gap-2">
-                                <label class="text-[#F7E7CE]/90 text-sm">Mise</label>
-                                <input type="number" id="crashStakeInput" min="1" step="1" value="10" class="w-24 px-3 py-2 rounded-lg bg-black/50 border border-[#14b8a6]/50 text-[#F7E7CE] text-center focus:ring-2 focus:ring-[#14b8a6]/50 focus:border-[#14b8a6]/70" placeholder="ARCANA" />
+                                <label class="text-[#F7E7CE]/90 text-sm">Mise (ARCANA)</label>
+                                <input type="number" id="crashStakeInput" min="1" step="1" value="10" class="w-24 px-3 py-2 rounded-lg bg-black/50 border border-[#a78bfa]/50 text-[#F7E7CE] text-center focus:ring-2 focus:ring-[#a78bfa]/50 focus:border-[#a78bfa]/70" placeholder="ARCANA" />
                             </div>
                             <button type="button" id="crashBetBtn" class="btn-crash-bet">Parier</button>
                         </div>
                         <p id="crashStatus" class="text-sm text-[#F7E7CE]/70 mt-3 text-center min-h-[1.25rem]"></p>
+                        <p class="crash-liquidite-rule text-center">10 % des profits du casino sont réinjectés dans la liquidité ARCANA.</p>
                     </div>
                 </div>
 
@@ -945,6 +1104,30 @@
                             <button type="button" id="plinkoDropBtn" class="btn-plinko-drop">Lancer la bille</button>
                         </div>
                         <p id="plinkoResult" class="text-sm text-[#F7E7CE]/90 mt-3 text-center min-h-[1.25rem] font-medium"></p>
+                    </div>
+                </div>
+
+                <!-- Jeu Keno : grille 40 numéros, jusqu'à 10 choisis, bouton Tirer -->
+                <div id="casino-keno-block" class="keno-game-wrapper mt-10">
+                    <div class="keno-game-box">
+                        <h3 class="text-lg font-bold text-[#a78bfa] mb-3 uppercase tracking-wider">Keno</h3>
+                        <p class="text-xs text-[#F7E7CE]/80 mb-2">Mises en jetons <strong>ARCANA</strong>. Choisissez jusqu'à 10 numéros (1–40), puis <strong>Tirer</strong>.</p>
+                        <div id="kenoGrid" class="keno-grid"></div>
+                        <div class="flex flex-wrap items-center justify-center gap-4 mb-3">
+                            <div class="flex items-center gap-2">
+                                <label class="text-[#F7E7CE]/90 text-sm">Mise (ARCANA)</label>
+                                <input type="number" id="kenoStakeInput" min="1" step="1" value="10" class="w-24 px-3 py-2 rounded-lg bg-black/50 border border-[#a78bfa]/50 text-[#F7E7CE] text-center focus:ring-2 focus:ring-[#a78bfa]/50 focus:border-[#a78bfa]/70" />
+                            </div>
+                            <button type="button" id="kenoDrawBtn" class="btn-keno-draw">Tirer</button>
+                        </div>
+                        <p class="text-xs text-[#F7E7CE]/70 mb-1">Numéros tirés :</p>
+                        <div id="kenoDrawArea" class="keno-draw-area"></div>
+                        <p id="kenoResult" class="text-sm font-medium mt-3 text-center min-h-[1.25rem]"></p>
+                        <table class="keno-payout-table">
+                            <thead><tr><th>Bons numéros</th><th>Multiplicateur</th></tr></thead>
+                            <tbody id="kenoPayoutBody"></tbody>
+                        </table>
+                        <p class="keno-liquidite-rule text-center">10 % des profits du casino sont réinjectés dans la liquidité ARCANA.</p>
                     </div>
                 </div>
             </div>
@@ -981,8 +1164,25 @@
             "https://1rpc.io/matic"
         ];
         const POLYGON_CHAIN_ID = 137;
-        const ARCANA_TOKEN_ABI = ["function balanceOf(address owner) view returns (uint256)"];
+        const ARCANA_TOKEN_ABI = ["function balanceOf(address owner) view returns (uint256)", "function approve(address spender, uint256 amount) returns (bool)"];
         const POL_USD_APPROX = 0.4;
+
+        /* Contrats Casino : une fois ArcanaCrash.sol et ArcanaKeno déployés, remplacer null par les adresses (ex: ARCANA_CRASH_ADDRESS = '0x...'). Les fonctions contractCrashPlaceBet, contractCrashCashOut et contractKenoPlay appelleront alors les contrats via ethers.js. */
+        const ARCANA_CRASH_ADDRESS = null;
+        const ARCANA_KENO_ADDRESS = null;
+        const ARCANA_CRASH_ABI = [
+            "function placeBet(uint256 amount) external",
+            "function cashOut(uint256 roundId) external",
+            "function getCurrentMultiplier() view returns (uint256)",
+            "event BetPlaced(address indexed player, uint256 roundId, uint256 amount)",
+            "event CashOut(address indexed player, uint256 roundId, uint256 multiplier, uint256 payout)"
+        ];
+        const ARCANA_KENO_ABI = [
+            "function play(uint256 amount, uint8[] calldata selectedNumbers) external",
+            "function drawAndSettle(uint256 roundId) external",
+            "event KenoPlayed(address indexed player, uint256 roundId, uint256 amount, uint8[] selected)",
+            "event KenoSettled(address indexed player, uint256 roundId, uint8[] drawn, uint256 payout)"
+        ];
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
         const PRICE_PER_ARCANA = 0.00025;
@@ -1500,9 +1700,9 @@
                 if (isCrashed && points[i] >= crashPoint) { crashIdx = i; break; }
                 ctx.lineTo(scaleX(i), scaleY(points[i]));
             }
-            ctx.strokeStyle = '#14b8a6';
+            ctx.strokeStyle = '#a78bfa';
             ctx.lineWidth = 3;
-            ctx.shadowColor = 'rgba(20, 184, 166, 0.8)';
+            ctx.shadowColor = 'rgba(167, 139, 250, 0.8)';
             ctx.shadowBlur = 8;
             ctx.stroke();
             ctx.shadowBlur = 0;
@@ -1521,6 +1721,7 @@
         function tickCrash() {
             const canvas = document.getElementById('crashCanvas');
             const multEl = document.getElementById('crashMultDisplay');
+            const multCenter = document.getElementById('crashMultCenter');
             const statusEl = document.getElementById('crashStatus');
             const btn = document.getElementById('crashBetBtn');
             if (!crashState.running || !canvas || !multEl) return;
@@ -1529,14 +1730,18 @@
             crashState.points.push(mult);
             const maxPoints = 400;
             if (crashState.points.length > maxPoints) crashState.points.shift();
-            multEl.textContent = mult.toFixed(2) + 'x';
+            const multText = mult.toFixed(2) + 'x';
+            multEl.textContent = multText;
+            if (multCenter) { multCenter.textContent = multText; multCenter.classList.remove('crashed', 'won'); }
             multEl.classList.remove('crashed', 'won');
             drawCrashCurve(canvas, crashState.points, false, mult, crashState.crashPoint);
 
             if (crashState.cashedOut) {
                 crashState.running = false;
-                multEl.textContent = crashState.cashOutMult.toFixed(2) + 'x';
+                const outText = crashState.cashOutMult.toFixed(2) + 'x';
+                multEl.textContent = outText;
                 multEl.classList.add('won');
+                if (multCenter) { multCenter.textContent = outText; multCenter.classList.add('won'); }
                 const gain = Math.floor(crashState.stake * crashState.cashOutMult);
                 statusEl.textContent = 'Gagné ! +' + gain + ' ARCANA';
                 if (btn) { btn.textContent = 'Parier'; btn.classList.remove('cash-out'); btn.disabled = false; }
@@ -1550,8 +1755,10 @@
                 crashState.running = false;
                 crashState.points.push(crashState.crashPoint);
                 drawCrashCurve(canvas, crashState.points, true, mult, crashState.crashPoint);
-                multEl.textContent = crashState.crashPoint.toFixed(2) + 'x';
+                const crashText = crashState.crashPoint.toFixed(2) + 'x';
+                multEl.textContent = crashText;
                 multEl.classList.add('crashed');
+                if (multCenter) { multCenter.textContent = crashText; multCenter.classList.add('crashed'); }
                 statusEl.textContent = 'Crash ! Vous avez perdu ' + crashState.stake + ' ARCANA.';
                 if (btn) { btn.textContent = 'Parier'; btn.classList.remove('cash-out'); btn.disabled = false; }
                 if (window.crashRecentBets == null) window.crashRecentBets = [];
@@ -1584,8 +1791,11 @@
                 animId: 0,
                 points: [1]
             };
-            multEl.textContent = '1.00x';
+            const initMult = '1.00x';
+            multEl.textContent = initMult;
             multEl.classList.remove('crashed', 'won');
+            const multCenter = document.getElementById('crashMultCenter');
+            if (multCenter) { multCenter.textContent = initMult; multCenter.classList.remove('crashed', 'won'); }
             statusEl.textContent = 'La courbe monte… cliquez sur Cash Out avant le crash !';
             if (btn) { btn.textContent = 'Cash Out'; btn.classList.add('cash-out'); btn.disabled = false; }
             crashState.animId = requestAnimationFrame(tickCrash);
@@ -1598,6 +1808,63 @@
             if (mult >= crashState.crashPoint) return;
             crashState.cashedOut = true;
             crashState.cashOutMult = mult;
+        }
+
+        /* ----- Appels Smart Contract Crash / Keno (ethers.js) — actifs une fois les contrats déployés ----- */
+        function getCrashContract() {
+            if (!ARCANA_CRASH_ADDRESS || !signer) return null;
+            try {
+                return new ethers.Contract(ARCANA_CRASH_ADDRESS, ARCANA_CRASH_ABI, signer);
+            } catch (e) { return null; }
+        }
+        function getKenoContract() {
+            if (!ARCANA_KENO_ADDRESS || !signer) return null;
+            try {
+                return new ethers.Contract(ARCANA_KENO_ADDRESS, ARCANA_KENO_ABI, signer);
+            } catch (e) { return null; }
+        }
+        async function contractCrashPlaceBet(amountWei) {
+            const c = getCrashContract();
+            if (!c) return { success: false };
+            try {
+                const token = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ARCANA_TOKEN_ABI, signer);
+                await token.approve(ARCANA_CRASH_ADDRESS, amountWei);
+                const tx = await c.placeBet(amountWei);
+                await tx.wait();
+                const roundId = tx.events?.find(e => e.event === 'BetPlaced')?.args?.roundId;
+                return { success: true, roundId: roundId != null ? roundId.toString() : null };
+            } catch (e) {
+                console.warn('[Arcana] contractCrashPlaceBet:', e);
+                return { success: false, error: e.message };
+            }
+        }
+        async function contractCrashCashOut(roundId) {
+            const c = getCrashContract();
+            if (!c) return { success: false };
+            try {
+                const tx = await c.cashOut(ethers.BigNumber.from(roundId));
+                await tx.wait();
+                const payout = tx.events?.find(e => e.event === 'CashOut')?.args?.payout;
+                return { success: true, payout: payout ? payout.toString() : null };
+            } catch (e) {
+                console.warn('[Arcana] contractCrashCashOut:', e);
+                return { success: false, error: e.message };
+            }
+        }
+        async function contractKenoPlay(amountWei, selectedNumbers) {
+            const c = getKenoContract();
+            if (!c) return { success: false };
+            try {
+                const token = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ARCANA_TOKEN_ABI, signer);
+                await token.approve(ARCANA_KENO_ADDRESS, amountWei);
+                const tx = await c.play(amountWei, selectedNumbers);
+                await tx.wait();
+                const roundId = tx.events?.find(e => e.event === 'KenoPlayed')?.args?.roundId;
+                return { success: true, roundId: roundId != null ? roundId.toString() : null };
+            } catch (e) {
+                console.warn('[Arcana] contractKenoPlay:', e);
+                return { success: false, error: e.message };
+            }
         }
 
         /* ----- Jeu Plinko ----- */
@@ -1733,6 +2000,107 @@
             step(1);
         }
 
+        /* ----- Jeu Keno ----- */
+        const KENO_PAYOUT = [0, 0, 1, 2, 5, 15, 50, 100, 250, 400, 500];
+        const KENO_MAX_SELECT = 10;
+        let kenoDrawing = false;
+
+        function initKenoGrid() {
+            const grid = document.getElementById('kenoGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            for (let n = 1; n <= 40; n++) {
+                const cell = document.createElement('button');
+                cell.type = 'button';
+                cell.className = 'keno-num';
+                cell.dataset.num = String(n);
+                cell.textContent = n;
+                cell.addEventListener('click', () => {
+                    if (kenoDrawing) return;
+                    const selected = grid.querySelectorAll('.keno-num.selected');
+                    if (cell.classList.contains('selected')) {
+                        cell.classList.remove('selected');
+                    } else if (selected.length < KENO_MAX_SELECT) {
+                        cell.classList.add('selected');
+                    }
+                });
+                grid.appendChild(cell);
+            }
+        }
+
+        function initKenoPayoutTable() {
+            const tbody = document.getElementById('kenoPayoutBody');
+            if (!tbody) return;
+            tbody.innerHTML = KENO_PAYOUT.map((mult, hits) => '<tr><td>' + hits + '</td><td>x' + mult + '</td></tr>').join('');
+        }
+
+        function getSecureKenoDraw() {
+            const pool = [];
+            for (let i = 1; i <= 40; i++) pool.push(i);
+            const buf = new Uint8Array(2);
+            for (let i = 39; i >= 30; i--) {
+                crypto.getRandomValues(buf);
+                const j = i - Math.floor((buf[0] * 256 + buf[1]) % (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            return pool.slice(30, 40).sort((a, b) => a - b);
+        }
+
+        async function runKenoDraw() {
+            const grid = document.getElementById('kenoGrid');
+            const drawArea = document.getElementById('kenoDrawArea');
+            const resultEl = document.getElementById('kenoResult');
+            const btn = document.getElementById('kenoDrawBtn');
+            const stakeInput = document.getElementById('kenoStakeInput');
+            if (!grid || !drawArea) return;
+            const selected = Array.from(grid.querySelectorAll('.keno-num.selected')).map(el => parseInt(el.dataset.num, 10));
+            if (selected.length < 1) {
+                Swal.fire({ icon: 'warning', title: 'Sélection requise', text: 'Choisissez au moins 1 numéro (jusqu\'à 10).' });
+                return;
+            }
+            const stake = Math.floor(parseFloat(stakeInput?.value, 10) || 0);
+            if (stake < 1) {
+                Swal.fire({ icon: 'warning', title: 'Mise invalide', text: 'Mise d\'au moins 1 ARCANA.' });
+                return;
+            }
+            if (kenoDrawing) return;
+            kenoDrawing = true;
+            if (btn) btn.disabled = true;
+            drawArea.innerHTML = '';
+            resultEl.textContent = '';
+            grid.querySelectorAll('.keno-num').forEach(cell => { cell.classList.remove('hit'); });
+            const drawn = getSecureKenoDraw();
+            const selectedSet = new Set(selected);
+
+            for (let i = 0; i < drawn.length; i++) {
+                await new Promise(r => setTimeout(r, 350));
+                const num = drawn[i];
+                const ball = document.createElement('div');
+                ball.className = 'keno-ball';
+                ball.textContent = num;
+                drawArea.appendChild(ball);
+                const cell = grid.querySelector('.keno-num[data-num="' + num + '"]');
+                if (cell && cell.classList.contains('selected')) cell.classList.add('hit');
+            }
+
+            const matches = drawn.filter(n => selectedSet.has(n)).length;
+            const mult = KENO_PAYOUT[Math.min(matches, 10)];
+            const gain = Math.floor(stake * mult);
+            resultEl.textContent = matches + ' bon(s) numéro(s) → x' + mult + ' = ' + (gain > 0 ? '+' + gain + ' ARCANA' : '0 ARCANA');
+            resultEl.style.color = gain > 0 ? '#34d399' : '#9ca3af';
+
+            if (window.plinkoDisplayBalance == null && typeof userClaimableBalance !== 'undefined') window.plinkoDisplayBalance = userClaimableBalance;
+            if (window.plinkoDisplayBalance != null) window.plinkoDisplayBalance = (window.plinkoDisplayBalance || 0) + (gain - stake);
+            if (document.getElementById('plinkoBalanceDisplay')) updatePlinkoBalanceDisplay();
+
+            if (window.kenoRecentBets == null) window.kenoRecentBets = [];
+            window.kenoRecentBets.unshift({ game: 'Keno', player: userAddress || '0x...', mise: stake, multiplier: String(mult), win: gain > 0, gain });
+            updateRecentBets();
+
+            kenoDrawing = false;
+            if (btn) btn.disabled = false;
+        }
+
         function maskAddress(addr) {
             if (!addr || typeof addr !== 'string') return '0x...???';
             const a = addr.startsWith('0x') ? addr.slice(2) : addr;
@@ -1757,11 +2125,12 @@
         function getRecentBets() {
             const crashBets = (window.crashRecentBets || []).slice(0, 10);
             const plinkoBets = (window.plinkoRecentBets || []).slice(0, 10);
+            const kenoBets = (window.kenoRecentBets || []).slice(0, 10);
             let rest;
             if (typeof window.getRecentBetsFromContract === 'function') {
                 try { rest = window.getRecentBetsFromContract(); } catch (e) { rest = getSimulatedRecentBets(); }
             } else rest = getSimulatedRecentBets();
-            return [...plinkoBets, ...crashBets, ...rest].slice(0, 15);
+            return [...kenoBets, ...plinkoBets, ...crashBets, ...rest].slice(0, 15);
         }
 
         function getSimulatedRecentBets() {
@@ -1854,6 +2223,8 @@
                         document.getElementById('casino-crash-block')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     } else if (game === 'plinko') {
                         document.getElementById('casino-plinko-block')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else if (game === 'keno') {
+                        document.getElementById('casino-keno-block')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     } else {
                         if (window.Swal) Swal.fire({ icon: 'info', title: 'Bientôt disponible', text: 'Ce jeu sera disponible prochainement.' });
                     }
@@ -1869,6 +2240,10 @@
                 const plinkoDropBtn = document.getElementById('plinkoDropBtn');
                 if (plinkoDropBtn) plinkoDropBtn.addEventListener('click', dropPlinkoBall);
                 updatePlinkoBalanceDisplay();
+                initKenoGrid();
+                initKenoPayoutTable();
+                const kenoDrawBtn = document.getElementById('kenoDrawBtn');
+                if (kenoDrawBtn) kenoDrawBtn.addEventListener('click', runKenoDraw);
                 if (copyAddressBtn) {
                     copyAddressBtn.onclick = () => {
                         const addr = document.getElementById('receptionAddress').textContent;
