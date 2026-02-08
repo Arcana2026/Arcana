@@ -634,21 +634,28 @@
 
         async function withdraw() {
             if (!userAddress) return alert("Veuillez connecter votre wallet !");
+            const ethersLib = window.ethers;
+            if (!ethersLib || !ethersLib.utils || !ethersLib.utils.getAddress) {
+                alert("Erreur : ethers non disponible.");
+                return;
+            }
             try {
+                const safeUserAddress = ethersLib.utils.getAddress(userAddress);
+                const safeContractAddress = ethersLib.utils.getAddress(VAULT_ADDRESS);
                 const response = await fetch(`${RENDER_URL}/api/sign-withdrawal`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ address: userAddress, amount: "10000" })
+                    body: JSON.stringify({ address: safeUserAddress, amount: "10000" })
                 });
                 const text = await response.text();
                 if (!text || text.trim() === "") throw new Error("Le serveur n'a pas repondu (reponse vide). Verifiez que l'API est accessible.");
                 let data;
                 try { data = JSON.parse(text); } catch (_) { throw new Error("Reponse serveur invalide (JSON)"); }
                 if (!data.success) throw new Error(data.error || "Signature de retrait indisponible");
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const provider = new ethersLib.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
-                const contract = new ethers.Contract(CONTRACT_WITHDRAW, abiWithdraw, signer);
-                const tx = await contract.withdraw(ethers.utils.parseUnits(data.amount, 18), data.nonce, data.signature);
+                const contract = new ethersLib.Contract(safeContractAddress, abiWithdraw, signer);
+                const tx = await contract.withdraw(ethersLib.utils.parseUnits(data.amount, 18), data.nonce, data.signature);
                 await tx.wait();
                 document.getElementById('successSound').play();
                 alert("🥂 Retrait effectué !");
