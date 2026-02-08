@@ -24,6 +24,7 @@
     <!-- ethers.js : chargé via CDN (également dépendance du projet dans package.json) pour connexion MetaMask et Polygon -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
     <style>
         body {
@@ -1580,6 +1581,29 @@
             "function playSlots(uint256 betAmount) external",
             "event GameResult(address indexed player, uint256 betAmount, uint256 winAmount, bool won)"
         ];
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#F7E7CE', '#22d3ee', '#a78bfa'] });
+            }
+        }
+
+        var gameResultListenerOff = null;
+        function setupGameResultListener() {
+            if (!ARCANA_CASINO_ADDRESS || !window.ethers || !userAddress || !window.ethereum) return;
+            try {
+                if (gameResultListenerOff) return;
+                var provider = new ethers.providers.Web3Provider(window.ethereum);
+                var casino = new ethers.Contract(ARCANA_CASINO_ADDRESS, ARCANA_CASINO_ABI, provider);
+                casino.on('GameResult', function(player, betAmount, winAmount, won) {
+                    if (player && userAddress && player.toLowerCase() === userAddress.toLowerCase() && won) {
+                        triggerConfetti();
+                        if (typeof updateUI === 'function') updateUI();
+                    }
+                });
+                gameResultListenerOff = function() { casino.removeAllListeners('GameResult'); gameResultListenerOff = null; };
+            } catch (e) { console.warn('[Arcana] GameResult listener:', e); }
+        }
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
         const PRICE_PER_ARCANA = 0.00025;
@@ -1814,6 +1838,7 @@
                     connectBtn.innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
                 }
                 await updateUI();
+                setupGameResultListener();
                 const balArcana = document.getElementById('user-balance-arcana');
                 const balPol = document.getElementById('user-balance-pol');
                 if (balArcana || balPol) {
@@ -2118,6 +2143,7 @@
                             const winAmount = event && event.args && event.args.winAmount ? event.args.winAmount.toString() : '0';
                             const winFormatted = parseFloat(ethers.utils.formatUnits(winAmount, 18)).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
                             if (won) {
+                                triggerConfetti();
                                 Swal.fire({ icon: 'success', title: 'Gagné !', text: winFormatted + ' ARCANA crédités.' });
                             } else {
                                 Swal.fire({ icon: 'info', title: 'Pas de chance', text: 'Mise envoyée au casino (LP + Vault).' });
@@ -2290,7 +2316,12 @@
                 const won = event && event.args && event.args.won;
                 const winAmount = event && event.args && event.args.winAmount ? event.args.winAmount.toString() : '0';
                 const winFormatted = parseFloat(ethers.utils.formatUnits(winAmount, 18)).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
-                if (statusEl) statusEl.textContent = won ? 'Gagné ! +' + winFormatted + ' ARCANA' : 'Pas de chance. Mise envoyée au casino.';
+                if (won) {
+                    triggerConfetti();
+                    if (statusEl) statusEl.textContent = 'Gagné ! +' + winFormatted + ' ARCANA';
+                } else {
+                    if (statusEl) statusEl.textContent = 'Pas de chance. Mise envoyée au casino.';
+                }
                 if (typeof updateUI === 'function') updateUI();
             } catch (e) {
                 if (statusEl) statusEl.textContent = 'Erreur: ' + (e.message || 'Transaction échouée');
