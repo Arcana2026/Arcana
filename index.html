@@ -507,6 +507,7 @@
             <!-- Section Casino : Slot Machine -->
             <div id="casino-section" class="mb-8">
                 <h2 class="text-xl font-bold uppercase tracking-widest text-[#D4AF37] mb-4 text-center">🎰 Casino Arcana</h2>
+                <p class="text-center text-sm text-[#F7E7CE]/80 mb-4">10% des profits alimentent la Liquidité.</p>
                 <div class="slot-machine-wrapper">
                     <div class="slot-machine">
                         <div class="slot-reels" id="slotReels">
@@ -544,10 +545,12 @@
                 <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-2">🎁 Welcome Bonus</h3>
                 <p class="text-sm text-[#F7E7CE]/90 mb-1">• <strong>100%</strong> sur votre premier dépôt vers le Coffre : <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e37bf22Eb4fB514147</code></p>
                 <p class="text-sm text-[#F7E7CE]/90">• <strong>5 spins gratuits</strong> sur la Roue de la Fortune dans l'Arcade.</p>
+                <p class="text-xs text-[#00ffcc]/90 mt-1">100% des profits servent au Buyback d'ARCANA.</p>
                 <a href="arcade.html" class="inline-block mt-2 px-4 py-2 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30 text-sm font-medium">Accéder à l'Arcade</a>
             </div>
             <div class="traffic-counter flex flex-col items-center gap-2">
                 <a href="arcade.html" class="text-sm text-[#D4AF37] hover:underline uppercase tracking-widest">🎮 Arcade — 10 jeux</a>
+                <p class="text-xs text-[#F7E7CE]/70">100% des profits → Buyback ARCANA</p>
                 <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaPremiumClean&style=0006&nbdigits=5&type=page&initCount=0" border="0" />
                 <a href="https://arcana-safe.nft/arcana-admin" class="text-xs text-[#F7E7CE]/40 hover:text-[#D4AF37]/70 uppercase tracking-widest">Accès Admin</a>
             </div>
@@ -968,6 +971,23 @@
             }
         }
 
+        /* ----- Logique financière : répartition des gains ----- */
+        const ALLOCATION_ARCADE_BUYBACK = 1;
+        const ALLOCATION_CASINO_LP_PERCENT = 10;
+        const ALLOCATION_CASINO_VAULT_PERCENT = 90;
+
+        function calculateAllocations(profit, source) {
+            if (source === 'arcade') {
+                return { buybackArcana: profit };
+            }
+            if (source === 'casino') {
+                const lpPool = (profit * ALLOCATION_CASINO_LP_PERCENT) / 100;
+                const vault = (profit * ALLOCATION_CASINO_VAULT_PERCENT) / 100;
+                return { lpPool, vault };
+            }
+            return {};
+        }
+
         /* ----- Casino Slot Machine ----- */
         const SLOT_ICONS = [
             { id: 'crystal', symbol: '✦' },
@@ -1024,10 +1044,23 @@
                     slotSpinning = false;
                     if (spinBtn) { spinBtn.disabled = false; spinBtn.textContent = 'SPIN'; }
                     const same = final[0].id === final[1].id && final[1].id === final[2].id;
-                    if (same) Swal.fire({ icon: 'success', title: 'Gagné !', text: 'Trois symboles identiques !' });
+                    if (same) {
+                        Swal.fire({ icon: 'success', title: 'Gagné !', text: 'Trois symboles identiques !' });
+                    } else {
+                        const allocation = calculateAllocations(stake, 'casino');
+                        allocateCasinoSpinLoss(allocation.lpPool, allocation.vault);
+                    }
                 }
             };
             tick();
+        }
+
+        function allocateCasinoSpinLoss(lpPoolAmount, vaultAmount) {
+            if (lpPoolAmount == null || vaultAmount == null) return;
+            const allocation = { lpPool: lpPoolAmount, vault: vaultAmount };
+            window.lastCasinoAllocation = allocation;
+            if (typeof window.allocateToLpPool === 'function') window.allocateToLpPool(allocation.lpPool);
+            if (typeof window.allocateToVault === 'function') window.allocateToVault(allocation.vault);
         }
 
         async function approveArcanaSlot() {
