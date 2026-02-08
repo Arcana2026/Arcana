@@ -27,12 +27,18 @@
 
     <style>
         body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #0b0e11;
             color: #F7E7CE;
-            font-family: 'Inter', 'Montserrat', -apple-system, sans-serif;
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
+        }
+        .app-main-wrap, .app-content, .section-panel, .app-card, .tokenomics-card, .banner-official-domain, button, input, select, label {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        code, .address-field-value, .font-mono {
+            font-family: ui-monospace, monospace !important;
         }
 
         .app-layout {
@@ -75,7 +81,7 @@
             gap: 4px;
             font-size: 0.65rem;
             font-weight: 600;
-            font-family: 'Inter', 'Montserrat', sans-serif;
+            font-family: 'Inter', sans-serif;
             transition: color 0.2s ease;
         }
         .app-sidebar-btn:hover { color: #ffffff; opacity: 1; }
@@ -104,10 +110,13 @@
         }
         .app-topbar-balance {
             font-size: 0.95rem;
-            font-family: 'Inter', 'Montserrat', sans-serif;
+            font-family: 'Inter', sans-serif;
             color: #ffffff;
         }
         .app-topbar-balance span { color: #D4AF37; font-weight: 700; }
+        .app-topbar .wallet-address {
+            margin-left: auto;
+        }
         .app-content {
             flex: 1;
             overflow-y: auto;
@@ -253,53 +262,61 @@
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.45);
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            text-align: center;
-            font-family: 'Inter', 'Montserrat', sans-serif;
+            justify-content: center;
+            gap: 1rem;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
         }
         .tokenomics-card-icon {
             width: 40px;
             height: 40px;
+            min-width: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            margin-bottom: 12px;
             opacity: 0.9;
         }
         .tokenomics-card-title {
             font-size: 1rem;
             font-weight: 700;
-            margin: 0 0 0.35rem 0;
+            margin: 0 0 0.25rem 0;
             letter-spacing: 0.02em;
         }
         .tokenomics-card-sub {
             font-size: 0.8rem;
-            color: #ffffff;
+            color: rgba(255,255,255,0.9);
             margin: 0;
-            opacity: 0.9;
+        }
+        .tokenomics-card-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            min-width: 0;
         }
         .tokenomics-card--cyan .tokenomics-card-icon,
         .tokenomics-card--cyan .tokenomics-card-title {
             color: #22d3ee;
             text-shadow: 0 0 16px rgba(34, 211, 238, 0.5);
         }
-        .tokenomics-card--cyan { border-color: rgba(34, 211, 238, 0.2); }
+        .tokenomics-card--cyan { border: 1px solid rgba(212, 175, 55, 0.45); }
         .tokenomics-card--violet .tokenomics-card-icon,
         .tokenomics-card--violet .tokenomics-card-title {
             color: #a78bfa;
             text-shadow: 0 0 16px rgba(167, 139, 250, 0.5);
         }
-        .tokenomics-card--violet { border-color: rgba(167, 139, 250, 0.2); }
+        .tokenomics-card--violet { border: 1px solid rgba(212, 175, 55, 0.45); }
         .tokenomics-card--green .tokenomics-card-icon,
         .tokenomics-card--green .tokenomics-card-title {
             color: #34d399;
             text-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
         }
-        .tokenomics-card--green { border-color: rgba(52, 211, 153, 0.2); }
+        .tokenomics-card--green { border: 1px solid rgba(212, 175, 55, 0.45); }
         .tokenomics-recycle {
             display: inline-block;
             font-size: 1rem;
@@ -328,7 +345,7 @@
         }
 
         .logo-text-arcana {
-            font-family: 'Inter', 'Montserrat', sans-serif !important;
+            font-family: 'Inter', sans-serif !important;
             font-size: 3.5rem !important;
             background: linear-gradient(to bottom, #fef9e7, #f7e7ce, #d4af37) !important;
             -webkit-background-clip: text !important;
@@ -349,18 +366,18 @@
         }
 
         .wallet-address {
-            font-family: 'Inter', 'Montserrat', sans-serif;
-            background: rgba(212, 175, 55, 0.15);
+            font-family: 'Inter', sans-serif;
+            background: #D4AF37;
+            color: #0b0e11;
             padding: 10px 20px;
             border-radius: 12px;
-            border: 1px solid rgba(212, 175, 55, 0.5);
-            color: #D4AF37;
+            border: 1px solid rgba(212, 175, 55, 0.6);
             cursor: pointer !important;
             transition: 0.2s ease;
             font-size: 0.9rem;
             font-weight: 600;
         }
-        .wallet-address:hover { background: rgba(212, 175, 55, 0.25); border-color: #D4AF37; color: #f7e7ce; }
+        .wallet-address:hover { background: #e5c04a; border-color: #D4AF37; color: #0b0e11; }
 
         .card {
             background: linear-gradient(145deg, #131b2e, #0f1629) !important;
@@ -988,7 +1005,7 @@
             text-align: center;
             font-size: 0.95rem;
             font-weight: 600;
-            font-family: 'Inter', 'Montserrat', sans-serif;
+            font-family: 'Inter', sans-serif;
             letter-spacing: 0.08em;
             box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
@@ -1051,7 +1068,7 @@
             color: #ffffff;
             font-weight: 700;
             font-size: 1.1rem;
-            font-family: 'Inter', 'Montserrat', sans-serif;
+            font-family: 'Inter', sans-serif;
             letter-spacing: 0.08em;
             padding: 1rem 2rem;
             border-radius: 12px;
@@ -1141,18 +1158,24 @@
                 <div class="tokenomics-row">
                 <div class="tokenomics-card tokenomics-card--cyan">
                     <div class="tokenomics-card-icon">🕹️<span class="tokenomics-recycle" title="Rachat déflationniste">♻️</span></div>
-                    <h3 class="tokenomics-card-title">Arcana Games</h3>
-                    <p class="tokenomics-card-sub">100% Rachat de jetons</p>
+                    <div class="tokenomics-card-text">
+                        <h3 class="tokenomics-card-title">Arcana Games</h3>
+                        <p class="tokenomics-card-sub">100% Rachat de jetons</p>
+                    </div>
                 </div>
                 <div class="tokenomics-card tokenomics-card--violet">
                     <div class="tokenomics-card-icon">🎰</div>
-                    <h3 class="tokenomics-card-title">Casino Pool</h3>
-                    <p class="tokenomics-card-sub">10% Injection Liquidité</p>
+                    <div class="tokenomics-card-text">
+                        <h3 class="tokenomics-card-title">Casino Pool</h3>
+                        <p class="tokenomics-card-sub">10% Injection Liquidité</p>
+                    </div>
                 </div>
                 <div class="tokenomics-card tokenomics-card--green">
                     <div class="tokenomics-card-icon">🛡️</div>
-                    <h3 class="tokenomics-card-title">Smart Contract</h3>
-                    <p class="tokenomics-card-sub">Vérifié & Audité</p>
+                    <div class="tokenomics-card-text">
+                        <h3 class="tokenomics-card-title">Smart Contract</h3>
+                        <p class="tokenomics-card-sub">Vérifié & Audité</p>
+                    </div>
                 </div>
                 </div>
             </div>
@@ -1303,18 +1326,24 @@
                 <div class="tokenomics-row">
                     <div class="tokenomics-card tokenomics-card--cyan">
                         <div class="tokenomics-card-icon">🕹️<span class="tokenomics-recycle" title="Rachat déflationniste">♻️</span></div>
-                        <h3 class="tokenomics-card-title">Arcana Games</h3>
-                        <p class="tokenomics-card-sub">100% Rachat de jetons</p>
+                        <div class="tokenomics-card-text">
+                            <h3 class="tokenomics-card-title">Arcana Games</h3>
+                            <p class="tokenomics-card-sub">100% Rachat de jetons</p>
+                        </div>
                     </div>
                     <div class="tokenomics-card tokenomics-card--violet">
                         <div class="tokenomics-card-icon">🎰</div>
-                        <h3 class="tokenomics-card-title">Casino Pool</h3>
-                        <p class="tokenomics-card-sub">10% Injection Liquidité</p>
+                        <div class="tokenomics-card-text">
+                            <h3 class="tokenomics-card-title">Casino Pool</h3>
+                            <p class="tokenomics-card-sub">10% Injection Liquidité</p>
+                        </div>
                     </div>
                     <div class="tokenomics-card tokenomics-card--green">
                         <div class="tokenomics-card-icon">🛡️</div>
-                        <h3 class="tokenomics-card-title">Smart Contract</h3>
-                        <p class="tokenomics-card-sub">Vérifié & Audité</p>
+                        <div class="tokenomics-card-text">
+                            <h3 class="tokenomics-card-title">Smart Contract</h3>
+                            <p class="tokenomics-card-sub">Vérifié & Audité</p>
+                        </div>
                     </div>
                 </div>
                 </div>
@@ -1544,10 +1573,12 @@
             "event KenoPlayed(address indexed player, uint256 roundId, uint256 amount, uint8[] selected)",
             "event KenoSettled(address indexed player, uint256 roundId, uint8[] drawn, uint256 payout)"
         ];
-        /* ArcanaCasino.sol — Slots : playSlots(betAmount, multiplier). Mettre l'adresse après déploiement. */
-        const ARCANA_CASINO_ADDRESS = null;
+        /* ArcanaCasino.sol déployé sur Polygon — playSlots(betAmount) détermine le gain on-chain. */
+        const CASINO_CONTRACT_ADDRESS = "0x0a6Db8dfc670dDc655Ed5eEDa4746a687CfE2744";
+        const ARCANA_CASINO_ADDRESS = CASINO_CONTRACT_ADDRESS;
         const ARCANA_CASINO_ABI = [
-            "function playSlots(uint256 betAmount, uint256 multiplier) external"
+            "function playSlots(uint256 betAmount) external",
+            "event GameResult(address indexed player, uint256 betAmount, uint256 winAmount, bool won)"
         ];
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
@@ -2074,17 +2105,20 @@
                     reels.forEach((reel, i) => setReelIcons(reel, [getRandomIcon(), finalIcons[i], getRandomIcon()]));
                     slotSpinning = false;
                     if (spinBtn) { spinBtn.disabled = false; spinBtn.textContent = 'SPIN'; }
-                    const multiplier = getSlotMultiplier(finalIcons);
                     if (ARCANA_CASINO_ADDRESS && window.ethers && userAddress) {
                         try {
                             const provider = new ethers.providers.Web3Provider(window.ethereum);
                             const signer = provider.getSigner();
                             const casino = new ethers.Contract(ARCANA_CASINO_ADDRESS, ARCANA_CASINO_ABI, signer);
                             const betWei = ethers.utils.parseEther(stake.toString());
-                            const tx = await casino.playSlots(betWei, multiplier);
-                            await tx.wait();
-                            if (multiplier > 0) {
-                                Swal.fire({ icon: 'success', title: 'Gagné !', text: multiplier + 'x — ' + (stake * multiplier) + ' ARCANA crédités.' });
+                            const tx = await casino.playSlots(betWei);
+                            const receipt = await tx.wait();
+                            const event = receipt.events && receipt.events.find(function(e) { return e.event === 'GameResult'; });
+                            const won = event && event.args && event.args.won;
+                            const winAmount = event && event.args && event.args.winAmount ? event.args.winAmount.toString() : '0';
+                            const winFormatted = parseFloat(ethers.utils.formatUnits(winAmount, 18)).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                            if (won) {
+                                Swal.fire({ icon: 'success', title: 'Gagné !', text: winFormatted + ' ARCANA crédités.' });
                             } else {
                                 Swal.fire({ icon: 'info', title: 'Pas de chance', text: 'Mise envoyée au casino (LP + Vault).' });
                             }
@@ -2093,7 +2127,8 @@
                             Swal.fire({ icon: 'error', title: 'Transaction échouée', text: e.message || 'playSlots a échoué.' });
                         }
                     } else {
-                        if (multiplier > 0) Swal.fire({ icon: 'success', title: 'Gagné !', text: multiplier + 'x (démo — connectez le contrat pour les vrais gains).' });
+                        const multiplier = getSlotMultiplier(finalIcons);
+                        if (multiplier > 0) Swal.fire({ icon: 'success', title: 'Gagné !', text: multiplier + 'x (démo — connectez le wallet pour jouer on-chain).' });
                         else {
                             const allocation = calculateAllocations(stake, 'casino');
                             allocateCasinoSpinLoss(allocation.lpPool, allocation.vault);
@@ -2231,6 +2266,37 @@
             }
 
             crashState.animId = requestAnimationFrame(tickCrash);
+        }
+
+        async function placeCrashBetOnChain() {
+            const stakeInput = document.getElementById('crashStakeInput');
+            const btn = document.getElementById('crashBetBtn');
+            const statusEl = document.getElementById('crashStatus');
+            const stake = Math.max(1, Math.floor(parseFloat(stakeInput?.value, 10) || 0));
+            if (!ARCANA_CASINO_ADDRESS || !window.ethers || !userAddress) {
+                startCrashRound();
+                return;
+            }
+            if (btn) { btn.disabled = true; btn.textContent = 'Transaction...'; }
+            if (statusEl) statusEl.textContent = 'Transaction en cours...';
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const casino = new ethers.Contract(ARCANA_CASINO_ADDRESS, ARCANA_CASINO_ABI, signer);
+                const betWei = ethers.utils.parseEther(String(stake));
+                const tx = await casino.playSlots(betWei);
+                const receipt = await tx.wait();
+                const event = receipt.events && receipt.events.find(function(e) { return e.event === 'GameResult'; });
+                const won = event && event.args && event.args.won;
+                const winAmount = event && event.args && event.args.winAmount ? event.args.winAmount.toString() : '0';
+                const winFormatted = parseFloat(ethers.utils.formatUnits(winAmount, 18)).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                if (statusEl) statusEl.textContent = won ? 'Gagné ! +' + winFormatted + ' ARCANA' : 'Pas de chance. Mise envoyée au casino.';
+                if (typeof updateUI === 'function') updateUI();
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Erreur: ' + (e.message || 'Transaction échouée');
+                Swal.fire({ icon: 'error', title: 'Erreur', text: e.message || 'playSlots a échoué.' });
+            }
+            if (btn) { btn.disabled = false; btn.textContent = 'Parier'; }
         }
 
         function startCrashRound() {
@@ -2621,10 +2687,11 @@
                 return;
             }
             if (!ARCANA_CASINO_ADDRESS) {
-                Swal.fire({ icon: 'info', title: 'Contrat non déployé', text: 'Déployez ArcanaCasino.sol et définissez ARCANA_CASINO_ADDRESS. En démo, vous pouvez lancer SPIN sans approve.' });
+                Swal.fire({ icon: 'info', title: 'Contrat non déployé', text: 'Contrat Casino non configuré.' });
                 slotApproved = true;
                 return;
             }
+            /* Approve du token ARCANA pour autoriser le contrat Casino (CASINO_CONTRACT_ADDRESS) à dépenser les jetons du joueur. */
             const stakeInput = document.getElementById('slotStakeInput');
             const rawStake = Math.max(1, parseInt(stakeInput?.value, 10) || 10);
             const amount = ethers.constants.MaxUint256;
@@ -2687,21 +2754,22 @@
                 if (slotSpinBtn) slotSpinBtn.onclick = spin;
                 if (slotApproveBtn) slotApproveBtn.onclick = approveArcanaSlot;
                 function showSection(sectionId) {
-                    const id = (sectionId || '').replace(/^section-/, '');
+                    const id = String(sectionId || '').replace(/^section-/, '').trim();
                     const tabId = id || 'dashboard';
-                    document.querySelectorAll('.section-panel, .section-content').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+                    const allSections = document.querySelectorAll('.section-panel');
+                    allSections.forEach(function(p) { p.classList.remove('active'); p.style.display = 'none'; });
                     const panel = document.getElementById('section-' + tabId);
                     if (panel) { panel.classList.add('active'); panel.style.display = 'block'; }
-                    document.querySelectorAll('.app-sidebar-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.app-sidebar-btn').forEach(function(b) { b.classList.remove('active'); });
                     const btn = document.querySelector('.app-sidebar-btn[data-nav-tab="' + tabId + '"]');
                     if (btn) btn.classList.add('active');
                 }
-                function switchSection(tabId) { showSection(tabId); }
-                document.querySelectorAll('.app-sidebar-btn').forEach(btn => {
-                    btn.addEventListener('click', () => showSection(btn.getAttribute('data-nav-tab')));
+                window.showSection = showSection;
+                document.querySelectorAll('.app-sidebar-btn').forEach(function(btn) {
+                    var tab = btn.getAttribute('data-nav-tab');
+                    if (tab) btn.addEventListener('click', function() { showSection(tab); });
                 });
-                document.querySelectorAll('.section-panel, .section-content').forEach(p => { if (!p.classList.contains('active')) p.style.display = 'none'; });
-                if (typeof window !== 'undefined') window.showSection = showSection;
+                showSection('dashboard');
 
                 let theatreCurrentGame = null;
                 const GAME_BLOCK_IDS = { slots: 'casino-slots-block', crash: 'casino-crash-block', plinko: 'casino-plinko-block', keno: 'casino-keno-block' };
@@ -2763,8 +2831,9 @@
 
                 const crashBetBtn = document.getElementById('crashBetBtn');
                 if (crashBetBtn) {
-                    crashBetBtn.addEventListener('click', () => {
+                    crashBetBtn.addEventListener('click', function() {
                         if (crashState.running) cashOutCrash();
+                        else if (ARCANA_CASINO_ADDRESS && userAddress) placeCrashBetOnChain();
                         else startCrashRound();
                     });
                 }
