@@ -1136,7 +1136,7 @@
             <div class="app-content">
     <main id="app-main">
         <!-- Section Dashboard (affichée par défaut) -->
-        <section id="section-dashboard" class="section-panel active">
+        <section id="section-dashboard" class="section-panel section-content active">
             <div class="tokenomics-panel">
                 <div class="tokenomics-row">
                 <div class="tokenomics-card tokenomics-card--cyan">
@@ -1297,7 +1297,7 @@
         </section>
 
         <!-- Section Casino : une seule section visible à la fois -->
-        <section id="section-casino" class="section-panel">
+        <section id="section-casino" class="section-panel section-content">
             <div id="casino-section" class="px-2">
                 <div class="tokenomics-panel">
                 <div class="tokenomics-row">
@@ -1480,7 +1480,7 @@
         </section>
 
         <!-- Section Arcade -->
-        <section id="section-arcade" class="section-panel">
+        <section id="section-arcade" class="section-panel section-content">
             <div class="app-card text-center max-w-md mx-auto">
                 <h2 class="text-xl font-bold text-[#a78bfa] mb-4 uppercase tracking-wider">Arcade</h2>
                 <p class="text-[#F7E7CE]/90 mb-4">10 jeux disponibles sur la page Arcade.</p>
@@ -1489,7 +1489,7 @@
         </section>
 
         <!-- Section Profil -->
-        <section id="section-profil" class="section-panel">
+        <section id="section-profil" class="section-panel section-content">
             <div class="app-card max-w-lg mx-auto">
                 <h2 class="text-xl font-bold text-[#a78bfa] mb-4 uppercase tracking-wider">Profil</h2>
                 <p class="text-[#F7E7CE]/70 text-sm mb-4">Votre adresse et solde ARCANA (toujours visibles dans la barre du haut).</p>
@@ -1656,6 +1656,16 @@
                     if (plinkoBal) plinkoBal.innerText = userClaimableBalance.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
                     const headerBal = document.getElementById('headerBalanceArcana');
                     if (headerBal) headerBal.innerText = userClaimableBalance.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                    const userBalArcana = document.getElementById('user-balance-arcana');
+                    if (userBalArcana) userBalArcana.textContent = userClaimableBalance.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                    const userBalPol = document.getElementById('user-balance-pol');
+                    if (userBalPol) {
+                        try {
+                            const prov = new ethers.providers.Web3Provider(window.ethereum);
+                            const polBal = await prov.getBalance(userAddress);
+                            userBalPol.textContent = parseFloat(ethers.utils.formatEther(polBal)).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+                        } catch (_) { userBalPol.textContent = '—'; }
+                    }
                     const profilBal = document.getElementById('profilBalanceArcana');
                     if (profilBal) profilBal.innerText = userClaimableBalance.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
                     const profilAddr = document.getElementById('profilAddress');
@@ -1669,6 +1679,10 @@
                     if (plinkoBal) plinkoBal.innerText = vault.arcana != null ? vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) : '—';
                     const headerBal = document.getElementById('headerBalanceArcana');
                     if (headerBal) headerBal.innerText = vault.arcana != null ? vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) : '—';
+                    const userBalArcana = document.getElementById('user-balance-arcana');
+                    if (userBalArcana) userBalArcana.textContent = vault.arcana != null ? vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) : '—';
+                    const userBalPol = document.getElementById('user-balance-pol');
+                    if (userBalPol) userBalPol.textContent = vault.pol != null ? vault.pol.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) : '—';
                     const profilBal = document.getElementById('profilBalanceArcana');
                     if (profilBal) profilBal.innerText = vault.arcana != null ? vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) : '—';
                     const profilAddr = document.getElementById('profilAddress');
@@ -1680,6 +1694,10 @@
                 if (arcanaEl) arcanaEl.innerText = "—";
                 const headerBal = document.getElementById('headerBalanceArcana');
                 if (headerBal) headerBal.innerText = '—';
+                const userBalArcana = document.getElementById('user-balance-arcana');
+                if (userBalArcana) userBalArcana.textContent = '—';
+                const userBalPol = document.getElementById('user-balance-pol');
+                if (userBalPol) userBalPol.textContent = '—';
                 const profilBal = document.getElementById('profilBalanceArcana');
                 if (profilBal) profilBal.innerText = '—';
             }
@@ -1743,29 +1761,48 @@
             }
         }
 
-        async function connect() {
+        async function connectWallet() {
             if (!window.ethereum && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
                 window.location.href = "https://metamask.app.link/dapp/" + window.location.href.replace(/^https?:\/\//, '');
                 return;
             }
-            if (window.ethereum) {
-                setButtonLoading('connectBtn', 'Connexion...');
-                try {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const accounts = await provider.send("eth_requestAccounts", []);
-                    userAddress = accounts[0];
-                    const connectBtn = document.getElementById('connectBtn');
+            if (!window.ethereum) {
+                Swal.fire({ icon: 'warning', title: 'MetaMask requis', text: 'Veuillez installer MetaMask pour connecter votre wallet.' });
+                return;
+            }
+            setButtonLoading('connectBtn', 'Connexion...');
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                userAddress = accounts[0];
+                signer = provider.getSigner();
+                const connectBtn = document.getElementById('connectBtn');
+                if (connectBtn) {
                     connectBtn.classList.remove('btn-loading');
                     connectBtn.disabled = false;
                     connectBtn.innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
-                    await updateUI();
-                } catch (err) {
-                    console.error(err);
-                    restoreButton('connectBtn', 'Connecter Wallet');
-                    Swal.fire({ icon: 'error', title: 'Connexion échouée', text: err.message || 'Impossible de connecter le wallet.' });
                 }
-            } else { Swal.fire({ icon: 'warning', title: 'MetaMask requis', text: 'Veuillez installer MetaMask pour connecter votre wallet.' }); }
+                await updateUI();
+                const balArcana = document.getElementById('user-balance-arcana');
+                const balPol = document.getElementById('user-balance-pol');
+                if (balArcana || balPol) {
+                    try {
+                        const prov = new ethers.providers.Web3Provider(window.ethereum);
+                        const polBal = await prov.getBalance(userAddress);
+                        const tokenContract = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ARCANA_TOKEN_ABI, prov);
+                        const arcanaBal = await tokenContract.balanceOf(userAddress);
+                        if (balPol) balPol.textContent = parseFloat(ethers.utils.formatEther(polBal)).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+                        if (balArcana) balArcana.textContent = parseFloat(ethers.utils.formatUnits(arcanaBal, 18)).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                    } catch (e) { if (balArcana) balArcana.textContent = '—'; if (balPol) balPol.textContent = '—'; }
+                }
+            } catch (err) {
+                console.error(err);
+                restoreButton('connectBtn', 'Connecter Wallet');
+                Swal.fire({ icon: 'error', title: 'Connexion échouée', text: err.message || 'Impossible de connecter le wallet.' });
+            }
         }
+        const connect = connectWallet;
+        if (typeof window !== 'undefined') { window.connectWallet = connectWallet; window.connect = connect; }
 
         async function withdraw() {
             if (!userAddress) {
@@ -2636,12 +2673,12 @@
                 const copyAddressBtn = document.getElementById('copyAddressBtn');
                 const amountInput = document.getElementById('amountInput');
                 const tokenSelect = document.getElementById('tokenSelect');
-                if (!connectBtn || !withdrawBtn) {
-                    console.error("[Arcana] Éléments DOM manquants (connectBtn ou withdrawBtn)");
+                if (!connectBtn) {
+                    console.error("[Arcana] Élément DOM manquant: connectBtn");
                     return;
                 }
                 connectBtn.onclick = connect;
-                withdrawBtn.onclick = withdraw;
+                if (withdrawBtn) withdrawBtn.onclick = withdraw;
                 if (claimBtn) claimBtn.onclick = claim;
                 if (buyBtn) buyBtn.onclick = buyNow;
                 if (ctaInvest) ctaInvest.onclick = investDirect;
@@ -2649,18 +2686,22 @@
                 const slotApproveBtn = document.getElementById('slotApproveBtn');
                 if (slotSpinBtn) slotSpinBtn.onclick = spin;
                 if (slotApproveBtn) slotApproveBtn.onclick = approveArcanaSlot;
-                function switchSection(tabId) {
-                    document.querySelectorAll('.section-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+                function showSection(sectionId) {
+                    const id = (sectionId || '').replace(/^section-/, '');
+                    const tabId = id || 'dashboard';
+                    document.querySelectorAll('.section-panel, .section-content').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
                     const panel = document.getElementById('section-' + tabId);
                     if (panel) { panel.classList.add('active'); panel.style.display = 'block'; }
                     document.querySelectorAll('.app-sidebar-btn').forEach(b => b.classList.remove('active'));
                     const btn = document.querySelector('.app-sidebar-btn[data-nav-tab="' + tabId + '"]');
                     if (btn) btn.classList.add('active');
                 }
+                function switchSection(tabId) { showSection(tabId); }
                 document.querySelectorAll('.app-sidebar-btn').forEach(btn => {
-                    btn.addEventListener('click', () => switchSection(btn.getAttribute('data-nav-tab')));
+                    btn.addEventListener('click', () => showSection(btn.getAttribute('data-nav-tab')));
                 });
-                document.querySelectorAll('.section-panel').forEach(p => { if (!p.classList.contains('active')) p.style.display = 'none'; });
+                document.querySelectorAll('.section-panel, .section-content').forEach(p => { if (!p.classList.contains('active')) p.style.display = 'none'; });
+                if (typeof window !== 'undefined') window.showSection = showSection;
 
                 let theatreCurrentGame = null;
                 const GAME_BLOCK_IDS = { slots: 'casino-slots-block', crash: 'casino-crash-block', plinko: 'casino-plinko-block', keno: 'casino-keno-block' };
