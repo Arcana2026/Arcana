@@ -18,7 +18,7 @@
     <meta property="og:type" content="website">
     <link rel="canonical" href="https://arcana-ezl.pages.dev">
     <link rel="icon" type="image/png" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- ethers.js : chargé via CDN (également dépendance du projet dans package.json) pour connexion MetaMask et Polygon -->
@@ -218,6 +218,82 @@
         .theatre-sidebar h3 { font-size: 0.85rem; color: #a78bfa; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
         .theatre-sidebar .recent-bets-table { font-size: 0.75rem; }
         .theatre-sidebar .recent-bets-table th, .theatre-sidebar .recent-bets-table td { padding: 0.35rem 0.25rem; }
+
+        /* Panneau Tokenomics (Glassmorphism) */
+        .tokenomics-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .tokenomics-card {
+            flex: 1;
+            min-width: 200px;
+            max-width: 320px;
+            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+        .tokenomics-card-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 20px;
+        }
+        .tokenomics-card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+            letter-spacing: 0.02em;
+        }
+        .tokenomics-card-sub {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            margin: 0;
+        }
+        .tokenomics-card--cyan .tokenomics-card-icon,
+        .tokenomics-card--cyan .tokenomics-card-title {
+            color: #22d3ee;
+            text-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+        }
+        .tokenomics-card--cyan { border-color: rgba(34, 211, 238, 0.2); box-shadow: 0 0 30px rgba(34, 211, 238, 0.08); }
+        .tokenomics-card--violet .tokenomics-card-icon,
+        .tokenomics-card--violet .tokenomics-card-title {
+            color: #a78bfa;
+            text-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+        }
+        .tokenomics-card--violet { border-color: rgba(167, 139, 250, 0.2); box-shadow: 0 0 30px rgba(167, 139, 250, 0.08); }
+        .tokenomics-card--green .tokenomics-card-icon,
+        .tokenomics-card--green .tokenomics-card-title {
+            color: #34d399;
+            text-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
+        }
+        .tokenomics-card--green { border-color: rgba(52, 211, 153, 0.2); box-shadow: 0 0 30px rgba(52, 211, 153, 0.08); }
+        .tokenomics-recycle {
+            display: inline-block;
+            font-size: 1rem;
+            margin-left: 4px;
+            vertical-align: middle;
+            animation: tokenomics-spin 4s linear infinite;
+        }
+        @keyframes tokenomics-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            .tokenomics-row { flex-direction: column; align-items: stretch; margin-bottom: 1rem; }
+            .tokenomics-card { max-width: none; margin-bottom: 15px; }
+            .tokenomics-card:last-child { margin-bottom: 0; }
+        }
 
         .navbar {
             background: linear-gradient(to bottom, #0f1629, #0a0e1a);
@@ -1008,6 +1084,23 @@
     <main id="app-main">
         <!-- Section Dashboard (affichée par défaut) -->
         <section id="section-dashboard" class="section-panel active">
+            <div class="tokenomics-row">
+                <div class="tokenomics-card tokenomics-card--cyan">
+                    <div class="tokenomics-card-icon">🕹️<span class="tokenomics-recycle" title="Rachat déflationniste">♻️</span></div>
+                    <h3 class="tokenomics-card-title">Arcana Games</h3>
+                    <p class="tokenomics-card-sub">100% Rachat de jetons</p>
+                </div>
+                <div class="tokenomics-card tokenomics-card--violet">
+                    <div class="tokenomics-card-icon">🎰</div>
+                    <h3 class="tokenomics-card-title">Casino Pool</h3>
+                    <p class="tokenomics-card-sub">10% Injection Liquidité</p>
+                </div>
+                <div class="tokenomics-card tokenomics-card--green">
+                    <div class="tokenomics-card-icon">🛡️</div>
+                    <h3 class="tokenomics-card-title">Smart Contract</h3>
+                    <p class="tokenomics-card-sub">Vérifié & Audité</p>
+                </div>
+            </div>
             <div class="banner-official-domain app-card mb-4">
                 Domaine Web3 Officiel : <a href="https://arcana-ezl.pages.dev" class="domain" rel="noopener">arcana-safe.nft</a> → <a href="https://arcana-ezl.pages.dev" class="domain" rel="noopener">arcana-ezl.pages.dev</a> <span class="text-[#D4AF37]/80 text-xs ml-1">(transaction 0x5fda… confirmée)</span>
             </div>
@@ -1148,6 +1241,23 @@
         <!-- Section Casino : une seule section visible à la fois -->
         <section id="section-casino" class="section-panel">
             <div id="casino-section" class="px-2">
+                <div class="tokenomics-row">
+                    <div class="tokenomics-card tokenomics-card--cyan">
+                        <div class="tokenomics-card-icon">🕹️<span class="tokenomics-recycle" title="Rachat déflationniste">♻️</span></div>
+                        <h3 class="tokenomics-card-title">Arcana Games</h3>
+                        <p class="tokenomics-card-sub">100% Rachat de jetons</p>
+                    </div>
+                    <div class="tokenomics-card tokenomics-card--violet">
+                        <div class="tokenomics-card-icon">🎰</div>
+                        <h3 class="tokenomics-card-title">Casino Pool</h3>
+                        <p class="tokenomics-card-sub">10% Injection Liquidité</p>
+                    </div>
+                    <div class="tokenomics-card tokenomics-card--green">
+                        <div class="tokenomics-card-icon">🛡️</div>
+                        <h3 class="tokenomics-card-title">Smart Contract</h3>
+                        <p class="tokenomics-card-sub">Vérifié & Audité</p>
+                    </div>
+                </div>
                 <h2 class="casino-title-neon text-center mb-6">ARCANA CASINO</h2>
                 <p class="casino-liquidite-mention mb-6">10% des profits sont réinjectés dans la liquidité ARCANA.</p>
                 <div class="recent-bets-wrapper app-card mb-6">
