@@ -22,7 +22,7 @@ function getClientIp(req) {
 // ========== CONFIGURATION ADMIN & VAULT (UNIQUE) ==========
 // Seule cette adresse est ADMIN et VAULT : elle perçoit tous les profits et gère les fonds.
 // Aucune autre adresse ne peut recevoir les pertes Arcade ni gérer le coffre.
-const ADMIN_VAULT_ADDRESS = (process.env.ARCANA_ADMIN_VAULT || '0x29D61511C84E332635E296e375f22Eb4fB514147').toLowerCase();
+const ADMIN_VAULT_ADDRESS = (process.env.ARCANA_ADMIN_VAULT || '0x29D61511C84E332635E296e37bf22Eb4fB514147').toLowerCase();
 
 // Domaine Web3 officiel Arcana Safe (transaction Polygon 0x5fda... confirmée)
 const OFFICIAL_DOMAIN = process.env.OFFICIAL_DOMAIN || 'https://arcana-ezl.pages.dev';
