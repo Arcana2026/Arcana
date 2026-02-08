@@ -210,6 +210,84 @@
         .btn-spinner { display: inline-block; width: 1em; height: 1em; margin-right: 0.5em; vertical-align: -0.15em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: btn-spin 0.6s linear infinite; }
         @keyframes btn-spin { to { transform: rotate(360deg); } }
 
+        /* Casino Slot Machine — néon violet/bleu style Arcanes */
+        .slot-machine-wrapper {
+            padding: 1.5rem;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(88, 28, 135, 0.25) 0%, rgba(59, 7, 100, 0.3) 50%, rgba(30, 58, 138, 0.25) 100%);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.4), 0 0 80px rgba(59, 130, 246, 0.2), inset 0 0 60px rgba(88, 28, 135, 0.15);
+            border: 2px solid rgba(167, 139, 250, 0.5);
+        }
+        .slot-machine {
+            background: linear-gradient(180deg, #1e1b2e 0%, #0f0d18 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .slot-reels {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .slot-reel {
+            width: 5rem;
+            height: 5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            border: 2px solid rgba(139, 92, 246, 0.4);
+            overflow: hidden;
+        }
+        .slot-reel.spinning .slot-cell { animation: slot-blur 0.15s linear infinite; }
+        @keyframes slot-blur { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .slot-cell {
+            font-size: 1.75rem;
+            line-height: 1.6;
+            min-height: 1.6em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-spin-gold {
+            background: linear-gradient(135deg, #D4AF37, #B8860B);
+            color: #0a0e1a;
+            font-weight: 800;
+            font-size: 1.1rem;
+            letter-spacing: 0.2em;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: pulse-gold 1.5s ease-in-out infinite;
+        }
+        .btn-spin-gold:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
+        }
+        .btn-spin-gold:disabled { opacity: 0.6; cursor: not-allowed; animation: none; }
+        @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255,255,255,0.3); } 50% { box-shadow: 0 0 28px rgba(212, 175, 55, 0.65), inset 0 1px 0 rgba(255,255,255,0.3); } }
+        .btn-approve-slot {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(99, 102, 241, 0.9));
+            color: #fff;
+            font-weight: 700;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid rgba(167, 139, 250, 0.6);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-approve-slot:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(139, 92, 246, 0.5);
+        }
+        .btn-approve-slot:disabled { opacity: 0.6; cursor: not-allowed; }
+
         .banner-official-domain {
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(184, 134, 11, 0.18) 50%, rgba(212, 175, 55, 0.28) 100%);
             border-bottom: 2px solid rgba(212, 175, 55, 0.6);
@@ -421,6 +499,42 @@
                             </section>
 
                             <p class="text-center text-[#D4AF37]/80 text-xs uppercase tracking-widest pt-2">— Le Coffre-Fort Arcana —</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Casino : Slot Machine -->
+            <div id="casino-section" class="mb-8">
+                <h2 class="text-xl font-bold uppercase tracking-widest text-[#D4AF37] mb-4 text-center">🎰 Casino Arcana</h2>
+                <div class="slot-machine-wrapper">
+                    <div class="slot-machine">
+                        <div class="slot-reels" id="slotReels">
+                            <div class="slot-reel" data-reel="0">
+                                <div class="slot-cell" data-icon="crystal">✦</div>
+                                <div class="slot-cell" data-icon="potion">🧪</div>
+                                <div class="slot-cell" data-icon="dragon">🐉</div>
+                            </div>
+                            <div class="slot-reel" data-reel="1">
+                                <div class="slot-cell" data-icon="dragon">🐉</div>
+                                <div class="slot-cell" data-icon="crystal">✦</div>
+                                <div class="slot-cell" data-icon="potion">🧪</div>
+                            </div>
+                            <div class="slot-reel" data-reel="2">
+                                <div class="slot-cell" data-icon="potion">🧪</div>
+                                <div class="slot-cell" data-icon="dragon">🐉</div>
+                                <div class="slot-cell" data-icon="crystal">✦</div>
+                            </div>
+                        </div>
+                        <div class="slot-controls mt-6 flex flex-col items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <label class="text-[#F7E7CE]/90 text-sm">Mise (ARCANA)</label>
+                                <input type="number" id="slotStakeInput" min="1" step="1" value="10" class="w-24 px-3 py-2 rounded-lg bg-black/50 border border-[#D4AF37]/50 text-[#F7E7CE] text-center" />
+                            </div>
+                            <div class="flex flex-wrap justify-center gap-3">
+                                <button type="button" id="slotApproveBtn" class="btn-approve-slot">Approve ARCANA</button>
+                                <button type="button" id="slotSpinBtn" class="btn-spin-gold">SPIN</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -854,6 +968,97 @@
             }
         }
 
+        /* ----- Casino Slot Machine ----- */
+        const SLOT_ICONS = [
+            { id: 'crystal', symbol: '✦' },
+            { id: 'potion', symbol: '🧪' },
+            { id: 'dragon', symbol: '🐉' }
+        ];
+        let slotSpinning = false;
+        let slotApproved = false;
+
+        function getRandomIcon() {
+            return SLOT_ICONS[Math.floor(Math.random() * SLOT_ICONS.length)];
+        }
+
+        function setReelIcons(reelEl, icons) {
+            const cells = reelEl.querySelectorAll('.slot-cell');
+            cells.forEach((cell, i) => {
+                const icon = icons[i] || getRandomIcon();
+                cell.setAttribute('data-icon', icon.id);
+                cell.textContent = icon.symbol;
+            });
+        }
+
+        async function spin() {
+            if (slotSpinning) return;
+            const stakeInput = document.getElementById('slotStakeInput');
+            const spinBtn = document.getElementById('slotSpinBtn');
+            const stake = parseInt(stakeInput?.value, 10) || 10;
+            if (!slotApproved) {
+                Swal.fire({ icon: 'warning', title: 'Approve requis', text: 'Cliquez sur "Approve ARCANA" avant de lancer le spin.' });
+                return;
+            }
+            const reelsEl = document.getElementById('slotReels');
+            if (!reelsEl) return;
+            const reels = reelsEl.querySelectorAll('.slot-reel');
+            slotSpinning = true;
+            if (spinBtn) { spinBtn.disabled = true; spinBtn.textContent = '...'; }
+            reels.forEach(r => r.classList.add('spinning'));
+
+            const duration = 2000;
+            const interval = 80;
+            const steps = duration / interval;
+            let elapsed = 0;
+            const tick = () => {
+                reels.forEach(reel => {
+                    const icons = [getRandomIcon(), getRandomIcon(), getRandomIcon()];
+                    setReelIcons(reel, icons);
+                });
+                elapsed += interval;
+                if (elapsed < duration) setTimeout(tick, interval);
+                else {
+                    reels.forEach(reel => reel.classList.remove('spinning'));
+                    const final = [getRandomIcon(), getRandomIcon(), getRandomIcon()];
+                    reels.forEach((reel, i) => setReelIcons(reel, [getRandomIcon(), final[i], getRandomIcon()]));
+                    slotSpinning = false;
+                    if (spinBtn) { spinBtn.disabled = false; spinBtn.textContent = 'SPIN'; }
+                    const same = final[0].id === final[1].id && final[1].id === final[2].id;
+                    if (same) Swal.fire({ icon: 'success', title: 'Gagné !', text: 'Trois symboles identiques !' });
+                }
+            };
+            tick();
+        }
+
+        async function approveArcanaSlot() {
+            if (!window.ethereum || !userAddress) {
+                Swal.fire({ icon: 'info', title: 'Connexion requise', text: 'Connectez votre wallet pour approuver.' });
+                return;
+            }
+            const stakeInput = document.getElementById('slotStakeInput');
+            const amount = (parseInt(stakeInput?.value, 10) || 10) * 1e18;
+            const approveBtn = document.getElementById('slotApproveBtn');
+            if (!approveBtn) return;
+            approveBtn.disabled = true;
+            approveBtn.textContent = 'Approve...';
+            try {
+                const ethersLib = window.ethers;
+                if (!ethersLib) throw new Error('ethers non chargé');
+                const provider = new ethersLib.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const tokenContract = new ethersLib.Contract(ARCANA_TOKEN_ADDRESS, ['function approve(address spender, uint256 amount) returns (bool)'], signer);
+                const tx = await tokenContract.approve(PRESALE_VAULT, ethersLib.BigNumber.from(amount.toString()));
+                await tx.wait();
+                slotApproved = true;
+                Swal.fire({ icon: 'success', title: 'Approuvé', text: 'Vous pouvez lancer le spin.' });
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'Erreur', text: e.message || 'Approve échoué.' });
+            } finally {
+                approveBtn.disabled = false;
+                approveBtn.textContent = 'Approve ARCANA';
+            }
+        }
+
         window.addEventListener('load', () => {
             if (typeof window === 'undefined') {
                 console.error("[Arcana] window non disponible");
@@ -886,6 +1091,10 @@
                 if (claimBtn) claimBtn.onclick = claim;
                 if (buyBtn) buyBtn.onclick = buyNow;
                 if (ctaInvest) ctaInvest.onclick = investDirect;
+                const slotSpinBtn = document.getElementById('slotSpinBtn');
+                const slotApproveBtn = document.getElementById('slotApproveBtn');
+                if (slotSpinBtn) slotSpinBtn.onclick = spin;
+                if (slotApproveBtn) slotApproveBtn.onclick = approveArcanaSlot;
                 if (copyAddressBtn) {
                     copyAddressBtn.onclick = () => {
                         const addr = document.getElementById('receptionAddress').textContent;
