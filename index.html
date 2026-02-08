@@ -18,7 +18,7 @@
     <meta property="og:type" content="website">
     <link rel="canonical" href="https://arcana-ezl.pages.dev">
     <link rel="icon" type="image/png" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- ethers.js : chargé via CDN (également dépendance du projet dans package.json) pour connexion MetaMask et Polygon -->
@@ -29,7 +29,7 @@
         body {
             background-color: #0b0e11;
             color: #F7E7CE;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', 'Manrope', -apple-system, sans-serif;
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
@@ -64,30 +64,24 @@
             width: 48px;
             height: 48px;
             border-radius: 12px;
-            border: 1px solid transparent;
+            border: none;
             background: transparent;
-            color: rgba(247, 231, 206, 0.6);
+            color: rgba(255, 255, 255, 0.7);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
+            gap: 4px;
             font-size: 0.65rem;
             font-weight: 600;
-            transition: all 0.2s ease;
+            font-family: 'Inter', 'Manrope', sans-serif;
+            transition: color 0.2s ease;
         }
-        .app-sidebar-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: #F7E7CE;
-            border-color: rgba(255, 255, 255, 0.08);
-        }
-        .app-sidebar-btn.active {
-            background: rgba(139, 92, 246, 0.15);
-            color: #a78bfa;
-            border-color: rgba(167, 139, 250, 0.3);
-        }
-        .app-sidebar-btn .icon { font-size: 1.25rem; line-height: 1; }
+        .app-sidebar-btn:hover { color: rgba(255, 255, 255, 1); }
+        .app-sidebar-btn.active { color: rgba(255, 255, 255, 1); }
+        .app-sidebar-btn .icon { width: 22px; height: 22px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+        .app-sidebar-btn .icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
         /* Conteneur principal (droite) */
         .app-main-wrap {
@@ -117,7 +111,7 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 1.25rem;
+            padding: 30px;
         }
         .section-panel {
             display: none;
@@ -128,9 +122,9 @@
             display: block !important;
         }
         .app-card {
-            background: rgba(15, 17, 26, 0.6);
+            background: #1a1a1a;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 1.25rem;
             margin-bottom: 1rem;
             transition: box-shadow 0.2s ease;
@@ -148,7 +142,7 @@
         .casino-games-grid .app-card { margin-bottom: 0; }
         .game-card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
         .game-card-header h3 { margin: 0; font-size: 1rem; color: #a78bfa; }
-        .btn-jouer-theatre { padding: 0.5rem 1rem; border-radius: 10px; border: 1px solid rgba(167, 139, 250, 0.5); background: rgba(139, 92, 246, 0.2); color: #c4b5fd; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-jouer-theatre { padding: 0.5rem 1rem; border-radius: 12px; border: 1px solid rgba(167, 139, 250, 0.5); background: rgba(139, 92, 246, 0.2); color: #c4b5fd; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-jouer-theatre:hover { background: rgba(139, 92, 246, 0.35); box-shadow: 0 0 15px rgba(139, 92, 246, 0.25); }
         .game-placeholder { min-height: 120px; }
 
@@ -232,7 +226,7 @@
             min-width: 200px;
             max-width: 320px;
             padding: 1.25rem 1.5rem;
-            border-radius: 16px;
+            border-radius: 12px;
             background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -308,7 +302,7 @@
         }
 
         .logo-text-arcana {
-            font-family: 'Great Vibes', cursive !important;
+            font-family: 'Inter', 'Manrope', sans-serif !important;
             font-size: 3.5rem !important;
             background: linear-gradient(to bottom, #fef9e7, #f7e7ce, #d4af37) !important;
             -webkit-background-clip: text !important;
@@ -332,7 +326,7 @@
             font-family: monospace;
             background: rgba(255,255,255,0.05);
             padding: 8px 16px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #F7E7CE;
             cursor: pointer !important;
@@ -345,7 +339,7 @@
             background: linear-gradient(145deg, #131b2e, #0f1629) !important;
             border: 1px solid #D4AF37 !important;
             box-shadow: 20px 20px 40px rgba(0,0,0,0.5);
-            border-radius: 20px;
+            border-radius: 12px;
         }
 
         .stat-value {
@@ -406,7 +400,7 @@
 
         .presale-box {
             border: 1px solid #D4AF37;
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 1.5rem;
             background: rgba(0,0,0,0.3);
             margin: 1.5rem 0;
@@ -483,7 +477,7 @@
         @keyframes neon-flicker { 0%, 90%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(167,139,250,0.9), 0 0 20px rgba(139,92,246,0.7), 0 0 40px rgba(124,58,237,0.5); } 93%, 97% { opacity: 0.92; text-shadow: 0 0 8px rgba(167,139,250,0.8), 0 0 16px rgba(139,92,246,0.6); } }
         .slot-machine-wrapper {
             padding: clamp(1rem, 4vw, 1.5rem);
-            border-radius: 20px;
+            border-radius: 12px;
             background: linear-gradient(135deg, rgba(88, 28, 135, 0.2) 0%, rgba(30, 27, 75, 0.4) 50%, rgba(30, 58, 138, 0.2) 100%);
             box-shadow: 0 0 50px rgba(139, 92, 246, 0.35), 0 0 100px rgba(59, 130, 246, 0.15), inset 0 0 60px rgba(88, 28, 135, 0.1);
             border: 2px solid rgba(167, 139, 250, 0.5);
@@ -491,7 +485,7 @@
         }
         .slot-machine {
             background: linear-gradient(180deg, rgba(30, 27, 46, 0.85) 0%, rgba(15, 13, 24, 0.95) 100%);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: clamp(1rem, 3vw, 1.5rem);
             border: 1px solid rgba(139, 92, 246, 0.4);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
@@ -566,7 +560,7 @@
         /* Jeu Crash — style Stake/MetaWin : fond sombre, néon violet */
         .crash-game-wrapper {
             padding: clamp(1rem, 4vw, 1.5rem);
-            border-radius: 20px;
+            border-radius: 12px;
             background: #1a1a1a;
             box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), 0 0 80px rgba(168, 85, 247, 0.08), inset 0 0 40px rgba(0,0,0,0.3);
             border: 2px solid rgba(168, 85, 247, 0.6);
@@ -581,7 +575,7 @@
         }
         .crash-game-box {
             background: #1a1a1a;
-            border-radius: 16px;
+            border-radius: 12px;
             padding: clamp(1rem, 3vw, 1.5rem);
             border: 1px solid rgba(168, 85, 247, 0.4);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
@@ -644,7 +638,7 @@
         /* Jeu Plinko */
         .plinko-game-wrapper {
             padding: clamp(1rem, 4vw, 1.5rem);
-            border-radius: 20px;
+            border-radius: 12px;
             background: linear-gradient(135deg, rgba(124, 45, 18, 0.2) 0%, rgba(234, 88, 12, 0.15) 50%, rgba(67, 20, 7, 0.25) 100%);
             box-shadow: 0 0 50px rgba(234, 88, 12, 0.2), 0 0 100px rgba(234, 88, 12, 0.08), inset 0 0 60px rgba(124, 45, 18, 0.06);
             border: 2px solid rgba(234, 88, 12, 0.5);
@@ -655,7 +649,7 @@
         }
         .plinko-game-box {
             background: linear-gradient(180deg, rgba(30, 27, 46, 0.9) 0%, rgba(15, 13, 24, 0.95) 100%);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: clamp(1rem, 3vw, 1.5rem);
             border: 1px solid rgba(234, 88, 12, 0.4);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
@@ -730,7 +724,7 @@
         /* Jeu Keno — style Stake/MetaWin : fond sombre, néon violet */
         .keno-game-wrapper {
             padding: clamp(1rem, 4vw, 1.5rem);
-            border-radius: 20px;
+            border-radius: 12px;
             background: #1a1a1a;
             box-shadow: 0 0 40px rgba(139, 92, 246, 0.2), 0 0 80px rgba(168, 85, 247, 0.08), inset 0 0 40px rgba(0,0,0,0.3);
             border: 2px solid rgba(168, 85, 247, 0.6);
@@ -745,7 +739,7 @@
         }
         .keno-game-box {
             background: #1a1a1a;
-            border-radius: 16px;
+            border-radius: 12px;
             padding: clamp(1rem, 3vw, 1.5rem);
             border: 1px solid rgba(168, 85, 247, 0.4);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
@@ -763,7 +757,7 @@
             justify-content: center;
             font-weight: 700;
             font-size: 0.95rem;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 2px solid rgba(168, 85, 247, 0.4);
             background: #1a1a1a;
             color: #F7E7CE;
@@ -823,7 +817,7 @@
             border-collapse: collapse;
             font-size: 0.8rem;
             margin-top: 0.75rem;
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
             border: 1px solid rgba(168, 85, 247, 0.3);
         }
@@ -872,7 +866,7 @@
         @media (min-width: 960px) { .casino-grid { grid-template-columns: repeat(4, 1fr); } }
         .casino-game-card {
             position: relative;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
             background: linear-gradient(180deg, rgba(30, 27, 46, 0.9) 0%, rgba(15, 13, 24, 0.98) 100%);
             border: 1px solid rgba(139, 92, 246, 0.35);
@@ -931,7 +925,7 @@
             color: #0a0e1a;
             background: linear-gradient(135deg, #D4AF37, #B8860B);
             border: 2px solid rgba(255, 215, 0, 0.7);
-            border-radius: 10px;
+            border-radius: 12px;
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -967,12 +961,47 @@
             text-align: center;
             font-size: 0.95rem;
             font-weight: 600;
+            font-family: 'Inter', 'Manrope', sans-serif;
             letter-spacing: 0.08em;
             box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         .banner-official-domain .domain { color: #D4AF37; text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.5); transition: color 0.2s, border-color 0.2s; }
         .banner-official-domain .domain:hover { color: #F7E7CE; border-bottom-color: #D4AF37; }
+
+        .address-field-wrap {
+            display: inline-flex;
+            align-items: center;
+            max-width: 100%;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .address-field-value {
+            color: rgba(0, 255, 204, 0.95);
+            font-family: monospace;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+            word-break: break-all;
+        }
+        .address-copy-btn {
+            flex-shrink: 0;
+            width: 40px;
+            height: 100%;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-left: 1px solid rgba(255,255,255,0.08);
+            background: transparent;
+            color: #D4AF37;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .address-copy-btn:hover { background: rgba(212, 175, 55, 0.15); color: #F7E7CE; }
+        .address-copy-btn svg { flex-shrink: 0; }
 
         .badge-verified-blockchain {
             display: inline-flex;
@@ -985,7 +1014,7 @@
             color: #D4AF37;
             background: rgba(212, 175, 55, 0.15);
             border: 1px solid rgba(212, 175, 55, 0.6);
-            border-radius: 6px;
+            border-radius: 12px;
             white-space: nowrap;
             box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
         }
@@ -995,24 +1024,21 @@
             color: #0a0e1a;
             font-weight: 700;
             font-size: 1.1rem;
+            font-family: 'Inter', 'Manrope', sans-serif;
             letter-spacing: 0.08em;
             padding: 1rem 1.5rem;
-            border-radius: 14px;
+            border-radius: 12px;
             text-align: center;
             text-decoration: none;
-            border: none;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 4px 20px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255,255,255,0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            animation: cta-glow 2.5s ease-in-out infinite;
+            border: 1px solid rgba(212, 175, 55, 0.9);
+            box-shadow: none;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }
         .btn-cta-invest:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 40px rgba(212, 175, 55, 0.8), 0 6px 24px rgba(212, 175, 55, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+            border-color: #D4AF37;
             color: #0a0e1a;
-        }
-        @keyframes cta-glow {
-            0%, 100% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 4px 20px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255,255,255,0.3); }
-            50% { box-shadow: 0 0 38px rgba(212, 175, 55, 0.75), 0 4px 24px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255,255,255,0.3); }
         }
 
         /* --- HEADER MOBILE --- */
@@ -1070,10 +1096,10 @@
     <div class="app-layout">
         <aside class="app-sidebar">
             <img src="logo.png" alt="Arcana" class="app-sidebar-logo">
-            <button type="button" class="app-sidebar-btn active" data-nav-tab="dashboard" title="Dashboard"><span class="icon">📊</span>Dashboard</button>
-            <button type="button" class="app-sidebar-btn" data-nav-tab="casino" title="Casino"><span class="icon">🎰</span>Casino</button>
-            <button type="button" class="app-sidebar-btn" data-nav-tab="arcade" title="Arcade"><span class="icon">🎮</span>Arcade</button>
-            <button type="button" class="app-sidebar-btn" data-nav-tab="profil" title="Profil"><span class="icon">👤</span>Profil</button>
+            <button type="button" class="app-sidebar-btn active" data-nav-tab="dashboard" title="Dashboard"><span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>Dashboard</button>
+            <button type="button" class="app-sidebar-btn" data-nav-tab="casino" title="Casino"><span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10v4M12 10v4M18 10v4M2 12h20"/></svg></span>Casino</button>
+            <button type="button" class="app-sidebar-btn" data-nav-tab="arcade" title="Arcade"><span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01M17 16H7a2 2 0 01-2-2v-4a2 2 0 012-2h10a2 2 0 012 2v4a2 2 0 01-2 2z"/></svg></span>Arcade</button>
+            <button type="button" class="app-sidebar-btn" data-nav-tab="profil" title="Profil"><span class="icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="3"/><path d="M5 20v-2a4 4 0 014-4h6a4 4 0 014 4v2"/></svg></span>Profil</button>
         </aside>
         <div class="app-main-wrap">
             <header class="app-topbar">
@@ -1113,12 +1139,15 @@
             <h2 id="balanceTitle" class="text-xl mb-4 opacity-80 uppercase tracking-widest">Réserve du Coffre Arcana Safe</h2>
             <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80 mb-2">Adresse de réception (Polygon)</p>
             <div class="flex items-center justify-center gap-2 mb-2 flex-wrap">
-                <code id="receptionAddress" class="text-[#00ffcc]/95 font-mono text-sm px-3 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/50 break-all">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>
+                <div class="address-field-wrap">
+                    <code id="receptionAddress" class="address-field-value">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>
+                    <button type="button" id="copyAddressBtn" class="address-copy-btn" title="Copier l'adresse" aria-label="Copier l'adresse"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" fill="none" stroke-width="1.5"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" fill="none" stroke-width="1.5"/></svg></button>
+                </div>
                 <span class="badge-verified-blockchain" title="Contrat vérifié sur Polygon">Vérifié sur la Blockchain</span>
-                <button type="button" id="copyAddressBtn" class="px-3 py-2 rounded-lg border border-[#D4AF37]/60 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition" title="Copier l'adresse">Copier</button>
-                <button type="button" id="addArcanaMetaMaskBtn" class="px-3 py-2 rounded-lg border border-[#00ffcc]/60 text-[#00ffcc] text-xs font-medium hover:bg-[#00ffcc]/20 transition" title="Ajouter le token ARCANA dans MetaMask">+ ARCANA dans MetaMask</button>
+                <button type="button" id="addArcanaMetaMaskBtn" class="px-3 py-2 rounded-xl border border-[#00ffcc]/60 text-[#00ffcc] text-xs font-medium hover:bg-[#00ffcc]/20 transition" title="Ajouter le token ARCANA dans MetaMask">+ ARCANA dans MetaMask</button>
             </div>
-            <p class="text-[#F7E7CE]/60 text-xs mb-4">Les fonds de la prévente sont envoyés vers cette adresse. Vérifiez-la sur Polygonscan.</p>
+            <p class="text-[#F7E7CE]/60 text-xs mb-2">Les fonds de la prévente sont envoyés vers cette adresse. Vérifiez-la sur <a id="polygonscanLink" href="https://polygonscan.com/address/0x29D61511C84E332635E296e37bf22Eb4fB514147" target="_blank" rel="noopener" class="text-[#D4AF37] hover:underline">Polygonscan</a>.</p>
+            <p class="text-[#F7E7CE]/50 text-xs mb-4">🛡️ Liquidité verrouillée | Audit en cours</p>
             <div class="stat-value my-8">
                 <p class="mb-1"><span id="balanceDisplayPol">...</span> <span class="text-lg">POL</span></p>
                 <p><span id="balanceDisplayArcana">...</span> <span class="text-lg">ARCANA</span></p>
@@ -2613,7 +2642,10 @@
                 if (copyAddressBtn) {
                     copyAddressBtn.onclick = () => {
                         const addr = document.getElementById('receptionAddress').textContent;
-                        navigator.clipboard.writeText(addr).then(() => { copyAddressBtn.textContent = 'Copié !'; setTimeout(() => { copyAddressBtn.textContent = 'Copier'; }, 2000); }).catch(() => Swal.fire({ icon: 'info', title: 'Copie', text: 'Copiez manuellement : ' + addr }));
+                        navigator.clipboard.writeText(addr).then(() => {
+                            copyAddressBtn.setAttribute('title', 'Copié !');
+                            setTimeout(() => { copyAddressBtn.setAttribute('title', 'Copier l\'adresse'); }, 2000);
+                        }).catch(() => Swal.fire({ icon: 'info', title: 'Copie', text: 'Copiez manuellement : ' + addr }));
                     };
                 }
                 const addArcanaBtn = document.getElementById('addArcanaMetaMaskBtn');
