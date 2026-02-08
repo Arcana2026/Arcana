@@ -27,83 +27,121 @@
 
     <style>
         body {
-            background-color: #0f111a;
+            background-color: #0b0e11;
             color: #F7E7CE;
             font-family: 'Playfair Display', serif;
             min-height: 100vh;
             margin: 0;
-            padding-top: 70px;
+            overflow: hidden;
         }
 
-        /* Header fixe + onglets */
-        .app-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: rgba(15, 17, 26, 0.95);
-            border-bottom: 2px solid rgba(168, 85, 247, 0.5);
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
-            padding: 0.6rem 1rem;
+        .app-layout {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.75rem;
+            height: 100vh;
+            overflow: hidden;
         }
-        .app-nav {
+
+        /* Sidebar latérale */
+        .app-sidebar {
+            width: 72px;
+            min-width: 72px;
+            background: rgba(11, 14, 17, 0.98);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 0.25rem;
+            padding: 1rem 0;
+            gap: 0.5rem;
         }
-        .app-nav-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            border: 1px solid rgba(168, 85, 247, 0.4);
+        .app-sidebar-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 0.5rem;
+        }
+        .app-sidebar-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            border: 1px solid transparent;
             background: transparent;
-            color: #c4b5fd;
-            font-weight: 600;
-            font-size: 0.9rem;
+            color: rgba(247, 231, 206, 0.6);
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-size: 0.65rem;
+            font-weight: 600;
             transition: all 0.2s ease;
         }
-        .app-nav-btn:hover {
-            background: rgba(139, 92, 246, 0.2);
-            border-color: rgba(168, 85, 247, 0.7);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        .app-sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #F7E7CE;
+            border-color: rgba(255, 255, 255, 0.08);
         }
-        .app-nav-btn.active {
-            background: rgba(139, 92, 246, 0.35);
-            border-color: #a78bfa;
-            color: #fff;
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        .app-sidebar-btn.active {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            border-color: rgba(167, 139, 250, 0.3);
+        }
+        .app-sidebar-btn .icon { font-size: 1.25rem; line-height: 1; }
+
+        /* Conteneur principal (droite) */
+        .app-main-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .app-topbar {
+            flex-shrink: 0;
+            height: 56px;
+            padding: 0 1.25rem;
+            background: rgba(11, 14, 17, 0.98);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        .app-topbar-balance {
+            font-size: 0.9rem;
+            color: rgba(247, 231, 206, 0.9);
+        }
+        .app-topbar-balance span { color: #D4AF37; font-weight: 700; }
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1.25rem;
         }
         .section-panel {
             display: none;
-            padding: 1.5rem 1rem 3rem;
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
         }
         .section-panel.active {
-            display: block;
+            display: block !important;
         }
         .app-card {
-            background: #0f111a;
-            border: 1px solid rgba(168, 85, 247, 0.4);
-            border-radius: 16px;
+            background: rgba(15, 17, 26, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
             padding: 1.25rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 0 25px rgba(0,0,0,0.3), 0 0 40px rgba(139, 92, 246, 0.08);
+            margin-bottom: 1rem;
             transition: box-shadow 0.2s ease;
         }
         .app-card:hover {
-            box-shadow: 0 0 30px rgba(0,0,0,0.35), 0 0 50px rgba(139, 92, 246, 0.12);
+            border-color: rgba(255, 255, 255, 0.09);
         }
         .casino-games-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 1.25rem;
+            gap: 1rem;
         }
         @media (min-width: 640px) { .casino-games-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .casino-games-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -144,14 +182,16 @@
 
         .wallet-address {
             font-family: monospace;
-            background: rgba(0,0,0,0.4);
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: 1px solid #F7E7CE;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: #F7E7CE;
             cursor: pointer !important;
-            transition: 0.3s ease;
+            transition: 0.2s ease;
+            font-size: 0.875rem;
         }
+        .wallet-address:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
 
         .card {
             background: linear-gradient(145deg, #131b2e, #0f1629) !important;
@@ -860,19 +900,20 @@
     <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
     <audio id="crashBoomSound" preload="auto"><source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg"></audio>
 
-    <header class="app-header">
-        <div class="flex items-center gap-3">
-            <img src="logo.png" alt="Arcana Safe" class="logo-image-center" style="width: 42px; height: auto;">
-            <span class="logo-text-arcana" style="font-size: 1.6rem !important;">Arcana Safe</span>
-        </div>
-        <nav class="app-nav">
-            <button type="button" class="app-nav-btn active" data-nav-tab="dashboard">Dashboard</button>
-            <button type="button" class="app-nav-btn" data-nav-tab="casino">Casino</button>
-            <button type="button" class="app-nav-btn" data-nav-tab="arcade">Arcade</button>
-        </nav>
-        <button id="connectBtn" class="wallet-address">Connecter Wallet</button>
-    </header>
-
+    <div class="app-layout">
+        <aside class="app-sidebar">
+            <img src="logo.png" alt="Arcana" class="app-sidebar-logo">
+            <button type="button" class="app-sidebar-btn active" data-nav-tab="dashboard" title="Dashboard"><span class="icon">📊</span>Dashboard</button>
+            <button type="button" class="app-sidebar-btn" data-nav-tab="casino" title="Casino"><span class="icon">🎰</span>Casino</button>
+            <button type="button" class="app-sidebar-btn" data-nav-tab="arcade" title="Arcade"><span class="icon">🎮</span>Arcade</button>
+            <button type="button" class="app-sidebar-btn" data-nav-tab="profil" title="Profil"><span class="icon">👤</span>Profil</button>
+        </aside>
+        <div class="app-main-wrap">
+            <header class="app-topbar">
+                <div class="app-topbar-balance">Solde : <span id="headerBalanceArcana">—</span> ARCANA</div>
+                <button id="connectBtn" class="wallet-address">Connecter Wallet</button>
+            </header>
+            <div class="app-content">
     <main id="app-main">
         <!-- Section Dashboard (affichée par défaut) -->
         <section id="section-dashboard" class="section-panel active">
@@ -1002,6 +1043,15 @@
                 <p class="text-xs text-[#00ffcc]/90 mt-1">100% des profits servent au Buyback d'ARCANA.</p>
                 <a href="arcade.html" class="inline-block mt-2 px-4 py-2 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30 text-sm font-medium">Accéder à l'Arcade</a>
             </div>
+            <div class="traffic-counter flex flex-col items-center gap-2 py-6 mt-6 border-t border-white/5">
+                <a href="arcade.html" class="text-sm text-[#D4AF37] hover:underline uppercase tracking-widest">🎮 Arcade — 10 jeux</a>
+                <p class="text-xs text-[#F7E7CE]/50">100% des profits → Buyback ARCANA</p>
+                <a href="https://arcana-safe.nft/arcana-admin" class="text-xs text-[#F7E7CE]/40 hover:text-[#D4AF37]/70 uppercase tracking-widest">Accès Admin</a>
+            </div>
+            <footer class="mt-6 pt-6 border-t border-white/5 text-center">
+                <p class="text-[#F7E7CE]/60 text-sm mb-1">Besoin d'aide ? Contactez le support Arcana</p>
+                <a href="mailto:blockarcana-admin@proton.me" class="text-[#D4AF37] hover:underline font-medium">blockarcana-admin@proton.me</a>
+            </footer>
         </section>
 
         <!-- Section Casino : une seule section visible à la fois -->
@@ -1142,18 +1192,23 @@
                 <a href="arcade.html" class="inline-block px-6 py-3 rounded-xl bg-[#7c3aed]/80 text-white font-bold border border-[#a78bfa] hover:bg-[#6d28d9] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] transition">Accéder à l'Arcade</a>
             </div>
         </section>
-    </main>
 
-    <div class="traffic-counter flex flex-col items-center gap-2 py-6">
-                <a href="arcade.html" class="text-sm text-[#D4AF37] hover:underline uppercase tracking-widest">🎮 Arcade — 10 jeux</a>
-                <p class="text-xs text-[#F7E7CE]/70">100% des profits → Buyback ARCANA</p>
-                <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaPremiumClean&style=0006&nbdigits=5&type=page&initCount=0" border="0" />
-                <a href="https://arcana-safe.nft/arcana-admin" class="text-xs text-[#F7E7CE]/40 hover:text-[#D4AF37]/70 uppercase tracking-widest">Accès Admin</a>
+        <!-- Section Profil -->
+        <section id="section-profil" class="section-panel">
+            <div class="app-card max-w-lg mx-auto">
+                <h2 class="text-xl font-bold text-[#a78bfa] mb-4 uppercase tracking-wider">Profil</h2>
+                <p class="text-[#F7E7CE]/70 text-sm mb-4">Votre adresse et solde ARCANA (toujours visibles dans la barre du haut).</p>
+                <div class="space-y-3">
+                    <p class="text-sm"><span class="text-[#D4AF37]/80">Adresse :</span> <code id="profilAddress" class="text-[#00ffcc]/90 font-mono text-xs break-all">Non connecté</code></p>
+                    <p class="text-sm"><span class="text-[#D4AF37]/80">Solde ARCANA :</span> <span id="profilBalanceArcana" class="font-semibold">—</span></p>
+                    <p class="text-xs text-[#F7E7CE]/50">Réseau : Polygon</p>
+                </div>
             </div>
-            <footer class="mt-12 pt-8 pb-6 border-t border-[#D4AF37]/30 text-center">
-                <p class="text-[#F7E7CE]/80 text-sm mb-1">Besoin d'aide ? Contactez le support Arcana</p>
-                <a href="mailto:blockarcana-admin@proton.me" class="text-[#D4AF37] hover:underline font-medium">blockarcana-admin@proton.me</a>
-            </footer>
+        </section>
+    </main>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         let provider;
@@ -1299,6 +1354,12 @@
                     window.plinkoDisplayBalance = userClaimableBalance;
                     const plinkoBal = document.getElementById('plinkoBalanceDisplay');
                     if (plinkoBal) plinkoBal.innerText = userClaimableBalance.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                    const headerBal = document.getElementById('headerBalanceArcana');
+                    if (headerBal) headerBal.innerText = userClaimableBalance.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                    const profilBal = document.getElementById('profilBalanceArcana');
+                    if (profilBal) profilBal.innerText = userClaimableBalance.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                    const profilAddr = document.getElementById('profilAddress');
+                    if (profilAddr) profilAddr.textContent = userAddress ? (userAddress.slice(0, 6) + '…' + userAddress.slice(-4)) : 'Non connecté';
                 } else {
                     const vault = await getBalance();
                     if (polEl) polEl.innerText = vault.pol.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
@@ -1306,11 +1367,21 @@
                     document.getElementById('balanceTitle').innerText = "Réserve du Coffre Arcana Safe";
                     const plinkoBal = document.getElementById('plinkoBalanceDisplay');
                     if (plinkoBal) plinkoBal.innerText = vault.arcana != null ? vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) : '—';
+                    const headerBal = document.getElementById('headerBalanceArcana');
+                    if (headerBal) headerBal.innerText = vault.arcana != null ? vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) : '—';
+                    const profilBal = document.getElementById('profilBalanceArcana');
+                    if (profilBal) profilBal.innerText = vault.arcana != null ? vault.arcana.toLocaleString('fr-FR', { maximumFractionDigits: 0 }) : '—';
+                    const profilAddr = document.getElementById('profilAddress');
+                    if (profilAddr) profilAddr.textContent = userAddress ? (userAddress.slice(0, 6) + '…' + userAddress.slice(-4)) : 'Non connecté';
                 }
             } catch (err) {
                 console.warn("Erreur solde blockchain:", err);
                 if (polEl) polEl.innerText = "—";
                 if (arcanaEl) arcanaEl.innerText = "—";
+                const headerBal = document.getElementById('headerBalanceArcana');
+                if (headerBal) headerBal.innerText = '—';
+                const profilBal = document.getElementById('profilBalanceArcana');
+                if (profilBal) profilBal.innerText = '—';
             }
 
             // 2. Appel /api/presale-status : si le serveur est en veille, le reste du script continue
@@ -2247,16 +2318,17 @@
                 if (slotSpinBtn) slotSpinBtn.onclick = spin;
                 if (slotApproveBtn) slotApproveBtn.onclick = approveArcanaSlot;
                 function switchSection(tabId) {
-                    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+                    document.querySelectorAll('.section-panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
                     const panel = document.getElementById('section-' + tabId);
-                    if (panel) panel.classList.add('active');
-                    document.querySelectorAll('.app-nav-btn').forEach(b => b.classList.remove('active'));
-                    const btn = document.querySelector('.app-nav-btn[data-nav-tab="' + tabId + '"]');
+                    if (panel) { panel.classList.add('active'); panel.style.display = 'block'; }
+                    document.querySelectorAll('.app-sidebar-btn').forEach(b => b.classList.remove('active'));
+                    const btn = document.querySelector('.app-sidebar-btn[data-nav-tab="' + tabId + '"]');
                     if (btn) btn.classList.add('active');
                 }
-                document.querySelectorAll('.app-nav-btn').forEach(btn => {
+                document.querySelectorAll('.app-sidebar-btn').forEach(btn => {
                     btn.addEventListener('click', () => switchSection(btn.getAttribute('data-nav-tab')));
                 });
+                document.querySelectorAll('.section-panel').forEach(p => { if (!p.classList.contains('active')) p.style.display = 'none'; });
                 const crashBetBtn = document.getElementById('crashBetBtn');
                 if (crashBetBtn) {
                     crashBetBtn.addEventListener('click', () => {
