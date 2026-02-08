@@ -23,6 +23,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- ethers.js : chargé via CDN (également dépendance du projet dans package.json) pour connexion MetaMask et Polygon -->
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -205,6 +206,10 @@
             cursor: not-allowed;
         }
 
+        .btn-loading { pointer-events: none; opacity: 0.85; }
+        .btn-spinner { display: inline-block; width: 1em; height: 1em; margin-right: 0.5em; vertical-align: -0.15em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: btn-spin 0.6s linear infinite; }
+        @keyframes btn-spin { to { transform: rotate(360deg); } }
+
         .banner-official-domain {
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(184, 134, 11, 0.18) 50%, rgba(212, 175, 55, 0.28) 100%);
             border-bottom: 2px solid rgba(212, 175, 55, 0.6);
@@ -317,6 +322,7 @@
                 <code id="receptionAddress" class="text-[#00ffcc]/95 font-mono text-sm px-3 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/50 break-all">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>
                 <span class="badge-verified-blockchain" title="Contrat vérifié sur Polygon">Vérifié sur la Blockchain</span>
                 <button type="button" id="copyAddressBtn" class="px-3 py-2 rounded-lg border border-[#D4AF37]/60 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition" title="Copier l'adresse">Copier</button>
+                <button type="button" id="addArcanaMetaMaskBtn" class="px-3 py-2 rounded-lg border border-[#00ffcc]/60 text-[#00ffcc] text-xs font-medium hover:bg-[#00ffcc]/20 transition" title="Ajouter le token ARCANA dans MetaMask">+ ARCANA dans MetaMask</button>
             </div>
             <p class="text-[#F7E7CE]/60 text-xs mb-4">Les fonds de la prévente sont envoyés vers cette adresse. Vérifiez-la sur Polygonscan.</p>
             <div class="stat-value my-8">
@@ -485,6 +491,22 @@
             "function totalSold() view returns (uint256)"
         ];
 
+        function setButtonLoading(btnId, loadingText) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.dataset.originalText = btn.innerText;
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-spinner"></span>' + (loadingText || 'En cours...');
+        }
+        function restoreButton(btnId, defaultText) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.classList.remove('btn-loading');
+            btn.disabled = false;
+            btn.innerText = defaultText != null ? defaultText : (btn.dataset.originalText || '');
+        }
+
         /** Évite le crash "Unexpected end of JSON input" : ne jamais utiliser response.json() sur une réponse vide ou non-JSON. */
         async function safeFetchJson(url, options) {
             let text;
@@ -623,23 +645,35 @@
                 return;
             }
             if (window.ethereum) {
+                setButtonLoading('connectBtn', 'Connexion...');
                 try {
                     const provider = new ethers.providers.Web3Provider(window.ethereum);
                     const accounts = await provider.send("eth_requestAccounts", []);
                     userAddress = accounts[0];
-                    document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
+                    const connectBtn = document.getElementById('connectBtn');
+                    connectBtn.classList.remove('btn-loading');
+                    connectBtn.disabled = false;
+                    connectBtn.innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
                     await updateUI();
-                } catch (err) { console.error(err); }
-            } else { alert("Veuillez installer MetaMask !"); }
+                } catch (err) {
+                    console.error(err);
+                    restoreButton('connectBtn', 'Connecter Wallet');
+                    Swal.fire({ icon: 'error', title: 'Connexion échouée', text: err.message || 'Impossible de connecter le wallet.' });
+                }
+            } else { Swal.fire({ icon: 'warning', title: 'MetaMask requis', text: 'Veuillez installer MetaMask pour connecter votre wallet.' }); }
         }
 
         async function withdraw() {
-            if (!userAddress) return alert("Veuillez connecter votre wallet !");
-            const ethersLib = window.ethers;
-            if (!ethersLib || !ethersLib.utils || !ethersLib.utils.getAddress) {
-                alert("Erreur : ethers non disponible.");
+            if (!userAddress) {
+                Swal.fire({ icon: 'info', title: 'Connexion requise', text: 'Veuillez connecter votre wallet !' });
                 return;
             }
+            const ethersLib = window.ethers;
+            if (!ethersLib || !ethersLib.utils || !ethersLib.utils.getAddress) {
+                Swal.fire({ icon: 'error', title: 'Erreur', text: 'ethers non disponible.' });
+                return;
+            }
+            setButtonLoading('withdrawBtn', 'Retrait en cours...');
             try {
                 const safeUserAddress = ethersLib.utils.getAddress(userAddress);
                 const safeContractAddress = ethersLib.utils.getAddress(ARCANA_VAULT_ADDRESS);
@@ -658,10 +692,14 @@
                 const contract = new ethersLib.Contract(safeContractAddress, abiWithdraw, signer);
                 const tx = await contract.withdraw(ethersLib.utils.parseUnits(data.amount, 18), data.nonce, data.signature);
                 await tx.wait();
-                document.getElementById('successSound').play();
-                alert("🥂 Retrait effectué !");
+                if (document.getElementById('successSound')) document.getElementById('successSound').play();
+                await Swal.fire({ icon: 'success', title: 'Retrait effectué !', text: 'Vos fonds ont été envoyés.' });
                 await updateUI();
-            } catch (err) { alert("Erreur : " + err.message); }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Erreur de retrait', text: err.message || 'Une erreur est survenue.' });
+            } finally {
+                restoreButton('withdrawBtn', 'Effectuer un Retrait');
+            }
         }
 
         const ERC20_ABI = [
@@ -670,13 +708,20 @@
         ];
 
         async function buyNow() {
-            if (!window.ethereum) return alert("Veuillez installer MetaMask !");
-            if (!userAddress) return alert("Veuillez connecter votre wallet !");
-            
+            if (!window.ethereum) {
+                Swal.fire({ icon: 'warning', title: 'MetaMask requis', text: 'Veuillez installer MetaMask !' });
+                return;
+            }
+            if (!userAddress) {
+                Swal.fire({ icon: 'info', title: 'Connexion requise', text: 'Veuillez connecter votre wallet !' });
+                return;
+            }
             const amount = parseFloat(document.getElementById('amountInput').value);
             const token = document.getElementById('tokenSelect').value;
-            
-            if (!amount || amount <= 0) return alert("Veuillez entrer un montant valide.");
+            if (!amount || amount <= 0) {
+                Swal.fire({ icon: 'warning', title: 'Montant invalide', text: 'Veuillez entrer un montant valide.' });
+                return;
+            }
 
             let provider = new ethers.providers.Web3Provider(window.ethereum);
             let network = await provider.getNetwork();
@@ -688,17 +733,16 @@
                     });
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                 } catch (e) {
-                    return alert("Veuillez basculer sur le réseau Polygon pour effectuer l'achat.");
+                    Swal.fire({ icon: 'warning', title: 'Réseau Polygon', text: "Veuillez basculer sur le réseau Polygon pour effectuer l'achat." });
+                    return;
                 }
             }
 
             const signer = provider.getSigner();
             const amountWei = ethers.utils.parseUnits(amount.toString(), token === "POL" ? 18 : 6);
 
+            setButtonLoading('buyBtn', 'Transaction en cours...');
             try {
-                document.getElementById('buyBtn').disabled = true;
-                document.getElementById('buyBtn').innerText = "Transaction en cours...";
-
                 const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, signer);
 
                 if (token === "POL") {
@@ -725,8 +769,8 @@
                     await buyTx.wait();
                 }
 
-                document.getElementById('successSound').play();
-                alert("✅ Votre achat a été enregistré ! Les fonds ont été envoyés vers la trésorerie.");
+                if (document.getElementById('successSound')) document.getElementById('successSound').play();
+                await Swal.fire({ icon: 'success', title: 'Achat enregistré !', text: 'Les fonds ont été envoyés vers la trésorerie.' });
 
                 const updateRes = await fetch(`${RENDER_URL}/api/presale-update`, {
                     method: 'POST',
@@ -742,10 +786,9 @@
                 document.getElementById('amountInput').value = "";
                 updateReceiveText();
             } catch (err) {
-                alert("Erreur : " + (err.message || err.reason || "Transaction échouée"));
+                Swal.fire({ icon: 'error', title: 'Transaction échouée', text: err.message || err.reason || 'Une erreur est survenue.' });
             } finally {
-                document.getElementById('buyBtn').disabled = false;
-                document.getElementById('buyBtn').innerText = "Acheter maintenant";
+                restoreButton('buyBtn', 'Acheter maintenant');
             }
         }
 
@@ -756,8 +799,14 @@
         }
 
         async function claim() {
-            if (!window.ethereum) return alert("Veuillez installer MetaMask !");
-            if (!userAddress) return alert("Veuillez connecter votre wallet !");
+            if (!window.ethereum) {
+                Swal.fire({ icon: 'warning', title: 'MetaMask requis', text: 'Veuillez installer MetaMask !' });
+                return;
+            }
+            if (!userAddress) {
+                Swal.fire({ icon: 'info', title: 'Connexion requise', text: 'Veuillez connecter votre wallet !' });
+                return;
+            }
 
             let provider = new ethers.providers.Web3Provider(window.ethereum);
             let network = await provider.getNetwork();
@@ -766,19 +815,19 @@
                     await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                 } catch (e) {
-                    return alert("Veuillez basculer sur le réseau Polygon.");
+                    Swal.fire({ icon: 'warning', title: 'Réseau Polygon', text: 'Veuillez basculer sur le réseau Polygon.' });
+                    return;
                 }
             }
 
+            setButtonLoading('claimBtn', 'Réclamation en cours...');
             try {
-                document.getElementById('claimBtn').disabled = true;
-                document.getElementById('claimBtn').innerText = "Réclamation en cours...";
                 const signer = provider.getSigner();
                 const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, signer);
                 const tx = await presaleContract.claim();
                 await tx.wait();
-                document.getElementById('successSound').play();
-                alert("🎉 Vos jetons Arcana ont été réclamés avec succès !");
+                if (document.getElementById('successSound')) document.getElementById('successSound').play();
+                await Swal.fire({ icon: 'success', title: 'Jetons réclamés !', text: 'Vos jetons Arcana ont été réclamés avec succès.' });
                 try { await updateUI(); } catch (e) {
                     console.warn("Rafraîchissement après claim:", e.message);
                     if (document.getElementById('progressText')) document.getElementById('progressText').innerText = "Données non rafraîchies — " + (e.message || "réessayez");
@@ -786,15 +835,14 @@
             } catch (err) {
                 const msg = (err && (err.message || err.reason)) || String(err) || "Transaction echouee";
                 if (msg.includes("no tokens") || msg.includes("nothing to claim") || msg.includes("revert") || msg.includes("Claim not open")) {
-                    alert("Aucun jeton à réclamer pour le moment. La libération des fonds n'a pas encore été activée.");
+                    Swal.fire({ icon: 'info', title: 'Rien à réclamer', text: "Aucun jeton à réclamer pour le moment. La libération des fonds n'a pas encore été activée." });
                 } else if (/JSON|Unexpected end|invalide|serveur/i.test(msg)) {
-                    alert("Erreur de communication avec le serveur (réponse invalide). Réessayez dans quelques instants.");
+                    Swal.fire({ icon: 'error', title: 'Serveur', text: "Erreur de communication avec le serveur. Réessayez dans quelques instants." });
                 } else {
-                    alert("Erreur : " + msg);
+                    Swal.fire({ icon: 'error', title: 'Erreur', text: msg });
                 }
             } finally {
-                document.getElementById('claimBtn').disabled = false;
-                document.getElementById('claimBtn').innerText = "Réclamer mes jetons Arcana Safe";
+                restoreButton('claimBtn', 'Réclamer mes jetons Arcana Safe');
             }
         }
 
@@ -841,7 +889,34 @@
                 if (copyAddressBtn) {
                     copyAddressBtn.onclick = () => {
                         const addr = document.getElementById('receptionAddress').textContent;
-                        navigator.clipboard.writeText(addr).then(() => { copyAddressBtn.textContent = 'Copié !'; setTimeout(() => { copyAddressBtn.textContent = 'Copier'; }, 2000); }).catch(() => alert('Copiez manuellement : ' + addr));
+                        navigator.clipboard.writeText(addr).then(() => { copyAddressBtn.textContent = 'Copié !'; setTimeout(() => { copyAddressBtn.textContent = 'Copier'; }, 2000); }).catch(() => Swal.fire({ icon: 'info', title: 'Copie', text: 'Copiez manuellement : ' + addr }));
+                    };
+                }
+                const addArcanaBtn = document.getElementById('addArcanaMetaMaskBtn');
+                if (addArcanaBtn) {
+                    addArcanaBtn.onclick = async () => {
+                        if (!window.ethereum) {
+                            Swal.fire({ icon: 'warning', title: 'MetaMask requis', text: 'Installez MetaMask pour ajouter le token.' });
+                            return;
+                        }
+                        try {
+                            const added = await window.ethereum.request({
+                                method: 'wallet_watchAsset',
+                                params: {
+                                    type: 'ERC20',
+                                    options: {
+                                        address: ARCANA_TOKEN_ADDRESS,
+                                        symbol: 'ARCANA',
+                                        decimals: 18
+                                    }
+                                }
+                            });
+                            if (added) {
+                                Swal.fire({ icon: 'success', title: 'Token ajouté', text: 'ARCANA a été ajouté à votre wallet MetaMask.' });
+                            }
+                        } catch (e) {
+                            Swal.fire({ icon: 'error', title: 'Erreur', text: e.message || 'Impossible d\'ajouter le token.' });
+                        }
                     };
                 }
                 if (amountInput) {
