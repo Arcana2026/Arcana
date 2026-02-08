@@ -146,6 +146,78 @@
         @media (min-width: 640px) { .casino-games-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .casino-games-grid { grid-template-columns: repeat(3, 1fr); } }
         .casino-games-grid .app-card { margin-bottom: 0; }
+        .game-card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .game-card-header h3 { margin: 0; font-size: 1rem; color: #a78bfa; }
+        .btn-jouer-theatre { padding: 0.5rem 1rem; border-radius: 10px; border: 1px solid rgba(167, 139, 250, 0.5); background: rgba(139, 92, 246, 0.2); color: #c4b5fd; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-jouer-theatre:hover { background: rgba(139, 92, 246, 0.35); box-shadow: 0 0 15px rgba(139, 92, 246, 0.25); }
+        .game-placeholder { min-height: 120px; }
+
+        /* Conteneur Théâtre plein écran (style MetaWin) */
+        #game-theatre {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            z-index: 9999;
+            background: #0b0e11;
+            display: none;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        #game-theatre.theatre-visible {
+            display: flex;
+            opacity: 1;
+        }
+        .theatre-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10000;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.06);
+            color: #F7E7CE;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .theatre-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+        .theatre-main {
+            flex: 1;
+            display: flex;
+            min-height: 0;
+            padding: 1rem;
+            padding-top: 4rem;
+        }
+        .theatre-game-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            overflow: auto;
+        }
+        .theatre-game-area > * { max-width: 100%; }
+        .theatre-sidebar {
+            width: 300px;
+            min-width: 300px;
+            border-left: 1px solid rgba(255,255,255,0.06);
+            padding: 1rem;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+        }
+        .theatre-sidebar h3 { font-size: 0.85rem; color: #a78bfa; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .theatre-sidebar .recent-bets-table { font-size: 0.75rem; }
+        .theatre-sidebar .recent-bets-table th, .theatre-sidebar .recent-bets-table td { padding: 0.35rem 0.25rem; }
 
         .navbar {
             background: linear-gradient(to bottom, #0f1629, #0a0e1a);
@@ -900,6 +972,25 @@
     <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
     <audio id="crashBoomSound" preload="auto"><source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg"></audio>
 
+    <!-- Conteneur Théâtre : jeu en plein écran (caché par défaut) -->
+    <div id="game-theatre">
+        <button type="button" class="theatre-close" id="theatreCloseBtn" aria-label="Fermer">✕</button>
+        <div class="theatre-main">
+            <div class="theatre-game-area" id="theatreGameArea"></div>
+            <aside class="theatre-sidebar">
+                <h3>Mise &amp; Historique</h3>
+                <p class="text-xs text-[#F7E7CE]/60 mb-2">Les paramètres de mise sont dans le jeu au centre.</p>
+                <h3 class="mt-4">Derniers paris</h3>
+                <div class="recent-bets-table-wrap">
+                    <table class="recent-bets-table">
+                        <thead><tr><th>Jeu</th><th>Joueur</th><th>Mise</th><th>Mult.</th><th>Gain</th></tr></thead>
+                        <tbody id="theatreRecentBetsBody"></tbody>
+                    </table>
+                </div>
+            </aside>
+        </div>
+    </div>
+
     <div class="app-layout">
         <aside class="app-sidebar">
             <img src="logo.png" alt="Arcana" class="app-sidebar-logo">
@@ -1077,7 +1168,12 @@
                     </div>
                 </div>
                 <div class="casino-games-grid">
-                    <div class="app-card">
+                    <div class="app-card" data-game-card="slots">
+                        <div class="game-card-header">
+                            <h3>Arcana Slots</h3>
+                            <button type="button" class="btn-jouer-theatre" data-game="slots">Jouer</button>
+                        </div>
+                        <div id="game-placeholder-slots" class="game-placeholder">
                 <div id="casino-slots-block" class="slot-machine-wrapper max-w-lg mx-auto">
                     <div class="slot-machine">
                         <div class="slot-reels" id="slotReels">
@@ -1109,8 +1205,14 @@
                         </div>
                     </div>
                 </div>
+                        </div>
                     </div>
-                    <div class="app-card">
+                    <div class="app-card" data-game-card="crash">
+                        <div class="game-card-header">
+                            <h3>Crash</h3>
+                            <button type="button" class="btn-jouer-theatre" data-game="crash">Jouer</button>
+                        </div>
+                        <div id="game-placeholder-crash" class="game-placeholder">
                 <div id="casino-crash-block" class="crash-game-wrapper">
                     <div class="crash-game-box">
                         <h3 class="text-lg font-bold text-[#a78bfa] mb-3 uppercase tracking-wider">Crash</h3>
@@ -1134,8 +1236,14 @@
                         <p class="crash-liquidite-rule text-center">10 % des profits du casino sont réinjectés dans la liquidité ARCANA.</p>
                     </div>
                 </div>
+                        </div>
                     </div>
-                    <div class="app-card">
+                    <div class="app-card" data-game-card="plinko">
+                        <div class="game-card-header">
+                            <h3>Plinko</h3>
+                            <button type="button" class="btn-jouer-theatre" data-game="plinko">Jouer</button>
+                        </div>
+                        <div id="game-placeholder-plinko" class="game-placeholder">
                 <div id="casino-plinko-block" class="plinko-game-wrapper">
                     <div class="plinko-game-box">
                         <h3 class="text-lg font-bold text-[#ea580c] mb-3 uppercase tracking-wider">Plinko</h3>
@@ -1155,8 +1263,14 @@
                         <p id="plinkoResult" class="text-sm text-[#F7E7CE]/90 mt-3 text-center min-h-[1.25rem] font-medium"></p>
                     </div>
                 </div>
+                        </div>
                     </div>
-                    <div class="app-card">
+                    <div class="app-card" data-game-card="keno">
+                        <div class="game-card-header">
+                            <h3>Keno</h3>
+                            <button type="button" class="btn-jouer-theatre" data-game="keno">Jouer</button>
+                        </div>
+                        <div id="game-placeholder-keno" class="game-placeholder">
                 <div id="casino-keno-block" class="keno-game-wrapper">
                     <div class="keno-game-box">
                         <h3 class="text-lg font-bold text-[#a78bfa] mb-3 uppercase tracking-wider">Keno</h3>
@@ -1179,6 +1293,7 @@
                         <p class="keno-liquidite-rule text-center">10 % des profits du casino sont réinjectés dans la liquidité ARCANA.</p>
                     </div>
                 </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1715,16 +1830,14 @@
             reels.forEach(r => r.classList.add('spinning'));
 
             const duration = 2000;
-            const interval = 80;
-            const steps = duration / interval;
-            let elapsed = 0;
+            const startTime = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
             const tick = () => {
+                const elapsed = (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()) - startTime;
                 reels.forEach(reel => {
                     const icons = [getRandomIcon(), getRandomIcon(), getRandomIcon()];
                     setReelIcons(reel, icons);
                 });
-                elapsed += interval;
-                if (elapsed < duration) setTimeout(tick, interval);
+                if (elapsed < duration) requestAnimationFrame(tick);
                 else {
                     reels.forEach(reel => reel.classList.remove('spinning'));
                     const final = [getRandomIcon(), getRandomIcon(), getRandomIcon()];
@@ -1740,7 +1853,7 @@
                     }
                 }
             };
-            tick();
+            requestAnimationFrame(tick);
         }
 
         function allocateCasinoSpinLoss(lpPoolAmount, vaultAmount) {
@@ -2215,15 +2328,17 @@
         const GAME_NAMES = { slots: 'Arcana Slots', crash: 'Crash', plinko: 'Plinko', mines: 'Mines', roulette: 'Roulette Arcane' };
 
         function updateRecentBets() {
-            const tbody = document.getElementById('recentBetsBody');
-            if (!tbody) return;
             const bets = getRecentBets();
-            tbody.innerHTML = bets.map(b => {
+            const rows = bets.map(b => {
                 const winClass = b.win ? 'bet-win' : 'bet-loss';
                 const gainText = b.win ? '+' + b.gain + ' ARCANA' : '-' + b.mise + ' ARCANA';
                 const multDisplay = (b.multiplier + '').replace(/x$/i, '') + 'x';
-                return '<tr><td>' + b.game + '</td><td class="font-mono text-xs">' + maskAddress(b.player) + '</td><td>' + b.mise + ' ARCANA</td><td>' + multDisplay + '</td><td class="' + winClass + '">' + gainText + '</td></tr>';
+                return '<tr><td>' + b.game + '</td><td class="font-mono text-xs">' + maskAddress(b.player) + '</td><td>' + b.mise + '</td><td>' + multDisplay + '</td><td class="' + winClass + '">' + gainText + '</td></tr>';
             }).join('');
+            const tbody = document.getElementById('recentBetsBody');
+            if (tbody) tbody.innerHTML = rows;
+            const theatreTbody = document.getElementById('theatreRecentBetsBody');
+            if (theatreTbody) theatreTbody.innerHTML = rows;
         }
 
         function getRecentBets() {
@@ -2329,6 +2444,47 @@
                     btn.addEventListener('click', () => switchSection(btn.getAttribute('data-nav-tab')));
                 });
                 document.querySelectorAll('.section-panel').forEach(p => { if (!p.classList.contains('active')) p.style.display = 'none'; });
+
+                let theatreCurrentGame = null;
+                const GAME_BLOCK_IDS = { slots: 'casino-slots-block', crash: 'casino-crash-block', plinko: 'casino-plinko-block', keno: 'casino-keno-block' };
+                const GAME_PLACEHOLDER_IDS = { slots: 'game-placeholder-slots', crash: 'game-placeholder-crash', plinko: 'game-placeholder-plinko', keno: 'game-placeholder-keno' };
+                function openTheatre(gameId) {
+                    const blockId = GAME_BLOCK_IDS[gameId];
+                    const placeholderId = GAME_PLACEHOLDER_IDS[gameId];
+                    if (!blockId || !placeholderId) return;
+                    const block = document.getElementById(blockId);
+                    const placeholder = document.getElementById(placeholderId);
+                    const area = document.getElementById('theatreGameArea');
+                    if (!block || !placeholder || !area) return;
+                    theatreCurrentGame = gameId;
+                    area.appendChild(block);
+                    const theatre = document.getElementById('game-theatre');
+                    if (theatre) {
+                        theatre.style.display = 'flex';
+                        requestAnimationFrame(() => { theatre.classList.add('theatre-visible'); });
+                    }
+                }
+                function closeTheatre() {
+                    if (!theatreCurrentGame) return;
+                    const theatre = document.getElementById('game-theatre');
+                    if (theatre) theatre.classList.remove('theatre-visible');
+                    const gameId = theatreCurrentGame;
+                    theatreCurrentGame = null;
+                    setTimeout(() => {
+                        const blockId = GAME_BLOCK_IDS[gameId];
+                        const placeholderId = GAME_PLACEHOLDER_IDS[gameId];
+                        const block = document.getElementById(blockId);
+                        const placeholder = document.getElementById(placeholderId);
+                        if (block && placeholder) placeholder.appendChild(block);
+                        if (theatre) theatre.style.display = 'none';
+                    }, 280);
+                }
+                document.querySelectorAll('.btn-jouer-theatre').forEach(btn => {
+                    btn.addEventListener('click', () => openTheatre(btn.getAttribute('data-game')));
+                });
+                const theatreCloseBtn = document.getElementById('theatreCloseBtn');
+                if (theatreCloseBtn) theatreCloseBtn.addEventListener('click', closeTheatre);
+
                 const crashBetBtn = document.getElementById('crashBetBtn');
                 if (crashBetBtn) {
                     crashBetBtn.addEventListener('click', () => {
