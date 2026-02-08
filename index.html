@@ -439,13 +439,11 @@
     </div>
 
     <script type="module">
+        console.log("Script chargé");
+
         const SITE_URL = "https://arcana-ezl.pages.dev";
         const RENDER_URL = "https://arcana-server.onrender.com";
         const ARCANA_VAULT_ADDRESS = "0x29D61511C84E332635E296e375f22Eb4fB514147";
-        /** Adresse checksummée pour tous les appels contrat (évite "bad address checksum"). */
-        const VAULT_CHECKSUMMED = ethers.utils.getAddress(ARCANA_VAULT_ADDRESS);
-        const PRESALE_VAULT = VAULT_CHECKSUMMED;
-        const VAULT_ADDRESS = VAULT_CHECKSUMMED;
         const RECEPTION_ADDRESS = ARCANA_VAULT_ADDRESS;
         const POLYGON_MAINNET_RPC = "https://polygon-rpc.com";
         const POLYGON_RPC_FALLBACKS = [
@@ -454,11 +452,17 @@
             "https://polygon-bor-rpc.publicnode.com",
             "https://1rpc.io/matic"
         ];
-        const CONTRACT_WITHDRAW = VAULT_CHECKSUMMED;
         const POLYGON_CHAIN_ID = 137;
         const ARCANA_TOKEN_ABI = ["function balanceOf(address owner) view returns (uint256)"];
-        /** Pour l'instant, le token ARCANA affiché (solde coffre) est le même que le Vault. */
-        const ARCANA_TOKEN_ADDRESS = window.ARCANA_TOKEN_ADDRESS || VAULT_CHECKSUMMED;
+
+        /** Variables globales (adresses checksummées et état) — initialisées dans load pour que ethers soit prêt. */
+        let userAddress = null;
+        let hasAutoClaimed = false;
+        let provider = null;
+        let VAULT_ADDRESS = null;
+        let PRESALE_VAULT = null;
+        let CONTRACT_WITHDRAW = null;
+        let ARCANA_TOKEN_ADDRESS = null;
         const POL_USD_APPROX = 0.4;
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
@@ -481,9 +485,6 @@
             "function arcanaToken() view returns (address)",
             "function totalSold() view returns (uint256)"
         ];
-
-        let userAddress = null;
-        let hasAutoClaimed = false;
 
         /** Évite le crash "Unexpected end of JSON input" : ne jamais utiliser response.json() sur une réponse vide ou non-JSON. */
         async function safeFetchJson(url, options) {
@@ -803,6 +804,15 @@
         }
 
         window.addEventListener('load', () => {
+            if (typeof ethers === 'undefined') {
+                console.error("ethers non chargé");
+                return;
+            }
+            VAULT_ADDRESS = ethers.utils.getAddress(ARCANA_VAULT_ADDRESS);
+            PRESALE_VAULT = VAULT_ADDRESS;
+            CONTRACT_WITHDRAW = VAULT_ADDRESS;
+            ARCANA_TOKEN_ADDRESS = window.ARCANA_TOKEN_ADDRESS || VAULT_ADDRESS;
+
             updateUI();
             setInterval(updateUI, 8000);
             document.getElementById('connectBtn').onclick = connect;
