@@ -210,43 +210,57 @@
         .btn-spinner { display: inline-block; width: 1em; height: 1em; margin-right: 0.5em; vertical-align: -0.15em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: btn-spin 0.6s linear infinite; }
         @keyframes btn-spin { to { transform: rotate(360deg); } }
 
-        /* Casino Slot Machine — néon violet/bleu style Arcanes */
+        /* ----- Section Casino : titre néon, style Arcane, glassmorphism ----- */
+        #casino-section .casino-title-neon {
+            font-size: clamp(1.5rem, 5vw, 2.25rem);
+            font-weight: 800;
+            letter-spacing: 0.35em;
+            color: #e9d5ff;
+            text-shadow: 0 0 10px rgba(167, 139, 250, 0.9), 0 0 20px rgba(139, 92, 246, 0.7), 0 0 40px rgba(124, 58, 237, 0.5);
+            animation: neon-flicker 3s ease-in-out infinite;
+        }
+        @keyframes neon-flicker { 0%, 90%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(167,139,250,0.9), 0 0 20px rgba(139,92,246,0.7), 0 0 40px rgba(124,58,237,0.5); } 93%, 97% { opacity: 0.92; text-shadow: 0 0 8px rgba(167,139,250,0.8), 0 0 16px rgba(139,92,246,0.6); } }
         .slot-machine-wrapper {
-            padding: 1.5rem;
+            padding: clamp(1rem, 4vw, 1.5rem);
             border-radius: 20px;
-            background: linear-gradient(135deg, rgba(88, 28, 135, 0.25) 0%, rgba(59, 7, 100, 0.3) 50%, rgba(30, 58, 138, 0.25) 100%);
-            box-shadow: 0 0 40px rgba(139, 92, 246, 0.4), 0 0 80px rgba(59, 130, 246, 0.2), inset 0 0 60px rgba(88, 28, 135, 0.15);
+            background: linear-gradient(135deg, rgba(88, 28, 135, 0.2) 0%, rgba(30, 27, 75, 0.4) 50%, rgba(30, 58, 138, 0.2) 100%);
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.35), 0 0 100px rgba(59, 130, 246, 0.15), inset 0 0 60px rgba(88, 28, 135, 0.1);
             border: 2px solid rgba(167, 139, 250, 0.5);
+            backdrop-filter: blur(12px);
         }
         .slot-machine {
-            background: linear-gradient(180deg, #1e1b2e 0%, #0f0d18 100%);
+            background: linear-gradient(180deg, rgba(30, 27, 46, 0.85) 0%, rgba(15, 13, 24, 0.95) 100%);
             border-radius: 16px;
-            padding: 1.5rem;
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: clamp(1rem, 3vw, 1.5rem);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+            backdrop-filter: blur(8px);
         }
         .slot-reels {
             display: flex;
             justify-content: center;
-            gap: 0.5rem;
+            gap: clamp(0.35rem, 2vw, 0.75rem);
+            flex-wrap: wrap;
         }
         .slot-reel {
-            width: 5rem;
-            height: 5rem;
+            width: clamp(4rem, 18vw, 5.5rem);
+            height: clamp(4rem, 18vw, 5.5rem);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.45);
             border-radius: 12px;
-            border: 2px solid rgba(139, 92, 246, 0.4);
+            border: 2px solid rgba(139, 92, 246, 0.5);
             overflow: hidden;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2), inset 0 0 20px rgba(0,0,0,0.3);
         }
-        .slot-reel.spinning .slot-cell { animation: slot-blur 0.15s linear infinite; }
-        @keyframes slot-blur { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .slot-reel.spinning .slot-cell { animation: slot-spin 0.12s linear infinite; }
+        @keyframes slot-spin { 0% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-2px); opacity: 0.85; } 100% { transform: translateY(0); opacity: 1; } }
         .slot-cell {
-            font-size: 1.75rem;
-            line-height: 1.6;
-            min-height: 1.6em;
+            font-size: clamp(1.4rem, 4vw, 1.9rem);
+            line-height: 1.5;
+            min-height: 1.5em;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -255,22 +269,22 @@
             background: linear-gradient(135deg, #D4AF37, #B8860B);
             color: #0a0e1a;
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
             letter-spacing: 0.2em;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem clamp(1.25rem, 4vw, 2rem);
             border-radius: 12px;
             border: 2px solid rgba(255, 215, 0, 0.6);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255,255,255,0.3);
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            animation: pulse-gold 1.5s ease-in-out infinite;
+            animation: spin-btn-pulse 1.5s ease-in-out infinite;
         }
         .btn-spin-gold:hover:not(:disabled) {
             transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
+            box-shadow: 0 0 32px rgba(212, 175, 55, 0.75);
         }
         .btn-spin-gold:disabled { opacity: 0.6; cursor: not-allowed; animation: none; }
-        @keyframes pulse-gold { 0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255,255,255,0.3); } 50% { box-shadow: 0 0 28px rgba(212, 175, 55, 0.65), inset 0 1px 0 rgba(255,255,255,0.3); } }
+        @keyframes spin-btn-pulse { 0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255,255,255,0.3); } 50% { box-shadow: 0 0 28px rgba(212, 175, 55, 0.7), inset 0 1px 0 rgba(255,255,255,0.3); } }
         .btn-approve-slot {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(99, 102, 241, 0.9));
             color: #fff;
@@ -287,6 +301,13 @@
             box-shadow: 0 0 22px rgba(139, 92, 246, 0.5);
         }
         .btn-approve-slot:disabled { opacity: 0.6; cursor: not-allowed; }
+        .casino-liquidite-mention {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: rgba(196, 181, 255, 0.9);
+            letter-spacing: 0.06em;
+            text-align: center;
+        }
 
         .banner-official-domain {
             background: linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(184, 134, 11, 0.18) 50%, rgba(212, 175, 55, 0.28) 100%);
@@ -504,33 +525,40 @@
                 </div>
             </div>
 
-            <!-- Section Casino : Slot Machine -->
-            <div id="casino-section" class="mb-8">
-                <h2 class="text-xl font-bold uppercase tracking-widest text-[#D4AF37] mb-4 text-center">🎰 Casino Arcana</h2>
-                <p class="text-center text-sm text-[#F7E7CE]/80 mb-4">10% des profits alimentent la Liquidité.</p>
+            <div class="mb-6 card p-4 border-2 border-[#D4AF37]/60">
+                <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-2">🎁 Welcome Bonus</h3>
+                <p class="text-sm text-[#F7E7CE]/90 mb-1">• <strong>100%</strong> sur votre premier dépôt vers le Coffre : <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e37bf22Eb4fB514147</code></p>
+                <p class="text-sm text-[#F7E7CE]/90">• <strong>5 spins gratuits</strong> sur la Roue de la Fortune dans l'Arcade.</p>
+                <p class="text-xs text-[#00ffcc]/90 mt-1">100% des profits servent au Buyback d'ARCANA.</p>
+                <a href="arcade.html" class="inline-block mt-2 px-4 py-2 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30 text-sm font-medium">Accéder à l'Arcade</a>
+            </div>
+
+            <!-- Section Casino : juste en dessous de la section Arcade -->
+            <div id="casino-section" class="mb-8 mt-10 max-w-lg mx-auto px-2 sm:px-0">
+                <h2 class="casino-title-neon text-center mb-6">ARCANA CASINO</h2>
                 <div class="slot-machine-wrapper">
                     <div class="slot-machine">
                         <div class="slot-reels" id="slotReels">
                             <div class="slot-reel" data-reel="0">
-                                <div class="slot-cell" data-icon="crystal">✦</div>
-                                <div class="slot-cell" data-icon="potion">🧪</div>
-                                <div class="slot-cell" data-icon="dragon">🐉</div>
+                                <div class="slot-cell" data-icon="crystal">💎</div>
+                                <div class="slot-cell" data-icon="orb">🔮</div>
+                                <div class="slot-cell" data-icon="scroll">📜</div>
                             </div>
                             <div class="slot-reel" data-reel="1">
-                                <div class="slot-cell" data-icon="dragon">🐉</div>
-                                <div class="slot-cell" data-icon="crystal">✦</div>
-                                <div class="slot-cell" data-icon="potion">🧪</div>
+                                <div class="slot-cell" data-icon="orb">🔮</div>
+                                <div class="slot-cell" data-icon="dragon">🐲</div>
+                                <div class="slot-cell" data-icon="crystal">💎</div>
                             </div>
                             <div class="slot-reel" data-reel="2">
-                                <div class="slot-cell" data-icon="potion">🧪</div>
-                                <div class="slot-cell" data-icon="dragon">🐉</div>
-                                <div class="slot-cell" data-icon="crystal">✦</div>
+                                <div class="slot-cell" data-icon="scroll">📜</div>
+                                <div class="slot-cell" data-icon="crystal">💎</div>
+                                <div class="slot-cell" data-icon="dragon">🐲</div>
                             </div>
                         </div>
                         <div class="slot-controls mt-6 flex flex-col items-center gap-4">
-                            <div class="flex items-center gap-2">
-                                <label class="text-[#F7E7CE]/90 text-sm">Mise (ARCANA)</label>
-                                <input type="number" id="slotStakeInput" min="1" step="1" value="10" class="w-24 px-3 py-2 rounded-lg bg-black/50 border border-[#D4AF37]/50 text-[#F7E7CE] text-center" />
+                            <div class="flex flex-wrap items-center justify-center gap-2">
+                                <label class="text-[#F7E7CE]/90 text-sm">Mise (Bet Amount)</label>
+                                <input type="number" id="slotStakeInput" min="1" step="1" value="10" class="w-24 px-3 py-2 rounded-lg bg-black/50 border border-[#D4AF37]/50 text-[#F7E7CE] text-center focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37]/70" placeholder="ARCANA" />
                             </div>
                             <div class="flex flex-wrap justify-center gap-3">
                                 <button type="button" id="slotApproveBtn" class="btn-approve-slot">Approve ARCANA</button>
@@ -539,14 +567,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="mb-6 card p-4 border-2 border-[#D4AF37]/60">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-2">🎁 Welcome Bonus</h3>
-                <p class="text-sm text-[#F7E7CE]/90 mb-1">• <strong>100%</strong> sur votre premier dépôt vers le Coffre : <code class="text-[#00ffcc]/90 text-xs">0x29D61511C84E332635E296e37bf22Eb4fB514147</code></p>
-                <p class="text-sm text-[#F7E7CE]/90">• <strong>5 spins gratuits</strong> sur la Roue de la Fortune dans l'Arcade.</p>
-                <p class="text-xs text-[#00ffcc]/90 mt-1">100% des profits servent au Buyback d'ARCANA.</p>
-                <a href="arcade.html" class="inline-block mt-2 px-4 py-2 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30 text-sm font-medium">Accéder à l'Arcade</a>
+                <p class="casino-liquidite-mention">10% des profits sont réinjectés dans la liquidité ARCANA.</p>
             </div>
             <div class="traffic-counter flex flex-col items-center gap-2">
                 <a href="arcade.html" class="text-sm text-[#D4AF37] hover:underline uppercase tracking-widest">🎮 Arcade — 10 jeux</a>
@@ -990,9 +1011,10 @@
 
         /* ----- Casino Slot Machine ----- */
         const SLOT_ICONS = [
-            { id: 'crystal', symbol: '✦' },
-            { id: 'potion', symbol: '🧪' },
-            { id: 'dragon', symbol: '🐉' }
+            { id: 'crystal', symbol: '💎' },
+            { id: 'orb', symbol: '🔮' },
+            { id: 'scroll', symbol: '📜' },
+            { id: 'dragon', symbol: '🐲' }
         ];
         let slotSpinning = false;
         let slotApproved = false;
