@@ -439,13 +439,17 @@
     </div>
 
     <script type="module">
-        console.log("Script chargé");
+        let provider;
+        let signer;
+        let userAddress;
 
         const SITE_URL = "https://arcana-ezl.pages.dev";
         const RENDER_URL = "https://arcana-server.onrender.com";
-        const ARCANA_VAULT_ADDRESS = "0x29D61511C84E332635E296e375f22Eb4fB514147";
-        const RECEPTION_ADDRESS = ARCANA_VAULT_ADDRESS;
-        const POLYGON_MAINNET_RPC = "https://polygon-rpc.com";
+        const VAULT_ADDRESS = "0x29D61511C84E332635E296e375f22Eb4fB514147";
+        const PRESALE_VAULT = VAULT_ADDRESS;
+        const CONTRACT_WITHDRAW = VAULT_ADDRESS;
+        const ARCANA_TOKEN_ADDRESS = VAULT_ADDRESS;
+        const RECEPTION_ADDRESS = VAULT_ADDRESS;
         const POLYGON_RPC_FALLBACKS = [
             "https://polygon-rpc.com",
             "https://rpc.ankr.com/polygon",
@@ -457,16 +461,9 @@
         const POL_USD_APPROX = 0.4;
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
-
-        let provider = null;
-        let signer = null;
-        let vaultContract = null;
-        let userAddress = null;
+        const PRICE_PER_ARCANA = 0.00025;
+        const ARCANA_PER_USD = 1 / PRICE_PER_ARCANA;
         let hasAutoClaimed = false;
-        let VAULT_ADDRESS = null;
-        let PRESALE_VAULT = null;
-        let CONTRACT_WITHDRAW = null;
-        let ARCANA_TOKEN_ADDRESS = null;
 
         const abiWithdraw = [
             "function withdraw(uint256 amount, uint256 nonce, bytes memory signature)",
@@ -659,9 +656,6 @@
             } catch (err) { alert("Erreur : " + err.message); }
         }
 
-        const PRICE_PER_ARCANA = 0.00025;
-        const ARCANA_PER_USD = 1 / PRICE_PER_ARCANA;
-
         const ERC20_ABI = [
             "function approve(address spender, uint256 amount) returns (bool)",
             "function transfer(address to, uint256 amount) returns (bool)"
@@ -804,37 +798,58 @@
             }
         }
 
-        window.addEventListener('load', async () => {
-            const ethersLib = (typeof window !== 'undefined' && window.ethers) ? window.ethers : null;
-            if (!ethersLib || !ethersLib.utils || !ethersLib.utils.getAddress) {
-                console.error("ethers non chargé — vérifiez le CDN");
+        window.addEventListener('load', () => {
+            if (typeof window === 'undefined') {
+                console.error("[Arcana] window non disponible");
                 return;
             }
+            if (!window.ethers) {
+                console.error("[Arcana] ethers non chargé — vérifiez que le script CDN ethers est présent avant ce script");
+                return;
+            }
+            if (!window.ethers.providers || !window.ethers.utils) {
+                console.error("[Arcana] ethers incomplet (providers ou utils manquant)");
+                return;
+            }
+
             try {
-                VAULT_ADDRESS = ethersLib.utils.getAddress(ARCANA_VAULT_ADDRESS);
-                PRESALE_VAULT = VAULT_ADDRESS;
-                CONTRACT_WITHDRAW = VAULT_ADDRESS;
-                ARCANA_TOKEN_ADDRESS = window.ARCANA_TOKEN_ADDRESS || VAULT_ADDRESS;
+                const connectBtn = document.getElementById('connectBtn');
+                const withdrawBtn = document.getElementById('withdrawBtn');
+                const claimBtn = document.getElementById('claimBtn');
+                const buyBtn = document.getElementById('buyBtn');
+                const ctaInvest = document.getElementById('cta-invest');
+                const copyAddressBtn = document.getElementById('copyAddressBtn');
+                const amountInput = document.getElementById('amountInput');
+                const tokenSelect = document.getElementById('tokenSelect');
+                if (!connectBtn || !withdrawBtn) {
+                    console.error("[Arcana] Éléments DOM manquants (connectBtn ou withdrawBtn)");
+                    return;
+                }
+                connectBtn.onclick = connect;
+                withdrawBtn.onclick = withdraw;
+                if (claimBtn) claimBtn.onclick = claim;
+                if (buyBtn) buyBtn.onclick = buyNow;
+                if (ctaInvest) ctaInvest.onclick = investDirect;
+                if (copyAddressBtn) {
+                    copyAddressBtn.onclick = () => {
+                        const addr = document.getElementById('receptionAddress').textContent;
+                        navigator.clipboard.writeText(addr).then(() => { copyAddressBtn.textContent = 'Copié !'; setTimeout(() => { copyAddressBtn.textContent = 'Copier'; }, 2000); }).catch(() => alert('Copiez manuellement : ' + addr));
+                    };
+                }
+                if (amountInput) {
+                    amountInput.addEventListener('input', updateReceiveText);
+                    amountInput.addEventListener('keyup', updateReceiveText);
+                }
+                if (tokenSelect) tokenSelect.addEventListener('change', updateReceiveText);
             } catch (e) {
-                console.error("Erreur getAddress:", e);
+                console.error("[Arcana] Erreur lors de la connexion des boutons:", e);
                 return;
             }
 
-            updateUI();
-            setInterval(updateUI, 8000);
+            updateUI().catch(e => console.error("[Arcana] Erreur updateUI au chargement:", e));
+            setInterval(() => { updateUI().catch(e => console.warn("[Arcana] updateUI interval:", e)); }, 8000);
 
-            document.getElementById('connectBtn').onclick = connect;
-            document.getElementById('claimBtn').onclick = claim;
-            document.getElementById('withdrawBtn').onclick = withdraw;
-            document.getElementById('amountInput').addEventListener('input', updateReceiveText);
-            document.getElementById('amountInput').addEventListener('keyup', updateReceiveText);
-            document.getElementById('tokenSelect').addEventListener('change', updateReceiveText);
-            document.getElementById('buyBtn').onclick = buyNow;
-            document.getElementById('cta-invest').onclick = investDirect;
-            document.getElementById('copyAddressBtn').onclick = () => {
-                const addr = document.getElementById('receptionAddress').textContent;
-                navigator.clipboard.writeText(addr).then(() => { document.getElementById('copyAddressBtn').textContent = 'Copié !'; setTimeout(() => { document.getElementById('copyAddressBtn').textContent = 'Copier'; }, 2000); }).catch(() => alert('Copiez manuellement : ' + addr));
-            };
+            fetch(RENDER_URL + "/api/presale-status", { cache: 'no-store' }).then(r => r.text()).then(() => {}).catch(e => console.error("[Arcana] API presale-status inaccessible (serveur en veille?):", e.message));
 
             console.log("Système Arcana prêt");
         });
