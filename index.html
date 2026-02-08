@@ -208,6 +208,15 @@
             overflow: auto;
         }
         .theatre-game-area > * { max-width: 100%; }
+        .theatre-game-area iframe.theatre-codepen-embed {
+            width: 100%;
+            height: 100%;
+            min-height: 60vh;
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            border-radius: 12px;
+            background: #0b0e11;
+            box-shadow: 0 0 30px rgba(167, 139, 250, 0.15), 0 0 60px rgba(212, 175, 55, 0.08);
+        }
         .theatre-sidebar {
             width: 300px;
             min-width: 300px;
@@ -1340,23 +1349,24 @@
                         <div class="slot-reels" id="slotReels">
                             <div class="slot-reel" data-reel="0">
                                 <div class="slot-cell" data-icon="crystal">💎</div>
-                                <div class="slot-cell" data-icon="orb">🔮</div>
-                                <div class="slot-cell" data-icon="scroll">📜</div>
+                                <div class="slot-cell" data-icon="dragon">🐲</div>
+                                <div class="slot-cell" data-icon="crystal">🔮</div>
                             </div>
                             <div class="slot-reel" data-reel="1">
-                                <div class="slot-cell" data-icon="orb">🔮</div>
-                                <div class="slot-cell" data-icon="dragon">🐲</div>
+                                <div class="slot-cell" data-icon="dragon">🐉</div>
                                 <div class="slot-cell" data-icon="crystal">💎</div>
+                                <div class="slot-cell" data-icon="dragon">🐲</div>
                             </div>
                             <div class="slot-reel" data-reel="2">
-                                <div class="slot-cell" data-icon="scroll">📜</div>
                                 <div class="slot-cell" data-icon="crystal">💎</div>
-                                <div class="slot-cell" data-icon="dragon">🐲</div>
+                                <div class="slot-cell" data-icon="dragon">🐉</div>
+                                <div class="slot-cell" data-icon="crystal">🔮</div>
                             </div>
                         </div>
+                        <p class="slot-paytable text-center text-xs text-[#F7E7CE]/80 mt-3">💎 3x Cristal = 3× &nbsp;|&nbsp; 🐲🐉 3x Dragon = 5×</p>
                         <div class="slot-controls mt-6 flex flex-col items-center gap-4">
                             <div class="flex flex-wrap items-center justify-center gap-2">
-                                <label class="text-[#F7E7CE]/90 text-sm">Mise (Bet Amount)</label>
+                                <label class="text-[#F7E7CE]/90 text-sm">Mise (ARCANA)</label>
                                 <input type="number" id="slotStakeInput" min="1" step="1" value="10" class="w-24 px-3 py-2 rounded-lg bg-black/50 border border-[#D4AF37]/50 text-[#F7E7CE] text-center focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37]/70" placeholder="ARCANA" />
                             </div>
                             <div class="flex flex-wrap justify-center gap-3">
@@ -1456,6 +1466,15 @@
                 </div>
                         </div>
                     </div>
+                    <div class="app-card" data-game-card="codepen">
+                        <div class="game-card-header">
+                            <h3>Jeu Bonus</h3>
+                            <button type="button" class="btn-jouer-theatre" data-game="codepen">Jouer</button>
+                        </div>
+                        <div id="game-placeholder-codepen" class="game-placeholder game-placeholder-codepen">
+                            <p class="text-[#F7E7CE]/70 text-sm text-center py-8">Jeu open-source — s'ouvre en plein écran.<br><span class="text-[#a78bfa]/90 text-xs">Thème Arcana (Noir, Or, Violet)</span></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1524,6 +1543,11 @@
             "function drawAndSettle(uint256 roundId) external",
             "event KenoPlayed(address indexed player, uint256 roundId, uint256 amount, uint8[] selected)",
             "event KenoSettled(address indexed player, uint256 roundId, uint8[] drawn, uint256 payout)"
+        ];
+        /* ArcanaCasino.sol — Slots : playSlots(betAmount, multiplier). Mettre l'adresse après déploiement. */
+        const ARCANA_CASINO_ADDRESS = null;
+        const ARCANA_CASINO_ABI = [
+            "function playSlots(uint256 betAmount, uint256 multiplier) external"
         ];
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
@@ -1951,13 +1975,14 @@
             return {};
         }
 
-        /* ----- Casino Slot Machine ----- */
+        /* ----- Casino Slot Machine (cristaux / dragons, playSlots ArcanaCasino.sol) ----- */
         const SLOT_ICONS = [
-            { id: 'crystal', symbol: '💎' },
-            { id: 'orb', symbol: '🔮' },
-            { id: 'scroll', symbol: '📜' },
-            { id: 'dragon', symbol: '🐲' }
+            { id: 'crystal', symbol: '💎', name: 'Cristal' },
+            { id: 'crystal', symbol: '🔮', name: 'Cristal' },
+            { id: 'dragon', symbol: '🐲', name: 'Dragon' },
+            { id: 'dragon', symbol: '🐉', name: 'Dragon' }
         ];
+        const SLOT_PAYTABLE = { crystal: 3, dragon: 5 };
         let slotSpinning = false;
         let slotApproved = false;
 
@@ -1974,12 +1999,18 @@
             });
         }
 
+        function getSlotMultiplier(finalIcons) {
+            const a = finalIcons[0].id, b = finalIcons[1].id, c = finalIcons[2].id;
+            if (a === b && b === c && SLOT_PAYTABLE[a]) return SLOT_PAYTABLE[a];
+            return 0;
+        }
+
         async function spin() {
             if (slotSpinning) return;
             const stakeInput = document.getElementById('slotStakeInput');
             const spinBtn = document.getElementById('slotSpinBtn');
-            const stake = parseInt(stakeInput?.value, 10) || 10;
-            if (!slotApproved) {
+            const stake = Math.max(1, parseInt(stakeInput?.value, 10) || 10);
+            if (!slotApproved && ARCANA_CASINO_ADDRESS) {
                 Swal.fire({ icon: 'warning', title: 'Approve requis', text: 'Cliquez sur "Approve ARCANA" avant de lancer le spin.' });
                 return;
             }
@@ -1992,6 +2023,7 @@
 
             const duration = 2000;
             const startTime = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
+            let finalIcons = [];
             const tick = () => {
                 const elapsed = (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()) - startTime;
                 reels.forEach(reel => {
@@ -2000,17 +2032,35 @@
                 });
                 if (elapsed < duration) requestAnimationFrame(tick);
                 else {
+                    finalIcons = [getRandomIcon(), getRandomIcon(), getRandomIcon()];
                     reels.forEach(reel => reel.classList.remove('spinning'));
-                    const final = [getRandomIcon(), getRandomIcon(), getRandomIcon()];
-                    reels.forEach((reel, i) => setReelIcons(reel, [getRandomIcon(), final[i], getRandomIcon()]));
+                    reels.forEach((reel, i) => setReelIcons(reel, [getRandomIcon(), finalIcons[i], getRandomIcon()]));
                     slotSpinning = false;
                     if (spinBtn) { spinBtn.disabled = false; spinBtn.textContent = 'SPIN'; }
-                    const same = final[0].id === final[1].id && final[1].id === final[2].id;
-                    if (same) {
-                        Swal.fire({ icon: 'success', title: 'Gagné !', text: 'Trois symboles identiques !' });
+                    const multiplier = getSlotMultiplier(finalIcons);
+                    if (ARCANA_CASINO_ADDRESS && window.ethers && userAddress) {
+                        try {
+                            const provider = new ethers.providers.Web3Provider(window.ethereum);
+                            const signer = provider.getSigner();
+                            const casino = new ethers.Contract(ARCANA_CASINO_ADDRESS, ARCANA_CASINO_ABI, signer);
+                            const betWei = ethers.utils.parseEther(stake.toString());
+                            const tx = await casino.playSlots(betWei, multiplier);
+                            await tx.wait();
+                            if (multiplier > 0) {
+                                Swal.fire({ icon: 'success', title: 'Gagné !', text: multiplier + 'x — ' + (stake * multiplier) + ' ARCANA crédités.' });
+                            } else {
+                                Swal.fire({ icon: 'info', title: 'Pas de chance', text: 'Mise envoyée au casino (LP + Vault).' });
+                            }
+                            if (typeof updateUI === 'function') updateUI();
+                        } catch (e) {
+                            Swal.fire({ icon: 'error', title: 'Transaction échouée', text: e.message || 'playSlots a échoué.' });
+                        }
                     } else {
-                        const allocation = calculateAllocations(stake, 'casino');
-                        allocateCasinoSpinLoss(allocation.lpPool, allocation.vault);
+                        if (multiplier > 0) Swal.fire({ icon: 'success', title: 'Gagné !', text: multiplier + 'x (démo — connectez le contrat pour les vrais gains).' });
+                        else {
+                            const allocation = calculateAllocations(stake, 'casino');
+                            allocateCasinoSpinLoss(allocation.lpPool, allocation.vault);
+                        }
                     }
                 }
             };
@@ -2533,8 +2583,14 @@
                 Swal.fire({ icon: 'info', title: 'Connexion requise', text: 'Connectez votre wallet pour approuver.' });
                 return;
             }
+            if (!ARCANA_CASINO_ADDRESS) {
+                Swal.fire({ icon: 'info', title: 'Contrat non déployé', text: 'Déployez ArcanaCasino.sol et définissez ARCANA_CASINO_ADDRESS. En démo, vous pouvez lancer SPIN sans approve.' });
+                slotApproved = true;
+                return;
+            }
             const stakeInput = document.getElementById('slotStakeInput');
-            const amount = (parseInt(stakeInput?.value, 10) || 10) * 1e18;
+            const rawStake = Math.max(1, parseInt(stakeInput?.value, 10) || 10);
+            const amount = ethers.constants.MaxUint256;
             const approveBtn = document.getElementById('slotApproveBtn');
             if (!approveBtn) return;
             approveBtn.disabled = true;
@@ -2545,10 +2601,10 @@
                 const provider = new ethersLib.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
                 const tokenContract = new ethersLib.Contract(ARCANA_TOKEN_ADDRESS, ['function approve(address spender, uint256 amount) returns (bool)'], signer);
-                const tx = await tokenContract.approve(PRESALE_VAULT, ethersLib.BigNumber.from(amount.toString()));
+                const tx = await tokenContract.approve(ARCANA_CASINO_ADDRESS, amount);
                 await tx.wait();
                 slotApproved = true;
-                Swal.fire({ icon: 'success', title: 'Approuvé', text: 'Vous pouvez lancer le spin.' });
+                Swal.fire({ icon: 'success', title: 'Approuvé', text: 'Vous pouvez lancer le spin (ARCANA → ArcanaCasino).' });
             } catch (e) {
                 Swal.fire({ icon: 'error', title: 'Erreur', text: e.message || 'Approve échoué.' });
             } finally {
@@ -2608,17 +2664,30 @@
 
                 let theatreCurrentGame = null;
                 const GAME_BLOCK_IDS = { slots: 'casino-slots-block', crash: 'casino-crash-block', plinko: 'casino-plinko-block', keno: 'casino-keno-block' };
-                const GAME_PLACEHOLDER_IDS = { slots: 'game-placeholder-slots', crash: 'game-placeholder-crash', plinko: 'game-placeholder-plinko', keno: 'game-placeholder-keno' };
+                const GAME_PLACEHOLDER_IDS = { slots: 'game-placeholder-slots', crash: 'game-placeholder-crash', plinko: 'game-placeholder-plinko', keno: 'game-placeholder-keno', codepen: 'game-placeholder-codepen' };
+                const CODEPEN_EMBED_URL = 'https://codepen.io/vanderlanth/embed/NxmqpQ?theme-id=1&default-tab=result&editable=false';
                 function openTheatre(gameId) {
-                    const blockId = GAME_BLOCK_IDS[gameId];
-                    const placeholderId = GAME_PLACEHOLDER_IDS[gameId];
-                    if (!blockId || !placeholderId) return;
-                    const block = document.getElementById(blockId);
-                    const placeholder = document.getElementById(placeholderId);
                     const area = document.getElementById('theatreGameArea');
-                    if (!block || !placeholder || !area) return;
+                    if (!area) return;
                     theatreCurrentGame = gameId;
-                    area.appendChild(block);
+
+                    if (gameId === 'codepen') {
+                        area.innerHTML = '';
+                        const iframe = document.createElement('iframe');
+                        iframe.setAttribute('src', CODEPEN_EMBED_URL);
+                        iframe.setAttribute('class', 'theatre-codepen-embed');
+                        iframe.setAttribute('title', 'Jeu Bonus Arcana');
+                        area.appendChild(iframe);
+                    } else {
+                        const blockId = GAME_BLOCK_IDS[gameId];
+                        const placeholderId = GAME_PLACEHOLDER_IDS[gameId];
+                        if (!blockId || !placeholderId) return;
+                        const block = document.getElementById(blockId);
+                        const placeholder = document.getElementById(placeholderId);
+                        if (!block || !placeholder) return;
+                        area.appendChild(block);
+                    }
+
                     const theatre = document.getElementById('game-theatre');
                     if (theatre) {
                         theatre.style.display = 'flex';
@@ -2632,11 +2701,16 @@
                     const gameId = theatreCurrentGame;
                     theatreCurrentGame = null;
                     setTimeout(() => {
-                        const blockId = GAME_BLOCK_IDS[gameId];
-                        const placeholderId = GAME_PLACEHOLDER_IDS[gameId];
-                        const block = document.getElementById(blockId);
-                        const placeholder = document.getElementById(placeholderId);
-                        if (block && placeholder) placeholder.appendChild(block);
+                        const area = document.getElementById('theatreGameArea');
+                        if (gameId === 'codepen') {
+                            if (area) area.innerHTML = '';
+                        } else {
+                            const blockId = GAME_BLOCK_IDS[gameId];
+                            const placeholderId = GAME_PLACEHOLDER_IDS[gameId];
+                            const block = document.getElementById(blockId);
+                            const placeholder = document.getElementById(placeholderId);
+                            if (block && placeholder) placeholder.appendChild(block);
+                        }
                         if (theatre) theatre.style.display = 'none';
                     }, 280);
                 }
