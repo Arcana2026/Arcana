@@ -1546,6 +1546,7 @@
 
         const SITE_URL = "https://arcana-ezl.pages.dev";
         const RENDER_URL = "https://arcana-server.onrender.com";
+        /* Slots et Crash n'utilisent pas RENDER_URL : Slots = contrat 0x0a6D... (RNG on-chain), Crash = RNG dans index.html (crypto.getRandomValues) ou contrat 0x0a6D... */
         const ARCANA_VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
         const VAULT_ADDRESS = ARCANA_VAULT_ADDRESS;
         const PRESALE_VAULT = ARCANA_VAULT_ADDRESS;
@@ -2081,7 +2082,7 @@
             return {};
         }
 
-        /* ----- Casino Slot Machine (cristaux / dragons, playSlots ArcanaCasino.sol) ----- */
+        /* ----- Casino Slot Machine : RNG 100% on-chain via contrat 0x0a6D... (Polygon), aucun serveur Render ----- */
         const SLOT_ICONS = [
             { id: 'crystal', symbol: '💎', name: 'Cristal' },
             { id: 'crystal', symbol: '🔮', name: 'Cristal' },
@@ -2094,6 +2095,24 @@
 
         function getRandomIcon() {
             return SLOT_ICONS[Math.floor(Math.random() * SLOT_ICONS.length)];
+        }
+
+        function getIconById(id) {
+            const found = SLOT_ICONS.find(function(icon) { return icon.id === id; });
+            return found || SLOT_ICONS[0];
+        }
+
+        /** Déduit les 3 symboles à afficher à partir du résultat on-chain (GameResult). Pas de RNG client pour le résultat. */
+        function slotIconsFromContractResult(won, winAmountWei, betWei) {
+            var bet = ethers.BigNumber.isBigNumber(betWei) ? betWei : ethers.BigNumber.from(betWei || '0');
+            var win = ethers.BigNumber.isBigNumber(winAmountWei) ? winAmountWei : ethers.BigNumber.from(winAmountWei || '0');
+            if (!won || win.lte(0)) {
+                var mix = [getIconById('crystal'), getIconById('dragon'), getIconById('crystal')];
+                return mix;
+            }
+            var bet10 = bet.mul(10);
+            if (win.gte(bet10)) return [getIconById('dragon'), getIconById('dragon'), getIconById('dragon')];
+            return [getIconById('crystal'), getIconById('crystal'), getIconById('crystal')];
         }
 
         function setReelIcons(reelEl, icons) {
@@ -2114,7 +2133,6 @@
         async function spin() {
             if (slotSpinning) return;
             const stakeInput = document.getElementById('slotStakeInput');
-            const spinBtn = document.getElementById('slotSpinBtn');
             const stake = Math.max(1, parseInt(stakeInput?.value, 10) || 10);
             if (!slotApproved && ARCANA_CASINO_ADDRESS) {
                 Swal.fire({ icon: 'warning', title: 'Approve requis', text: 'Cliquez sur "Approve ARCANA" avant de lancer le spin.' });
@@ -2124,12 +2142,43 @@
             if (!reelsEl) return;
             const reels = reelsEl.querySelectorAll('.slot-reel');
             slotSpinning = true;
-            if (spinBtn) { spinBtn.disabled = true; spinBtn.textContent = '...'; }
-            reels.forEach(r => r.classList.add('spinning'));
+            var spinBtnEl = document.getElementById('slotSpinBtn');
+            if (spinBtnEl) { spinBtnEl.disabled = true; spinBtnEl.textContent = '...'; }
 
+            var finalIcons = [];
+            var won = false;
+            var winAmount = '0';
+            var betWei = ethers.utils.parseEther(stake.toString());
+            var contractUsed = false;
+
+            if (ARCANA_CASINO_ADDRESS && window.ethers && userAddress && window.ethereum) {
+                try {
+                    console.log('[Arcana] Slots: appel direct contrat Polygon 0x0a6D... playSlots, mise =', stake, 'ARCANA');
+                    var provider = new ethers.providers.Web3Provider(window.ethereum);
+                    var signer = provider.getSigner();
+                    var casino = new ethers.Contract(ARCANA_CASINO_ADDRESS, ARCANA_CASINO_ABI, signer);
+                    var tx = await casino.playSlots(betWei);
+                    var receipt = await tx.wait();
+                    var event = receipt.events && receipt.events.find(function(e) { return e.event === 'GameResult'; });
+                    won = event && event.args && event.args.won;
+                    winAmount = event && event.args && event.args.winAmount ? event.args.winAmount.toString() : '0';
+                    finalIcons = slotIconsFromContractResult(won, winAmount, betWei);
+                    contractUsed = true;
+                    console.log('[Arcana] Slots: résultat on-chain won =', won, ', winAmount =', winAmount);
+                } catch (e) {
+                    console.error('[Arcana] Slots: erreur contrat', e);
+                    slotSpinning = false;
+                    if (spinBtnEl) { spinBtnEl.disabled = false; spinBtnEl.textContent = 'SPIN'; }
+                    Swal.fire({ icon: 'error', title: 'Transaction échouée', text: e.message || 'playSlots a échoué.' });
+                    return;
+                }
+            } else {
+                finalIcons = [getRandomIcon(), getRandomIcon(), getRandomIcon()];
+            }
+
+            reels.forEach(r => r.classList.add('spinning'));
             const duration = 2000;
             const startTime = typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
-            let finalIcons = [];
             const tick = () => {
                 const elapsed = (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now()) - startTime;
                 reels.forEach(reel => {
@@ -2138,38 +2187,19 @@
                 });
                 if (elapsed < duration) requestAnimationFrame(tick);
                 else {
-                    finalIcons = [getRandomIcon(), getRandomIcon(), getRandomIcon()];
                     reels.forEach(reel => reel.classList.remove('spinning'));
                     reels.forEach((reel, i) => setReelIcons(reel, [getRandomIcon(), finalIcons[i], getRandomIcon()]));
                     slotSpinning = false;
-                    if (spinBtn) { spinBtn.disabled = false; spinBtn.textContent = 'SPIN'; }
-                    if (ARCANA_CASINO_ADDRESS && window.ethers && userAddress) {
-                        try {
-                            console.log('[Arcana] Mise (Slots): stake =', stake, 'ARCANA');
-                            var provider = new ethers.providers.Web3Provider(window.ethereum);
-                            var signer = provider.getSigner();
-                            var casino = new ethers.Contract(ARCANA_CASINO_ADDRESS, ARCANA_CASINO_ABI, signer);
-                            var betWei = ethers.utils.parseEther(stake.toString());
-                            console.log('[Arcana] Mise (Slots): appel playSlots...');
-                            var tx = await casino.playSlots(betWei);
-                            console.log('[Arcana] Mise (Slots): tx envoyée, attente confirmation...');
-                            var receipt = await tx.wait();
-                            var event = receipt.events && receipt.events.find(function(e) { return e.event === 'GameResult'; });
-                            var won = event && event.args && event.args.won;
-                            var winAmount = event && event.args && event.args.winAmount ? event.args.winAmount.toString() : '0';
-                            var winFormatted = parseFloat(ethers.utils.formatUnits(winAmount, 18)).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
-                            console.log('[Arcana] Résultat (Slots): won =', won, ', winAmount =', winFormatted, 'ARCANA');
-                            if (won) {
-                                if (typeof triggerConfetti === 'function') triggerConfetti();
-                                Swal.fire({ icon: 'success', title: 'Gagné !', text: winFormatted + ' ARCANA crédités.' });
-                            } else {
-                                Swal.fire({ icon: 'info', title: 'Pas de chance', text: 'Mise envoyée au casino (LP + Vault).' });
-                            }
-                            if (typeof updateUI === 'function') updateUI();
-                        } catch (e) {
-                            console.error('[Arcana] Résultat (Slots): erreur', e);
-                            Swal.fire({ icon: 'error', title: 'Transaction échouée', text: e.message || 'playSlots a échoué.' });
+                    if (spinBtnEl) { spinBtnEl.disabled = false; spinBtnEl.textContent = 'SPIN'; }
+                    if (contractUsed) {
+                        var winFormatted = parseFloat(ethers.utils.formatUnits(winAmount, 18)).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+                        if (won) {
+                            if (typeof triggerConfetti === 'function') triggerConfetti();
+                            Swal.fire({ icon: 'success', title: 'Gagné !', text: winFormatted + ' ARCANA crédités (résultat on-chain).' });
+                        } else {
+                            Swal.fire({ icon: 'info', title: 'Pas de chance', text: 'Mise envoyée au casino (LP + Vault).' });
                         }
+                        if (typeof updateUI === 'function') updateUI();
                     } else {
                         const multiplier = getSlotMultiplier(finalIcons);
                         if (multiplier > 0) Swal.fire({ icon: 'success', title: 'Gagné !', text: multiplier + 'x (démo — connectez le wallet pour jouer on-chain).' });
@@ -2191,7 +2221,7 @@
             if (typeof window.allocateToVault === 'function') window.allocateToVault(allocation.vault);
         }
 
-        /* ----- Jeu Crash (60 FPS, temps réel, son Boom) ----- */
+        /* ----- Jeu Crash : RNG 100% dans index.html (crypto.getRandomValues), aucun serveur Render ----- */
         const CRASH_MULT_MIN = 1.01;
         const CRASH_MULT_MAX = 10;
         const CRASH_TAU_MS = 4500;
@@ -2199,6 +2229,7 @@
         const getCrashTime = () => (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
         let crashState = { running: false, startTime: 0, crashPoint: 1, stake: 0, cashedOut: false, cashOutMult: 0, animId: 0, points: [], lastPointTime: 0 };
 
+        /** Point de crash généré côté client (Crypto API). Pas d'appel à arcana-server.onrender.com. */
         function getSecureCrashPoint() {
             const buf = new Uint32Array(2);
             crypto.getRandomValues(buf);
@@ -2312,6 +2343,7 @@
             crashState.animId = requestAnimationFrame(tickCrash);
         }
 
+        /** Mise Crash envoyée directement au contrat Polygon 0x0a6D... (playSlots). Aucun appel à arcana-server.onrender.com. */
         async function placeCrashBetOnChain() {
             const stakeInput = document.getElementById('crashStakeInput');
             const btn = document.getElementById('crashBetBtn');
@@ -2324,12 +2356,11 @@
             if (btn) { btn.disabled = true; btn.textContent = 'Transaction...'; }
             if (statusEl) statusEl.textContent = 'Transaction en cours...';
             try {
-                console.log('[Arcana] Mise (Crash): stake =', stake, 'ARCANA');
+                console.log('[Arcana] Crash: appel direct contrat 0x0a6D... playSlots, mise =', stake, 'ARCANA');
                 var provider = new ethers.providers.Web3Provider(window.ethereum);
                 var signer = provider.getSigner();
                 var casino = new ethers.Contract(ARCANA_CASINO_ADDRESS, ARCANA_CASINO_ABI, signer);
                 var betWei = ethers.utils.parseEther(String(stake));
-                console.log('[Arcana] Mise (Crash): appel playSlots...');
                 var tx = await casino.playSlots(betWei);
                 console.log('[Arcana] Mise (Crash): tx envoyée, attente confirmation...');
                 var receipt = await tx.wait();
