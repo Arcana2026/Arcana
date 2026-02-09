@@ -21,8 +21,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- ethers.js : chargé via CDN (également dépendance du projet dans package.json) pour connexion MetaMask et Polygon -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <!-- ethers.js : CDN pour connexion MetaMask et Polygon (v5 pour compatibilité avec le code existant) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
@@ -1149,7 +1149,7 @@
         <div class="app-main-wrap">
             <header class="app-topbar">
                 <div class="app-topbar-balance">Solde : <span id="headerBalanceArcana">—</span> ARCANA</div>
-                <button id="connectBtn" class="wallet-address">Connecter Wallet</button>
+                <button type="button" id="connectWallet" class="wallet-address">Connecter Wallet</button>
             </header>
             <div class="app-content">
     <main id="app-main">
@@ -1817,6 +1817,7 @@
         }
 
         async function connectWallet() {
+            alert('Tentative de connexion...');
             console.log('[Arcana] Connexion: clic Connecter Wallet');
             console.log('[Arcana] Connexion: window.ethereum =', typeof window !== 'undefined' ? !!window.ethereum : 'N/A');
             if (typeof window === 'undefined') return;
@@ -1829,7 +1830,8 @@
                 window.location.href = "https://metamask.app.link/dapp/" + window.location.href.replace(/^https?:\/\//, '');
                 return;
             }
-            setButtonLoading('connectBtn', 'Connexion...');
+            var connectBtnEl = document.getElementById('connectWallet') || document.getElementById('connectBtn');
+            if (connectBtnEl) setButtonLoading(connectBtnEl.id, 'Connexion...');
             try {
                 console.log('[Arcana] Connexion: appel eth_requestAccounts...');
                 var provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1837,11 +1839,11 @@
                 userAddress = accounts[0];
                 console.log('[Arcana] Connexion: succès, adresse =', userAddress ? userAddress.slice(0, 10) + '...' : 'null');
                 signer = provider.getSigner();
-                var connectBtn = document.getElementById('connectBtn');
-                if (connectBtn) {
-                    connectBtn.classList.remove('btn-loading');
-                    connectBtn.disabled = false;
-                    connectBtn.innerText = userAddress ? userAddress.substring(0,6) + "..." + userAddress.substring(38) : 'Connecter Wallet';
+                var connectBtnEl2 = document.getElementById('connectWallet') || document.getElementById('connectBtn');
+                if (connectBtnEl2) {
+                    connectBtnEl2.classList.remove('btn-loading');
+                    connectBtnEl2.disabled = false;
+                    connectBtnEl2.innerText = userAddress ? userAddress.substring(0,6) + "..." + userAddress.substring(38) : 'Connecter Wallet';
                 }
                 await updateUI();
                 if (typeof setupGameResultListener === 'function') setupGameResultListener();
@@ -1860,7 +1862,8 @@
                 console.log('[Arcana] Connexion: terminée.');
             } catch (err) {
                 console.error('[Arcana] Connexion: erreur', err);
-                restoreButton('connectBtn', 'Connecter Wallet');
+                var connectBtnId = (document.getElementById('connectWallet') || document.getElementById('connectBtn'));
+                restoreButton(connectBtnId ? connectBtnId.id : 'connectWallet', 'Connecter Wallet');
                 Swal.fire({ icon: 'error', title: 'Connexion échouée', text: err.message || 'Impossible de connecter le wallet.' });
             }
         }
@@ -2782,7 +2785,7 @@
             }
 
             try {
-                var connectBtn = document.getElementById('connectBtn');
+                var connectBtn = document.getElementById('connectWallet') || document.getElementById('connectBtn');
                 var withdrawBtn = document.getElementById('withdrawBtn');
                 const claimBtn = document.getElementById('claimBtn');
                 const buyBtn = document.getElementById('buyBtn');
@@ -2791,10 +2794,11 @@
                 const amountInput = document.getElementById('amountInput');
                 const tokenSelect = document.getElementById('tokenSelect');
                 if (!connectBtn) {
-                    console.error("[Arcana] Élément DOM manquant: connectBtn");
+                    console.error("[Arcana] Élément DOM manquant: connectWallet ou connectBtn");
                     return;
                 }
-                connectBtn.onclick = function() { console.log('[Arcana] Clic bouton Connecter Wallet'); connect(); };
+                console.log('[Arcana] Bouton Connecter trouvé, id =', connectBtn.id);
+                connectBtn.onclick = function() { console.log('[Arcana] Clic bouton Connecter Wallet'); connectWallet(); };
                 if (withdrawBtn) withdrawBtn.onclick = withdraw;
                 if (claimBtn) claimBtn.onclick = claim;
                 if (buyBtn) buyBtn.onclick = buyNow;
