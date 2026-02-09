@@ -2783,6 +2783,26 @@
                 return;
             }
 
+            window.arcanaOnWalletConnected = function(accounts) {
+                if (!accounts || !accounts[0]) return;
+                userAddress = accounts[0];
+                if (window.ethers && window.ethereum) {
+                    provider = new window.ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+                }
+                var btn = document.getElementById('connectWallet') || document.getElementById('connectBtn');
+                if (btn) btn.innerText = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
+                if (typeof updateUI === 'function') updateUI();
+            };
+
+            if (window.ethereum) {
+                window.ethereum.request({ method: 'eth_accounts' }).then(function(accounts) {
+                    if (accounts && accounts.length > 0 && window.arcanaOnWalletConnected) {
+                        window.arcanaOnWalletConnected(accounts);
+                    }
+                }).catch(function() {});
+            }
+
             try {
                 var connectBtn = document.getElementById('connectWallet') || document.getElementById('connectBtn');
                 var withdrawBtn = document.getElementById('withdrawBtn');
@@ -2967,13 +2987,18 @@
     <script>
         function connect() {
             console.log('Bouton cliqué !');
-            if (typeof window.ethereum !== 'undefined') {
-                window.ethereum.request({ method: 'eth_requestAccounts' })
-                    .then(function() { alert('MetaMask détecté et connecté !'); })
-                    .catch(function(err) { alert('Erreur : ' + err.message); });
-            } else {
+            if (typeof window.ethereum === 'undefined') {
                 alert('Installez MetaMask svp !');
+                return;
             }
+            window.ethereum.request({ method: 'eth_requestAccounts' })
+                .then(function(accounts) {
+                    if (accounts && accounts[0] && typeof window.arcanaOnWalletConnected === 'function') {
+                        window.arcanaOnWalletConnected(accounts);
+                    }
+                    alert('MetaMask détecté et connecté !');
+                })
+                .catch(function(err) { alert('Erreur : ' + (err && err.message ? err.message : String(err))); });
         }
     </script>
 </body>
