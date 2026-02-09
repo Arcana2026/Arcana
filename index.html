@@ -1149,7 +1149,7 @@
         <div class="app-main-wrap">
             <header class="app-topbar">
                 <div class="app-topbar-balance">Solde : <span id="headerBalanceArcana">—</span> ARCANA</div>
-                <button type="button" id="connectWallet" class="wallet-address">Connecter Wallet</button>
+                <button id="connectWallet" onclick="connect()">Connecter Wallet</button>
             </header>
             <div class="app-content">
     <main id="app-main">
@@ -1867,8 +1867,7 @@
                 Swal.fire({ icon: 'error', title: 'Connexion échouée', text: err.message || 'Impossible de connecter le wallet.' });
             }
         }
-        const connect = connectWallet;
-        if (typeof window !== 'undefined') { window.connectWallet = connectWallet; window.connect = connect; }
+        if (typeof window !== 'undefined') { window.connectWallet = connectWallet; }
 
         async function withdraw() {
             if (!userAddress) {
@@ -2795,10 +2794,7 @@
                 const tokenSelect = document.getElementById('tokenSelect');
                 if (!connectBtn) {
                     console.error("[Arcana] Élément DOM manquant: connectWallet ou connectBtn");
-                    return;
                 }
-                console.log('[Arcana] Bouton Connecter trouvé, id =', connectBtn.id);
-                connectBtn.onclick = function() { console.log('[Arcana] Clic bouton Connecter Wallet'); connectWallet(); };
                 if (withdrawBtn) withdrawBtn.onclick = withdraw;
                 if (claimBtn) claimBtn.onclick = claim;
                 if (buyBtn) buyBtn.onclick = buyNow;
@@ -2967,6 +2963,18 @@
 
             console.log("Système Arcana prêt");
         });
+    </script>
+    <script>
+        function connect() {
+            console.log('Bouton cliqué !');
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.request({ method: 'eth_requestAccounts' })
+                    .then(function() { alert('MetaMask détecté et connecté !'); })
+                    .catch(function(err) { alert('Erreur : ' + err.message); });
+            } else {
+                alert('Installez MetaMask svp !');
+            }
+        }
     </script>
 </body>
 </html>
