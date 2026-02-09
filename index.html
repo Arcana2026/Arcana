@@ -3000,12 +3000,16 @@
             window.ethereum.request({ method: 'eth_requestAccounts' })
                 .then(function(accounts) {
                     var addr = accounts && accounts[0] ? accounts[0] : null;
-                    if (addr && typeof window.arcanaOnWalletConnected === 'function') {
+                    if (!addr) return;
+                    // Récupérer l'adresse du portefeuille (accounts[0])
+                    var btn = document.getElementById('connectWallet') || document.getElementById('connectBtn');
+                    if (btn) btn.innerText = addr.slice(0, 6) + '...' + addr.slice(-4);
+                    if (typeof window.arcanaOnWalletConnected === 'function') {
                         window.arcanaOnWalletConnected(accounts);
                     }
-                    var btn = document.getElementById('connectWallet') || document.getElementById('connectBtn');
-                    if (btn && addr) btn.innerText = addr.slice(0, 6) + '...' + addr.slice(-4);
-                    alert('MetaMask détecté et connecté !');
+                    requestAnimationFrame(function() {
+                        alert('MetaMask détecté et connecté !');
+                    });
                 })
                 .catch(function(err) { alert('Erreur : ' + (err && err.message ? err.message : String(err))); });
         }
