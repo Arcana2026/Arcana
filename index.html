@@ -9,8 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     
-    <script src="https://cdn.jsdelivr.net/npm/@web3-onboard/core@2.21.2/dist/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@web3-onboard/injected-wallets@2.10.11/dist/index.min.js"></script>
+    <!-- Web3Onboard chargé via import() dans le script principal -->
 
     <style>
         :root {
@@ -97,8 +96,8 @@
 
     <nav class="nav-blur sticky top-0 z-50 px-8 py-3 flex justify-between items-center">
         <div class="flex items-center gap-6">
-            <div class="w-24 h-24 flex-shrink-0 overflow-hidden">
-                <img src="logo.png" alt="Arcana" class="w-full h-full object-contain scale-150">
+            <div class="w-36 h-36 flex-shrink-0 rounded-full overflow-hidden border-2 border-[#D4AF37]/40 shadow-[0_0_25px_rgba(212,175,55,0.2)] flex items-center justify-center bg-[#05070a]">
+                <img src="logo.png" alt="Arcana" class="w-full h-full object-cover scale-125">
             </div>
             <span class="font-luxury text-2xl tracking-[0.2em] text-white">ARCANA SAFE</span>
         </div>
@@ -167,128 +166,106 @@
             </div>
         </div>
 
-        <section class="mt-16 mb-12">
-            <h2 class="font-luxury text-2xl text-center text-[#D4AF37] mb-10 tracking-[0.15em] uppercase">Guide de Poche</h2>
-            <div class="grid md:grid-cols-3 gap-8 text-center">
-                <div class="glass-card p-8">
-                    <div class="text-[#D4AF37] text-2xl mb-4 font-luxury">01</div>
-                    <h3 class="font-luxury text-white mb-2">Connecter</h3>
-                    <p class="text-sm opacity-60">Utilisez votre Trust Wallet ou MetaMask sur Polygon.</p>
-                </div>
-                <div class="glass-card p-8">
-                    <div class="text-[#D4AF37] text-2xl mb-4 font-luxury">02</div>
-                    <h3 class="font-luxury text-white mb-2">Investir</h3>
-                    <p class="text-sm opacity-60">Convertissez vos POL en ARCANA instantanément.</p>
-                </div>
-                <div class="glass-card p-8">
-                    <div class="text-[#D4AF37] text-2xl mb-4 font-luxury">03</div>
-                    <h3 class="font-luxury text-white mb-2">Sécuriser</h3>
-                    <p class="text-sm opacity-60">Vos jetons sont protégés dans le coffre intelligent.</p>
+        </main>
+
+    <div id="quickPouch" class="fixed bottom-6 right-6 z-[100] max-w-[320px]">
+        <div class="glass-card p-5 border-[#D4AF37]/40 shadow-[0_0_30px_rgba(212,175,55,0.2)] space-y-4">
+            <div class="text-center">
+                <div class="text-[10px] uppercase tracking-widest font-bold text-[#D4AF37]">Ma Réserve Arcana</div>
+                <div id="pouchBalance" class="text-2xl font-bold text-white mt-1">0 ARCANA</div>
+                <div class="flex items-center justify-center gap-2 mt-2">
+                    <span class="w-2 h-2 bg-[#00ffcc] rounded-full animate-pulse"></span>
+                    <span class="text-[8px] text-[#00ffcc] font-bold">POLYGON</span>
                 </div>
             </div>
-        </section>
-    </main>
-
-    <div id="quickPouch" class="fixed bottom-6 right-6 z-[100]">
-        <div class="glass-card p-5 flex flex-col items-center gap-3 border-[#D4AF37]/40 shadow-[0_0_30px_rgba(212,175,55,0.2)]">
-            <div class="text-[10px] uppercase tracking-widest font-bold text-[#D4AF37]">Ma Réserve Arcana</div>
-            <div id="pouchBalance" class="text-2xl font-bold text-white">0 ARCANA</div>
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-[#00ffcc] rounded-full animate-pulse"></span>
-                <span class="text-[8px] text-[#00ffcc] font-bold">POLYGON CONNECTÉ</span>
+            <div class="border-t border-[#D4AF37]/20 pt-4">
+                <div class="text-[10px] uppercase tracking-widest font-bold text-[#D4AF37] mb-3">Guide de Poche</div>
+                <div class="space-y-2 text-left">
+                    <div class="flex items-start gap-2">
+                        <span class="text-[#D4AF37] font-luxury text-sm">01</span>
+                        <p class="text-xs text-[#F7E7CE]/80">Connecter Trust Wallet ou MetaMask.</p>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-[#D4AF37] font-luxury text-sm">02</span>
+                        <p class="text-xs text-[#F7E7CE]/80">Échanger POL contre ARCANA.</p>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-[#D4AF37] font-luxury text-sm">03</span>
+                        <p class="text-xs text-[#F7E7CE]/80">Jetons sécurisés dans le coffre.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
-        const injected = window.web3onboardInjectedWallets.default();
-        
-        const onboard = window.web3onboardCore.default({
-            wallets: [injected],
-            chains: [{ 
-                id: '0x89', 
-                token: 'POL', 
-                label: 'Polygon Mainnet', 
-                rpcUrl: 'https://polygon-rpc.com' 
-            }],
-            appMetadata: { 
-                name: 'Arcana Safe', 
-                icon: 'logo.png', 
-                description: 'DeFi Sanctuary' 
-            },
+        const { default: Onboard } = await import('https://esm.sh/@web3-onboard/core@2');
+        const { default: injectedModule } = await import('https://esm.sh/@web3-onboard/injected-wallets@2');
+
+        const ONBOARD_PROJECT_ID = "YOUR_PROJECT_ID";
+        const onboard = Onboard({
+            wallets: [injectedModule()],
+            chains: [{ id: "0x89", token: "POL", label: "Polygon Mainnet", rpcUrl: "https://polygon-rpc.com" }],
+            appMetadata: { name: "Arcana Safe", icon: "logo.png", description: "DeFi Sanctuary" },
             accountCenter: { desktop: { enabled: true }, mobile: { enabled: true } }
         });
 
         const PRESALE_VAULT = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
         const abiSimple = ["function balanceOf(address owner) view returns (uint256)", "function buyWithPOL() payable"];
-        
         let userAddress = null;
         let connectedSigner = null;
 
         async function updateUI() {
             if (userAddress && connectedSigner) {
                 try {
-                    const contract = new ethers.Contract(PRESALE_VAULT, abiSimple, connectedSigner);
+                    const provider = connectedSigner.provider || (connectedSigner && new ethers.providers.Web3Provider(window.ethereum));
+                    const contract = new ethers.Contract(PRESALE_VAULT, abiSimple, provider);
                     const balance = await contract.balanceOf(userAddress);
                     const formatted = parseFloat(ethers.utils.formatUnits(balance, 18)).toLocaleString('fr-FR');
-                    
                     document.getElementById('balanceDisplay').innerText = formatted;
                     document.getElementById('pouchBalance').innerText = formatted + " ARCANA";
-                    document.getElementById('quickPouch').style.display = 'block';
+                    document.getElementById('quickPouch').style.display = "block";
                     document.getElementById('balanceTitle').innerText = "VOTRE RÉSERVE PRIVÉE";
-                } catch (e) { console.error("Update UI Error:", e); }
+                } catch (e) { console.error("Update UI:", e); }
             }
         }
 
         async function connect() {
             const wallets = await onboard.connectWallet();
-            if (wallets[0]) {
-                const provider = new ethers.providers.Web3Provider(wallets[0].provider);
+            if (wallets && wallets.length > 0 && wallets[0].provider) {
+                const provider = new ethers.providers.Web3Provider(wallets[0].provider, "any");
                 connectedSigner = provider.getSigner();
                 userAddress = await connectedSigner.getAddress();
-                
-                // Update Button Label
-                document.getElementById('connectBtn').innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
-                document.getElementById('connectBtn').classList.add('bg-[#D4AF37]', 'text-black');
-                
+                const btn = document.getElementById('connectBtn');
+                if (btn) { btn.innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38); btn.classList.add('bg-[#D4AF37]', 'text-black'); }
                 updateUI();
             }
         }
 
         async function buyNow() {
-            if (!userAddress) return await connect();
+            if (!userAddress) { await connect(); if (!connectedSigner) return; }
             const amount = document.getElementById('amountInput').value;
             if (!amount || amount <= 0) return alert("Veuillez entrer un montant.");
-            
-            const contract = new ethers.Contract(PRESALE_VAULT, abiSimple, connectedSigner);
             try {
                 document.getElementById('buyBtn').innerText = "Vérification...";
-                const tx = await contract.buyWithPOL({ 
-                    value: ethers.utils.parseEther(amount.toString()) 
-                });
-                document.getElementById('buyBtn').innerText = "En cours...";
+                const contract = new ethers.Contract(PRESALE_VAULT, abiSimple, connectedSigner);
+                const tx = await contract.buyWithPOL({ value: ethers.utils.parseEther(amount.toString()) });
                 await tx.wait();
                 document.getElementById('successSound').play();
-                alert("Félicitations ! Vos ARCANA ont été sécurisés dans votre coffre.");
+                alert("Félicitations ! Vos ARCANA ont été sécurisés.");
                 updateUI();
-            } catch (e) { 
-                console.error(e);
-                alert("Transaction annulée."); 
-            } finally { 
-                document.getElementById('buyBtn').innerText = "Acheter"; 
-            }
+            } catch (e) { console.error(e); alert("Transaction annulée."); }
+            finally { document.getElementById('buyBtn').innerText = "Acheter"; }
         }
 
         function calculateReceive() {
             const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-            const receive = Math.floor(amount * 4000); 
-            document.getElementById('receiveText').innerText = `Tu recevras : ${receive.toLocaleString('fr-FR')} ARCANA`;
+            document.getElementById('receiveText').innerText = "Tu recevras : " + Math.floor(amount * 4000).toLocaleString('fr-FR') + " ARCANA";
         }
 
-        // Event Listeners
-        document.getElementById('connectBtn').addEventListener('click', connect);
-        document.getElementById('buyBtn').addEventListener('click', buyNow);
-        document.getElementById('amountInput').addEventListener('input', calculateReceive);
+        document.getElementById('buyBtn').onclick = buyNow;
+        document.getElementById('amountInput').oninput = calculateReceive;
+        document.getElementById('connectBtn').onclick = connect;
     </script>
 </body>
 </html>
