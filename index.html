@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcana Safe — Écosystème Multi-Wallet & Casino</title>
+    <title>Arcana Safe | Sanctuaire Numérique</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,16 +15,28 @@
     <script src="https://cdn.jsdelivr.net/npm/@web3-onboard/walletconnect"></script>
 
     <style>
-        body { background-color: #0b0e11; color: #F7E7CE; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; margin: 0; }
+        :root { --gold: #D4AF37; --bg: #0b0e11; }
+        body { background-color: var(--bg); color: #F7E7CE; font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; margin: 0; }
         .app-layout { display: flex; height: 100vh; }
-        .app-sidebar { width: 85px; background: #0a0a0a; border-right: 1px solid rgba(212, 175, 55, 0.35); display: flex; flex-direction: column; align-items: center; padding: 2rem 0; gap: 2.5rem; }
-        .app-sidebar-logo { width: 55px; height: 55px; border-radius: 50%; filter: drop-shadow(0 0 10px #D4AF37); }
+        
+        /* Sidebar Prestige que tu as demandée */
+        .app-sidebar {
+            width: 90px; background: #0a0a0a; border-right: 1px solid rgba(212, 175, 55, 0.35);
+            display: flex; flex-direction: column; align-items: center; padding: 2rem 0; gap: 2.5rem;
+        }
+        .app-sidebar-logo { width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--gold); filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4)); }
+        
+        /* Conteneur Principal */
         .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .app-topbar { height: 70px; background: #0a0a0a; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; }
+        .app-topbar { height: 75px; background: #0a0a0a; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; }
         .app-content { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
-        .glass-card { background: #15181c; border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; }
-        .btn-gold { background: linear-gradient(135deg, #D4AF37, #B8860B); color: #000; font-weight: 700; padding: 12px 24px; border-radius: 12px; transition: 0.3s; }
-        .font-luxury { font-family: 'Cinzel', serif; }
+
+        /* Cartes Glassmorphism High-Tech */
+        .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 20px; padding: 2.5rem; }
+        .btn-gold { background: linear-gradient(135deg, #D4AF37, #B8860B); color: #000; font-weight: 700; padding: 12px 28px; border-radius: 50px; transition: 0.3s; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2); }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4); }
+        
+        .font-luxury { font-family: 'Cinzel', serif; letter-spacing: 2px; }
         .text-gold { color: #D4AF37; }
     </style>
 </head>
@@ -33,64 +45,73 @@
     <div class="app-layout">
         <aside class="app-sidebar">
             <img src="logo.png" alt="Arcana" class="app-sidebar-logo">
-            <div class="cursor-pointer opacity-50 hover:opacity-100" title="Dashboard">🏠</div>
-            <div class="cursor-pointer opacity-50 hover:opacity-100" title="Casino">🎰</div>
-            <div class="cursor-pointer opacity-50 hover:opacity-100" title="Profil">👤</div>
+            <div class="text-2xl cursor-pointer opacity-40 hover:opacity-100 transition" title="Dashboard">🏠</div>
+            <div class="text-2xl cursor-pointer opacity-40 hover:opacity-100 transition" title="Casino">🎰</div>
+            <div class="text-2xl cursor-pointer opacity-40 hover:opacity-100 transition" title="Whitepaper">📖</div>
         </aside>
 
         <div class="app-main">
             <header class="app-topbar">
-                <div class="font-luxury text-xl tracking-widest text-white">ARCANA <span class="text-gold">SAFE</span></div>
+                <div class="font-luxury text-xl text-white">ARCANA <span class="text-gold">SAFE</span></div>
                 <div class="flex items-center gap-8">
-                    <div class="text-[10px] uppercase text-gray-500">Solde : <span id="topBalance" class="text-white text-sm font-bold">0</span> <span class="text-gold font-bold">ARCANA</span></div>
-                    <button id="connectBtn" class="btn-gold text-xs">CONNECTER WALLET</button>
+                    <div class="hidden md:block text-[10px] uppercase text-gray-500 tracking-widest">
+                        Solde: <span id="topBalance" class="text-white text-sm font-bold">0</span> <span class="text-gold">ARC</span>
+                    </div>
+                    <button id="connectBtn" class="btn-gold text-xs uppercase">Connecter Wallet</button>
                 </div>
             </header>
 
             <div class="app-content">
-                <div class="mb-12">
-                    <h1 class="font-luxury text-5xl mb-4">LE SANCTUAIRE <span class="text-gold">DÉCENTRALISÉ</span></h1>
-                    <p class="text-gray-500 italic max-w-xl border-l border-gold/30 pl-4">Sécurisez votre avenir avec Arcana Safe, où chaque jeu récompense la communauté.</p>
+                <div class="mb-16">
+                    <h1 class="font-luxury text-6xl mb-6 text-white leading-tight">LE SANCTUAIRE <br><span class="text-gold">DÉCENTRALISÉ</span></h1>
+                    <p class="text-gray-400 max-w-xl border-l-2 border-gold/30 pl-6 italic">Architecture inviolable. Redistribution communautaire de 10% automatique.</p>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
                     <div class="glass-card">
-                        <h2 class="font-luxury text-2xl text-gold mb-4">CASINO REDISTRIBUTION (10%)</h2>
-                        <p class="text-sm text-gray-400 mb-6">Mise directe via Smart Contract. 10% des jetons Arcana sont redistribués on-chain.</p>
-                        <div class="bg-black/40 p-6 rounded-2xl border border-white/5">
-                            <p class="text-[10px] text-gray-500 uppercase mb-4 tracking-widest">Votre Mise ARCANA</p>
-                            <input type="number" id="betInput" value="10" class="w-full bg-transparent text-4xl font-bold text-white outline-none mb-6">
-                            <button id="spinBtn" class="btn-gold w-full py-4 mb-2">LANCER LE SPIN 🎰</button>
-                            <button id="approveBtn" class="text-[10px] text-gray-600 underline block w-full text-center hover:text-white transition">APPROUVER LE CONTRAT</button>
+                        <h2 class="font-luxury text-2xl text-gold mb-6 text-center">ARCANA CASINO</h2>
+                        <div class="bg-black/40 p-8 rounded-3xl border border-white/5 text-center">
+                            <p class="text-[10px] text-gray-500 uppercase mb-4 tracking-[3px]">Mise Actuelle</p>
+                            <input type="number" id="betInput" value="10" class="w-full bg-transparent text-5xl font-bold text-white text-center outline-none mb-8">
+                            <button id="spinBtn" class="btn-gold w-full py-5 text-lg mb-4">LANCER LE SPIN 🎰</button>
+                            <button id="approveBtn" class="text-[10px] text-gray-600 hover:text-white transition uppercase underline">Autoriser le contrat</button>
                         </div>
+                        <p class="text-center text-[10px] text-gray-500 mt-6 italic">Distribution de 10% on-chain activée via contrat 0x0a6D...</p>
                     </div>
 
-                    <div class="glass-card">
-                        <h2 class="font-luxury text-2xl text-gold mb-4">🎁 BONUS DE BIENVENUE</h2>
-                        <div class="space-y-4 text-sm text-gray-300">
-                            <p>• <strong>100%</strong> sur votre premier dépôt vers le Coffre.</p>
-                            <p>• <strong>5 spins gratuits</strong> sur la Roue Arcane.</p>
-                            <div class="p-4 bg-gold/10 rounded-xl border border-gold/20 mt-4">
-                                <p class="text-xs text-gold">100% des profits servent au Buyback d'ARCANA.</p>
+                    <div class="glass-card flex flex-col justify-center">
+                        <h2 class="font-luxury text-2xl text-gold mb-6">RECOMPENSES</h2>
+                        <div class="space-y-6">
+                            <div class="p-4 bg-gold/5 border border-gold/10 rounded-xl">
+                                <p class="text-sm font-bold text-white mb-1">🎁 Bonus de Bienvenue</p>
+                                <p class="text-xs text-gray-400">100% sur votre premier dépôt vers le Coffre.</p>
+                            </div>
+                            <div class="p-4 bg-gold/5 border border-gold/10 rounded-xl">
+                                <p class="text-sm font-bold text-white mb-1">🎮 Free Spins</p>
+                                <p class="text-xs text-gray-400">5 tours gratuits offerts sur la Roue Arcane.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div id="whitepaper" class="glass-card">
-                    <h2 class="font-luxury text-2xl text-center mb-8 tracking-[4px]">📖 LIVRE BLANC</h2>
-                    <div class="space-y-8 text-sm text-gray-400 leading-relaxed">
+                    <h2 class="font-luxury text-3xl text-center mb-12 tracking-[6px]">📖 LIVRE BLANC</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-sm text-gray-400 leading-relaxed">
                         <section>
-                            <h3 class="font-bold text-white uppercase border-b border-gold/20 mb-2">1. Vision</h3>
-                            <p>Arcana Safe est le sanctuaire de vos actifs. Nous bâtissons une forteresse numérique protégée par des protocoles inviolables, assurant que votre valeur reste entre vos mains.</p>
+                            <h3 class="font-bold text-white uppercase border-b border-gold/30 pb-2 mb-4">1. Vision</h3>
+                            <p>Arcana Safe est bien plus qu'un simple coffre-fort : c'est un écosystème financier sécurisé. Nous bâtissons une forteresse numérique où chaque actif repose sous la garde de protocoles inviolables.</p>
                         </section>
                         <section>
-                            <h3 class="font-bold text-white uppercase border-b border-gold/20 mb-2">2. Tokenomics</h3>
-                            <p>Offre totale : 400 000 000 ARCANA. Une redistribution de 10% des gains du casino est injectée dans la liquidité pour stabiliser l'écosystème.</p>
+                            <h3 class="font-bold text-white uppercase border-b border-gold/30 pb-2 mb-4">2. Tokenomics</h3>
+                            <p>Offre totale : 400 000 000 ARCANA. Redistribution : 10% des profits du casino sont réinjectés pour soutenir la liquidité et récompenser la communauté.</p>
                         </section>
                         <section>
-                            <h3 class="font-bold text-white uppercase border-b border-gold/20 mb-2">3. Sécurité</h3>
-                            <p>Le système de Claim différé garantit la stabilité. Les jetons ne sont libérés qu'après avoir atteint l'objectif de 100 000 $ de la prévente.</p>
+                            <h3 class="font-bold text-white uppercase border-b border-gold/30 pb-2 mb-4">3. Sécurité</h3>
+                            <p>Le système de Claim différé garantit la stabilité du projet. Les jetons ne sont libérés qu'après l'atteinte de l'objectif de 100 000$.</p>
+                        </section>
+                        <section>
+                            <h3 class="font-bold text-white uppercase border-b border-gold/30 pb-2 mb-4">4. Roadmap</h3>
+                            <p>Prévente en cours, suivie de l'ouverture du Coffre et du déploiement de la suite de jeux d'arcade décentralisés.</p>
                         </section>
                     </div>
                 </div>
@@ -98,74 +119,73 @@
         </div>
     </div>
 
-    <div class="fixed bottom-6 right-6 z-50">
-        <div onclick="document.getElementById('vaultWindow').classList.toggle('hidden')" class="w-14 h-14 bg-gold rounded-full flex items-center justify-center text-black font-bold cursor-pointer shadow-2xl hover:scale-110 transition">ARC</div>
-        <div id="vaultWindow" class="hidden absolute bottom-20 right-0 w-64 glass-card shadow-2xl border-gold/30">
+    <div class="fixed bottom-8 right-8 z-50">
+        <div onclick="document.getElementById('v-window').classList.toggle('hidden')" class="w-16 h-16 bg-gold rounded-full flex items-center justify-center text-black font-black text-xl cursor-pointer shadow-2xl hover:scale-110 transition">ARC</div>
+        <div id="v-window" class="hidden absolute bottom-20 right-0 w-72 glass-card shadow-2xl border-gold/30 p-6 bg-[#0a0a0a]">
             <p class="text-xs text-gold font-bold mb-2">GUIDE POCHE</p>
             <p class="text-[10px] text-gray-500 mb-4">RÉSERVE ACTUELLE</p>
-            <h4 id="vaultBalance" class="text-2xl font-bold">0 ARCANA</h4>
+            <h4 id="v-balance" class="text-3xl font-bold">0 ARCANA</h4>
             <hr class="my-4 border-white/5">
             <p class="text-[10px] text-green-500 font-bold">● POLYGON MAINNET LIVE</p>
         </div>
     </div>
 
     <script>
-        const PROJECT_ID = "8893d93707736e4f3586071930777991";
+        const PROJECT_ID = "8893d93707736e4f3586071930777991"; // Ton Heidi
         const CONTRACT_ADDR = "0x0a6Db8dfc670dDc655Ed5eEDa4746a687CfE2744";
         const TOKEN_ADDR = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
 
-        // Multi-Wallet Config
+        // Configuration Multi-Wallet Stable
         const injected = window.web3OnboardInjectedWallets.default();
-        const walletConnect = window.web3OnboardWalletConnect.default({ projectId: PROJECT_ID, version: 2 });
+        const wc = window.web3OnboardWalletConnect.default({ projectId: PROJECT_ID, version: 2 });
         const onboard = window.web3OnboardCore.default({
-            wallets: [injected, walletConnect],
+            wallets: [injected, wc],
             chains: [{ id: '0x89', token: 'POL', label: 'Polygon', rpcUrl: 'https://polygon-rpc.com' }],
-            appMetadata: { name: 'Arcana Safe', description: 'Luxury Casino Vault' }
+            appMetadata: { name: 'Arcana Safe', description: 'Casino Sanctuary' }
         });
 
-        let walletSigner;
+        let walletProvider;
 
         async function connect() {
             const wallets = await onboard.connectWallet();
             if (wallets[0]) {
                 const provider = new ethers.providers.Web3Provider(wallets[0].provider);
-                walletSigner = provider.getSigner();
-                const addr = wallets[0].accounts[0].address;
-                document.getElementById('connectBtn').innerText = addr.slice(0,6)+"..."+addr.slice(-4);
+                walletProvider = provider;
+                const address = wallets[0].accounts[0].address;
+                document.getElementById('connectBtn').innerText = address.slice(0,6)+"..."+address.slice(-4);
                 
-                // Update Balances
+                // Update Solde
                 const tokenAbi = ["function balanceOf(address owner) view returns (uint256)"];
-                const tokenContract = new ethers.Contract(TOKEN_ADDR, tokenAbi, provider);
-                const balance = await tokenContract.balanceOf(addr);
-                const formatted = ethers.utils.formatUnits(balance, 18).split('.')[0];
-                document.getElementById('topBalance').innerText = formatted;
-                document.getElementById('vaultBalance').innerText = formatted + " ARCANA";
+                const contract = new ethers.Contract(TOKEN_ADDR, tokenAbi, provider);
+                const balance = await contract.balanceOf(address);
+                const val = ethers.utils.formatUnits(balance, 18).split('.')[0];
+                document.getElementById('topBalance').innerText = val;
+                document.getElementById('v-balance').innerText = val + " ARCANA";
             }
         }
 
         async function approveToken() {
-            if(!walletSigner) return Swal.fire("Connectez-vous");
+            if(!walletProvider) return Swal.fire("Connectez votre wallet");
             const abi = ["function approve(address spender, uint256 amount) returns (bool)"];
-            const contract = new ethers.Contract(TOKEN_ADDR, abi, walletSigner);
+            const contract = new ethers.Contract(TOKEN_ADDR, abi, walletProvider.getSigner());
             const tx = await contract.approve(CONTRACT_ADDR, ethers.constants.MaxUint256);
-            Swal.fire("Approbation", "Traitement en cours...", "info");
+            Swal.fire("Approbation", "Traitement blockchain...", "info");
             await tx.wait();
-            Swal.fire("Succès", "Le Casino est maintenant autorisé.", "success");
+            Swal.fire("Succès", "Contrat Autorisé !", "success");
         }
 
         async function playSlots() {
-            if(!walletSigner) return Swal.fire("Connectez-vous");
+            if(!walletProvider) return Swal.fire("Connectez votre wallet");
             const amount = document.getElementById('betInput').value;
             const abi = ["function playSlots(uint256 betAmount) external"];
-            const contract = new ethers.Contract(CONTRACT_ADDR, abi, walletSigner);
+            const contract = new ethers.Contract(CONTRACT_ADDR, abi, walletProvider.getSigner());
             try {
                 const tx = await contract.playSlots(ethers.utils.parseUnits(amount, 18));
+                Swal.fire("Transaction envoyée", "Le sort en est jeté...", "info");
                 await tx.wait();
-                Swal.fire("Gagné !", "La redistribution de 10% a été validée.", "success");
-                connect(); // Refresh balance
-            } catch (e) {
-                Swal.fire("Erreur", "Vérifiez votre solde ARCANA ou l'approbation.", "error");
-            }
+                Swal.fire("Terminé !", "10% redistribués aux joueurs.", "success");
+                connect();
+            } catch (e) { Swal.fire("Erreur", "Vérifiez votre solde ARCANA", "error"); }
         }
 
         document.getElementById('connectBtn').onclick = connect;
