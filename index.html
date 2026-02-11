@@ -105,8 +105,8 @@
 
     <nav class="nav-blur sticky top-0 z-50 px-8 py-4 flex justify-between items-center">
         <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-lg overflow-hidden bg-[#05070a] border border-[#D4AF37]/30">
-                <img src="logo.png" alt="Arcana" class="w-full h-full object-cover">
+            <div class="w-24 h-24 flex-shrink-0 rounded-full flex items-center justify-center shadow-lg overflow-hidden bg-[#05070a] border border-[#D4AF37]/30">
+                <img src="logo.png" alt="Arcana" class="w-full h-full object-cover scale-150">
             </div>
             <span class="font-luxury text-2xl tracking-[0.2em] text-white">ARCANA SAFE</span>
         </div>
@@ -167,9 +167,14 @@
                         Tu recevras : 0 ARCANA
                     </div>
 
-                    <button id="buyBtn" class="btn-premium w-full py-5 rounded-2xl text-sm shadow-2xl">
-                        Acheter maintenant
-                    </button>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button id="buyBtn" class="btn-premium flex-1 py-5 rounded-2xl text-sm shadow-2xl">
+                            Acheter maintenant
+                        </button>
+                        <a href="#" id="whitepaperBtn" class="flex-1 py-5 rounded-2xl text-[10px] font-bold tracking-[0.2em] uppercase border-2 border-[#D4AF37] text-white hover:bg-[#D4AF37]/10 transition-all text-center flex items-center justify-center">
+                            LIRE LE WHITE PAPER
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -191,6 +196,44 @@
                 </button>
             </div>
         </div>
+
+        <section class="mt-16 mb-12 fade-in" aria-labelledby="chemin-arcana-title">
+            <h2 id="chemin-arcana-title" class="font-luxury text-2xl md:text-3xl text-center text-[#D4AF37] mb-10 tracking-[0.15em] uppercase">
+                Votre chemin vers l'Arcana
+            </h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 flex flex-col items-center text-center">
+                    <div class="w-14 h-14 rounded-full border-2 border-[#D4AF37] flex items-center justify-center mb-6 bg-[#D4AF37]/5">
+                        <svg class="w-7 h-7 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <span class="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold mb-2">Étape 1</span>
+                    <h3 class="font-luxury text-lg text-white mb-3">Connexion</h3>
+                    <p class="text-sm text-[#F7E7CE]/80">Reliez votre Wallet Trust ou MetaMask.</p>
+                </div>
+                <div class="glass-card p-8 flex flex-col items-center text-center">
+                    <div class="w-14 h-14 rounded-full border-2 border-[#D4AF37] flex items-center justify-center mb-6 bg-[#D4AF37]/5">
+                        <svg class="w-7 h-7 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold mb-2">Étape 2</span>
+                    <h3 class="font-luxury text-lg text-white mb-3">Investissement</h3>
+                    <p class="text-sm text-[#F7E7CE]/80">Échangez vos POL contre des ARCANA.</p>
+                </div>
+                <div class="glass-card p-8 flex flex-col items-center text-center">
+                    <div class="w-14 h-14 rounded-full border-2 border-[#D4AF37] flex items-center justify-center mb-6 bg-[#D4AF37]/5">
+                        <svg class="w-7 h-7 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <span class="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold mb-2">Étape 3</span>
+                    <h3 class="font-luxury text-lg text-white mb-3">Sécurisation</h3>
+                    <p class="text-sm text-[#F7E7CE]/80">Vos jetons sont gardés en sécurité dans le coffre.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <script type="module">
