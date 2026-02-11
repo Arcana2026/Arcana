@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <!-- Web3Onboard (core + injected-wallets) chargé via import dans le script principal -->
 
     <style>
         :root {
@@ -102,8 +103,8 @@
 
     <nav class="nav-blur sticky top-0 z-50 px-8 py-4 flex justify-between items-center">
         <div class="flex items-center gap-4">
-            <div class="w-10 h-10 bg-gradient-to-tr from-[#D4AF37] to-[#F7E7CE] rounded-full flex items-center justify-center shadow-lg">
-                <span class="text-black font-bold">A</span>
+            <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-lg overflow-hidden bg-[#05070a] border border-[#D4AF37]/30">
+                <img src="logo.png" alt="Arcana" class="w-full h-full object-cover">
             </div>
             <span class="font-luxury text-2xl tracking-[0.2em] text-white">ARCANA SAFE</span>
         </div>
@@ -191,14 +192,44 @@
     </main>
 
     <script type="module">
-        const RENDER_URL = "https://arcana-safe.nft"; // À remplacer par ton URL Render réelle
+        const { default: Onboard } = await import('https://esm.sh/@web3-onboard/core@2');
+        const { default: injectedModule } = await import('https://esm.sh/@web3-onboard/injected-wallets@2');
+
+        const RENDER_URL = "https://arcana-safe.nft";
         const PRESALE_VAULT = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
         const CONTRACT_WITHDRAW = "0x29D8898950882798e36e65B150A6c7a723821141";
         const POLYGON_CHAIN_ID = 137;
+        const POLYGON_CHAIN_ID_HEX = "0x89";
         const PRICE_PER_ARCANA = 0.00025;
         const ARCANA_PER_USD = 1 / PRICE_PER_ARCANA;
         const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
         const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
+        const ONBOARD_PROJECT_ID = "YOUR_PROJECT_ID";
+        // Remplacez YOUR_PROJECT_ID par votre Project ID (ex. WalletConnect Cloud) pour la config Polygon.
+
+        const polygonChain = {
+            id: POLYGON_CHAIN_ID_HEX,
+            token: "MATIC",
+            label: "Polygon",
+            rpcUrl: "https://polygon-rpc.com"
+        };
+
+        const injected = injectedModule();
+        const onboard = Onboard({
+            wallets: [injected],
+            chains: [polygonChain],
+            appMetadata: {
+                name: "Arcana Safe",
+                icon: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23D4AF37'/><text x='16' y='21' text-anchor='middle' fill='%2305070a' font-size='14' font-weight='bold'>A</text></svg>",
+                description: "Le Sanctuaire de vos Actifs Numériques",
+                recommendedInjectedWallets: [
+                    { name: "MetaMask", url: "https://metamask.io" },
+                    { name: "Trust Wallet", url: "https://trustwallet.com" },
+                    { name: "Coinbase Wallet", url: "https://wallet.coinbase.com" }
+                ]
+            },
+            accountCenter: { desktop: { enabled: false }, mobile: { enabled: false } }
+        });
 
         const abiPresale = [
             "function balanceOf(address owner) view returns (uint256)",
@@ -216,11 +247,14 @@
         ];
 
         let userAddress = null;
+        let connectedSigner = null;
+
+        function getConnectBtn() { return document.getElementById('connectBtn'); }
 
         async function updateUI() {
             try {
-                if (window.ethereum && userAddress) {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                if (userAddress && connectedSigner) {
+                    const provider = connectedSigner.provider;
                     const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
                     const balance = await contract.balanceOf(userAddress);
                     document.getElementById('balanceDisplay').innerText = parseFloat(ethers.utils.formatUnits(balance, 18)).toLocaleString('fr-FR');
@@ -231,11 +265,9 @@
 
                 const res = await fetch(`${RENDER_URL}/api/presale-status`);
                 const data = await res.json();
-                
                 const percent = Math.max(2, Math.min(100, (data.totalRaised / data.target) * 100));
                 document.getElementById('progressBar').style.width = percent + "%";
                 document.getElementById('progressText').innerText = `Récolté : ${data.totalRaised} $`;
-                
                 if (data.totalRaised >= data.target) {
                     document.getElementById('claimBtn').disabled = false;
                     document.getElementById('claimBtn').classList.remove('text-white/20');
@@ -246,24 +278,31 @@
         }
 
         async function connect() {
-            if (window.ethereum) {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const accounts = await provider.send("eth_requestAccounts", []);
-                userAddress = accounts[0];
-                document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
-                updateUI();
-            } else { alert("MetaMask requis !"); }
+            try {
+                const wallets = await onboard.connectWallet();
+                if (wallets && wallets.length > 0 && wallets[0].provider) {
+                    const provider = new ethers.providers.Web3Provider(wallets[0].provider, "any");
+                    connectedSigner = provider.getSigner();
+                    userAddress = await connectedSigner.getAddress();
+                    getConnectBtn().innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
+                    updateUI();
+                }
+            } catch (e) {
+                console.warn("Connexion annulée ou erreur:", e);
+                if (!userAddress) alert("Connexion annulée ou portefeuille non pris en charge.");
+            }
         }
 
         async function buyNow() {
-            if (!userAddress) return connect();
+            if (!userAddress || !connectedSigner) {
+                await connect();
+                if (!connectedSigner) return;
+            }
             const amount = document.getElementById('amountInput').value;
             const token = document.getElementById('tokenSelect').value;
             if (!amount || amount <= 0) return alert("Entrez un montant");
 
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, signer);
+            const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, connectedSigner);
             const amountWei = ethers.utils.parseUnits(amount.toString(), token === "POL" ? 18 : 6);
 
             try {
@@ -272,7 +311,6 @@
                 if (token === "POL") {
                     tx = await presaleContract.buyWithPOL({ value: amountWei });
                 } else {
-                    // Logique Token ERC20 Approve ici si nécessaire
                     alert("Achat Token en cours de déploiement...");
                     return;
                 }
@@ -280,8 +318,52 @@
                 document.getElementById('successSound').play();
                 alert("Achat réussi !");
                 updateUI();
-            } catch (e) { alert("Erreur: " + e.message); }
+            } catch (e) { alert("Erreur: " + (e.message || e)); }
             finally { document.getElementById('buyBtn').innerText = "Acheter maintenant"; }
+        }
+
+        async function claim() {
+            if (!userAddress || !connectedSigner) {
+                await connect();
+                if (!connectedSigner) return;
+            }
+            try {
+                const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, connectedSigner);
+                const tx = await presaleContract.claim();
+                await tx.wait();
+                document.getElementById('successSound').play();
+                alert("Jetons réclamés !");
+                updateUI();
+            } catch (e) { alert("Erreur claim: " + (e.message || e)); }
+        }
+
+        async function withdraw() {
+            if (!userAddress || !connectedSigner) {
+                await connect();
+                if (!connectedSigner) return;
+            }
+            const withdrawContract = new ethers.Contract(CONTRACT_WITHDRAW, abiWithdraw, connectedSigner);
+            try {
+                const res = await fetch(`${RENDER_URL}/api/sign-withdrawal`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ address: userAddress, amount: "0" })
+                });
+                const data = await res.json();
+                if (!data || !data.signature) {
+                    alert("Signature de retrait indisponible.");
+                    return;
+                }
+                const tx = await withdrawContract.withdraw(
+                    ethers.BigNumber.from(data.amount),
+                    ethers.BigNumber.from(data.nonce),
+                    data.signature
+                );
+                await tx.wait();
+                document.getElementById('successSound').play();
+                alert("Retrait effectué.");
+                updateUI();
+            } catch (e) { alert("Erreur retrait: " + (e.message || e)); }
         }
 
         function updateReceiveText() {
@@ -289,9 +371,19 @@
             document.getElementById('receiveText').innerText = `Tu recevras : ${Math.floor(amount * ARCANA_PER_USD).toLocaleString('fr-FR')} ARCANA`;
         }
 
+        onboard.state.select('wallets').subscribe((wallets) => {
+            if (!wallets || wallets.length === 0) {
+                userAddress = null;
+                connectedSigner = null;
+                getConnectBtn().innerText = "CONNECTER WALLET";
+            }
+        });
+
         window.addEventListener('load', () => {
-            document.getElementById('connectBtn').onclick = connect;
+            getConnectBtn().onclick = connect;
             document.getElementById('buyBtn').onclick = buyNow;
+            document.getElementById('withdrawBtn').onclick = withdraw;
+            document.getElementById('claimBtn').onclick = claim;
             document.getElementById('amountInput').oninput = updateReceiveText;
             updateUI();
         });
