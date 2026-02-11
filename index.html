@@ -26,7 +26,6 @@
 
         .font-prestige { font-family: 'Cinzel', serif; }
 
-        /* Effet Glassmorphism */
         .glass-panel {
             background: var(--glass);
             backdrop-filter: blur(15px);
@@ -34,7 +33,6 @@
             border-radius: 20px;
         }
 
-        /* Logo Imposant */
         .logo-main {
             height: 110px;
             filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4));
@@ -42,7 +40,6 @@
         }
         .logo-main:hover { transform: scale(1.05); }
 
-        /* Boutons High-Tech */
         .btn-gold {
             background: linear-gradient(135deg, #D4AF37, #B8860B);
             color: black;
@@ -52,12 +49,11 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
         }
-        .btn-gold:hover {
+        .btn-gold:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5);
         }
 
-        /* Sidebar Moderne */
         .sidebar {
             width: 80px;
             background: rgba(0,0,0,0.4);
@@ -71,7 +67,6 @@
             z-index: 100;
         }
 
-        /* Widget Guide Poche */
         #quickPouch {
             position: fixed;
             bottom: 30px;
@@ -91,7 +86,6 @@
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
         }
 
-        /* Progress Bar High-Tech */
         .progress-track {
             background: rgba(255,255,255,0.05);
             height: 12px;
@@ -110,9 +104,9 @@
 
     <aside class="sidebar hidden md:flex">
         <img src="logo.png" class="w-12 h-12 mb-10 rounded-full" alt="Arcana">
-        <nav class="space-y-8">
+        <nav class="space-y-8 text-2xl">
             <button onclick="location.reload()" class="text-gold opacity-50 hover:opacity-100 block">🏠</button>
-            <button class="text-white opacity-30 hover:opacity-100 block">🎰</button>
+            <button onclick="Swal.fire('Arcana Casino','Bientôt disponible sur cette interface','info')" class="text-white opacity-30 hover:opacity-100 block">🎰</button>
             <button class="text-white opacity-30 hover:opacity-100 block">🛡️</button>
         </nav>
     </aside>
@@ -122,7 +116,7 @@
         <header class="flex justify-between items-center px-8 py-6">
             <div class="flex items-center gap-6">
                 <img src="logo.png" alt="Arcana Safe" class="logo-main">
-                <h1 class="font-prestige text-3xl tracking-tighter hidden lg:block">ARCANA <span class="text-[#D4AF37]">SAFE</span></h1>
+                <h1 class="font-prestige text-3xl tracking-tighter hidden lg:block uppercase">ARCANA <span class="text-[#D4AF37]">SAFE</span></h1>
             </div>
             
             <div class="flex items-center gap-4">
@@ -138,57 +132,102 @@
         <main class="max-w-6xl mx-auto px-6 py-10">
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="glass-panel p-8 text-center">
-                    <p class="text-xs uppercase text-gold mb-2 tracking-widest">Réserve POL</p>
-                    <h2 id="balancePOL" class="text-4xl font-bold">...</h2>
+                <div class="glass-panel p-8 text-center border-gold/20">
+                    <p class="text-xs uppercase text-gold mb-2 tracking-widest">Réserve du Coffre</p>
+                    <code class="text-[10px] text-gray-500 block mb-2">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>
+                    <h2 id="balanceARCANA" class="text-3xl font-bold">400,000,000</h2>
                 </div>
                 <div class="glass-panel p-8 text-center border-gold/40">
-                    <p class="text-xs uppercase text-gold mb-2 tracking-widest">Réserve ARCANA</p>
-                    <h2 id="balanceARCANA" class="text-4xl font-bold">...</h2>
+                    <p class="text-xs uppercase text-gold mb-2 tracking-widest">Redistribution Casino</p>
+                    <h2 class="text-4xl font-bold text-green-500">10% <span class="text-xs text-white">FIXE</span></h2>
                 </div>
-                <div class="glass-panel p-8 text-center">
+                <div class="glass-panel p-8 text-center border-gold/20">
                     <p class="text-xs uppercase text-gold mb-2 tracking-widest">Valeur Jeton</p>
                     <h2 class="text-4xl font-bold">$0.00025</h2>
                 </div>
             </div>
 
-            <section class="glass-panel p-10 mb-12 relative overflow-hidden">
-                <div class="relative z-10">
-                    <h2 class="font-prestige text-3xl mb-8 text-center uppercase tracking-widest">Le Coffre-Fort <span class="text-gold">Arcana</span></h2>
-                    
-                    <div class="max-w-2xl mx-auto">
-                        <div class="flex justify-between mb-4 text-sm uppercase tracking-widest">
-                            <span>Objectif : 100 000 $</span>
-                            <span id="raisedText">Récolté : ... $</span>
-                        </div>
-                        <div class="progress-track mb-10">
-                            <div id="progressBar" class="progress-fill" style="width: 2%"></div>
-                        </div>
-
-                        <div class="bg-black/40 p-8 rounded-3xl border border-white/5">
-                            <div class="grid grid-cols-2 gap-4 mb-6">
-                                <select id="tokenSelect" class="bg-transparent border border-gold/30 p-4 rounded-xl text-white outline-none">
-                                    <option value="POL">POL (Polygon)</option>
-                                    <option value="USDT">USDT</option>
-                                </select>
-                                <input type="number" id="amountInput" placeholder="Montant" class="bg-transparent border border-gold/30 p-4 rounded-xl text-white outline-none">
-                            </div>
-                            <p id="receiveText" class="text-center text-gold/80 text-sm mb-6 font-bold">Tu recevras : 0 ARCANA</p>
-                            <button onclick="buyNow()" class="btn-gold w-full py-5 rounded-2xl text-lg">Investir dans le Sanctuaire</button>
-                        </div>
+            <section class="glass-panel p-8 mb-12 border-gold/20">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-prestige text-xl tracking-widest text-gold uppercase">🎰 Station de Jeu Automatique</h2>
+                    <button id="approveBtn" onclick="approveToken()" class="text-[10px] border border-gold/50 px-4 py-1 rounded-full text-gold hover:bg-gold/10 transition uppercase">Approuver Arcana</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-black/40 p-6 rounded-3xl border border-white/5 text-center">
+                        <p class="text-xs text-gray-400 mb-4 uppercase">Mise instantanée</p>
+                        <input type="number" id="betAmount" value="10" class="bg-transparent border-b border-gold text-2xl text-center w-32 outline-none mb-6 font-bold text-white">
+                        <button id="spinBtn" onclick="playSlots()" class="btn-gold w-full py-4 rounded-xl">Lancer le Spin</button>
+                    </div>
+                    <div class="text-sm text-gray-400 space-y-3">
+                        <p>🛡️ <strong class="text-white">Smart Contract :</strong> Chaque partie redistribue automatiquement 10% des jetons à la pool de liquidité.</p>
+                        <p>✅ <strong class="text-white">Audit :</strong> Vérifié sur la blockchain Polygon.</p>
                     </div>
                 </div>
             </section>
 
-            <div class="max-w-3xl mx-auto glass-panel p-8">
+            <section class="glass-panel p-10 mb-12 relative overflow-hidden">
+                <div class="relative z-10 max-w-2xl mx-auto">
+                    <h2 class="font-prestige text-3xl mb-8 text-center uppercase tracking-widest">Le Coffre-Fort <span class="text-gold">Arcana</span></h2>
+                    
+                    <div class="flex justify-between mb-4 text-sm uppercase tracking-widest">
+                        <span>Objectif : 100 000 $</span>
+                        <span id="raisedText">Récolté : 5,200 $</span>
+                    </div>
+                    <div class="progress-track mb-10">
+                        <div id="progressBar" class="progress-fill" style="width: 5.2%"></div>
+                    </div>
+
+                    <div class="bg-black/40 p-8 rounded-3xl border border-white/5">
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <select id="tokenSelect" class="bg-transparent border border-gold/30 p-4 rounded-xl text-white outline-none">
+                                <option value="POL">POL (Polygon)</option>
+                                <option value="USDT">USDT</option>
+                            </select>
+                            <input type="number" id="amountInput" placeholder="Montant" class="bg-transparent border border-gold/30 p-4 rounded-xl text-white outline-none">
+                        </div>
+                        <p id="receiveText" class="text-center text-gold/80 text-sm mb-6 font-bold">Tu recevras : 0 ARCANA</p>
+                        <button onclick="buyNow()" class="btn-gold w-full py-5 rounded-2xl text-lg">Investir dans le Sanctuaire</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="max-w-4xl mx-auto glass-panel p-8">
                 <details class="group">
                     <summary class="list-none flex justify-between items-center cursor-pointer">
-                        <span class="font-prestige tracking-widest text-lg">📖 CONSULTER LE LIVRE BLANC</span>
+                        <span class="font-prestige tracking-widest text-lg uppercase">📖 CONSULTER LE LIVRE BLANC INTÉGRAL</span>
                         <span class="text-gold transition group-open:rotate-180">▼</span>
                     </summary>
-                    <div class="mt-8 text-sm leading-relaxed text-gray-400 space-y-6">
-                        <p><strong class="text-white">1. Vision :</strong> Arcana Safe est un écosystème financier sécurisé par le Coffre-Fort Arcana. Une forteresse numérique où chaque actif repose sous la garde de protocoles inviolables.</p>
-                        <p><strong class="text-white">2. Sécurité :</strong> Le système de Claim différé garantit que les jetons ne sont pas libérés avant que le Coffre n’ait atteint son objectif de 100 000$.</p>
+                    <div class="mt-8 space-y-8 text-sm leading-relaxed text-gray-400">
+                        <p class="italic text-gold text-center">« Au cœur des ténèbres, un coffre veille. »</p>
+
+                        <div>
+                            <h4 class="font-bold text-white mb-2 uppercase border-b border-gold/40 pb-1 tracking-widest">1. Vision</h4>
+                            <p>Arcana ne se contente pas d’être un simple jeton : c’est la clé d’un <strong class="text-gold">écosystème financier sécurisé</strong>, protégé par le <strong class="text-gold">Coffre-Fort Arcana</strong>. Dans un monde où la confiance est rare, nous construisons une forteresse numérique où chaque actif repose sous la garde de protocoles inviolables. La mission est claire : offrir aux détenteurs un sanctuaire de valeur, à l’abri des turbulences et des prédations.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-white mb-2 uppercase border-b border-gold/40 pb-1 tracking-widest">2. Tokenomics</h4>
+                            <p>L’économie Arcana est délibérément sobre et lisible : <strong class="text-gold">400 000 000</strong> jetons constituent l’intégralité de l’offre. 10% des profits du casino sont réinjectés dans la liquidité ARCANA pour stabiliser et valoriser le jeton sur le long terme.</p>
+                            <ul class="list-disc ml-6 mt-2 space-y-1">
+                                <li>Prix de prévente : 0,00025 $ / ARCANA</li>
+                                <li>Réseau : Polygon Mainnet</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-white mb-2 uppercase border-b border-gold/40 pb-1 tracking-widest">3. Sécurité</h4>
+                            <p>Le protection des détenteurs est au centre du design Arcana. Le <strong class="text-gold">système de Claim différé</strong> garantit que les jetons ne sont pas libérés avant que le Coffre n’ait atteint son objectif de 100 000 $ et que les conditions d’ouverture soient réunies.</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-white mb-2 uppercase border-b border-gold/40 pb-1 tracking-widest">4. Roadmap</h4>
+                            <ul class="list-disc ml-6 space-y-2">
+                                <li><strong class="text-white">Phase Prévente :</strong> Collecte de liquidité et déploiement des jeux.</li>
+                                <li><strong class="text-white">Ouverture du Coffre :</strong> Activation du Claim et listing sur DEX.</li>
+                            </ul>
+                        </div>
+                        
+                        <p class="text-center text-gold/50 text-xs uppercase tracking-widest pt-6 border-t border-white/5">— LE COFFRE-FORT ARCANA —</p>
                     </div>
                 </details>
             </div>
@@ -197,19 +236,20 @@
 
     <div id="quickPouch">
         <div class="pouch-bubble" onclick="toggleVault()">
-            <span class="text-2xl">🛡️</span>
+            <span class="text-xl font-bold text-black">ARC</span>
         </div>
-        <div id="vaultPanel" class="hidden absolute bottom-20 right-0 w-64 glass-panel p-6 shadow-2xl">
-            <h4 class="font-prestige text-gold text-sm mb-4">ARCANA VAULT</h4>
-            <p class="text-xs text-gray-400 mb-2">VOTRE RÉSERVE</p>
-            <p id="userVaultBalance" class="text-xl font-bold mb-4">0 ARCANA</p>
-            <div class="h-px bg-white/10 mb-4"></div>
-            <p class="text-[10px] text-green-500 flex items-center gap-2">● RÉSEAU POLYGON LIVE</p>
+        <div id="vaultPanel" class="hidden absolute bottom-20 right-0 w-64 glass-panel p-6 shadow-2xl border-gold/40">
+            <h4 class="font-prestige text-gold text-xs mb-4 uppercase tracking-tighter">Votre Réserve</h4>
+            <p id="userBalance" class="text-2xl font-bold">0 ARCANA</p>
+            <div class="h-px bg-white/10 my-4"></div>
+            <p class="text-[10px] text-green-500 flex items-center gap-2 uppercase font-bold">● Réseau Polygon Live</p>
         </div>
     </div>
 
     <script>
-        const VAULT_ADDR = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
+        const CONTRACT_ADDR = "0x0a6Db8dfc670dDc655Ed5eEDa4746a687CfE2744";
+        const TOKEN_ADDR = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
+        let signer;
         let userAddress = null;
 
         async function connect() {
@@ -218,39 +258,56 @@
                     const provider = new ethers.providers.Web3Provider(window.ethereum);
                     const accounts = await provider.send("eth_requestAccounts", []);
                     userAddress = accounts[0];
+                    signer = provider.getSigner();
                     
                     document.getElementById('connectBtn').innerText = "CONNECTÉ";
                     document.getElementById('walletDisplay').classList.remove('hidden');
                     document.getElementById('userAddrText').innerText = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
                     
-                    Swal.fire({ icon: 'success', title: 'Bienvenue au Sanctuaire', background: '#05070a', color: '#D4AF37' });
-                } catch (err) {
-                    console.error(err);
-                }
-            } else {
-                Swal.fire({ icon: 'error', title: 'MetaMask requis' });
-            }
+                    updateBalance(userAddress, provider);
+                    Swal.fire({ icon: 'success', title: 'Accès au Sanctuaire validé', background: '#05070a', color: '#D4AF37' });
+                } catch (err) { console.error(err); }
+            } else { Swal.fire({ icon: 'error', title: 'MetaMask requis' }); }
         }
 
-        function toggleVault() {
-            const panel = document.getElementById('vaultPanel');
-            panel.classList.toggle('hidden');
+        async function updateBalance(addr, provider) {
+            const abi = ["function balanceOf(address) view returns (uint256)"];
+            const contract = new ethers.Contract(TOKEN_ADDR, abi, provider);
+            const balance = await contract.balanceOf(addr);
+            document.getElementById('userBalance').innerText = ethers.utils.formatUnits(balance, 18).split('.')[0] + " ARCANA";
         }
 
-        // Simulation des chiffres (à relier à ton API Render)
-        function updateStats() {
-            document.getElementById('balancePOL').innerText = "1,240";
-            document.getElementById('balanceARCANA').innerText = "400M";
-            document.getElementById('raisedText').innerText = "Récolté : 5,200 $";
-            document.getElementById('progressBar').style.width = "5.2%";
+        async function approveToken() {
+            if (!signer) return Swal.fire("Connectez votre wallet");
+            const abi = ["function approve(address spender, uint256 amount) returns (bool)"];
+            const contract = new ethers.Contract(TOKEN_ADDR, abi, signer);
+            try {
+                const tx = await contract.approve(CONTRACT_ADDR, ethers.constants.MaxUint256);
+                Swal.fire("En cours", "Approbation envoyée...", "info");
+                await tx.wait();
+                Swal.fire("Succès", "Le casino peut désormais distribuer vos récompenses", "success");
+            } catch (e) { Swal.fire("Erreur", e.message, "error"); }
         }
+
+        async function playSlots() {
+            if (!signer) return Swal.fire("Connectez votre wallet");
+            const amount = document.getElementById('betAmount').value;
+            const abi = ["function playSlots(uint256 betAmount) external"];
+            const contract = new ethers.Contract(CONTRACT_ADDR, abi, signer);
+            try {
+                const tx = await contract.playSlots(ethers.utils.parseUnits(amount, 18));
+                Swal.fire("Traitement Blockchain", "Distribution des 10% en cours...", "info");
+                await tx.wait();
+                Swal.fire("Terminé", "Partie enregistrée sur Polygon", "success");
+                updateBalance(userAddress, signer.provider);
+            } catch (e) { Swal.fire("Erreur", "Solde insuffisant ou Approve manquant", "error"); }
+        }
+
+        function toggleVault() { document.getElementById('vaultPanel').classList.toggle('hidden'); }
 
         document.getElementById('amountInput').addEventListener('input', (e) => {
-            const val = e.target.value || 0;
-            document.getElementById('receiveText').innerText = `Tu recevras : ${Math.floor(val * 4000)} ARCANA`;
+            document.getElementById('receiveText').innerText = `Tu recevras : ${Math.floor(e.target.value * 4000)} ARCANA`;
         });
-
-        window.onload = updateStats;
     </script>
 </body>
 </html>
