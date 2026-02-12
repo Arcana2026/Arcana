@@ -117,11 +117,14 @@
             <h4 class="font-prestige text-[10px] text-[#D4AF37] mb-6 tracking-widest">GUIDE POCHE</h4>
             <div class="space-y-4">
                 <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">Wallet:</span><span id="pouchAddr" class="text-[9px] font-mono">Not Connected</span></div>
-                <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">ARCANA:</span><span id="pouchArcana" class="font-bold text-[#D4AF37]">0</span></div>
+                <div class="text-[9px] opacity-60 uppercase mb-2 tracking-widest">Dashboard</div>
+                <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">Solde ARCANA:</span><span id="pouchArcana" class="font-bold text-[#D4AF37]">0</span></div>
+                <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">Profits (~$):</span><span id="pouchProfits" class="font-bold text-green-400">0</span></div>
                 <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">USDC:</span><span id="pouchUsdc" class="font-bold text-white">0</span></div>
                 <div class="flex justify-between"><span class="text-[9px] opacity-60 uppercase">POL (Gas):</span><span id="pouchPol" class="font-bold text-white">0</span></div>
             </div>
-            <button onclick="location.reload()" class="mt-6 w-full py-2 border border-red-500/20 text-red-500 text-[9px] rounded-lg uppercase font-bold hover:bg-red-500/10 transition">Disconnect</button>
+            <button onclick="claimWithdraw()" class="mt-4 w-full py-2 btn-prestige text-[9px] rounded-lg uppercase font-bold">Retrait (Claim)</button>
+            <button onclick="location.reload()" class="mt-2 w-full py-2 border border-red-500/20 text-red-500 text-[9px] rounded-lg uppercase font-bold hover:bg-red-500/10 transition">Disconnect</button>
         </div>
         <div onclick="togglePouch()" class="w-16 h-16 bg-gradient-to-br from-[#D4AF37] to-[#B8860B] rounded-2xl flex items-center justify-center cursor-pointer shadow-2xl hover:scale-110 transition border border-white/20">
             <img src="logo.png" class="w-10 h-10 rounded-full" alt="Vault">
@@ -143,6 +146,13 @@
             "function approve(address spender, uint256 amount) public returns (bool)",
             "function allowance(address owner, address spender) public view returns (uint256)",
             "function balanceOf(address account) public view returns (uint256)"
+        ];
+
+        // ABI du Vault ArcanaPresaleVault (0x29D6...5147)
+        const VAULT_ABI = [
+            "function balanceOf(address) view returns (uint256)",
+            "function claim()",
+            "function claimOpen() view returns (bool)"
         ];
 
         let provider, signer, account;
@@ -210,11 +220,58 @@
                 const polBal = await provider.getBalance(account);
                 document.getElementById('pouchPol').innerText = parseFloat(ethers.utils.formatEther(polBal)).toFixed(3);
 
-                // USDC sur Polygon (6 décimales) — 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
+                // USDC sur Polygon (6 décimales)
                 const usdcContract = new ethers.Contract(TOKEN_ADDRESSES.USDC, ERC20_ABI, provider);
                 const usdcBal = await usdcContract.balanceOf(account);
                 document.getElementById('pouchUsdc').innerText = parseFloat(ethers.utils.formatUnits(usdcBal, 6)).toFixed(2);
+
+                // Dashboard — Solde ARCANA (claimable) et Profits depuis le vault 0x29D6...5147
+                const vaultContract = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, provider);
+                const arcanaBal = await vaultContract.balanceOf(account);
+                const arcanaFormatted = parseFloat(ethers.utils.formatEther(arcanaBal));
+                document.getElementById('pouchArcana').innerText = arcanaFormatted.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+                // Profits estimés : 1 ARCANA = 0.00025 $ (taux presale)
+                const profitsUsd = arcanaFormatted * 0.00025;
+                document.getElementById('pouchProfits').innerText = profitsUsd.toFixed(2);
             } catch (e) { console.error(e); }
+        }
+
+        async function claimWithdraw() {
+            if (!account) return connect();
+            try {
+                const vaultContract = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
+                const isOpen = await vaultContract.claimOpen();
+                if (!isOpen) {
+                    return Swal.fire({
+                        title: 'Claim fermé',
+                        text: 'Le retrait ARCANA n\'est pas encore ouvert. Attendez l\'ouverture officielle.',
+                        icon: 'info',
+                        background: '#05070a', color: '#D4AF37'
+                    });
+                }
+                const balance = await vaultContract.balanceOf(account);
+                if (balance.isZero()) {
+                    return Swal.fire({
+                        title: 'Rien à retirer',
+                        text: 'Votre solde ARCANA claimable est de 0.',
+                        icon: 'warning',
+                        background: '#05070a', color: '#D4AF37'
+                    });
+                }
+                Swal.fire({ title: 'Retrait en cours...', text: 'Confirmez dans MetaMask', didOpen: () => Swal.showLoading() });
+                const tx = await vaultContract.claim();
+                await tx.wait();
+                Swal.fire({ title: 'Retrait réussi !', text: 'Vos ARCANA ont été transférés dans votre wallet.', icon: 'success', background: '#05070a', color: '#D4AF37' });
+                updateBalances();
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    title: 'Erreur',
+                    text: error.message || 'Le retrait a échoué. Vérifiez le gas.',
+                    icon: 'error',
+                    background: '#05070a', color: '#D4AF37'
+                });
+            }
         }
 
         async function buyNow() {
