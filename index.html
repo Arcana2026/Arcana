@@ -223,48 +223,61 @@
         let provider, signer, account;
 
         async function connect() {
-            if (window.ethereum) {
-                try {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    await provider.send("eth_requestAccounts", []);
-                    signer = provider.getSigner();
-                    account = await signer.getAddress();
-                    
-                    // Mise à jour de l'interface
-                    document.getElementById('connectWallet').innerText = account.slice(0,6) + "..." + account.slice(-4);
-                    document.getElementById('pouchAddr').innerText = account.slice(0,10) + "...";
-                    
-                    updateBalances();
-                    Swal.fire({ title: 'Vault Connecté', icon: 'success', background: '#05070a', color: '#D4AF37' });
-                } catch (e) { console.error(e); }
+    // 1. Vérifier si un wallet est présent
+    if (typeof window.ethereum !== 'undefined') {
+        try {
+            // 2. Forcer la demande de compte
+            const accounts = await window.ethereum.request({ 
+                method: 'eth_requestAccounts' 
+            });
+            
+            if (accounts.length > 0) {
+                account = accounts[0];
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+
+                // 3. Mise à jour de l'interface (Bouton et Guide Poche)
+                const shortAddr = account.slice(0, 6) + "..." + account.slice(-4);
+                document.getElementById('connectWallet').innerText = shortAddr;
+                document.getElementById('pouchAddr').innerText = shortAddr;
+                
+                // 4. Lancer la mise à jour des soldes
+                updateBalances();
+                
+                Swal.fire({
+                    title: 'Coffre Connecté',
+                    text: 'Sécurité Arcana Activée',
+                    icon: 'success',
+                    background: '#05070a',
+                    color: '#D4AF37',
+                    confirmButtonColor: '#D4AF37'
+                });
+            }
+        } catch (error) {
+            console.error("Erreur de connexion:", error);
+            if (error.code === 4001) {
+                Swal.fire('Annulé', 'Vous avez refusé la connexion.', 'info');
             } else {
-                Swal.fire('MetaMask requis', 'Veuillez installer un wallet.', 'error');
+                Swal.fire('Erreur', 'Impossible de se connecter au wallet.', 'error');
             }
         }
-
-        async function updateBalances() {
-            if (!account) return;
-            const polBal = await provider.getBalance(account);
-            document.getElementById('pouchPol').innerText = parseFloat(ethers.utils.formatEther(polBal)).toFixed(3);
-            // Ici tu ajoutes ton appel balanceOf() pour ARCANA avec ton contrat
-        }
-
-        async function buyNow() {
-            const amount = document.getElementById('amountInput').value;
-            if (!account) return connect();
-            if (amount <= 0) return Swal.fire('Erreur', 'Entrez un montant valide.', 'warning');
-            
-            console.log("Transaction vers:", VAULT_ADDRESS, "Montant:", amount);
-            // Ta logique d'achat originale buyWithPOL() ou buyWithNative() continue ici
-        }
-
-        function togglePouch() {
-            document.getElementById('pouchWindow').classList.toggle('active');
-        }
-
-        function toggleWhitepaper() {
-            document.getElementById('whitepaperBox').classList.toggle('open');
-        }
+    } else {
+        // 5. Si pas de wallet, rediriger ou proposer WalletConnect
+        Swal.fire({
+            title: 'Wallet introuvable',
+            text: 'Voulez-vous ouvrir Arcana dans MetaMask ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ouvrir MetaMask',
+            background: '#05070a',
+            color: '#D4AF37'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open(`https://metamask.app.link/dapp/${window.location.hostname}`);
+            }
+        });
+    }
+}
     </script>
 </body>
 </html>
