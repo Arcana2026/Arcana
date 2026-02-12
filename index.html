@@ -92,9 +92,10 @@
             <div class="max-w-md mx-auto">
                 <h3 class="font-prestige text-xs mb-6 tracking-widest text-[#D4AF37]">OFFICIAL ARCANA SALE</h3>
                 <div class="flex gap-2 mb-4">
-                    <select id="tokenSelect" class="bg-black/60 border border-white/10 p-4 rounded-xl text-xs text-white outline-none">
-                        <option value="POL">POL</option><option value="USDT">USDT</option>
-                    </select>
+                    <select id="tokenSelect" class="bg-black/60 border border-white/10 p-4 rounded-xl text-xs uppercase text-white outline-none">
+                        <option value="POL">POL</option>
+                        <option value="USDT">USDT</option>
+                        <option value="USDC">USDC</option> </select>
                     <input type="number" id="amountInput" placeholder="AMOUNT" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none">
                 </div>
                 <button onclick="buyNow()" class="btn-prestige w-full py-5 rounded-2xl text-xl">PURCHASE ARCANA</button>
@@ -128,42 +129,58 @@
     <script>
         const PROJECT_ID = "8893d93707736e4f3586071930777991"; 
         const VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
+        
+        // Adresses officielles sur le réseau Polygon
+        const TOKEN_ADDRESSES = {
+            "USDT": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+            "USDC": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+        };
+
+        // Interface minimale pour interagir avec les jetons (ERC20)
+        const ERC20_ABI = [
+            "function approve(address spender, uint256 amount) public returns (bool)",
+            "function allowance(address owner, address spender) public view returns (uint256)",
+            "function balanceOf(address account) public view returns (uint256)"
+        ];
+
         let provider, signer, account;
 
         async function connect() {
-            // Solution robuste pour éviter le "Wallet introuvable"
-            if (window.ethereum || (window.web3 && window.web3.currentProvider)) {
-                const currentProvider = window.ethereum || window.web3.currentProvider;
-                try {
-                    provider = new ethers.providers.Web3Provider(currentProvider);
-                    const accounts = await provider.send("eth_requestAccounts", []);
-                    account = accounts[0];
-                    signer = provider.getSigner();
+    // Cette ligne permet de détecter MetaMask même si l'extension met du temps à charger sur PC
+    const providerOrigin = window.ethereum || (window.web3 && window.web3.currentProvider);
 
-                    // UI Updates
-                    document.getElementById('connectWallet').innerText = account.slice(0,6) + "..." + account.slice(-4);
-                    document.getElementById('pouchAddr').innerText = account.slice(0,10) + "...";
-                    updateBalances();
-                    Swal.fire({ title: 'Vault Connecté', icon: 'success', background: '#05070a', color: '#D4AF37' });
-                } catch (e) {
-                    console.error("User denied account access");
-                }
-            } else {
-                // Fallback si aucun wallet n'est détecté du tout
-                Swal.fire({
-                    title: 'Wallet introuvable',
-                    text: 'Voulez-vous ouvrir Arcana dans MetaMask ?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ouvrir MetaMask',
-                    background: '#05070a', color: '#D4AF37'
-                }).then((res) => {
-                    if (res.isConfirmed) {
-                        window.open(`https://metamask.app.link/dapp/${window.location.hostname}`);
-                    }
-                });
-            }
+    if (providerOrigin) {
+        try {
+            provider = new ethers.providers.Web3Provider(providerOrigin);
+            await provider.send("eth_requestAccounts", []);
+            signer = provider.getSigner();
+            account = await signer.getAddress();
+            
+            // Mise à jour de ton interface
+            const shortAddr = account.slice(0,6) + "..." + account.slice(-4);
+            document.getElementById('connectWallet').innerText = shortAddr;
+            document.getElementById('pouchAddr').innerText = shortAddr;
+            
+            updateBalances();
+            Swal.fire({ title: 'Vault Connecté', icon: 'success', background: '#05070a', color: '#D4AF37' });
+        } catch (e) {
+            console.error("Accès refusé");
         }
+    } else {
+        // Si vraiment introuvable sur le HP
+        Swal.fire({
+            title: 'Wallet introuvable',
+            text: 'Vérifiez que MetaMask est installé et déverrouillé sur votre navigateur HP.',
+            icon: 'warning',
+            confirmButtonText: 'Ouvrir MetaMask',
+            background: '#05070a', color: '#D4AF37'
+        }).then((res) => {
+            if (res.isConfirmed) {
+                window.open('https://metamask.io/download/', '_blank');
+            }
+        });
+    }
+}
 
         async function updateBalances() {
             if (!account) return;
@@ -175,11 +192,51 @@
         }
 
         async function buyNow() {
-            if (!account) return connect();
+            if (!account) return connect(); // Si pas connecté, on connecte d'abord
+
             const amount = document.getElementById('amountInput').value;
-            if (amount <= 0) return Swal.fire('Erreur', 'Entrez un montant valide.', 'warning');
-            console.log("Achat vers:", VAULT_ADDRESS, "Montant:", amount);
-            // Ta logique buyWithPOL() originale s'insère ici
+            const tokenSelected = document.getElementById('tokenSelect').value;
+
+            if (!amount || amount <= 0) {
+                return Swal.fire('Montant invalide', 'Veuillez entrer un montant supérieur à 0.', 'warning');
+            }
+
+            try {
+                const amountWei = ethers.utils.parseUnits(amount, (tokenSelected === "POL" ? 18 : 6));
+
+                if (tokenSelected === "POL") {
+                    // ACHAT AVEC POL (NATIF)
+                    const tx = await signer.sendTransaction({
+                        to: VAULT_ADDRESS,
+                        value: amountWei
+                    });
+                    await tx.wait();
+                    Swal.fire('Succès !', `Achat de ${amount} POL réussi.`, 'success');
+                } 
+                else {
+                    // ACHAT AVEC USDT OU USDC
+                    const tokenAddr = TOKEN_ADDRESSES[tokenSelected];
+                    const tokenContract = new ethers.Contract(tokenAddr, ERC20_ABI, signer);
+
+                    // ÉTAPE 1 : Vérifier l'autorisation (Approve)
+                    Swal.fire({ title: 'Vérification...', text: 'Autorisation du contrat en cours', didOpen: () => Swal.showLoading() });
+                    
+                    const approveTx = await tokenContract.approve(VAULT_ADDRESS, amountWei);
+                    await approveTx.wait();
+
+                    // ÉTAPE 2 : Appeler ta fonction d'achat sur ton Smart Contract
+                    // Note : Ici j'utilise une fonction générique 'buyWithToken', assure-toi qu'elle porte le même nom dans ton contrat
+                    const vaultContract = new ethers.Contract(VAULT_ADDRESS, ["function buyWithToken(address token, uint256 amount) public"], signer);
+                    const purchaseTx = await vaultContract.buyWithToken(tokenAddr, amountWei);
+                    await purchaseTx.wait();
+
+                    Swal.fire('Félicitations !', `Achat avec ${tokenSelected} sécurisé.`, 'success');
+                }
+                updateBalances(); // Rafraîchir les chiffres dans le Guide Poche
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Erreur', 'La transaction a échoué. Vérifiez votre solde.', 'error');
+            }
         }
 
         function togglePouch() { document.getElementById('pouchWindow').classList.toggle('active'); }
