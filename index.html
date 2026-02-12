@@ -95,7 +95,8 @@
                     <select id="tokenSelect" class="bg-black/60 border border-white/10 p-4 rounded-xl text-xs uppercase text-white outline-none">
                         <option value="POL">POL</option>
                         <option value="USDT">USDT</option>
-                        <option value="USDC">USDC</option> </select>
+                        <option value="USDC">USDC</option>
+                    </select>
                     <input type="number" id="amountInput" placeholder="AMOUNT" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none">
                 </div>
                 <button onclick="buyNow()" class="btn-prestige w-full py-5 rounded-2xl text-xl">PURCHASE ARCANA</button>
@@ -117,6 +118,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">Wallet:</span><span id="pouchAddr" class="text-[9px] font-mono">Not Connected</span></div>
                 <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">ARCANA:</span><span id="pouchArcana" class="font-bold text-[#D4AF37]">0</span></div>
+                <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">USDC:</span><span id="pouchUsdc" class="font-bold text-white">0</span></div>
                 <div class="flex justify-between"><span class="text-[9px] opacity-60 uppercase">POL (Gas):</span><span id="pouchPol" class="font-bold text-white">0</span></div>
             </div>
             <button onclick="location.reload()" class="mt-6 w-full py-2 border border-red-500/20 text-red-500 text-[9px] rounded-lg uppercase font-bold hover:bg-red-500/10 transition">Disconnect</button>
@@ -146,48 +148,72 @@
         let provider, signer, account;
 
         async function connect() {
-    // Cette ligne permet de détecter MetaMask même si l'extension met du temps à charger sur PC
-    const providerOrigin = window.ethereum || (window.web3 && window.web3.currentProvider);
+            // Détection robuste du wallet (PC & mobile) — priorité: window.ethereum puis window.web3
+            const getProvider = () => {
+                if (window.ethereum) return window.ethereum;
+                if (window.web3 && typeof window.web3.currentProvider !== 'undefined') return window.web3.currentProvider;
+                return null;
+            };
 
-    if (providerOrigin) {
-        try {
-            provider = new ethers.providers.Web3Provider(providerOrigin);
-            await provider.send("eth_requestAccounts", []);
-            signer = provider.getSigner();
-            account = await signer.getAddress();
-            
-            // Mise à jour de ton interface
-            const shortAddr = account.slice(0,6) + "..." + account.slice(-4);
-            document.getElementById('connectWallet').innerText = shortAddr;
-            document.getElementById('pouchAddr').innerText = shortAddr;
-            
-            updateBalances();
-            Swal.fire({ title: 'Vault Connecté', icon: 'success', background: '#05070a', color: '#D4AF37' });
-        } catch (e) {
-            console.error("Accès refusé");
-        }
-    } else {
-        // Si vraiment introuvable sur le HP
-        Swal.fire({
-            title: 'Wallet introuvable',
-            text: 'Vérifiez que MetaMask est installé et déverrouillé sur votre navigateur HP.',
-            icon: 'warning',
-            confirmButtonText: 'Ouvrir MetaMask',
-            background: '#05070a', color: '#D4AF37'
-        }).then((res) => {
-            if (res.isConfirmed) {
-                window.open('https://metamask.io/download/', '_blank');
+            let providerOrigin = getProvider();
+
+            // Sur PC, l'extension peut s'injecter après le chargement — attendre un court délai si absent
+            if (!providerOrigin && typeof window.addEventListener === 'function') {
+                providerOrigin = await new Promise((resolve) => {
+                    const check = () => {
+                        const p = getProvider();
+                        if (p) { resolve(p); return; }
+                        setTimeout(() => resolve(getProvider()), 500);
+                    };
+                    check();
+                });
             }
-        });
-    }
-}
+
+            if (providerOrigin) {
+                try {
+                    provider = new ethers.providers.Web3Provider(providerOrigin);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    account = await signer.getAddress();
+
+                    const shortAddr = account.slice(0, 6) + "..." + account.slice(-4);
+                    document.getElementById('connectWallet').innerText = shortAddr;
+                    document.getElementById('pouchAddr').innerText = shortAddr;
+
+                    updateBalances();
+                    Swal.fire({ title: 'Vault Connecté', icon: 'success', background: '#05070a', color: '#D4AF37' });
+                } catch (e) {
+                    console.error("Accès refusé", e);
+                    Swal.fire({
+                        title: 'Connexion refusée',
+                        text: e.code === 4001 ? 'Vous avez annulé la connexion.' : 'Vérifiez que votre wallet est déverrouillé.',
+                        icon: 'warning',
+                        background: '#05070a', color: '#D4AF37'
+                    });
+                }
+            } else {
+                Swal.fire({
+                    title: 'Wallet introuvable',
+                    text: 'Installez MetaMask ou un wallet Web3 compatible (Brave, Trust, etc.) sur votre ordinateur.',
+                    icon: 'warning',
+                    confirmButtonText: 'Installer MetaMask',
+                    background: '#05070a', color: '#D4AF37'
+                }).then((res) => {
+                    if (res.isConfirmed) window.open('https://metamask.io/download/', '_blank');
+                });
+            }
+        }
 
         async function updateBalances() {
             if (!account) return;
             try {
                 const polBal = await provider.getBalance(account);
                 document.getElementById('pouchPol').innerText = parseFloat(ethers.utils.formatEther(polBal)).toFixed(3);
-                // Ajoute ici ta logique balanceOf() pour ARCANA
+
+                // USDC sur Polygon (6 décimales) — 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174
+                const usdcContract = new ethers.Contract(TOKEN_ADDRESSES.USDC, ERC20_ABI, provider);
+                const usdcBal = await usdcContract.balanceOf(account);
+                document.getElementById('pouchUsdc').innerText = parseFloat(ethers.utils.formatUnits(usdcBal, 6)).toFixed(2);
             } catch (e) { console.error(e); }
         }
 
@@ -214,17 +240,22 @@
                     Swal.fire('Succès !', `Achat de ${amount} POL réussi.`, 'success');
                 } 
                 else {
-                    // ACHAT AVEC USDT OU USDC
+                    // ACHAT AVEC USDT OU USDC — Approve obligatoire vers 0x29D6...5147
                     const tokenAddr = TOKEN_ADDRESSES[tokenSelected];
                     const tokenContract = new ethers.Contract(tokenAddr, ERC20_ABI, signer);
 
-                    // ÉTAPE 1 : Vérifier l'autorisation (Approve)
                     Swal.fire({ title: 'Vérification...', text: 'Autorisation du contrat en cours', didOpen: () => Swal.showLoading() });
-                    
-                    const approveTx = await tokenContract.approve(VAULT_ADDRESS, amountWei);
-                    await approveTx.wait();
 
-                    // ÉTAPE 2 : Appeler ta fonction d'achat sur ton Smart Contract
+                    // Vérifier l'allowance existante — éviter un approve inutile si déjà suffisant
+                    const currentAllowance = await tokenContract.allowance(account, VAULT_ADDRESS);
+                    if (currentAllowance.lt(amountWei)) {
+                        const approveTx = await tokenContract.approve(VAULT_ADDRESS, amountWei);
+                        await approveTx.wait();
+                    }
+
+                    Swal.fire({ title: 'Achat en cours...', text: `Envoi de ${tokenSelected} vers le Vault`, didOpen: () => Swal.showLoading() });
+
+                    // Appeler buyWithToken sur le Smart Contract
                     // Note : Ici j'utilise une fonction générique 'buyWithToken', assure-toi qu'elle porte le même nom dans ton contrat
                     const vaultContract = new ethers.Contract(VAULT_ADDRESS, ["function buyWithToken(address token, uint256 amount) public"], signer);
                     const purchaseTx = await vaultContract.buyWithToken(tokenAddr, amountWei);
