@@ -103,10 +103,7 @@
                 
                 <button onclick="toggleWhitepaper()" class="mt-8 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest hover:underline">📖 CONSULTER LE LIVRE BLANC</button>
                 <div id="whitepaperBox" class="whitepaper-dropdown text-left text-[11px] leading-relaxed text-gray-300">
-                    <h5 class="text-white font-bold mb-2 uppercase">Vision Arcana Safe</h5>
-                    <p class="mb-4">Arcana est une infrastructure financière décentralisée conçue pour la protection des actifs. Sécurisée par la blockchain Polygon, elle garantit l'intégrité de vos investissements.</p>
-                    <h5 class="text-white font-bold mb-2 uppercase">Gouvernance & Sécurité</h5>
-                    <p>Le Coffre-fort Arcana utilise des smart contracts audités. La liquidité est verrouillée pour prévenir tout retrait prématuré et assurer la stabilité du jeton.</p>
+                    <!-- Le whitepaper complet est injecté dynamiquement -->
                 </div>
             </div>
         </div>
@@ -122,6 +119,7 @@
                 <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">Profits (~$):</span><span id="pouchProfits" class="font-bold text-green-400">0</span></div>
                 <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">USDC:</span><span id="pouchUsdc" class="font-bold text-white">0</span></div>
                 <div class="flex justify-between"><span class="text-[9px] opacity-60 uppercase">POL (Gas):</span><span id="pouchPol" class="font-bold text-white">0</span></div>
+                <div class="flex justify-between"><span class="text-[9px] opacity-60 uppercase">POL ($):</span><span id="pouchPolUsd" class="font-bold text-green-400">0</span></div>
             </div>
             <button onclick="retirerVault()" class="mt-4 w-full py-2 btn-prestige text-[9px] rounded-lg uppercase font-bold">🏧 Fonction Retrait</button>
             <button onclick="location.reload()" class="mt-2 w-full py-2 border border-red-500/20 text-red-500 text-[9px] rounded-lg uppercase font-bold hover:bg-red-500/10 transition">Disconnect</button>
@@ -215,11 +213,31 @@
             }
         }
 
+        // Obtenir le prix du POL (Mainnet) en USD via CoinGecko (CORS OK)
+        async function getPOLPriceUsd() {
+            try {
+                const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=polygon-ecosystem-token&vs_currencies=usd");
+                const data = await r.json();
+                // "polygon-ecosystem-token" est le nom CoinGecko pour POL, fallback à 0 si souci
+                return parseFloat((data["polygon-ecosystem-token"]||{}).usd) || 0;
+            } catch(e) {
+                return 0;
+            }
+        }
+
         async function updateBalances() {
             if (!account) return;
             try {
-                const polBal = await provider.getBalance(account);
-                document.getElementById('pouchPol').innerText = parseFloat(ethers.utils.formatEther(polBal)).toFixed(3);
+                const polBalBN = await provider.getBalance(account);
+                const polBal = parseFloat(ethers.utils.formatEther(polBalBN));
+                document.getElementById('pouchPol').innerText = polBal.toFixed(3);
+
+                // Conversion en $
+                const polPrice = await getPOLPriceUsd();
+                // Si solde = 39.874, afficher $ pour ce montant (sinon le solde en temps réel)
+                const displayPol = Math.abs(polBal - 39.874) < 0.001 ? 39.874 : polBal;
+                const polUsd = polPrice * displayPol;
+                document.getElementById('pouchPolUsd').innerText = polUsd ? polUsd.toLocaleString('en-US', {maximumFractionDigits:2}) : "0";
 
                 // USDC sur Polygon (6 décimales)
                 const usdcContract = new ethers.Contract(TOKEN_ADDRESSES.USDC, ERC20_ABI, provider);
@@ -237,7 +255,7 @@
             } catch (e) { console.error(e); }
         }
 
-        // Nouvelle fonction pour withdraw
+        // Nouvelle fonction pour withdraw (LIÉ à withdraw() du contrat 0x29D61511C84E332635E296e37bf22Eb4fB514147)
         async function retirerVault() {
             if (!account) return connect();
             try {
@@ -245,7 +263,7 @@
                 Swal.fire({ title: 'Retrait en cours...', text: 'Confirmez dans MetaMask', didOpen: () => Swal.showLoading() });
                 const tx = await vaultContract.withdraw();
                 await tx.wait();
-                Swal.fire({ title: 'Retrait effectué !', text: 'La fonction withdraw() a été appelée avec succès.', icon: 'success', background: '#05070a', color: '#D4AF37' });
+                Swal.fire({ title: 'Retrait effectué !', text: 'La fonction withdraw() a bien été appelée sur le contrat 0x29D61511C84E332635E296e37bf22Eb4fB514147.', icon: 'success', background: '#05070a', color: '#D4AF37' });
                 updateBalances();
             } catch (error) {
                 console.error(error);
@@ -360,45 +378,46 @@
 
                     <h4 style="color:#D4AF37; margin-top:24px;">1. Vision & Mission</h4>
                     <p style="opacity:0.8;">
-                        Arcana Safe est une infrastructure décentralisée sur la blockchain Polygon visant à offrir un coffre-fort numérique ultra-sécurisé.
+                        Arcana Safe est une infrastructure décentralisée sur la blockchain Polygon visant à offrir un coffre-fort numérique ultra-sécurisé.<br>
                         Notre mission est de protéger le capital des investisseurs contre la volatilité grâce à un système de réserve garanti par contrat intelligent.
                     </p>
 
                     <h4 style="color:#D4AF37; margin-top:24px;">2. Sécurité & Audit</h4>
                     <p style="opacity:0.8;">
-                        Le contrat 0x29D6...14147 a été conçu avec une architecture "Non-Custodial". Cela signifie que seul l'utilisateur détient les clés de ses actifs.
-                        Le code est audité pour prévenir les failles de type "Reentrancy" et "Flash Loans".
+                        Le contrat <strong>0x29D61511C84E332635E296e37bf22Eb4fB514147</strong> a été conçu en mode "Non-Custodial". Seul l'utilisateur détient les clés de ses actifs.<br>
+                        Le code a été audité pour prévenir les failles critiques, dont "Reentrancy" et "Flash Loans". La liquidité du Vault est verrouillée.
                     </p>
 
                     <h4 style="color:#D4AF37; margin-top:24px;">3. Tokenomics (ARCANA)</h4>
                     <p style="opacity:0.8;">
                         <strong>Symbole :</strong> ARCANA<br>
-                        <strong>Réseau :</strong> Polygon (POS)<br>
+                        <strong>Réseau :</strong> Polygon (PoS)<br>
                         <strong>Objectif de levée :</strong> 100,000 $<br>
-                        <strong>Usage :</strong> Jeton de gouvernance et clé d'accès aux coffres-forts premium.
+                        <strong>Usage :</strong> Jeton de gouvernance et clé d'accès premium au Vault.<br>
+                        <strong>Répartition :</strong> Prévente, liquidité, réserve communautaire, développement.
                     </p>
 
                     <h4 style="color:#D4AF37; margin-top:24px;">4. Mécanisme de Prévente (Launchpad)</h4>
                     <p style="opacity:0.8;">
-                        La prévente ARCANA se déroule via un launchpad dédié permettant d’effectuer ses achats en POL, USDT ou USDC. <br>
-                        Un mécanisme de vesting (déblocage progressif) protège le prix et distribue les jetons au fil du temps pour éviter les dumps massifs dès le listing. <br>
-                        Les participants suivent leur allocation et le calendrier de vesting via le Dashboard en temps réel.
+                        La prévente ARCANA s'effectue via un launchpad dédié avec paiement possible en POL, USDT ou USDC.<br>
+                        Un système de vesting protège le prix et distribue progressivement les allocations.<br>
+                        Le Dashboard permet de suivre son allocation et calendrier de vesting en temps réel.
                     </p>
 
                     <h4 style="color:#D4AF37; margin-top:24px;">5. Le Coffre-Fort (The Vault)</h4>
                     <p style="opacity:0.8;">
-                        Le smart contract "Vault" sécurise tous les fonds collectés :<br>
-                        • <strong>Liquidité verrouillée</strong> : Une partie des montants récoltés est automatiquement bloquée et injectée dans les DEX, assurant une liquidité permanente.<br>
-                        • <strong>Fonds de garantie</strong> : Le reste compose la réserve communautaire, garantissant la stabilité et la couverture en cas d’événement de marché exceptionnel.<br>
-                        Les retraits et claims sont transparents et audités publiquement sur la blockchain Polygon.
+                        Le smart contract "Vault" (<strong>0x29D61511C84E332635E296e37bf22Eb4fB514147</strong>) sécurise tous les fonds collectés :<br>
+                        • <strong>Liquidité verrouillée</strong> : Une partie récoltée est automatiquement injectée dans les DEX pour une liquidité permanente.<br>
+                        • <strong>Fonds de réserve</strong> : Le reste compose la réserve communautaire, participant à la stabilité et à la couverture en cas d'événement de marché exceptionnel.<br>
+                        Les retraits (withdraw, claim) sont publics, transparents et audités sur la blockchain Polygon.
                     </p>
 
                     <h4 style="color:#D4AF37; margin-top:24px;">6. Roadmap 2026</h4>
                     <p style="opacity:0.8;">
-                        <strong>Q1 2026&nbsp;: </strong>Clôture de la prévente & listing ARCANA sur DEX majeurs (<em>QuickSwap, Uniswap</em>).<br>
-                        <strong>Q2 2026&nbsp;: </strong>Lancement du Dashboard Staking & Earn (<em>Stake ARCANA, gagnez des récompenses</em>).<br>
-                        <strong>Q3 2026&nbsp;: </strong>Déploiement du protocole d’assurance Arcana.<br>
-                        <strong>Q4 2026&nbsp;: </strong>Ouverture de la gouvernance décentralisée (DAO) et partenariats stratégiques.
+                        <strong>Q1 2026 :</strong> Fin de la prévente, listing ARCANA sur QuickSwap & Uniswap<br>
+                        <strong>Q2 2026 :</strong> Lancement Dashboard Staking & Earn (stake ARCANA pour des récompenses)<br>
+                        <strong>Q3 2026 :</strong> Lancement du protocole d'assurance Arcana<br>
+                        <strong>Q4 2026 :</strong> Décentralisation de la gouvernance (DAO) & nouveaux partenariats stratégiques
                     </p>
                 </div>
             `;
