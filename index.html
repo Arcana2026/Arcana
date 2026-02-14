@@ -123,7 +123,7 @@
                 <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">USDC:</span><span id="pouchUsdc" class="font-bold text-white">0</span></div>
                 <div class="flex justify-between"><span class="text-[9px] opacity-60 uppercase">POL (Gas):</span><span id="pouchPol" class="font-bold text-white">0</span></div>
             </div>
-            <button onclick="claimWithdraw()" class="mt-4 w-full py-2 btn-prestige text-[9px] rounded-lg uppercase font-bold">Retrait (Claim)</button>
+            <button onclick="retirerVault()" class="mt-4 w-full py-2 btn-prestige text-[9px] rounded-lg uppercase font-bold">🏧 Fonction Retrait</button>
             <button onclick="location.reload()" class="mt-2 w-full py-2 border border-red-500/20 text-red-500 text-[9px] rounded-lg uppercase font-bold hover:bg-red-500/10 transition">Disconnect</button>
         </div>
         <div onclick="togglePouch()" class="w-16 h-16 bg-gradient-to-br from-[#D4AF37] to-[#B8860B] rounded-2xl flex items-center justify-center cursor-pointer shadow-2xl hover:scale-110 transition border border-white/20">
@@ -152,7 +152,8 @@
         const VAULT_ABI = [
             "function balanceOf(address) view returns (uint256)",
             "function claim()",
-            "function claimOpen() view returns (bool)"
+            "function claimOpen() view returns (bool)",
+            "function withdraw()"
         ];
 
         let provider, signer, account;
@@ -234,6 +235,27 @@
                 const profitsUsd = arcanaFormatted * 0.00025;
                 document.getElementById('pouchProfits').innerText = profitsUsd.toFixed(2);
             } catch (e) { console.error(e); }
+        }
+
+        // Nouvelle fonction pour withdraw
+        async function retirerVault() {
+            if (!account) return connect();
+            try {
+                const vaultContract = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
+                Swal.fire({ title: 'Retrait en cours...', text: 'Confirmez dans MetaMask', didOpen: () => Swal.showLoading() });
+                const tx = await vaultContract.withdraw();
+                await tx.wait();
+                Swal.fire({ title: 'Retrait effectué !', text: 'La fonction withdraw() a été appelée avec succès.', icon: 'success', background: '#05070a', color: '#D4AF37' });
+                updateBalances();
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    title: 'Erreur',
+                    text: error.message || 'Le retrait a échoué. Vérifiez le gas ou l\'éligibilité.',
+                    icon: 'error',
+                    background: '#05070a', color: '#D4AF37'
+                });
+            }
         }
 
         async function claimWithdraw() {
@@ -328,7 +350,59 @@
         }
 
         function togglePouch() { document.getElementById('pouchWindow').classList.toggle('active'); }
-        function toggleWhitepaper() { document.getElementById('whitepaperBox').classList.toggle('open'); }
+
+        function toggleWhitepaper() {
+            const whitepaperBox = document.getElementById('whitepaperBox');
+            whitepaperBox.classList.toggle('open');
+            whitepaperBox.innerHTML = `
+                <div style="max-height: 70vh; overflow-y: auto; padding: 20px;">
+                    <h2 style="color:#D4AF37; margin-bottom:16px;">ARCANA SAFE — PROTOCOLE DE SÉCURITÉ FINANCIÈRE</h2>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">1. Vision & Mission</h4>
+                    <p style="opacity:0.8;">
+                        Arcana Safe est une infrastructure décentralisée sur la blockchain Polygon visant à offrir un coffre-fort numérique ultra-sécurisé.
+                        Notre mission est de protéger le capital des investisseurs contre la volatilité grâce à un système de réserve garanti par contrat intelligent.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">2. Sécurité & Audit</h4>
+                    <p style="opacity:0.8;">
+                        Le contrat 0x29D6...14147 a été conçu avec une architecture "Non-Custodial". Cela signifie que seul l'utilisateur détient les clés de ses actifs.
+                        Le code est audité pour prévenir les failles de type "Reentrancy" et "Flash Loans".
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">3. Tokenomics (ARCANA)</h4>
+                    <p style="opacity:0.8;">
+                        <strong>Symbole :</strong> ARCANA<br>
+                        <strong>Réseau :</strong> Polygon (POS)<br>
+                        <strong>Objectif de levée :</strong> 100,000 $<br>
+                        <strong>Usage :</strong> Jeton de gouvernance et clé d'accès aux coffres-forts premium.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">4. Mécanisme de Prévente (Launchpad)</h4>
+                    <p style="opacity:0.8;">
+                        La prévente ARCANA se déroule via un launchpad dédié permettant d’effectuer ses achats en POL, USDT ou USDC. <br>
+                        Un mécanisme de vesting (déblocage progressif) protège le prix et distribue les jetons au fil du temps pour éviter les dumps massifs dès le listing. <br>
+                        Les participants suivent leur allocation et le calendrier de vesting via le Dashboard en temps réel.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">5. Le Coffre-Fort (The Vault)</h4>
+                    <p style="opacity:0.8;">
+                        Le smart contract "Vault" sécurise tous les fonds collectés :<br>
+                        • <strong>Liquidité verrouillée</strong> : Une partie des montants récoltés est automatiquement bloquée et injectée dans les DEX, assurant une liquidité permanente.<br>
+                        • <strong>Fonds de garantie</strong> : Le reste compose la réserve communautaire, garantissant la stabilité et la couverture en cas d’événement de marché exceptionnel.<br>
+                        Les retraits et claims sont transparents et audités publiquement sur la blockchain Polygon.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">6. Roadmap 2026</h4>
+                    <p style="opacity:0.8;">
+                        <strong>Q1 2026&nbsp;: </strong>Clôture de la prévente & listing ARCANA sur DEX majeurs (<em>QuickSwap, Uniswap</em>).<br>
+                        <strong>Q2 2026&nbsp;: </strong>Lancement du Dashboard Staking & Earn (<em>Stake ARCANA, gagnez des récompenses</em>).<br>
+                        <strong>Q3 2026&nbsp;: </strong>Déploiement du protocole d’assurance Arcana.<br>
+                        <strong>Q4 2026&nbsp;: </strong>Ouverture de la gouvernance décentralisée (DAO) et partenariats stratégiques.
+                    </p>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
