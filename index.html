@@ -84,9 +84,9 @@
 
             <div class="max-w-xl mx-auto mb-16">
                 <div class="flex justify-between text-[10px] uppercase mb-3 opacity-70">
-                    <span>Goal: 100,000 $</span><span id="raisedAmt">Raised: 12,450 $</span>
+                    <span>Objectif : 1 200 000 $</span><span id="raisedAmt">Raised: 12,450 $</span>
                 </div>
-                <div class="progress-track"><div id="progressBar" class="progress-fill h-full" style="width: 12.45%"></div></div>
+                <div class="progress-track"><div id="progressBar" class="progress-fill h-full" style="width: 1.04%"></div></div>
             </div>
 
             <div class="max-w-md mx-auto">
@@ -99,6 +99,7 @@
                     </select>
                     <input type="number" id="amountInput" placeholder="AMOUNT" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none">
                 </div>
+                <div id="estimationBox" class="mb-5 text-xs text-[#D4AF37] font-bold text-center tracking-wider select-none">Estimation : 0.00 ARCANA</div>
                 <button onclick="buyNow()" class="btn-prestige w-full py-5 rounded-2xl text-xl">PURCHASE ARCANA</button>
                 
                 <button onclick="toggleWhitepaper()" class="mt-8 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest hover:underline">📖 CONSULTER LE LIVRE BLANC</button>
@@ -106,8 +107,42 @@
                     <!-- Le whitepaper complet est injecté dynamiquement -->
                 </div>
             </div>
-        </div>
-    </main>
+            <script>
+                // Conversion rates example
+                // (In production: fetch from contract or update as necessary)
+                const ARCANA_RATES = {
+                    "POL": 1000,   // 1 POL = 1000 ARCANA
+                    "USDT": 0.8,   // 1 USDT = 0.8 ARCANA (example, adjust as needed)
+                    "USDC": 0.8    // 1 USDC = 0.8 ARCANA (example, adjust as needed)
+                };
+
+                function updateEstimation() {
+                    const token = document.getElementById('tokenSelect').value;
+                    const amount = parseFloat(document.getElementById('amountInput').value);
+                    let rate = ARCANA_RATES[token] || 0;
+                    let estimation = 0.00;
+                    if (!isNaN(amount) && amount > 0) {
+                        estimation = amount * rate;
+                    }
+                    document.getElementById('estimationBox').textContent = 
+                        `Estimation : ${estimation.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} ARCANA`;
+                }
+
+                document.getElementById('tokenSelect').addEventListener('change', updateEstimation);
+                document.getElementById('amountInput').addEventListener('input', updateEstimation);
+
+                // ----------- Calcul dynamique barre de progression (optionnel, pour un affichage à jour si fonction de fetch) -------------
+                // Valeur récoltée actuelle (exemple) :
+                const amountRaisedUsd = 12450; // <-- Valeur en dollars US des POL récoltés, peut venir d'un backend/server onchain API
+                const hardcapUsd = 1200000;
+                // Calcul du pourcentage de progression par rapport au hardcap
+                const progressPct = Math.min((amountRaisedUsd / hardcapUsd) * 100, 100);
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById('progressBar').style.width = progressPct.toFixed(2) + '%';
+                    document.getElementById('raisedAmt').textContent = 'Raised: ' + amountRaisedUsd.toLocaleString('en-US', {maximumFractionDigits:0}) + ' $';
+                });
+                // ------------------------------------------------------------------------------------------------------------
+            </script>
 
     <div id="guide-poche">
         <div id="pouchWindow" class="glass-vault pouch-window">
@@ -392,9 +427,10 @@
                     <p style="opacity:0.8;">
                         <strong>Symbole :</strong> ARCANA<br>
                         <strong>Réseau :</strong> Polygon (PoS)<br>
-                        <strong>Objectif de levée :</strong> 100,000 $<br>
+                        <strong>Objectif de levée :</strong> 1 200 000 $<br>
                         <strong>Usage :</strong> Jeton de gouvernance et clé d'accès premium au Vault.<br>
-                        <strong>Répartition :</strong> Prévente, liquidité, réserve communautaire, développement.
+                        <strong>Répartition :</strong> Prévente, liquidité, réserve communautaire, développement.<br>
+                        <strong>Capitalisation initiale cible :</strong> 1 200 000 $ lors de la prévente.
                     </p>
 
                     <h4 style="color:#D4AF37; margin-top:24px;">4. Mécanisme de Prévente (Launchpad)</h4>
