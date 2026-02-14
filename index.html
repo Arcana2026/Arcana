@@ -97,7 +97,7 @@
                         <option value="USDT">USDT</option>
                         <option value="USDC">USDC</option>
                     </select>
-                    <input type="number" id="amountInput" placeholder="AMOUNT ($)" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none">
+                    <input type="text" id="amountInput" placeholder="AMOUNT ($)" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none">
                 </div>
                 <div id="estimationBox" class="mb-5 text-xs text-[#D4AF37] font-bold text-center tracking-wider select-none">Estimation : 0 ARCANA</div>
                 <button onclick="buyNow()" class="btn-prestige w-full py-5 rounded-2xl text-xl">PURCHASE ARCANA</button>
@@ -110,19 +110,41 @@
             <script>
                 // Taux fixe: prix par ARCANA
                 const ARCANA_PRICE_USD = 0.0026;
+                // Prix fictif POL en USD si l'API n'est pas utilisée
+                let pricePOL = 0.45;
+
+                function extractAmount(str) {
+                    // Extrait le premier nombre valide dans le champ (ignore le texte)
+                    str = (str || '').replace(',', '.');
+                    const match = str.match(/(\d+(\.\d+)?)/);
+                    return match ? parseFloat(match[1]) : NaN;
+                }
 
                 function updateEstimation() {
-                    // On fonctionne exclusivement sur la base d'un montant en $
-                    const amount = parseFloat(document.getElementById('amountInput').value.replace(',', '.'));
+                    const input = document.getElementById('amountInput').value;
+                    const amount = extractAmount(input);
+                    const tokenSelected = document.getElementById('tokenSelect').value;
                     let estimation = 0;
-                    if (!isNaN(amount) && amount > 0) {
-                        estimation = amount / ARCANA_PRICE_USD;
+                    let tokenPrice = 1;
+                    let isInvalid = false;
+
+                    if (tokenSelected === "POL") tokenPrice = pricePOL;
+
+                    if (isNaN(amount) || amount <= 0) {
+                        isInvalid = true;
+                    } 
+
+                    if (isInvalid) {
+                        document.getElementById('estimationBox').textContent = "Montant invalide";
+                    } else {
+                        estimation = (amount * tokenPrice) / ARCANA_PRICE_USD;
+                        document.getElementById('estimationBox').textContent = 
+                            `Estimation : ${estimation.toLocaleString(undefined, {maximumFractionDigits:0})} ARCANA`;
                     }
-                    document.getElementById('estimationBox').textContent = 
-                        `Estimation : ${estimation.toLocaleString(undefined, {maximumFractionDigits:0})} ARCANA`;
                 }
 
                 document.getElementById('amountInput').addEventListener('input', updateEstimation);
+                document.getElementById('tokenSelect').addEventListener('change', updateEstimation);
 
                 // --------- Progression Bar -----------
                 // Valeur récoltée actuelle (exemple) :
@@ -132,6 +154,7 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('progressBar').style.width = progressPct.toFixed(2) + '%';
                     document.getElementById('raisedAmt').textContent = 'Raised: ' + amountRaisedUsd.toLocaleString('en-US', {maximumFractionDigits:0}) + ' $';
+                    updateEstimation();
                 });
             </script>
     <div id="guide-poche">
@@ -338,24 +361,18 @@
         async function buyNow() {
             if (!account) return connect();
 
-            const amount = document.getElementById('amountInput').value;
+            const rawAmount = document.getElementById('amountInput').value;
+            const amount = extractAmount(rawAmount);
             const tokenSelected = document.getElementById('tokenSelect').value;
 
-            if (!amount || amount <= 0) {
-                return Swal.fire('Montant invalide', 'Veuillez entrer un montant supérieur à 0.', 'warning');
+            if (isNaN(amount) || amount <= 0) {
+                return Swal.fire('Montant invalide', 'Veuillez entrer un montant valide supérieur à 0.', 'warning');
             }
 
             try {
                 // Conversion montant $ → token natif (simplifié illustration)
-                const usdAmount = parseFloat(amount.replace(',', '.'));
-                if (isNaN(usdAmount) || usdAmount <= 0) {
-                    return Swal.fire('Montant invalide', 'Veuillez entrer un montant en dollars.', 'warning');
-                }
-
-                // Pour illustration : calcul montant du token à envoyer (côté smart contract montrez la logique requise)
-                // Ici l'appli effectue la transaction via POL, USDT ou USDC selon le montant en $
                 let decimals = 18;
-                let amountToSend = usdAmount;
+                let amountToSend = amount;
                 let tokenAddr = null;
 
                 if (tokenSelected === "USDT" || tokenSelected === "USDC") {
@@ -366,13 +383,12 @@
                 const amountWei = ethers.utils.parseUnits(amountToSend.toString(), decimals);
 
                 if (tokenSelected === "POL") {
-                    // ACHAT AVEC POL (montant en base $ converti hors frontend en backend/smart contract prod)
                     const tx = await signer.sendTransaction({
                         to: VAULT_ADDRESS,
                         value: amountWei
                     });
                     await tx.wait();
-                    Swal.fire('Succès !', `Achat de POL pour ${usdAmount} $ effectué.`, 'success');
+                    Swal.fire('Succès !', `Achat de POL pour ${amount} $ effectué.`, 'success');
                 }
                 else {
                     // ACHAT AVEC USDT/USDC
@@ -461,6 +477,13 @@
                     </p>
                 </div>
             `;
+        }
+
+        // Exposition de extractAmount si utilisé dans buyNow
+        function extractAmount(str) {
+            str = (str || '').replace(',', '.');
+            const match = str.match(/(\d+(\.\d+)?)/);
+            return match ? parseFloat(match[1]) : NaN;
         }
     </script>
 </body>
