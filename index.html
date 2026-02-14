@@ -97,7 +97,7 @@
                         <option value="USDT">USDT</option>
                         <option value="USDC">USDC</option>
                     </select>
-                    <input type="text" id="amountInput" placeholder="AMOUNT ($)" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none">
+                    <input type="text" id="amountInput" placeholder="AMOUNT ($)" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none" inputmode="decimal" pattern="[0-9.]*" autocomplete="off">
                 </div>
                 <div id="estimationBox" class="mb-5 text-xs text-[#D4AF37] font-bold text-center tracking-wider select-none">Estimation : 0 ARCANA</div>
                 <button onclick="buyNow()" class="btn-prestige w-full py-5 rounded-2xl text-xl">PURCHASE ARCANA</button>
@@ -110,51 +110,102 @@
             <script>
                 // Taux fixe: prix par ARCANA
                 const ARCANA_PRICE_USD = 0.0026;
-                // Prix fictif POL en USD si l'API n'est pas utilisée
+                // Prix POL (sera mis à jour dynamiquement)
                 let pricePOL = 0.45;
+                let lastPolPriceFetch = 0;
+                let isFetchingPOL = false;
 
-                function extractAmount(str) {
-                    // Extrait le premier nombre valide dans le champ (ignore le texte)
-                    str = (str || '').replace(',', '.');
-                    const match = str.match(/(\d+(\.\d+)?)/);
-                    return match ? parseFloat(match[1]) : NaN;
+                // Fonction qui récupère dynamiquement le prix POL via CoinGecko et MAJ le calculateur
+                async function fetchPOLPrice() {
+                    if (isFetchingPOL) return;
+                    isFetchingPOL = true;
+                    try {
+                        // API CoinGecko pour POL
+                        const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=polygon-ecosystem-token&vs_currencies=usd");
+                        const data = await response.json();
+                        const pol = parseFloat((data["polygon-ecosystem-token"]||{}).usd);
+                        // fallback si la réponse est mauvaise ou NaN
+                        pricePOL = isNaN(pol) || pol === 0 ? 0.45 : pol;
+                    } catch (e) {
+                        pricePOL = 0.45;
+                    }
+                    lastPolPriceFetch = Date.now();
+                    isFetchingPOL = false;
+                    updateEstimation();
+                }
+
+                // Nettoyage du champ pour autoriser uniquement chiffres et point décimal unique (FR ou US)
+                function extractCleanAmount(val) {
+                    if (!val) return '';
+                    let clean = val.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+                    // Retirer les points multiples après le premier
+                    let dotCount = (clean.match(/\./g) || []).length;
+                    if (dotCount > 1) {
+                        let first = clean.indexOf('.');
+                        clean = clean.slice(0, first + 1) + clean.slice(first + 1).replace(/\./g, '');
+                    }
+                    return clean;
                 }
 
                 function updateEstimation() {
-                    const input = document.getElementById('amountInput').value;
-                    const amount = extractAmount(input);
-                    const tokenSelected = document.getElementById('tokenSelect').value;
-                    let estimation = 0;
-                    let tokenPrice = 1;
-                    let isInvalid = false;
+                    const inputElem = document.getElementById('amountInput');
+                    let inputRaw = inputElem.value;
 
-                    if (tokenSelected === "POL") tokenPrice = pricePOL;
-
-                    if (isNaN(amount) || amount <= 0) {
-                        isInvalid = true;
-                    } 
-
-                    if (isInvalid) {
-                        document.getElementById('estimationBox').textContent = "Montant invalide";
-                    } else {
-                        estimation = (amount * tokenPrice) / ARCANA_PRICE_USD;
-                        document.getElementById('estimationBox').textContent = 
-                            `Estimation : ${estimation.toLocaleString(undefined, {maximumFractionDigits:0})} ARCANA`;
+                    // Nettoyage immédiat du champ si besoin (pour que "500 pommes" --> "500")
+                    const cleaned = extractCleanAmount(inputRaw);
+                    if (inputRaw !== cleaned) {
+                        // On ne déclenche le caret/cursor reset que si modifié
+                        inputElem.value = cleaned;
+                        inputRaw = cleaned;
                     }
+
+                    // Si le champ est vide ou le résultat n'est pas un nombre positif
+                    if (!inputRaw || isNaN(Number(inputRaw)) || Number(inputRaw) <= 0) {
+                        document.getElementById('estimationBox').textContent = "Estimation : 0 ARCANA";
+                        return;
+                    }
+                    const amount = Number(inputRaw);
+
+                    const tokenSelected = document.getElementById('tokenSelect').value;
+                    let tokenPrice = 1.00;
+                    if (tokenSelected === "POL") {
+                        tokenPrice = pricePOL;
+                    }
+
+                    // Formule : (Montant net * Prix du jeton) / 0.0026
+                    let estimation = (amount * tokenPrice) / ARCANA_PRICE_USD;
+                    document.getElementById('estimationBox').textContent =
+                        `Estimation : ${estimation.toLocaleString(undefined, {maximumFractionDigits:0})} ARCANA`;
                 }
 
                 document.getElementById('amountInput').addEventListener('input', updateEstimation);
-                document.getElementById('tokenSelect').addEventListener('change', updateEstimation);
+                document.getElementById('tokenSelect').addEventListener('change', function() {
+                    // Quand l'utilisateur sélectionne POL, on refait un fetch si >5min ou si jamais fetch
+                    if (document.getElementById('tokenSelect').value === "POL") {
+                        const now = Date.now();
+                        if (now - lastPolPriceFetch > 1000 * 60 * 5 || !lastPolPriceFetch) {
+                            fetchPOLPrice();
+                        } else {
+                            updateEstimation();
+                        }
+                    } else {
+                        updateEstimation();
+                    }
+                });
 
                 // --------- Progression Bar -----------
-                // Valeur récoltée actuelle (exemple) :
                 const amountRaisedUsd = 12450; // <-- À modifier dynamiquement en prod
                 const hardcapUsd = 1200000; // Objectif final
                 const progressPct = Math.min((amountRaisedUsd / hardcapUsd) * 100, 100);
                 document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('progressBar').style.width = progressPct.toFixed(2) + '%';
                     document.getElementById('raisedAmt').textContent = 'Raised: ' + amountRaisedUsd.toLocaleString('en-US', {maximumFractionDigits:0}) + ' $';
-                    updateEstimation();
+                    // Au mounting initial si POL sélectionné on fetch direct + update
+                    if (document.getElementById('tokenSelect').value === "POL") {
+                        fetchPOLPrice();
+                    } else {
+                        updateEstimation();
+                    }
                 });
             </script>
     <div id="guide-poche">
@@ -362,7 +413,8 @@
             if (!account) return connect();
 
             const rawAmount = document.getElementById('amountInput').value;
-            const amount = extractAmount(rawAmount);
+            // Utilise extractCleanAmount pour garantir le format côté achat aussi
+            const amount = Number(extractCleanAmount(rawAmount));
             const tokenSelected = document.getElementById('tokenSelect').value;
 
             if (isNaN(amount) || amount <= 0) {
@@ -479,11 +531,9 @@
             `;
         }
 
-        // Exposition de extractAmount si utilisé dans buyNow
+        // Nouveau : on utilise extractCleanAmount partout (notamment dans buyNow)
         function extractAmount(str) {
-            str = (str || '').replace(',', '.');
-            const match = str.match(/(\d+(\.\d+)?)/);
-            return match ? parseFloat(match[1]) : NaN;
+            return Number(extractCleanAmount(str));
         }
     </script>
 </body>
