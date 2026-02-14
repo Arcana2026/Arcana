@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCANA SAFE — The Vault</title>
+    <title>ARCANA — The Vault</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
@@ -97,9 +97,9 @@
                         <option value="USDT">USDT</option>
                         <option value="USDC">USDC</option>
                     </select>
-                    <input type="number" id="amountInput" placeholder="AMOUNT" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none">
+                    <input type="number" id="amountInput" placeholder="AMOUNT ($)" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none">
                 </div>
-                <div id="estimationBox" class="mb-5 text-xs text-[#D4AF37] font-bold text-center tracking-wider select-none">Estimation : 0.00 ARCANA</div>
+                <div id="estimationBox" class="mb-5 text-xs text-[#D4AF37] font-bold text-center tracking-wider select-none">Estimation : 0 ARCANA</div>
                 <button onclick="buyNow()" class="btn-prestige w-full py-5 rounded-2xl text-xl">PURCHASE ARCANA</button>
                 
                 <button onclick="toggleWhitepaper()" class="mt-8 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest hover:underline">📖 CONSULTER LE LIVRE BLANC</button>
@@ -108,42 +108,32 @@
                 </div>
             </div>
             <script>
-                // Conversion rates example
-                // (In production: fetch from contract or update as necessary)
-                const ARCANA_RATES = {
-                    "POL": 1000,   // 1 POL = 1000 ARCANA
-                    "USDT": 0.8,   // 1 USDT = 0.8 ARCANA (example, adjust as needed)
-                    "USDC": 0.8    // 1 USDC = 0.8 ARCANA (example, adjust as needed)
-                };
+                // Taux fixe: prix par ARCANA
+                const ARCANA_PRICE_USD = 0.0026;
 
                 function updateEstimation() {
-                    const token = document.getElementById('tokenSelect').value;
-                    const amount = parseFloat(document.getElementById('amountInput').value);
-                    let rate = ARCANA_RATES[token] || 0;
-                    let estimation = 0.00;
+                    // On fonctionne exclusivement sur la base d'un montant en $
+                    const amount = parseFloat(document.getElementById('amountInput').value.replace(',', '.'));
+                    let estimation = 0;
                     if (!isNaN(amount) && amount > 0) {
-                        estimation = amount * rate;
+                        estimation = amount / ARCANA_PRICE_USD;
                     }
                     document.getElementById('estimationBox').textContent = 
-                        `Estimation : ${estimation.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} ARCANA`;
+                        `Estimation : ${estimation.toLocaleString(undefined, {maximumFractionDigits:0})} ARCANA`;
                 }
 
-                document.getElementById('tokenSelect').addEventListener('change', updateEstimation);
                 document.getElementById('amountInput').addEventListener('input', updateEstimation);
 
-                // ----------- Calcul dynamique barre de progression (optionnel, pour un affichage à jour si fonction de fetch) -------------
+                // --------- Progression Bar -----------
                 // Valeur récoltée actuelle (exemple) :
-                const amountRaisedUsd = 12450; // <-- Valeur en dollars US des POL récoltés, peut venir d'un backend/server onchain API
-                const hardcapUsd = 1200000;
-                // Calcul du pourcentage de progression par rapport au hardcap
+                const amountRaisedUsd = 12450; // <-- À modifier dynamiquement en prod
+                const hardcapUsd = 1200000; // Objectif final
                 const progressPct = Math.min((amountRaisedUsd / hardcapUsd) * 100, 100);
                 document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('progressBar').style.width = progressPct.toFixed(2) + '%';
                     document.getElementById('raisedAmt').textContent = 'Raised: ' + amountRaisedUsd.toLocaleString('en-US', {maximumFractionDigits:0}) + ' $';
                 });
-                // ------------------------------------------------------------------------------------------------------------
             </script>
-
     <div id="guide-poche">
         <div id="pouchWindow" class="glass-vault pouch-window">
             <h4 class="font-prestige text-[10px] text-[#D4AF37] mb-6 tracking-widest">GUIDE POCHE</h4>
@@ -192,7 +182,7 @@
         let provider, signer, account;
 
         async function connect() {
-            // Détection robuste du wallet (PC & mobile) — priorité: window.ethereum puis window.web3
+            // Détection robuste du wallet (PC & mobile)
             const getProvider = () => {
                 if (window.ethereum) return window.ethereum;
                 if (window.web3 && typeof window.web3.currentProvider !== 'undefined') return window.web3.currentProvider;
@@ -201,7 +191,6 @@
 
             let providerOrigin = getProvider();
 
-            // Sur PC, l'extension peut s'injecter après le chargement — attendre un court délai si absent
             if (!providerOrigin && typeof window.addEventListener === 'function') {
                 providerOrigin = await new Promise((resolve) => {
                     const check = () => {
@@ -253,7 +242,6 @@
             try {
                 const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=polygon-ecosystem-token&vs_currencies=usd");
                 const data = await r.json();
-                // "polygon-ecosystem-token" est le nom CoinGecko pour POL, fallback à 0 si souci
                 return parseFloat((data["polygon-ecosystem-token"]||{}).usd) || 0;
             } catch(e) {
                 return 0;
@@ -269,7 +257,6 @@
 
                 // Conversion en $
                 const polPrice = await getPOLPriceUsd();
-                // Si solde = 39.874, afficher $ pour ce montant (sinon le solde en temps réel)
                 const displayPol = Math.abs(polBal - 39.874) < 0.001 ? 39.874 : polBal;
                 const polUsd = polPrice * displayPol;
                 document.getElementById('pouchPolUsd').innerText = polUsd ? polUsd.toLocaleString('en-US', {maximumFractionDigits:2}) : "0";
@@ -284,13 +271,12 @@
                 const arcanaBal = await vaultContract.balanceOf(account);
                 const arcanaFormatted = parseFloat(ethers.utils.formatEther(arcanaBal));
                 document.getElementById('pouchArcana').innerText = arcanaFormatted.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
-                // Profits estimés : 1 ARCANA = 0.00025 $ (taux presale)
-                const profitsUsd = arcanaFormatted * 0.00025;
-                document.getElementById('pouchProfits').innerText = profitsUsd.toFixed(2);
+                // Profits estimés = solde * prix (0.0026 $)
+                const profitsUsd = arcanaFormatted * 0.0026;
+                document.getElementById('pouchProfits').innerText = profitsUsd.toLocaleString('en-US', {maximumFractionDigits:2});
             } catch (e) { console.error(e); }
         }
 
-        // Nouvelle fonction pour withdraw (LIÉ à withdraw() du contrat 0x29D61511C84E332635E296e37bf22Eb4fB514147)
         async function retirerVault() {
             if (!account) return connect();
             try {
@@ -350,7 +336,7 @@
         }
 
         async function buyNow() {
-            if (!account) return connect(); // Si pas connecté, on connecte d'abord
+            if (!account) return connect();
 
             const amount = document.getElementById('amountInput').value;
             const tokenSelected = document.getElementById('tokenSelect').value;
@@ -360,25 +346,40 @@
             }
 
             try {
-                const amountWei = ethers.utils.parseUnits(amount, (tokenSelected === "POL" ? 18 : 6));
+                // Conversion montant $ → token natif (simplifié illustration)
+                const usdAmount = parseFloat(amount.replace(',', '.'));
+                if (isNaN(usdAmount) || usdAmount <= 0) {
+                    return Swal.fire('Montant invalide', 'Veuillez entrer un montant en dollars.', 'warning');
+                }
+
+                // Pour illustration : calcul montant du token à envoyer (côté smart contract montrez la logique requise)
+                // Ici l'appli effectue la transaction via POL, USDT ou USDC selon le montant en $
+                let decimals = 18;
+                let amountToSend = usdAmount;
+                let tokenAddr = null;
+
+                if (tokenSelected === "USDT" || tokenSelected === "USDC") {
+                    decimals = 6;
+                    tokenAddr = TOKEN_ADDRESSES[tokenSelected];
+                }
+
+                const amountWei = ethers.utils.parseUnits(amountToSend.toString(), decimals);
 
                 if (tokenSelected === "POL") {
-                    // ACHAT AVEC POL (NATIF)
+                    // ACHAT AVEC POL (montant en base $ converti hors frontend en backend/smart contract prod)
                     const tx = await signer.sendTransaction({
                         to: VAULT_ADDRESS,
                         value: amountWei
                     });
                     await tx.wait();
-                    Swal.fire('Succès !', `Achat de ${amount} POL réussi.`, 'success');
-                } 
+                    Swal.fire('Succès !', `Achat de POL pour ${usdAmount} $ effectué.`, 'success');
+                }
                 else {
-                    // ACHAT AVEC USDT OU USDC — Approve obligatoire vers 0x29D6...5147
-                    const tokenAddr = TOKEN_ADDRESSES[tokenSelected];
+                    // ACHAT AVEC USDT/USDC
                     const tokenContract = new ethers.Contract(tokenAddr, ERC20_ABI, signer);
 
                     Swal.fire({ title: 'Vérification...', text: 'Autorisation du contrat en cours', didOpen: () => Swal.showLoading() });
 
-                    // Vérifier l'allowance existante — éviter un approve inutile si déjà suffisant
                     const currentAllowance = await tokenContract.allowance(account, VAULT_ADDRESS);
                     if (currentAllowance.lt(amountWei)) {
                         const approveTx = await tokenContract.approve(VAULT_ADDRESS, amountWei);
@@ -387,15 +388,14 @@
 
                     Swal.fire({ title: 'Achat en cours...', text: `Envoi de ${tokenSelected} vers le Vault`, didOpen: () => Swal.showLoading() });
 
-                    // Appeler buyWithToken sur le Smart Contract
-                    // Note : Ici j'utilise une fonction générique 'buyWithToken', assure-toi qu'elle porte le même nom dans ton contrat
+                    // Appeler la fonction d'achat (nom à ajuster selon contrat: buyWithToken(address,uint256))
                     const vaultContract = new ethers.Contract(VAULT_ADDRESS, ["function buyWithToken(address token, uint256 amount) public"], signer);
                     const purchaseTx = await vaultContract.buyWithToken(tokenAddr, amountWei);
                     await purchaseTx.wait();
 
                     Swal.fire('Félicitations !', `Achat avec ${tokenSelected} sécurisé.`, 'success');
                 }
-                updateBalances(); // Rafraîchir les chiffres dans le Guide Poche
+                updateBalances();
             } catch (error) {
                 console.error(error);
                 Swal.fire('Erreur', 'La transaction a échoué. Vérifiez votre solde.', 'error');
@@ -409,11 +409,11 @@
             whitepaperBox.classList.toggle('open');
             whitepaperBox.innerHTML = `
                 <div style="max-height: 70vh; overflow-y: auto; padding: 20px;">
-                    <h2 style="color:#D4AF37; margin-bottom:16px;">ARCANA SAFE — PROTOCOLE DE SÉCURITÉ FINANCIÈRE</h2>
+                    <h2 style="color:#D4AF37; margin-bottom:16px;">ARCANA — PROTOCOLE DE SÉCURITÉ FINANCIÈRE</h2>
 
                     <h4 style="color:#D4AF37; margin-top:24px;">1. Vision & Mission</h4>
                     <p style="opacity:0.8;">
-                        Arcana Safe est une infrastructure décentralisée sur la blockchain Polygon visant à offrir un coffre-fort numérique ultra-sécurisé.<br>
+                        ARCANA est une infrastructure décentralisée sur la blockchain Polygon visant à offrir un coffre-fort numérique ultra-sécurisé.<br>
                         Notre mission est de protéger le capital des investisseurs contre la volatilité grâce à un système de réserve garanti par contrat intelligent.
                     </p>
 
@@ -427,7 +427,9 @@
                     <p style="opacity:0.8;">
                         <strong>Symbole :</strong> ARCANA<br>
                         <strong>Réseau :</strong> Polygon (PoS)<br>
-                        <strong>Objectif de levée :</strong> 1 200 000 $<br>
+                        <strong>Objectif de levée (Hardcap) :</strong> 1 200 000 $<br>
+                        <strong>Approvisionnement (Supply) :</strong> 900 000 000 ARCANA<br>
+                        <strong>Prix par jeton ARCANA :</strong> 0.0026 $<br>
                         <strong>Usage :</strong> Jeton de gouvernance et clé d'accès premium au Vault.<br>
                         <strong>Répartition :</strong> Prévente, liquidité, réserve communautaire, développement.<br>
                         <strong>Capitalisation initiale cible :</strong> 1 200 000 $ lors de la prévente.
@@ -436,6 +438,8 @@
                     <h4 style="color:#D4AF37; margin-top:24px;">4. Mécanisme de Prévente (Launchpad)</h4>
                     <p style="opacity:0.8;">
                         La prévente ARCANA s'effectue via un launchpad dédié avec paiement possible en POL, USDT ou USDC.<br>
+                        La quantité d'ARCANA reçue :<br>
+                        <strong>Montant en $ / 0.0026 = Nombre d'ARCANA</strong><br>
                         Un système de vesting protège le prix et distribue progressivement les allocations.<br>
                         Le Dashboard permet de suivre son allocation et calendrier de vesting en temps réel.
                     </p>
@@ -452,7 +456,7 @@
                     <p style="opacity:0.8;">
                         <strong>Q1 2026 :</strong> Fin de la prévente, listing ARCANA sur QuickSwap & Uniswap<br>
                         <strong>Q2 2026 :</strong> Lancement Dashboard Staking & Earn (stake ARCANA pour des récompenses)<br>
-                        <strong>Q3 2026 :</strong> Lancement du protocole d'assurance Arcana<br>
+                        <strong>Q3 2026 :</strong> Lancement du protocole d'assurance ARCANA<br>
                         <strong>Q4 2026 :</strong> Décentralisation de la gouvernance (DAO) & nouveaux partenariats stratégiques
                     </p>
                 </div>
