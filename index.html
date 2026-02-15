@@ -92,26 +92,18 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bloc Sanctuaire — en début de main, aligné à gauche */
-        .sanctuary-block {
-            display: flex; flex-direction: column; align-items: flex-start;
-            margin-bottom: 24px;
-        }
+        /* Bouton Sanctuaire — effet scintillement doré */
         .btn-sanctuary-glow {
-            display: block; width: fit-content; margin-bottom: 10px;
             padding: 14px 28px; font-family: 'Cinzel', serif; font-weight: 700;
             letter-spacing: 0.15em; color: #1a1510; background: linear-gradient(135deg, #d4af37, #f2d06b);
             border: 2px solid #b8860b; border-radius: 8px; cursor: pointer;
-            box-shadow: 0 0 15px #D4AF37;
-            animation: pulse-gold 2s infinite;
+            animation: glow-pulse 2s infinite;
         }
-        @keyframes pulse-gold {
+        @keyframes glow-pulse {
             0% { box-shadow: 0 0 5px #D4AF37; }
             50% { box-shadow: 0 0 25px #D4AF37, 0 0 40px rgba(212, 175, 55, 0.6); }
             100% { box-shadow: 0 0 5px #D4AF37; }
         }
-        .sanctuary-email { font-size: 14px; color: white; }
-        .sanctuary-email a { color: white; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -127,10 +119,6 @@
     </nav>
 
     <main class="container mx-auto px-4 py-8">
-        <div class="sanctuary-block">
-            <button onclick="window.location.href='arcanagame.html'" class="btn-sanctuary-glow">ENTRER DANS LE SANCTUAIRE</button>
-            <p class="sanctuary-email">Contact : <a href="mailto:blockarcana-admin@proton.me">blockarcana-admin@proton.me</a></p>
-        </div>
         <div class="glass-vault max-w-4xl mx-auto p-10 md:p-16 text-center">
             <h2 class="font-prestige text-4xl md:text-5xl mb-4 text-white tracking-[0.2em]">THE ARCANA VAULT</h2>
             <p class="text-gray-400 italic text-lg mb-12">Secure your financial future.</p>
@@ -165,6 +153,10 @@
                 <div id="whitepaperBox" class="whitepaper-dropdown text-left text-[11px] leading-relaxed text-gray-300">
                     <!-- Le whitepaper complet est injecté dynamiquement -->
                 </div>
+            </div>
+            <div style="text-align: left; margin-top: 24px;">
+                <button onclick="window.location.href='arcanagame.html'" class="btn-sanctuary-glow" style="display: block; margin-top: 40px; margin-bottom: 10px;">ENTRER DANS LE SANCTUAIRE</button>
+                <p style="font-size: 14px; color: rgba(255,255,255,0.7); text-align: left;">Contact : <a href="mailto:blockarcana-admin@proton.me" style="color: white; text-decoration: underline;">blockarcana-admin@proton.me</a></p>
             </div>
             <script>
                 // Taux fixe: prix par ARCANA
