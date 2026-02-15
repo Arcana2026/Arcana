@@ -714,10 +714,23 @@
           const { mainnet, polygon } = await import('https://esm.sh/viem/chains')
           const { watchAccount, getWalletClient } = await import('https://esm.sh/@wagmi/core@2.13.4')
           const projectId = '7004f981f33f063167f1395567798132'
-          const metadata = { name: 'Arcana', description: 'Arcana Game', url: 'https://arcana-ezl.pages.dev', icons: [] }
+          const metadata = {
+            name: 'Arcana',
+            description: 'Arcana Game - Écosystème Décentralisé sur Polygon',
+            url: 'https://arcana-ezl.pages.dev',
+            icons: ['https://arcana-ezl.pages.dev/favicon.ico']
+          }
           const chains = [mainnet, polygon]
           wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
-          createWeb3Modal({ wagmiConfig, projectId, chains })
+          createWeb3Modal({
+            wagmiConfig,
+            projectId,
+            chains,
+            defaultChain: polygon,
+            enableAnalytics: false,
+            enableOnramp: false,
+            featuredWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96']
+          })
           watchAccount(wagmiConfig, {
             onChange: async (account) => {
               if (account.address && window.arcanaOnW3mConnect) {
@@ -742,9 +755,15 @@
             adapters: [new Ethers5Adapter()],
             networks: [polygon],
             defaultNetwork: polygon,
-            metadata: { name: 'Arcana', description: 'Arcana Game', url: window.location.origin, icons: [] },
+            metadata: {
+              name: 'Arcana',
+              description: 'Arcana Game - Écosystème Décentralisé sur Polygon',
+              url: 'https://arcana-ezl.pages.dev',
+              icons: ['https://arcana-ezl.pages.dev/favicon.ico']
+            },
             projectId: '7004f981f33f063167f1395567798132',
-            features: { analytics: false },
+            features: { analytics: false, onramp: false },
+            explorerRecommendedWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
             themeMode: 'dark',
             themeVariables: { '--w3m-accent': '#d4af37' }
           });
