@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcana Game - Écosystème Décentralisé</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(212, 175, 55, 0.3);
+            --rune-glow-blue: #49cafa;
+            --frost-muted: #adb5bd;
+        }
+        body {
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        #star-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            margin: 15px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            z-index: 1;
+            transition: border 0.19s, box-shadow 0.16s;
+        }
+        .glass-panel.glitch {
+            /* Glitch border red effect */
+            animation: glitch-border 0.12s steps(1) infinite alternate, border-shake 0.17s linear infinite alternate;
+            border: 2.5px solid #ff2424 !important;
+            box-shadow: 0 0 22px 4px #ff2424, 0 0 2px 2px #d10000 inset;
+        }
+        @keyframes glitch-border {
+            0% { filter: none; }
+            25% { filter: contrast(1.3) brightness(1.1) hue-rotate(-12deg); }
+            51% { filter: contrast(2.4) brightness(1.2) hue-rotate(10deg); }
+            75% { filter: saturate(2) brightness(0.97) grayscale(0.2); }
+            100% { filter: none; }
+        }
+        @keyframes border-shake {
+            0%   { box-shadow: 0 0 15px 2px #af2222, 0 0 5px 2px #ff3c3c inset; }
+            45%  { box-shadow: -2px 1px 22px 4px #ff2424, 1px -1px 2px 2px #ff7676 inset; }
+            51%  { box-shadow: 1px -2px 23px 1px #e71e1e, 0 1px 2.5px 1px #ffe4e4 inset; }
+            100% { box-shadow: 0 0 22px 4px #ff2424, 0 0 2px 2px #d10000 inset; }
+        }
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-connect {
+            background: linear-gradient(45deg, #d4af37, #f2d06b);
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-connect:hover:not([disabled]):not(.disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--gold);
+            cursor: pointer;
+        }
+        .btn-connect[disabled], .btn-connect.disabled {
+            background: linear-gradient(45deg, #d4d4d4, #bbbbbb) !important;
+            color: #888 !important;
+            cursor: not-allowed;
+            opacity: 0.68;
+        }
+        .title-vault {
+            text-align: center;
+            font-size: 1.8em;
+            letter-spacing: 3px;
+            margin: 30px 0;
+        }
+        /* Section Oracle (Niveau 2) */
+        .oracle-mirror {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.2), transparent);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+        .oracle-mirror.frozen {
+            border: 3px solid #b9e9ff !important;
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.4), transparent) !important;
+            box-shadow: 0 0 30px #49cafa, 0 0 10px #ffffff inset !important;
+        }
+        /* Salle 2 (Niveau 2) : matière moins transparente pour immersion */
+        #level-2-panel {
+            background: rgba(0, 0, 0, 0.52);
+        }
+        #level-2-panel:has(.oracle-mirror.frozen) {
+            background: radial-gradient(ellipse at center, rgba(135, 206, 235, 0.2) 0%, rgba(100, 149, 237, 0.15) 40%, rgba(0, 0, 0, 0.55) 100%);
+            backdrop-filter: blur(12px) contrast(1.2) brightness(1.2);
+            -webkit-backdrop-filter: blur(12px) contrast(1.2) brightness(1.2);
+            border: 2px solid rgba(185, 233, 255, 0.5);
+            box-shadow: 0 0 25px rgba(135, 206, 235, 0.25), inset -10px -10px 30px rgba(135, 206, 235, 0.08), inset 10px 10px 20px rgba(255, 255, 255, 0.06);
+            opacity: 0.98;
+        }
+        .oracle-temp-warning {
+            color: var(--frost-muted);
+            font-weight: 600;
+            font-size: 1.02em;
+            text-align: center;
+            margin-top: 1em;
+        }
+        #chat-temple {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            max-height: 200px;
+            font-size: 0.9em;
+        }
+        .input-arcana {
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
+            color: var(--gold);
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+        .label-gold {
+            color: var(--gold);
+            text-transform: uppercase;
+            font-size: 0.7em;
+            letter-spacing: 1px;
+        }
+        .class-card {
+            cursor: pointer;
+            padding: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 15px;
+            transition: 0.3s;
+            width: 80px;
+        }
+        .class-card:hover {
+            background: rgba(214, 175, 55, 0.2);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px var(--gold);
+            transform: translateY(-5px);
+        }
+        .class-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        /* Digital Countdown style */
+        .digital-timer {
+            font-family: 'Orbitron', 'VT323', monospace;
+            font-size: 2.2em;
+            color: var(--gold);
+            text-align: center;
+            letter-spacing: 0.08em;
+            background: rgba(64,43,3,0.12);
+            text-shadow: 0 0 5px #d4af37, 0 0 18px rgba(212,175,55,0.25);
+            padding: 8px 0;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            font-variant-numeric: tabular-nums;
+            border: 1px solid rgba(212, 175, 55, 0.11);
+            transition: color 0.3s, background 0.3s;
+        }
+        .digital-timer.danger {
+            color: #fff0f0;
+            background: #b30505DD;
+            text-shadow: 0 0 9px #ff2424, 0 0 36px #ff555555;
+            border-color: #ff2424aa;
+            animation: glitch-border 0.15s steps(1) infinite alternate;
+        }
+        /* Runes grid */
+        #runes-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin: 35px 0 15px 0;
+        }
+        .rune-btn {
+            font-size: 2.2em;
+            padding: 22px 0 14px 0;
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.08) 60%, rgba(212, 175, 55, 0.13));
+            color: var(--gold);
+            box-shadow: 0 0 10px rgba(212,175,55,0.13);
+            cursor: pointer;
+            transition: background 0.12s, transform 0.2s, box-shadow 0.2s, border-color 0.17s, color 0.15s;
+            outline: none;
+            user-select: none;
+        }
+        .rune-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--gold);
+            cursor: pointer;
+        }
+        .rune-btn.selected {
+            background: linear-gradient(120deg, #d4af37 45%, #f2d06b 85%);
+            color: #181312;
+            border-color: #d4af37;
+            box-shadow: 0 0 18px #f5df99, 0 0 6.5px #fffba8;
+            transform: translateY(-2px) scale(1.09);
+        }
+        .rune-btn.good {
+            /* Bonne rune s'illumine bleu/or */
+            background: linear-gradient(120deg, var(--rune-glow-blue) 10%, #d4af37 70%);
+            color: #fff;
+            border-color: var(--rune-glow-blue);
+            box-shadow: 0 0 23px var(--rune-glow-blue), 0 0 12px #d4af37;
+            animation: glow-highlight 0.8s 1;
+        }
+        .rune-btn.bad {
+            /* Rune cliquée erreurr : effet rouge */
+            background: linear-gradient(120deg,#ed1c24 30%,#d4af37 99%);
+            color: #fff;
+            border-color: #fb5599;
+            box-shadow: 0 0 22px #ed1c24, 0 0 6px #fff7;
+            animation: wrongBtn 0.36s;
+        }
+        @keyframes glow-highlight {
+            0%{ box-shadow: 0 0 0 #fff0, 0 0 0 #fff0;}
+            8%{ box-shadow: 0 0 8px 4px var(--rune-glow-blue), 0 0 1px 1px #eaffff;}
+            80%{ box-shadow: 0 0 23px var(--rune-glow-blue), 0 0 12px #d4af37;}
+            100%{ }
+        }
+        @keyframes wrongBtn {
+            0%{filter:none;}
+            25%{filter:brightness(2) saturate(2.4);}
+            50%{filter:contrast(4);}
+            100%{filter:none;}
+        }
+        /* Progress bar */
+        .alignement-container {
+            width: 100%;
+            margin: 18px 0 8px 0;
+        }
+        .alignement-label {
+            font-size: 1em;
+            color: var(--gold);
+            opacity: 0.92;
+            text-align: left;
+            margin-bottom: 4px;
+            line-height: 1.2;
+            letter-spacing: 0.04em;
+        }
+        .alignement-bar-bg {
+            background: rgba(255,255,255,0.09);
+            border-radius: 9px;
+            width: 100%;
+            height: 18px;
+            overflow: hidden;
+            border: 1px solid var(--gold);
+            margin-bottom: 2px;
+        }
+        .alignement-bar-fill {
+            background: linear-gradient(90deg, #d4af37 30%, #f5df99 100%);
+            height: 100%;
+            width: 0%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px 0 rgba(212,175,55,0.32);
+            transition: width 0.5s cubic-bezier(.62,1.41,.84,.74);
+        }
+        .alignement-percentage {
+            font-size: 0.96em;
+            color: var(--gold);
+            text-align: right;
+            margin-right: 5px;
+            margin-top: -15px;
+            margin-bottom: 0;
+            opacity: 0.84;
+            letter-spacing: 0.03em;
+        }
+        /* Salle 3 (Sanctuaire) : pierre ancienne, bordure dorée pulsante */
+        @keyframes golden-border-pulse {
+            0%, 100% { box-shadow: 0 0 12px rgba(212, 175, 55, 0.5); border-color: rgba(212, 175, 55, 0.9); }
+            50% { box-shadow: 0 0 22px rgba(212, 175, 55, 0.7); border-color: #d4af37; }
+        }
+        #level-3-sanctuary {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 1111;
+            transform: translate(-50%, -50%);
+            max-width: 480px;
+            width: 94vw;
+            background-color: #1c1a18;
+            background-image: repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px), repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px), linear-gradient(145deg, #252220 0%, #1a1816 18%, #2a2622 38%, #1e1c1a 55%, #252220 72%, #181614 88%, #0f0e0c 100%);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 3px solid #b8860b;
+            border-radius: 20px;
+            box-shadow: 0 0 18px rgba(184, 134, 11, 0.35), inset 0 1px 0 rgba(212, 175, 55, 0.15), 0 0 0 1px rgba(212, 175, 55, 0.2);
+            animation: golden-border-pulse 2.5s ease-in-out infinite;
+            box-sizing: border-box;
+        }
+        @media (max-width: 600px) {
+            #level-3-sanctuary {
+                padding: 5px;
+                max-width: 97vw;
+            }
+        }
+        /* JACKPOT VICTORY style */
+        #victory-jackpot {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0;left: 0;right:0;bottom:0;
+            background:rgba(20, 10, 1, 0.95);
+            width:100vw; height:100vh;
+            pointer-events: none;
+        }
+        #victory-jackpot .victory-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -70%);
+            color: #ffd900;
+            font-size: 2.7em;
+            font-family:'Orbitron','VT323',monospace;
+            letter-spacing: 0.13em;
+            text-align:center;
+            text-shadow: 0 0 22px #fff799, 0 0 48px #d4af37, 0 0 128px #ffed80;
+            filter: brightness(1.3) drop-shadow(0 0 16px #f2cf5e);
+            animation:victoryPopup 1s cubic-bezier(.38,2,0,.97);
+        }
+        @keyframes victoryPopup {
+            0%{opacity:0;transform: translate(-50%,-46%) scale(0.7);}
+            85%{opacity:1;transform: translate(-50%,-48%) scale(1.07);}
+            100%{opacity:1;transform:translate(-50%,-70%) scale(1);}
+        }
+        /* Golden Rain Particles - au-dessus des murs de pierre */
+        .gold-rain {
+            position: absolute;
+            pointer-events: none;
+            z-index: 2200;
+            top:0; left:0;width:100vw;height:100vh;overflow:hidden;
+        }
+        .gold-drop {
+            position: absolute;
+            width: 7px; height: 25px;
+            border-radius: 7px 7px 9px 9px/13px;
+            opacity: 0.98;
+            background: linear-gradient(179deg,#fffbe7 4%,#ffe769 33%,#ecd16b 85%,#d4af37 100%);
+            filter: blur(0.2px) brightness(1.18);
+            box-shadow: 0 0 3px #fffbe7, 0 8px 24px #d4af3799;
+            animation: gold-rain-swoosh 1.45s linear forwards;
+        }
+        @keyframes gold-rain-swoosh {
+            0% { transform: translateY(-70px) scaleY(0.5) rotate(-9deg);}
+            26%{ opacity: 1;}
+            90% { opacity: 0.98;}
+            100% { transform: translateY(110vh) scaleY(1.1) rotate(7deg); opacity: 0;}
+        }
+        /* Nouveaux styles pour le sélecteur de token */
+        .token-select-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .arcana-token-option {
+            color: #FADB1C;
+        }
+
+        /* Brume atmosphérique en bas d'écran */
+        #arcana-fog {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35vh;
+            pointer-events: none;
+            z-index: 100;
+            background: linear-gradient(to top, rgba(180, 200, 220, 0.25) 0%, rgba(140, 160, 180, 0.12) 30%, transparent 70%);
+            filter: blur(25px);
+            -webkit-filter: blur(25px);
+            opacity: 0.7;
+            animation: fog-drift 12s ease-in-out infinite;
+            transition: opacity 1.2s ease, height 1.2s ease, background 1.2s ease;
+        }
+        #arcana-fog::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            background: linear-gradient(95deg, transparent 0%, rgba(200, 215, 230, 0.15) 25%, rgba(180, 200, 220, 0.18) 50%, rgba(200, 215, 230, 0.12) 75%, transparent 100%);
+            animation: fog-sweep 15s ease-in-out infinite;
+        }
+        #arcana-fog.sanctuary-active {
+            height: 55vh;
+            opacity: 0.92;
+            background: linear-gradient(to top, rgba(220, 230, 245, 0.55) 0%, rgba(200, 215, 235, 0.35) 25%, rgba(180, 200, 220, 0.15) 55%, transparent 85%);
+            filter: blur(35px);
+            -webkit-filter: blur(35px);
+        }
+        #arcana-fog.jackpot-golden {
+            background: linear-gradient(to top, rgba(212, 175, 55, 0.45) 0%, rgba(212, 175, 55, 0.25) 30%, rgba(184, 134, 11, 0.12) 60%, transparent 90%) !important;
+            filter: blur(40px);
+            -webkit-filter: blur(40px);
+            opacity: 0.95;
+            transition: background 10s ease, opacity 10s ease;
+        }
+        @keyframes fog-drift {
+            0%, 100% { transform: translateX(0) scaleX(1); }
+            50% { transform: translateX(2%) scaleX(1.02); }
+        }
+        @keyframes fog-sweep {
+            0%, 100% { transform: translateX(0); opacity: 0.6; }
+            50% { transform: translateX(5%); opacity: 1; }
+        }
+
+        /* Mentions légales / discrètes en bas de page */
+        .arcana-mention {
+            width: 100%;
+            text-align: center;
+            color: #b0a77b;
+            opacity: 0.44;
+            font-size: 0.98em;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            letter-spacing: 0.05em;
+            position: fixed;
+            left: 0;
+            bottom: 5px;
+            z-index: 3;
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+    <!-- Google Fonts for digital effect -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="star-container"></div>
+    <div id="arcana-fog" aria-hidden="true"></div>
+    <header>
+        <div class="logo-area">
+            <div style="width:40px; height:40px; background:var(--gold); border-radius:16%; box-shadow:0 0 12px #ffeaa5;"><span style="font-size:1.6em; display:block; line-height:40px; text-align:center;">🎲</span></div>
+            <div><strong>ARCANA GAME</strong><br><span style="font-size:0.68em; color:var(--gold); font-weight:500;">ÉCOSYSTÈME</span></div>
+        </div>
+        <div id="web3modal-connect-wrap"><w3m-button></w3m-button></div>
+    </header>
+
+    <div class="title-vault">THE ARCANA VAULT</div>
+    <div id="class-selection" class="glass-panel" style="display:none; text-align:center;">
+        <div class="label-gold">Rite d'Engagement / Étape 1</div>
+        <h2 style="letter-spacing: 2px;">CHOISISSEZ VOTRE DESTIN</h2>
+        <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+            <div class="class-card" onclick="selectClass('Scribe')">
+                <div class="class-icon">📜</div>
+                <p>SCRIBE</p>
+            </div>
+            <div class="class-card" onclick="selectClass('Invocateur')">
+                <div class="class-icon">🔥</div>
+                <p>INVOCATEUR</p>
+            </div>
+            <div class="class-card" onclick="selectClass('Gardien')">
+                <div class="class-icon">🛡️</div>
+                <p>GARDIEN</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="level-2-panel" class="glass-panel">
+        <div class="label-gold">Guide Poche / Niveau 2</div>
+        <div class="oracle-mirror">
+            <span id="temp">–</span>
+        </div>
+        <div id="oracle-warning-message" class="oracle-temp-warning" style="display:none;"></div>
+        <p style="text-align:center; font-size:0.8em; opacity:0.8;">Saisissez le sceau de l'alignement pour le Niveau 3</p>
+        <input type="text" id="sealCodeInput" class="input-arcana" placeholder="CODE DE 6 CARACTÈRES">
+        <button class="btn-connect" id="btnSeal" onclick="onSealClick()" style="width:100%; margin-top:15px;">SCELLER LE DESTIN</button>
+        <div class="token-select-group">
+            <input id="amountInput" type="number" min="0" step="any" class="input-arcana" placeholder="Montant" style="width: 110px;">
+            <select id="tokenSelect" class="input-arcana" style="width: 120px; margin-top: 0;">
+                <option value="ARCANA" class="arcana-token-option">ARCANA</option>
+                <option value="USDT">USDT</option>
+                <option value="USDC">USDC</option>
+                <option value="MATIC">MATIC</option>
+            </select>
+        </div>
+        <button id="btnDeposit" onclick="payStake()" class="btn-connect" style="width:100%; margin-top:15px; background:linear-gradient(45deg,#0d6b0d,#1a9c1a);">DÉPOSER</button>
+        <small style="color:var(--gold); opacity:0.85; display:block; margin-top:7px;">Dépôt possible en ARCANA, USDT, USDC, MATIC sur le réseau Polygon.</small>
+    </div>
+
+    <div id="chat-temple" class="glass-panel">
+        <div class="label-gold">Chat du Temple</div>
+        <div style="margin-top:10px; height:80px; overflow-y:auto; border-bottom:1px solid var(--glass-border);">
+            <p style="margin:5px 0;"><em>Système : Les trois classes sont réunies.</em></p>
+            <p style="margin:5px 0;"><b style="color:var(--gold)">Scribe :</b> J'ai les deux premiers chiffres !</p>
+        </div>
+        <input type="text" class="input-arcana" style="font-size:0.8em; padding:5px;" placeholder="Message aux initiés...">
+    </div>
+
+    <span class="admin-trigger" onclick="toggleAdmin()" title="L'Œil d'Arcana (Ctrl+Shift+A)">👁 Admin</span>
+
+    <div id="admin-dashboard" class="glass-panel" style="display:none;">
+        <button class="admin-close" onclick="hideAdmin()" title="Fermer">×</button>
+        <div class="label-gold" style="color: rgba(220, 100, 100);">L'ŒIL D'ARCANA</div>
+        <h3 style="letter-spacing: 2px; font-size: 1em;">Tableau de bord administrateur</h3>
+        <div class="admin-stat"><span class="label-gold">Joueurs Connectés :</span> <span id="admin-players">0</span></div>
+        <div class="admin-stat"><span class="label-gold">MATIC (natif) :</span> <span id="admin-balance">—</span></div>
+        <div class="admin-stat"><span class="label-gold">ARCANA (jeton) :</span> <span id="admin-arcana-balance">—</span></div>
+        <div class="admin-stat"><span class="label-gold">Statut Oracle (Température) :</span> <span id="admin-oracle">—</span></div>
+        <button id="force-open" onclick="forceOpenAdmin()" class="btn-connect" style="width:100%; margin-top:15px; background:linear-gradient(45deg,#8b2222,#c03030);">FORCE OUVERTURE</button>
+        <div class="label-gold" style="margin-top:15px;">Message aux Initiés</div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+            <input type="text" id="broadcast-input" class="input-arcana" placeholder="Message aux Initiés" style="flex:1; margin-top:0;">
+            <button onclick="emitBroadcast()" class="btn-connect" style="margin-top:0;">ÉMETTRE</button>
+        </div>
+        <div class="label-gold" style="margin-top:15px;">Log en temps réel</div>
+        <div id="admin-log"></div>
+    </div>
+    
+    <!-- ==== Sanctuaire du Destin (Niveau 3) ==== -->
+    <div id="level-3-sanctuary" class="glass-panel">
+        <div class="digital-timer" id="sanctuary-timer">15:00</div>
+        <h2 style="color:var(--gold); letter-spacing:2px; text-align:center; margin-bottom:0.3em;">
+            LE SANCTUAIRE DU DESTIN
+        </h2>
+        <div class="alignement-container">
+            <div class="alignement-label">Alignement du Sceau</div>
+            <div class="alignement-bar-bg">
+                <div id="alignement-fill" class="alignement-bar-fill"></div>
+            </div>
+            <div id="alignement-percent" class="alignement-percentage">0%</div>
+        </div>
+        <div id="runes-grid">
+            <!-- Les 12 symboles mystiques -->
+            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)">⏀</button>
+            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)">⏃</button>
+            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)">⏇</button>
+            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)">⎈</button>
+            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)">⎔</button>
+            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)">⌬</button>
+            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)">⏍</button>
+            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)">⏦</button>
+            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)">⧖</button>
+            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)">⧉</button>
+            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)">⨇</button>
+            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)">⩓</button>
+        </div>
+        <div id="sanctuary-success" style="display:none; margin-top: 1em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.1em;">
+            Sceau aligné ! Le Destin est révélé...
+        </div>
+    </div>
+    <!-- Victoire JACKPOT : pluie d'or -->
+    <div id="victory-jackpot">
+        <div class="victory-text">✨ JACKPOT DÉVERROUILLÉ<br><span style="font-size:0.62em;color:#fff;letter-spacing:0.09em;">Le Destin, scellé dans l'or éternel</span></div>
+        <div class="gold-rain"></div>
+    </div>
+    <!-- Web3Modal v3 / Reown AppKit -->
+    <script type="module">
+    (async function() {
+        const PROJECT_ID = '7004f981f33f063167f1395567798132';
+        try {
+            const { createAppKit } = await import('https://esm.sh/@reown/appkit@1.8.18');
+            const { polygon } = await import('https://esm.sh/@reown/appkit@1.8.18/networks');
+            const { Ethers5Adapter } = await import('https://esm.sh/@reown/appkit-adapter-ethers5@0.2.6');
+            const modal = createAppKit({
+                adapters: [new Ethers5Adapter()],
+                networks: [polygon],
+                defaultNetwork: polygon,
+                metadata: { name: 'Arcana Game', description: 'Écosystème Décentralisé', url: window.location.origin, icons: ['https://avatars.githubusercontent.com/u/179229932'] },
+                projectId: PROJECT_ID,
+                features: { analytics: false },
+                themeMode: 'dark',
+                themeVariables: { '--w3m-accent': '#d4af37' }
+            });
+            modal.subscribeProvider(async (state) => {
+                if (state.isConnected && state.provider) {
+                    const prov = new ethers.providers.Web3Provider(state.provider, 'any');
+                    const sgn = prov.getSigner();
+                    const acc = await sgn.getAddress();
+                    if (window.arcanaOnW3mConnect) window.arcanaOnW3mConnect(prov, sgn, acc);
+                }
+            });
+            modal.subscribeEvents((event) => {
+                if (event?.data?.event === 'CONNECT' && window.arcanaOnW3mConnect) {
+                    const p = modal.getWalletProvider();
+                    if (p) {
+                        const prov = new ethers.providers.Web3Provider(p, 'any');
+                        prov.getSigner().then(sgn => sgn.getAddress().then(acc => window.arcanaOnW3mConnect(prov, sgn, acc)));
+                    }
+                }
+            });
+        } catch (e) { console.warn('Web3Modal init:', e); document.getElementById('web3modal-connect-wrap').innerHTML = '<button class="btn-connect" onclick="connectWallet()">CONNECT WALLET</button>'; }
+    })();
+    </script>
+    <!-- Heartbeat audio (muted/loop, started in JS) -->
+    <audio id="heartbeat-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/08/20/audio_12c959d8f4.mp3"></audio>
+    <audio id="triumph-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/01/18/audio_8f0bc6dc2b.mp3"></audio>
+
+    <div class="arcana-mention">Arcana Game - Écosystème Décentralisé</div>
+</body>
+
+<!-- Lien stylisé d'ajout de token ARCANA à MetaMask juste après le bouton de dépôt -->
+<style>
+.arcana-add-metamask-link {
+    display: inline-block;
+    margin-top: 6px;
+    color: #ffd700;
+    font-size: 0.92em;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: underline dotted;
+    transition: color 0.18s;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+.arcana-add-metamask-link:hover {
+    color: #fff2b8;
+    text-decoration: underline;
+}
+</style>
+<script>
+    // --- CONFIGURATION OFFICIELLE ARCANA GAME ---
+    const ARCANA_GAME_CONTRACT = "0xFABF1FcFB7dA0Aa861A61747E1e5a2F2F8E9E337";
+    const ADMIN_ADDRESS = ""; // À REMPLIR : adresse 0x... du wallet autorisé pour Force Ouverture
+    const ARCANA_TOKEN_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
+    const USDT_TOKEN_ADDRESS   = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+    const USDC_TOKEN_ADDRESS   = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+    // Pour MATIC natif, pas besoin d'adresse.
+    // Ajouter l'adresse du contrat d'Arcana Game pour la température si c'est un autre contrat
+    const ARCANA_GAME_ORACLE_ABI = [
+        "function currentTemp() view returns (int256)",
+        "function updateOracle(int256 _temp) external"
+    ];
+
+    // ERC20 ABI minimum pour approve/allowance/transferFrom/balanceOf (lecture+Transfert)
+    const ERC20_ABI = [
+        "function approve(address,uint256) public returns (bool)",
+        "function allowance(address,address) public view returns (uint256)",
+        "function balanceOf(address) public view returns (uint256)",
+        "function decimals() public view returns (uint8)",
+        "function transfer(address,uint256) public returns (bool)"
+    ];
+
+    // Polygon chainId
+    const POLYGON_CHAIN_ID = "0x89"; // 137
+
+    var provider, signer, account;
+    window.arcanaOnW3mConnect = function(prov, sgn, acc) {
+        provider = prov; signer = sgn; account = acc;
+        fetchAndDisplayTemperature();
+        var btn = document.querySelector('#web3modal-connect-wrap .btn-connect');
+        if (btn) btn.innerText = 'Connecté';
+    };
+
+    // ----------------------- TEMPÉRATURE ORACLE -----------------------
+
+    // Remplace ici si le contrat de température est un autre ! (Sinon garde ARCANA_GAME_CONTRACT)
+    const ARCANA_GAME_ORACLE_CONTRACT = ARCANA_GAME_CONTRACT; 
+
+    async function fetchAndDisplayTemperature() {
+        try {
+            // Utilise provider public ou connecte au wallet au besoin
+            if (!provider) {
+                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
+            }
+            const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
+
+            let tempRaw = await oracle.currentTemp();
+            let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
+
+            const tempDisplay = document.getElementById('temp');
+            const depositBtn = document.getElementById('btnDeposit');
+            const warningMsg = document.getElementById('oracle-warning-message');
+            const oracleMirror = document.querySelector(".oracle-mirror");
+
+            // Affiche la température
+            if (tempC <= -10) {
+                tempDisplay.textContent = `${tempC}°C`;
+                if (warningMsg) warningMsg.style.display = "none";
+                if (depositBtn) {
+                    depositBtn.disabled = false;
+                    depositBtn.classList.remove("disabled");
+                    depositBtn.title = "";
+                }
+                // Ajoute le style frozen à l'oracle miroir
+                if (oracleMirror) {
+                    oracleMirror.classList.add("frozen");
+                }
+            } else {
+                tempDisplay.textContent = `${tempC}°C`;
+                // Affiche le message seulement si température > -10°C
+                if (warningMsg) {
+                  warningMsg.textContent = "Le givre ne s'est pas encore formé. Revenez quand Montréal gèlera.";
+                  warningMsg.style.display = "block";
+                }
+                if (depositBtn) {
+                  depositBtn.disabled = true;
+                  depositBtn.classList.add("disabled");
+                  depositBtn.title = "Les dépôts sont désactivés tant que Montréal n'est pas gelé.";
+                }
+                // Retire le style frozen de l'oracle miroir
+                if (oracleMirror) {
+                    oracleMirror.classList.remove("frozen");
+                }
+            }
+        } catch(e) {
+            const tempDisplay = document.getElementById('temp');
+            if (tempDisplay) tempDisplay.textContent = "??°C";
+            const warningMsg = document.getElementById('oracle-warning-message');
+            if (warningMsg) {
+                warningMsg.textContent = "Impossible de récupérer la température de l'oracle.";
+                warningMsg.style.display = "block";
+            }
+            const depositBtn = document.getElementById('btnDeposit');
+            if (depositBtn) {
+                depositBtn.disabled = true;
+                depositBtn.classList.add("disabled");
+                depositBtn.title = "Erreur sur l'oracle météo.";
+            }
+            const oracleMirror = document.querySelector(".oracle-mirror");
+            if (oracleMirror) {
+                oracleMirror.classList.remove("frozen");
+            }
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchAndDisplayTemperature();
+
+        // Optionnel : rafraîchit auto toutes les 3 minutes (si tu veux)
+        setInterval(fetchAndDisplayTemperature, 180*1000);
+    });
+
+    // Codes valides pour ouvrir le Sanctuaire (Niveau 3)
+    const VALID_SEAL_CODES = ['ARCANA2026'];
+
+    function showStyledAlert(message) {
+        const overlay = document.createElement('div');
+        overlay.id = 'arcana-alert-overlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;';
+        const box = document.createElement('div');
+        box.className = 'glass-panel';
+        box.style.cssText = 'max-width:360px;text-align:center;position:relative;';
+        box.innerHTML = '<p style="color:var(--gold);margin:0 0 20px 0;font-size:1em;line-height:1.4;">' + message + '</p><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;">OK</button>';
+        overlay.appendChild(box);
+        overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+        document.body.appendChild(overlay);
+    }
+
+    async function onSealClick() {
+        const level2Panel = document.getElementById('level-2-panel');
+        const codeInput = document.getElementById('sealCodeInput');
+        const btnSeal = document.getElementById('btnSeal');
+
+        btnSeal.disabled = true;
+        try {
+            if (!provider) {
+                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
+            }
+            const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
+            const tempRaw = await oracle.currentTemp();
+            const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
+
+            if (tempC > -10) {
+                showStyledAlert('Le givre n\'est pas encore assez profond pour ouvrir les portes du Sanctuaire.');
+                return;
+            }
+
+            const code = (codeInput.value || '').trim();
+            const isValidCode = VALID_SEAL_CODES.some(c => code.toUpperCase() === c.toUpperCase());
+
+            if (!isValidCode) {
+                vibratePanel(level2Panel);
+                const origBorder = codeInput.style.border;
+                codeInput.style.border = '2px solid #ff2424';
+                codeInput.style.transition = 'border 0.2s';
+                setTimeout(function() {
+                    codeInput.style.border = origBorder || '';
+                }, 1000);
+                return;
+            }
+
+            level2Panel.style.transition = 'opacity 0.5s ease';
+            level2Panel.style.opacity = '0';
+            setTimeout(function() {
+                level2Panel.style.display = 'none';
+                startFinalLevel();
+            }, 500);
+        } catch (e) {
+            showStyledAlert('Erreur : impossible de contacter l\'Oracle. ' + (e.message || e));
+        } finally {
+            btnSeal.disabled = false;
+        }
+    }
+
+    const ADMIN_SEAL_PASSWORD = 'ARCANA2026';
+    function toggleAdmin() {
+        const dash = document.getElementById('admin-dashboard');
+        if (!dash) return;
+        const willShow = (dash.style.display === 'none' || !dash.style.display);
+        if (willShow) {
+            const input = prompt('Saisissez le Sceau de l\'Administrateur');
+            if (input === null) return;
+            if ((input || '').trim().toUpperCase() !== ADMIN_SEAL_PASSWORD.toUpperCase()) {
+                alert('Accès refusé par l\'Oracle');
+                return;
+            }
+            dash.style.display = 'block';
+            refreshAdminStats();
+        } else {
+            dash.style.display = 'none';
+        }
+    }
+    function hideAdmin() {
+        const dash = document.getElementById('admin-dashboard');
+        if (dash) dash.style.display = 'none';
+    }
+    async function refreshAdminStats() {
+        const balanceEl = document.getElementById('admin-balance');
+        const arcanaBalanceEl = document.getElementById('admin-arcana-balance');
+        const oracleEl = document.getElementById('admin-oracle');
+        if (!balanceEl && !arcanaBalanceEl && !oracleEl) return;
+        try {
+            if (!provider) {
+                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
+            }
+            const contractAddr = ARCANA_GAME_CONTRACT;
+            if (balanceEl) {
+                const maticBalance = await provider.getBalance(contractAddr);
+                const maticFormatted = parseFloat(ethers.utils.formatEther(maticBalance)).toFixed(2);
+                balanceEl.textContent = maticFormatted + ' MATIC';
+            }
+            if (arcanaBalanceEl) {
+                const arcanaToken = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ERC20_ABI, provider);
+                const arcanaBalance = await arcanaToken.balanceOf(contractAddr);
+                const arcanaDecimals = await arcanaToken.decimals();
+                const arcanaFormatted = parseFloat(ethers.utils.formatUnits(arcanaBalance, arcanaDecimals)).toFixed(2);
+                arcanaBalanceEl.textContent = arcanaFormatted + ' ARCANA';
+            }
+            if (oracleEl) {
+                const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
+                const tempRaw = await oracle.currentTemp();
+                const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
+                oracleEl.textContent = tempC + '°C';
+            }
+        } catch (e) {
+            if (balanceEl) balanceEl.textContent = 'Erreur';
+            if (arcanaBalanceEl) arcanaBalanceEl.textContent = 'Erreur';
+            if (oracleEl) oracleEl.textContent = 'Erreur';
+        }
+    }
+    async function forceOpenAdmin() {
+        const btn = document.getElementById('force-open');
+        const logEl = document.getElementById('admin-log');
+        const btnOriginalText = btn ? btn.textContent : 'FORCE OUVERTURE';
+        if (btn) { btn.disabled = true; btn.textContent = '❄️ GIVRAGE EN COURS...'; }
+        try {
+            if (!signer) await connectWallet();
+            if (!signer) {
+                alert('Connexion au wallet requise. Veuillez déverrouiller MetaMask et réessayer.');
+                return;
+            }
+            account = await signer.getAddress();
+            if (ADMIN_ADDRESS && account.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
+                alert('Accès refusé. Seul l\'adresse admin peut effectuer cette action.');
+                return;
+            }
+            const contract = new ethers.Contract(ARCANA_GAME_CONTRACT, ARCANA_GAME_ORACLE_ABI, signer);
+            if (logEl) logEl.innerHTML += '<p>⏳ Envoi température -20°C au contrat...</p>';
+            const tx = await contract.updateOracle(-20);
+            if (logEl) logEl.innerHTML += '<p>⏳ Transaction en cours...</p>';
+            await tx.wait();
+            if (logEl) logEl.innerHTML += '<p>✅ Oracle forcé à -20°C. Le jeu est débloqué !</p>';
+            refreshAdminStats();
+            fetchAndDisplayTemperature();
+        } catch (e) {
+            if (logEl) logEl.innerHTML += '<p>❌ Erreur: ' + (e.message || e) + '</p>';
+            alert('Erreur Force Ouverture: ' + (e.message || e));
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = btnOriginalText; }
+        }
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+            e.preventDefault();
+            toggleAdmin();
+        }
+    });
+
+    // ===== Wallet connect & Polygon switch
+    async function connectWallet() {
+        if (!window.ethereum) {
+            alert("Veuillez installer MetaMask pour utiliser cette app.");
+            return;
+        }
+        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+        try {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            signer = provider.getSigner();
+            if (!signer) throw new Error('Impossible d\'obtenir le signer');
+            account = await signer.getAddress();
+
+            // Switch to Polygon if needed
+            const chainId = (await provider.getNetwork()).chainId;
+            if (chainId !== 137) {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: POLYGON_CHAIN_ID }]
+                    });
+                } catch(switchError) {
+                    // If chain isn't added
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: POLYGON_CHAIN_ID,
+                                chainName: "Polygon Mainnet",
+                                rpcUrls: ["https://polygon-rpc.com"],
+                                nativeCurrency: { name: "MATIC", symbol: "MATIC", decimals: 18 },
+                                blockExplorerUrls: ["https://polygonscan.com"]
+                            }]
+                        });
+                    } else {
+                        throw switchError;
+                    }
+                }
+            }
+
+            // Affichage du compte connecté (vous pouvez l'ajouter dans l'UI si besoin)
+            document.querySelector(".btn-connect").innerText = "Connecté";
+
+        } catch (err) {
+            if (err.code === 4001 || (err?.message && err.message.toLowerCase().includes('reject'))) {
+                alert("Connexion annulée. Veuillez déverrouiller MetaMask si nécessaire et réessayer.");
+            } else {
+                alert("Impossible de se connecter au wallet : " + (err.message || err));
+            }
+        }
+    }
+
+    // ============ FONCTION DE DÉPÔT MULTI-TOKEN POLYGON ==============
+    async function payStake() {
+        if (!window.ethereum) {
+            alert("Veuillez installer MetaMask pour utiliser cette app.");
+            return;
+        }
+        if (!signer || !account) await connectWallet();
+        if (!signer) {
+            alert("Connexion au wallet requise. Veuillez déverrouiller MetaMask et réessayer.");
+            return;
+        }
+
+        // Récupérer valeur/jeton sélectionné
+        const rawAmount = document.getElementById('amountInput').value;
+        const tokenSelected = document.getElementById('tokenSelect').value;
+        let amount = Number(rawAmount);
+
+        if (isNaN(amount) || amount <= 0) {
+            alert("Veuillez saisir un montant valide.");
+            return;
+        }
+
+        try {
+            let tokenAddress = null;
+            let isNative = false, decimals = 18;
+
+            // Détails par token
+            if (tokenSelected === "USDT") {
+                tokenAddress = USDT_TOKEN_ADDRESS;
+            } else if (tokenSelected === "USDC") {
+                tokenAddress = USDC_TOKEN_ADDRESS;
+            } else if (tokenSelected === "ARCANA") {
+                tokenAddress = ARCANA_TOKEN_ADDRESS;
+            } else if (tokenSelected === "MATIC") {
+                isNative = true;
+            } else {
+                throw new Error("Jeton non géré");
+            }
+
+            // Prepare amount in token's decimals
+            let parsedAmount = null;
+            if (!isNative) {
+                const token = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+                decimals = await token.decimals();
+                parsedAmount = ethers.utils.parseUnits(amount.toString(), decimals);
+            } else {
+                parsedAmount = ethers.utils.parseEther(amount.toString());
+            }
+
+            if (isNative) {
+                // ===== Dépôt en MATIC =====
+                const tx = await signer.sendTransaction({
+                    to: ARCANA_GAME_CONTRACT,
+                    value: parsedAmount
+                });
+                await tx.wait();
+                alert("Dépôt de " + amount + " MATIC envoyé!");
+            } else {
+                // ===== Dépôt ERC20 =====
+                // Vérifier allowance
+                const token = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+                const allowance = await token.allowance(account, ARCANA_GAME_CONTRACT);
+
+                if (allowance.lt(parsedAmount)) {
+                    // Approval nécessaire
+                    const tx1 = await token.approve(ARCANA_GAME_CONTRACT, parsedAmount);
+                    await tx1.wait();
+                }
+
+                // Transférer le montant au contrat
+                // (Le smart contract doit supporter receive/transferFrom)
+                const tx2 = await token.transfer(ARCANA_GAME_CONTRACT, parsedAmount);
+                await tx2.wait();
+                alert(`Dépôt de ${amount} ${tokenSelected} envoyé !`);
+            }
+        } catch (error) {
+            alert("Erreur lors du dépôt : " + (error.message || error));
+        }
+    }
+
+    // Ajout ARCANA à MetaMask
+    async function addArcanaToMetaMask() {
+        if (!window.ethereum) {
+            alert("Veuillez installer MetaMask !");
+            return;
+        }
+        try {
+            const wasAdded = await window.ethereum.request({
+                method: 'wallet_watchAsset',
+                params: {
+                    type: 'ERC20',
+                    options: {
+                        address: '0x1990fd46a1ad0344751be45d6779b8c1f827076d',
+                        symbol: 'ARCANA',
+                        decimals: 18,
+                        image: 'URL_DU_LOGO_ICI' // Remplacez par l'URL du logo ARCANA
+                    }
+                }
+            });
+            if (wasAdded) {
+                // Le token ARCANA a été ajouté avec succès
+            }
+        } catch (error) {
+            alert("Erreur lors de l'ajout du token : " + (error.message || error));
+        }
+    }
+
+    // Ajoute dynamiquement le lien sous le bouton de dépôt au chargement DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        // On cherche le bouton de dépôt (btn-stake ou btn-depot selon ton HTML)
+        // Adaptation : on cherche le parent autour du bouton stake ou le select jeton
+        let stakeBtn = document.querySelector('.btn-stake, .btn-depot, #stake-btn');
+        let tokenSelect = document.getElementById('tokenSelect');
+        let referenceNode = null;
+        if (stakeBtn) {
+            referenceNode = stakeBtn;
+        } else if(tokenSelect) {
+            // Fallback : on insère près du select
+            referenceNode = tokenSelect;
+        }
+        if (referenceNode && !document.getElementById('arcana-metamask-link')) {
+            let link = document.createElement('button');
+            link.type = "button";
+            link.className = "arcana-add-metamask-link";
+            link.id = "arcana-metamask-link";
+            link.tabIndex = 0;
+            link.innerHTML = '+ Ajouter le jeton ARCANA à MetaMask';
+            link.onclick = addArcanaToMetaMask;
+            // On l'insère juste après le bouton de stake
+            referenceNode.insertAdjacentElement('afterend', link);
+        }
+        // Insérer le style uniquement si non déjà présent
+        if (!document.getElementById('arcana-metamask-link-style')) {
+          var styleEl = document.createElement('style');
+          styleEl.id = 'arcana-metamask-link-style';
+          styleEl.innerHTML = `
+            .arcana-add-metamask-link {
+                display: inline-block;
+                margin-top: 6px;
+                color: #ffd700;
+                font-size: 0.92em;
+                font-family: inherit;
+                cursor: pointer;
+                text-decoration: underline dotted;
+                transition: color 0.18s;
+                background: transparent;
+                border: none;
+                padding: 0;
+            }
+            .arcana-add-metamask-link:hover {
+                color: #fff2b8;
+                text-decoration: underline;
+            }
+          `;
+          document.head.appendChild(styleEl);
+        }
+    });
+
+    // Fond étoilé dynamique : 200 étoiles avec animation de scintillement
+    (function() {
+        const container = document.getElementById('star-container');
+        const starCount = 200;
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2 + 0.5;
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const duration = 2 + Math.random() * 3;
+            const delay = Math.random() * 5;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.left = x + '%';
+            star.style.top = y + '%';
+            star.style.animation = `twinkle ${duration}s ease-in-out ${delay}s infinite`;
+            star.style.opacity = 0.3 + Math.random() * 0.5;
+            container.appendChild(star);
+        }
+    })();
+
+    // -- Suite du code originel inchangé pour le Sanctuaire & autres panneaux --
+    // -------- Sanctuaire du Destin (Level 3) FINAL -----------
+    const SANCTUARY_SEQUENCE = [2, 7, 5, 9, 0, 10];
+    let sanctuaryProgress = 0;
+    let sanctuaryLocked = false;
+    let sanctuaryTimerInterval = null;
+    let sanctuaryTimeLeft = 15 * 60;
+    let heartbeatInterval = null;
+    let heartbeatInitialRate = 950;
+    let glitchActive = false;
+    let oldGlitchPanel = null;
+
+    function playHeartbeat(rateMs) {
+        if (!window.arcanaHeartbeatTimer) window.arcanaHeartbeatTimer = null;
+        const audio = document.getElementById('heartbeat-audio');
+        if(window.arcanaHeartbeatTimer) clearTimeout(window.arcanaHeartbeatTimer);
+        function beat() {
+            audio.currentTime = 0;
+            audio.volume = 0.27;
+            audio.play();
+            window.arcanaHeartbeatTimer = setTimeout(beat, rateMs);
+        }
+        beat();
+        window.stopHeartbeat = function() {
+            if(window.arcanaHeartbeatTimer) clearTimeout(window.arcanaHeartbeatTimer);
+            window.arcanaHeartbeatTimer = null;
+            audio.pause(); audio.currentTime = 0;
+        }
+    }
+    function setSanctuaryProgress(newStep) {
+        sanctuaryProgress = newStep;
+        const fill = document.getElementById('alignement-fill');
+        const percent = Math.round((sanctuaryProgress/SANCTUARY_SEQUENCE.length)*100);
+        fill.style.width = percent+'%';
+        document.getElementById('alignement-percent').textContent = percent + "%";
+    }
+    function broadcastVictory(walletAddress) {
+        const addr = (walletAddress || account || 'Un Initié').toString();
+        const shortAddr = addr.length > 14 ? addr.slice(0, 6) + '…' + addr.slice(-4) : addr;
+        const msg = '✨ L\'ÉLU ' + shortAddr + ' vient de sceller le Destin ! La pluie d\'or tombe sur le Sanctuaire !';
+        const chatContainer = document.querySelector('#chat-temple div[style*="overflow-y"]') || document.querySelector('#chat-temple').children[1];
+        if (chatContainer) {
+            const p = document.createElement('p');
+            p.style.cssText = 'margin:5px 0; color:var(--gold); font-weight:bold;';
+            p.textContent = msg;
+            chatContainer.appendChild(p);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        return msg;
+    }
+    function triggerVictoryJackpot() {
+        const vj = document.getElementById('victory-jackpot');
+        vj.style.display = 'block';
+        vj.style.pointerEvents = 'auto';
+        makeGoldRainParticles();
+        try {
+            const ta = document.getElementById('triumph-audio');
+            if (ta) { ta.currentTime = 0; ta.volume = 0.6; ta.play().catch(()=>{}); }
+        } catch(e) {}
+        const fog = document.getElementById('arcana-fog');
+        if (fog) { fog.classList.add('sanctuary-active'); fog.classList.add('jackpot-golden'); }
+        window.setTimeout(()=>{
+            const f = document.getElementById('arcana-fog');
+            if (f) f.classList.remove('jackpot-golden');
+        }, 10000);
+        window.setTimeout(()=>{ vj.style.pointerEvents = 'none'; }, 3500);
+    }
+    function showSanctuarySuccess() {
+        document.getElementById('sanctuary-success').style.display = 'block';
+        document.getElementById('sanctuary-success').innerText = "JACKPOT DÉVERROUILLÉ ! Le Destin est révélé...";
+        Array.from(document.querySelectorAll('#runes-grid .rune-btn')).forEach(b=>b.disabled=true);
+        sanctuaryLocked = true;
+        stopHeartbeat();
+        broadcastVictory(account);
+        triggerVictoryJackpot();
+    }
+    function resetSanctuaryRunes() {
+        sanctuaryProgress = 0;
+        setSanctuaryProgress(0);
+        document.getElementById('sanctuary-success').style.display = 'none';
+        Array.from(document.querySelectorAll('#runes-grid .rune-btn')).forEach(btn=>{
+            btn.classList.remove('selected','good','bad');
+            btn.disabled = false;
+        });
+        sanctuaryLocked = false;
+    }
+    function updateSanctuaryTimerDisplay() {
+        const t = sanctuaryTimeLeft;
+        let mins = Math.floor(t/60), secs = t%60;
+        const timerElem = document.getElementById('sanctuary-timer');
+        timerElem.textContent = (mins<10?"0":"")+mins+":"+(secs<10?"0":"")+secs;
+        if(sanctuaryTimeLeft<=60){
+            timerElem.classList.add('danger');
+            enableGlitchPanel();
+        } else {
+            timerElem.classList.remove('danger');
+            disableGlitchPanel();
+        }
+    }
+    function enableGlitchPanel() {
+        const panel = document.getElementById('level-3-sanctuary');
+        if(glitchActive) return;
+        panel.classList.add('glitch');
+        glitchActive = true;
+    }
+    function disableGlitchPanel() {
+        const panel = document.getElementById('level-3-sanctuary');
+        if(glitchActive) {
+            panel.classList.remove('glitch');
+            glitchActive = false;
+        }
+    }
+    function tickSanctuaryTimer() {
+        if (--sanctuaryTimeLeft<0) {
+            clearInterval(sanctuaryTimerInterval);
+            sanctuaryTimerInterval = null;
+            document.getElementById('sanctuary-timer').textContent = "ÉCHEC";
+            sanctuaryLocked = true;
+            stopHeartbeat();
+            enableGlitchPanel();
+            Array.from(document.querySelectorAll('#runes-grid .rune-btn')).forEach(b=>b.disabled=true);
+            document.getElementById('sanctuary-success').style.display = 'block';
+            document.getElementById('sanctuary-success').innerText = "Temps écoulé. Le sceau s'efface...";
+            return;
+        }
+        updateSanctuaryTimerDisplay();
+        if(sanctuaryTimeLeft < 120){
+            let x = 1 - Math.max(0, (sanctuaryTimeLeft-60)/60);
+            let rate = Math.max(310, heartbeatInitialRate - x*650);
+            playHeartbeat(rate);
+        } else if(sanctuaryTimeLeft < 875 && sanctuaryTimeLeft % 7 === 0) {
+            playHeartbeat(heartbeatInitialRate);
+        }
+        if(sanctuaryTimeLeft>=120){ stopHeartbeat();}
+    }
+    function startFinalLevel() {
+        const fog = document.getElementById('arcana-fog');
+        if (fog) fog.classList.add('sanctuary-active');
+        resetSanctuaryRunes();
+        sanctuaryTimeLeft = 15*60;
+        updateSanctuaryTimerDisplay();
+        document.getElementById('level-3-sanctuary').style.display = 'block';
+        document.getElementById('level-3-sanctuary').style.opacity = '';
+        requestAnimationFrame(()=>{
+            let el = document.getElementById('level-3-sanctuary');
+            el.style.opacity = 0;
+            el.style.transform = 'translate(-50%, -46%) scale(0.96)';
+            setTimeout(()=>{
+                el.style.opacity = 1;
+                el.style.transform = 'translate(-50%,-50%) scale(1)';
+            }, 10);
+        });
+        if(sanctuaryTimerInterval) clearInterval(sanctuaryTimerInterval);
+        sanctuaryTimerInterval = setInterval(tickSanctuaryTimer, 1000);
+        sanctuaryLocked = false;
+        disableGlitchPanel();
+        stopHeartbeat();
+        document.getElementById('victory-jackpot').style.display = "none";
+    }
+    function onRuneClick(runeId){
+        if (sanctuaryLocked) return;
+        const runes = Array.from(document.querySelectorAll('#runes-grid .rune-btn'));
+        const btn = runes[runeId];
+        btn.blur();
+        if(runeId === SANCTUARY_SEQUENCE[sanctuaryProgress]){
+            btn.classList.add('good');
+            btn.disabled = true;
+            setTimeout(()=>btn.classList.remove('good'), 450);
+            btn.classList.add('selected');
+            setSanctuaryProgress(sanctuaryProgress+1);
+            if (sanctuaryProgress === SANCTUARY_SEQUENCE.length) {
+                showSanctuarySuccess();
+            }
+        } else {
+            btn.classList.add('bad');
+            vibratePanel(document.getElementById('level-3-sanctuary'));
+            setTimeout(()=>{
+                btn.classList.remove('bad');
+                runes.forEach(x=>x.classList.remove('selected','good','bad'));
+                runes.forEach(x=>x.disabled=false);
+                setSanctuaryProgress(0);
+            },310);
+        }
+    }
+    function vibratePanel(panel){
+        panel.style.animation = 'border-shake 0.22s linear 2';
+        panel.style.boxShadow = "0 0 28px #ff2424,0 0 9px #ffe7e5 inset";
+        setTimeout(()=>{
+            panel.style.animation = '';
+            panel.style.boxShadow = "";
+        }, 410);
+    }
+    function makeGoldRainParticles() {
+        const container = document.querySelector('#victory-jackpot .gold-rain');
+        if (!container) return;
+        container.innerHTML = '';
+        const GoldN = 35+Math.floor(Math.random()*8);
+        for(let i=0;i<GoldN;++i){
+            let span = document.createElement('span');
+            span.className = 'gold-drop';
+            span.style.left = (5+Math.random()*90)+'vw';
+            span.style.top = (-10-Math.random()*40)+'px';
+            let delay = Math.random()*1.25;
+            span.style.animationDelay = delay + 's';
+            span.style.opacity = 0.8 + Math.random()*0.2;
+            span.style.width = (7+Math.random()*5)+'px';
+            span.style.height = (21+Math.random()*18)+'px';
+            span.style.transform += " rotate("+(Math.random()*12-6)+"deg)";
+            container.appendChild(span);
+        }
+        setTimeout(()=>{container.innerHTML='';}, 4300);
+    }
+    document.addEventListener('DOMContentLoaded', ()=>{
+        document.getElementById('heartbeat-audio').play().then(()=>{document.getElementById('heartbeat-audio').pause();}).catch(()=>{});
+    });
+    function stopHeartbeat(){
+        if(window.arcanaHeartbeatTimer) clearTimeout(window.arcanaHeartbeatTimer);
+        window.arcanaHeartbeatTimer = null;
+        let a = document.getElementById('heartbeat-audio');
+        if(a && !a.paused){ a.pause(); a.currentTime=0;}
+    }
+
+
+    async function updateOracleFromAdmin() {
+        try {
+            // 1. On récupère la température réelle de Montréal via une API
+            const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=45.5088&longitude=-73.5878&current_weather=true');
+            const data = await response.json();
+            const temp = Math.round(data.current_weather.temperature);
+            
+            alert("Oracle : Température détectée à Montréal : " + temp + "°C");
+
+            // 2. On envoie cette température à ton contrat Arcana Game
+            if (!signer) await connectWallet();
+            const contract = new ethers.Contract(ARCANA_GAME_CONTRACT, ["function updateOracle(int256 _temp) external"], signer);
+
+            const tx = await contract.updateOracle(temp);
+            document.getElementById('admin-log').innerHTML += `<p>⏳ Oracle : Envoi blockchain (${temp}°C)...</p>`;
+            
+            await tx.wait();
+            alert("L'Oracle est synchronisé ! La température est scellée dans Polygon.");
+            document.getElementById('admin-log').innerHTML += `<p>✅ Oracle à jour : ${temp}°C</p>`;
+            
+            // MAJ miroir de glace immédiatement
+            fetchAndDisplayTemperature();
+            
+        } catch (error) {
+            console.error("Erreur Oracle:", error);
+            alert("Erreur de synchronisation : " + error.message);
+        }
+    }// Vous pouvez appeler startFinalLevel() pour faire apparaître la salle.
+</script>
+</html>

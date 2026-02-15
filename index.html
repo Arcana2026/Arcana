@@ -33,6 +33,40 @@
 
         .btn-prestige:hover { transform: translateY(-3px); box-shadow: 0 15px 30px var(--gold-glow); }
 
+        /* Effets interactifs : .btn-connect et .rune-btn */
+        .btn-connect, .rune-btn {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-connect:hover:not([disabled]):not(.disabled),
+        .rune-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--gold);
+            cursor: pointer;
+        }
+        .btn-connect:active:not([disabled]):not(.disabled),
+        .rune-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        /* Shimmer cyclique sur le bouton .btn-connect principal */
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+        }
+        .btn-connect {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-connect::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 0;
+            width: 40%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
         /* Barre de Progression Néon */
         .progress-track { background: rgba(255, 255, 255, 0.05); height: 12px; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.1); }
         .progress-fill { background: linear-gradient(90deg, #00ffcc, #00d4aa); box-shadow: 0 0 20px rgba(0, 255, 204, 0.6); transition: width 1.5s ease-in-out; }
@@ -57,6 +91,40 @@
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Bouton central Sanctuaire */
+        .sanctuary-cta {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 40vh;
+            padding: 2rem;
+        }
+        .btn-sanctuary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem 2.5rem;
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: linear-gradient(180deg, rgba(10, 15, 25, 0.95), rgba(5, 7, 10, 0.98));
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.4);
+        }
+        .btn-sanctuary:hover {
+            border-color: #5eb3f6;
+            box-shadow: 0 0 35px rgba(94, 179, 246, 0.6), 0 0 60px rgba(94, 179, 246, 0.3), inset 0 0 30px rgba(0, 0, 0, 0.3);
+            color: #7dc8ff;
+            transform: scale(1.03);
+        }
     </style>
 </head>
 <body>
@@ -72,6 +140,9 @@
     </nav>
 
     <main class="container mx-auto px-4 py-8">
+        <div class="sanctuary-cta">
+            <a href="ArcanaGame.html" class="btn-sanctuary">ENTRER DANS LE SANCTUAIRE</a>
+        </div>
         <div class="glass-vault max-w-4xl mx-auto p-10 md:p-16 text-center">
             <h2 class="font-prestige text-4xl md:text-5xl mb-4 text-white tracking-[0.2em]">THE ARCANA VAULT</h2>
             <p class="text-gray-400 italic text-lg mb-12">Secure your financial future.</p>
