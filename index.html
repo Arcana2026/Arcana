@@ -131,6 +131,20 @@
             0%, 100% { transform: translateX(-50%) translateY(0); }
             50% { transform: translateX(-50%) translateY(-6px); }
         }
+        /* Bouton Sanctuaire + glow pulsant */
+        .sanctuary-block { display: flex; flex-direction: column; align-items: flex-start; }
+        .btn-sanctuary-glow {
+            padding: 14px 28px; font-family: 'Cinzel', serif; font-weight: 700;
+            letter-spacing: 0.15em; color: #1a1510; background: linear-gradient(135deg, #d4af37, #f2d06b);
+            border: 2px solid #b8860b; border-radius: 8px; cursor: pointer;
+            animation: glow-pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes glow-pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(212,175,55,0.6), 0 0 30px rgba(255,255,255,0.3); }
+            50% { box-shadow: 0 0 25px rgba(212,175,55,0.9), 0 0 50px rgba(255,255,255,0.5); }
+        }
+        .sanctuary-email { margin-top: 14px; font-size: 14px; color: rgba(255,255,255,0.8); }
+        .sanctuary-email a { color: rgba(255,255,255,0.9); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -146,9 +160,9 @@
     </nav>
 
     <main class="container mx-auto px-4 py-8">
-        <div style="text-align: center;">
-            <a href="arcanagame.html" style="text-decoration: none;"><button>ENTRER DANS LE SANCTUAIRE</button></a>
-            <p style="margin-top: 20px; font-size: 14px; color: rgba(255,255,255,0.7);">Contact : <a href="mailto:blockarcana-admin@proton.me" style="color: white; text-decoration: underline;">blockarcana-admin@proton.me</a></p>
+        <div class="sanctuary-block">
+            <a href="arcanagame.html" style="text-decoration: none;"><button class="btn-sanctuary-glow">ENTRER DANS LE SANCTUAIRE</button></a>
+            <p class="sanctuary-email">Contact : <a href="mailto:blockarcana-admin@proton.me">blockarcana-admin@proton.me</a></p>
         </div>
         <div class="glass-vault max-w-4xl mx-auto p-10 md:p-16 text-center">
             <h2 class="font-prestige text-4xl md:text-5xl mb-4 text-white tracking-[0.2em]">THE ARCANA VAULT</h2>
