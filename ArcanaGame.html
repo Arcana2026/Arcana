@@ -571,7 +571,7 @@
 <body>
     <div id="star-container"></div>
     <div id="arcana-fog" aria-hidden="true"></div>
-    <a href="index.html" class="btn-back-accueil" title="Retour au Vault">← Retourner à la Source</a>
+    <a href="index.html" class="btn-back-accueil" style="color: #ff007f; text-decoration: none; font-weight: bold;">← Retour à Arcana Rose</a>
     <header>
         <div class="logo-area">
             <div style="width:40px; height:40px; background:var(--gold); border-radius:16%; box-shadow:0 0 12px #ffeaa5;"><span style="font-size:1.6em; display:block; line-height:40px; text-align:center;">🎲</span></div>
@@ -764,9 +764,11 @@
             });
         } catch (e) {
             console.warn('Web3Modal init:', e);
-            document.getElementById('web3modal-connect-wrap').innerHTML = '<button class="btn-connect" onclick="connectWallet()">CONNECT WALLET</button>';
+            var msg = '<div style="text-align:center;"><p style="color:var(--gold);font-size:0.85em;margin:0 0 10px 0;">Rechargez la page pour afficher le sélecteur de wallets.</p><button class="btn-connect" onclick="location.reload()">RÉESSAYER</button></div>';
+            var wrap = document.getElementById('web3modal-connect-wrap');
             var gw = document.getElementById('gate-connect-wrap');
-            if (gw) gw.innerHTML = '<button class="btn-connect" onclick="connectWallet()">CONNECT WALLET</button>';
+            if (wrap) wrap.innerHTML = msg;
+            if (gw) gw.innerHTML = msg;
         }
     })();
     </script>
@@ -1219,7 +1221,6 @@
     // ===== Wallet connect & Polygon switch
     async function connectWallet() {
         if (!window.ethereum) {
-            alert("Veuillez installer MetaMask pour utiliser cette app.");
             return;
         }
         provider = new ethers.providers.Web3Provider(window.ethereum, "any");
@@ -1273,12 +1274,12 @@
     // ============ FONCTION DE DÉPÔT MULTI-TOKEN POLYGON ==============
     async function payStake() {
         if (!window.ethereum) {
-            alert("Veuillez installer MetaMask pour utiliser cette app.");
+            showStyledAlert("Connectez votre wallet via le bouton de connexion pour effectuer un dépôt.");
             return;
         }
         if (!signer || !account) await connectWallet();
         if (!signer) {
-            alert("Connexion au wallet requise. Veuillez déverrouiller MetaMask et réessayer.");
+            showStyledAlert("Connectez votre wallet pour effectuer un dépôt.");
             return;
         }
 
@@ -1353,7 +1354,6 @@
     // Ajout ARCANA à MetaMask
     async function addArcanaToMetaMask() {
         if (!window.ethereum) {
-            alert("Veuillez installer MetaMask !");
             return;
         }
         try {
