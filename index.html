@@ -92,59 +92,31 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Icône d'entrée Sanctuaire — fixée en bas, style rune lumineuse, large pour mobile */
-        .btn-sanctuary {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: min(320px, 90vw);
-            width: max-content;
-            padding: 1rem 2.5rem;
-            min-height: 52px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
-            font-weight: 700;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--gold);
-            background: radial-gradient(ellipse at center, rgba(73, 202, 250, 0.15), rgba(5, 7, 10, 0.95));
-            border: 2px solid var(--gold);
-            border-radius: 50px;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            box-shadow: 0 0 25px rgba(73, 202, 250, 0.4), 0 8px 32px rgba(0, 0, 0, 0.6);
-            animation: float-gentle 3s ease-in-out infinite;
+        /* Bloc Sanctuaire — fixé à gauche, bouton + email */
+        .sanctuary-block {
+            position: fixed; left: 24px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; align-items: flex-start;
+            z-index: 800; padding: 16px;
         }
-        .btn-sanctuary:hover {
-            border-color: #49cafa;
-            box-shadow: 0 0 40px rgba(73, 202, 250, 0.7), 0 0 70px rgba(73, 202, 250, 0.3), 0 8px 32px rgba(0, 0, 0, 0.5);
-            color: #7dc8ff;
-            transform: translateX(-50%) scale(1.05);
-        }
-        @keyframes float-gentle {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-6px); }
-        }
-        /* Bouton Sanctuaire + glow pulsant */
-        .sanctuary-block { display: flex; flex-direction: column; align-items: flex-start; }
         .btn-sanctuary-glow {
             padding: 14px 28px; font-family: 'Cinzel', serif; font-weight: 700;
             letter-spacing: 0.15em; color: #1a1510; background: linear-gradient(135deg, #d4af37, #f2d06b);
             border: 2px solid #b8860b; border-radius: 8px; cursor: pointer;
-            animation: glow-pulse 1.8s ease-in-out infinite;
+            animation: glow-pulse 2s ease-in-out infinite;
         }
         @keyframes glow-pulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(212,175,55,0.6), 0 0 30px rgba(255,255,255,0.3); }
-            50% { box-shadow: 0 0 25px rgba(212,175,55,0.9), 0 0 50px rgba(255,255,255,0.5); }
+            0%, 100% { box-shadow: 0 0 5px #FFD700; }
+            50% { box-shadow: 0 0 15px #FFD700, 0 0 25px rgba(255,215,0,0.5); }
         }
         .sanctuary-email { margin-top: 14px; font-size: 14px; color: rgba(255,255,255,0.8); }
         .sanctuary-email a { color: rgba(255,255,255,0.9); text-decoration: underline; }
+        @media (max-width: 900px) {
+            .sanctuary-block { position: static; transform: none; margin-bottom: 24px; }
+            main { padding-left: 0; }
+        }
+        @media (min-width: 901px) {
+            main { padding-left: 220px; }
+        }
     </style>
 </head>
 <body>
