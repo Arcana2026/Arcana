@@ -698,86 +698,77 @@
         <div class="gold-rain"></div>
     </div>
     </div><!-- /game-container -->
-    <!-- Web3Modal v3 / Reown AppKit -->
-    <script type="module">
-    (async function() {
-        const PROJECT_ID = '7004f981f33f063167f1395567798132';
-        try {
-            const { createAppKit } = await import('https://esm.sh/@reown/appkit@1.8.18');
-            const { polygon } = await import('https://esm.sh/@reown/appkit@1.8.18/networks');
-            const { Ethers5Adapter } = await import('https://esm.sh/@reown/appkit-adapter-ethers5@0.2.6');
-            const modal = createAppKit({
-                adapters: [new Ethers5Adapter()],
-                networks: [polygon],
-                defaultNetwork: polygon,
-                metadata: { name: 'Arcana Game', description: 'Écosystème Décentralisé', url: window.location.origin, icons: ['https://avatars.githubusercontent.com/u/179229932'] },
-                projectId: PROJECT_ID,
-                features: { analytics: false },
-                themeMode: 'dark',
-                themeVariables: { '--w3m-accent': '#d4af37' }
-            });
-            function onAddressActive(prov, sgn, acc) {
-                if (window.arcanaOnW3mConnect) window.arcanaOnW3mConnect(prov, sgn, acc);
-            }
-            function onDisconnect() {
-                if (window.arcanaOnW3mDisconnect) window.arcanaOnW3mDisconnect();
-            }
-            modal.subscribeProvider(async (state) => {
-                if (state.isConnected && state.provider) {
-                    const prov = new ethers.providers.Web3Provider(state.provider, 'any');
-                    const sgn = prov.getSigner();
-                    const acc = await sgn.getAddress();
-                    if (acc) onAddressActive(prov, sgn, acc);
-                } else {
-                    onDisconnect();
-                }
-            });
-            if (typeof modal.watchAccount === 'function') {
-                modal.watchAccount((account) => {
-                    if (account?.address && account?.isConnected) {
-                        const p = modal.getWalletProvider();
-                        if (p) {
-                            const prov = new ethers.providers.Web3Provider(p, 'any');
-                            prov.getSigner().then(sgn => sgn.getAddress().then(acc => onAddressActive(prov, sgn, acc)));
-                        }
-                    }
-                });
-            } else if (typeof modal.subscribeState === 'function') {
-                modal.subscribeState((state) => {
-                    if (state?.addresses?.eth) {
-                        const p = modal.getWalletProvider();
-                        if (p && window.arcanaOnW3mConnect) {
-                            const prov = new ethers.providers.Web3Provider(p, 'any');
-                            prov.getSigner().then(sgn => sgn.getAddress().then(acc => onAddressActive(prov, sgn, acc)));
-                        }
-                    }
-                });
-            }
-            modal.subscribeEvents((event) => {
-                if (event?.data?.event === 'CONNECT') {
-                    const p = modal.getWalletProvider();
-                    if (p) {
-                        const prov = new ethers.providers.Web3Provider(p, 'any');
-                        prov.getSigner().then(sgn => sgn.getAddress().then(acc => onAddressActive(prov, sgn, acc)));
-                    }
-                }
-            });
-        } catch (e) {
-            console.warn('Web3Modal init:', e);
-            var msg = '<div style="text-align:center;"><p style="color:var(--gold);font-size:0.85em;margin:0 0 10px 0;">Rechargez la page pour afficher le sélecteur de wallets.</p><button class="btn-connect" onclick="location.reload()">RÉESSAYER</button></div>';
-            var wrap = document.getElementById('web3modal-connect-wrap');
-            var gw = document.getElementById('gate-connect-wrap');
-            if (wrap) wrap.innerHTML = msg;
-            if (gw) gw.innerHTML = msg;
-        }
-    })();
-    </script>
     <!-- Heartbeat audio (muted/loop, started in JS) -->
     <audio id="heartbeat-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/08/20/audio_12c959d8f4.mp3"></audio>
     <audio id="triumph-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/01/18/audio_8f0bc6dc2b.mp3"></audio>
     <audio id="ice-crackle-audio" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2571-ice-break-2571.mp3"></audio>
 
     <div class="arcana-mention">Arcana Game - Écosystème Décentralisé</div>
+
+    <script type="module">
+      (async function() {
+        let wagmiConfig = null
+        try {
+          const { createWeb3Modal, defaultWagmiConfig } = await import('https://esm.sh/@web3modal/wagmi@5.1.11')
+          const { mainnet, polygon } = await import('https://esm.sh/viem/chains')
+          const { watchAccount, getWalletClient } = await import('https://esm.sh/@wagmi/core@2.13.4')
+          const projectId = '7004f981f33f063167f1395567798132'
+          const metadata = { name: 'Arcana', description: 'Arcana Game', url: 'https://arcana-ezl.pages.dev', icons: [] }
+          const chains = [mainnet, polygon]
+          wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+          createWeb3Modal({ wagmiConfig, projectId, chains })
+          watchAccount(wagmiConfig, {
+            onChange: async (account) => {
+              if (account.address && window.arcanaOnW3mConnect) {
+                try {
+                  const client = await getWalletClient(wagmiConfig)
+                  if (!client) return
+                  const eip1193 = (typeof client.request === 'function') ? client : (client.transport?.value ?? client.transport ?? client)
+                  const prov = new ethers.providers.Web3Provider(eip1193, 'any')
+                  const sgn = prov.getSigner()
+                  const acc = await sgn.getAddress()
+                  window.arcanaOnW3mConnect(prov, sgn, acc)
+                } catch (err) { console.warn('wagmi provider:', err) }
+              }
+            }
+          })
+        } catch (e) {
+          console.warn('Web3Modal wagmi init:', e);
+          const { createAppKit } = await import('https://esm.sh/@reown/appkit@1.8.18');
+          const { polygon } = await import('https://esm.sh/@reown/appkit@1.8.18/networks');
+          const { Ethers5Adapter } = await import('https://esm.sh/@reown/appkit-adapter-ethers5@0.2.6');
+          const modal = createAppKit({
+            adapters: [new Ethers5Adapter()],
+            networks: [polygon],
+            defaultNetwork: polygon,
+            metadata: { name: 'Arcana', description: 'Arcana Game', url: window.location.origin, icons: [] },
+            projectId: '7004f981f33f063167f1395567798132',
+            features: { analytics: false },
+            themeMode: 'dark',
+            themeVariables: { '--w3m-accent': '#d4af37' }
+          });
+          modal.subscribeProvider(async (state) => {
+            if (state.isConnected && state.provider && window.arcanaOnW3mConnect) {
+              const prov = new ethers.providers.Web3Provider(state.provider, 'any');
+              const sgn = prov.getSigner();
+              const acc = await sgn.getAddress();
+              window.arcanaOnW3mConnect(prov, sgn, acc);
+            } else if (!state.isConnected && window.arcanaOnW3mDisconnect) window.arcanaOnW3mDisconnect();
+          });
+        }
+        if (window.ethereum) {
+          window.ethereum.on('accountsChanged', async (accounts) => {
+            if (accounts?.[0] && window.arcanaOnW3mConnect) {
+              const prov = new ethers.providers.Web3Provider(window.ethereum, 'any');
+              const sgn = prov.getSigner();
+              const acc = await sgn.getAddress();
+              window.arcanaOnW3mConnect(prov, sgn, acc);
+            }
+          });
+          window.ethereum.on('chainChanged', () => location.reload());
+        }
+      })();
+    </script>
 </body>
 
 <!-- Lien stylisé d'ajout de token ARCANA à MetaMask juste après le bouton de dépôt -->
