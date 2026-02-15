@@ -499,17 +499,18 @@
             margin-bottom: 25px;
             opacity: 0.9;
         }
-        /* Lien retour page principale — haut gauche, visible au-dessus de la brume */
+        /* Lien retour page principale — haut gauche, toujours visible au-dessus de la brume et du gate */
         .btn-back-accueil {
             position: fixed;
             top: 12px;
             left: 12px;
-            z-index: 650;
+            z-index: 700;
             font-size: 0.78rem;
-            color: rgba(212, 175, 55, 0.75);
+            color: rgba(212, 175, 55, 0.9);
             text-decoration: none;
             letter-spacing: 0.08em;
             transition: color 0.25s, text-shadow 0.25s;
+            pointer-events: auto;
         }
         .btn-back-accueil:hover {
             color: #ffd700;
@@ -941,29 +942,27 @@
         var shortAddr = addr && addr.length > 10 ? addr.slice(0, 6) + '…' + addr.slice(-4) : (addr || 'Initié');
         var gate = document.getElementById('arcana-connect-gate');
         var content = gameContainer();
-        if (gate) gate.classList.add('fade-out');
+        if (gate) { gate.classList.add('fade-out'); setTimeout(function(){ gate.classList.add('hidden'); }, 400); }
         document.body.classList.add('frost-transition');
         var fog = document.getElementById('arcana-fog');
         if (fog) fog.classList.add('sanctuary-active');
         spawnFrostParticles();
+        addOracleChatMessage('Bienvenue Bernard. L\'Oracle de Montréal analyse votre présence...');
         addOracleChatMessage('Oracle : Initié ' + shortAddr + ' reconnu. Le givre se propage...');
         try {
             var iceAudio = document.getElementById('ice-crackle-audio');
             if (iceAudio) { iceAudio.volume = 0.4; iceAudio.currentTime = 0; iceAudio.play().catch(function(){}); }
         } catch (e) {}
+        if (content) {
+            content.classList.add('visible', 'fade-in');
+            setTimeout(function() { content.classList.remove('fade-in'); }, 1100);
+        }
         setTimeout(function() {
-            if (gate) gate.classList.add('hidden');
-            if (content) {
-                content.classList.add('visible', 'fade-in');
-                setTimeout(function() { content.classList.remove('fade-in'); }, 1100);
-            }
-            setTimeout(function() {
-                document.body.classList.remove('frost-transition');
-                var frost = document.getElementById('frost-particles');
-                if (frost) frost.classList.remove('active');
-            }, 2500);
+            document.body.classList.remove('frost-transition');
+            var frost = document.getElementById('frost-particles');
+            if (frost) frost.classList.remove('active');
             fetchAndDisplayTemperature();
-        }, 650);
+        }, 2500);
     }
 
     window.arcanaOnW3mConnect = function(prov, sgn, acc) {
