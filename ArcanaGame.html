@@ -499,22 +499,71 @@
             margin-bottom: 25px;
             opacity: 0.9;
         }
-        /* Bouton discret retour accueil — discret pour préserver l'immersion */
+        /* Lien retour page principale — haut gauche, visible au-dessus de la brume */
         .btn-back-accueil {
             position: fixed;
-            bottom: 8px;
+            top: 12px;
             left: 12px;
-            z-index: 100;
-            font-size: 0.65rem;
-            color: rgba(176, 167, 123, 0.45);
+            z-index: 650;
+            font-size: 0.78rem;
+            color: rgba(212, 175, 55, 0.75);
             text-decoration: none;
-            letter-spacing: 0.1em;
-            transition: color 0.2s;
+            letter-spacing: 0.08em;
+            transition: color 0.25s, text-shadow 0.25s;
         }
-        .btn-back-accueil:hover { color: rgba(212, 175, 55, 0.7); }
+        .btn-back-accueil:hover {
+            color: #ffd700;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.6), 0 0 4px rgba(255, 215, 0, 0.4);
+        }
         /* Contenu jeu : caché par défaut */
-        #arcana-game-content { display: none; }
-        #arcana-game-content.visible { display: block; }
+        #game-container, #arcana-game-content { display: none; opacity: 0; }
+        #game-container.visible, #arcana-game-content.visible { display: block; }
+        /* Identification wallet : coin de l'écran */
+        .wallet-address-badge {
+            position: fixed; top: 12px; right: 12px; z-index: 600;
+            font-size: 0.75rem; font-family: monospace; color: var(--gold);
+            background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.4); letter-spacing: 0.05em;
+        }
+        /* Alerte Oracle stylisée (réseau non Polygon) */
+        .oracle-network-alert {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 9999; background: rgba(10, 15, 25, 0.98); border: 2px solid #49cafa;
+            border-radius: 16px; padding: 24px; max-width: 320px; text-align: center;
+            box-shadow: 0 0 40px rgba(73, 202, 250, 0.3);
+        }
+        .oracle-network-alert p { color: #b9e9ff; margin: 0 0 16px 0; line-height: 1.5; }
+        .oracle-network-alert .btn-connect { margin-top: 8px; }
+        /* Transition connexion : fade-out message / fade-in Sanctuaire */
+        #arcana-connect-gate.fade-out { opacity: 0; pointer-events: none; }
+        #arcana-connect-gate.fade-out .gate-message,
+        #arcana-connect-gate.fade-out .gate-connect-wrap { opacity: 0; transform: scale(0.95); }
+        #arcana-connect-gate .gate-message,
+        #arcana-connect-gate .gate-connect-wrap { transition: opacity 0.6s ease, transform 0.6s ease; }
+        #game-container.fade-in, #arcana-game-content.fade-in { animation: sanctuary-fade-in 1s ease forwards; }
+        @keyframes sanctuary-fade-in {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        /* Filtre bleu givre à la connexion */
+        body.frost-transition #arcana-fog { opacity: 0.95; filter: blur(35px); }
+        body.frost-transition #arcana-fog,
+        body.frost-transition #star-container { filter: blur(2px) hue-rotate(-5deg) saturate(0.9); }
+        /* Particules de givre */
+        #frost-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 550; opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        #frost-particles.active { opacity: 1; }
+        .frost-dot {
+            position: absolute; width: 2px; height: 2px; background: rgba(220, 240, 255, 0.8);
+            border-radius: 50%; animation: frost-fall 4s linear forwards;
+        }
+        @keyframes frost-fall {
+            0% { transform: translateY(-10px) scale(1); opacity: 0.8; }
+            100% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+        }
     </style>
     <!-- Google Fonts for digital effect -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&display=swap" rel="stylesheet">
@@ -522,7 +571,7 @@
 <body>
     <div id="star-container"></div>
     <div id="arcana-fog" aria-hidden="true"></div>
-    <a href="index.html" class="btn-back-accueil" title="Retour au Vault">⌂ Accueil</a>
+    <a href="index.html" class="btn-back-accueil" title="Retour au Vault">← Retourner à la Source</a>
     <header>
         <div class="logo-area">
             <div style="width:40px; height:40px; background:var(--gold); border-radius:16%; box-shadow:0 0 12px #ffeaa5;"><span style="font-size:1.6em; display:block; line-height:40px; text-align:center;">🎲</span></div>
@@ -531,11 +580,15 @@
         <div id="web3modal-connect-wrap"><w3m-button></w3m-button></div>
     </header>
 
+    <div id="frost-particles" aria-hidden="true"></div>
     <div id="arcana-connect-gate">
         <p class="gate-message">Le Sanctuaire attend.<br>Connectez votre wallet pour entrer.</p>
+        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center; margin-top:20px;">
+            <w3m-button></w3m-button>
+        </div>
     </div>
 
-    <div id="arcana-game-content">
+    <div id="game-container" class="arcana-game-content">
     <div class="title-vault">THE ARCANA VAULT</div>
     <div id="class-selection" class="glass-panel" style="display:none; text-align:center;">
         <div class="label-gold">Rite d'Engagement / Étape 1</div>
@@ -644,7 +697,7 @@
         <div class="victory-text">✨ JACKPOT DÉVERROUILLÉ<br><span style="font-size:0.62em;color:#fff;letter-spacing:0.09em;">Le Destin, scellé dans l'or éternel</span></div>
         <div class="gold-rain"></div>
     </div>
-    </div><!-- /arcana-game-content -->
+    </div><!-- /game-container -->
     <!-- Web3Modal v3 / Reown AppKit -->
     <script type="module">
     (async function() {
@@ -663,31 +716,64 @@
                 themeMode: 'dark',
                 themeVariables: { '--w3m-accent': '#d4af37' }
             });
+            function onAddressActive(prov, sgn, acc) {
+                if (window.arcanaOnW3mConnect) window.arcanaOnW3mConnect(prov, sgn, acc);
+            }
+            function onDisconnect() {
+                if (window.arcanaOnW3mDisconnect) window.arcanaOnW3mDisconnect();
+            }
             modal.subscribeProvider(async (state) => {
                 if (state.isConnected && state.provider) {
                     const prov = new ethers.providers.Web3Provider(state.provider, 'any');
                     const sgn = prov.getSigner();
                     const acc = await sgn.getAddress();
-                    if (window.arcanaOnW3mConnect) window.arcanaOnW3mConnect(prov, sgn, acc);
+                    if (acc) onAddressActive(prov, sgn, acc);
                 } else {
-                    if (window.arcanaOnW3mDisconnect) window.arcanaOnW3mDisconnect();
+                    onDisconnect();
                 }
             });
+            if (typeof modal.watchAccount === 'function') {
+                modal.watchAccount((account) => {
+                    if (account?.address && account?.isConnected) {
+                        const p = modal.getWalletProvider();
+                        if (p) {
+                            const prov = new ethers.providers.Web3Provider(p, 'any');
+                            prov.getSigner().then(sgn => sgn.getAddress().then(acc => onAddressActive(prov, sgn, acc)));
+                        }
+                    }
+                });
+            } else if (typeof modal.subscribeState === 'function') {
+                modal.subscribeState((state) => {
+                    if (state?.addresses?.eth) {
+                        const p = modal.getWalletProvider();
+                        if (p && window.arcanaOnW3mConnect) {
+                            const prov = new ethers.providers.Web3Provider(p, 'any');
+                            prov.getSigner().then(sgn => sgn.getAddress().then(acc => onAddressActive(prov, sgn, acc)));
+                        }
+                    }
+                });
+            }
             modal.subscribeEvents((event) => {
-                if (event?.data?.event === 'CONNECT' && window.arcanaOnW3mConnect) {
+                if (event?.data?.event === 'CONNECT') {
                     const p = modal.getWalletProvider();
                     if (p) {
                         const prov = new ethers.providers.Web3Provider(p, 'any');
-                        prov.getSigner().then(sgn => sgn.getAddress().then(acc => window.arcanaOnW3mConnect(prov, sgn, acc)));
+                        prov.getSigner().then(sgn => sgn.getAddress().then(acc => onAddressActive(prov, sgn, acc)));
                     }
                 }
             });
-        } catch (e) { console.warn('Web3Modal init:', e); document.getElementById('web3modal-connect-wrap').innerHTML = '<button class="btn-connect" onclick="connectWallet()">CONNECT WALLET</button>'; }
+        } catch (e) {
+            console.warn('Web3Modal init:', e);
+            document.getElementById('web3modal-connect-wrap').innerHTML = '<button class="btn-connect" onclick="connectWallet()">CONNECT WALLET</button>';
+            var gw = document.getElementById('gate-connect-wrap');
+            if (gw) gw.innerHTML = '<button class="btn-connect" onclick="connectWallet()">CONNECT WALLET</button>';
+        }
     })();
     </script>
     <!-- Heartbeat audio (muted/loop, started in JS) -->
     <audio id="heartbeat-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/08/20/audio_12c959d8f4.mp3"></audio>
     <audio id="triumph-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/01/18/audio_8f0bc6dc2b.mp3"></audio>
+    <audio id="ice-crackle-audio" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2571-ice-break-2571.mp3"></audio>
 
     <div class="arcana-mention">Arcana Game - Écosystème Décentralisé</div>
 </body>
@@ -740,25 +826,155 @@
 
     var provider, signer, account;
 
+    var gameContainer = function() { return document.getElementById('game-container') || document.getElementById('arcana-game-content'); };
+
     function showGameContent() {
         var gate = document.getElementById('arcana-connect-gate');
-        var content = document.getElementById('arcana-game-content');
+        var content = gameContainer();
         if (gate) gate.classList.add('hidden');
         if (content) content.classList.add('visible');
     }
 
+    function showOracleNetworkAlert() {
+        if (document.getElementById('oracle-network-overlay')) return;
+        var overlay = document.createElement('div');
+        overlay.id = 'oracle-network-overlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9998;';
+        var box = document.createElement('div');
+        box.className = 'oracle-network-alert';
+        box.innerHTML = '<p>L\'Oracle ne reconnaît que le réseau Polygon.</p><button class="btn-connect" onclick="switchToPolygon()">Passer sur Polygon</button><br><button class="btn-connect" style="margin-top:8px;background:transparent;border:1px solid #888;color:#888;" onclick="document.getElementById(\'oracle-network-overlay\').remove()">Fermer</button>';
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+    }
+
+    async function switchToPolygon() {
+        try {
+            if (window.ethereum && provider) {
+                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
+                var overlay = document.getElementById('oracle-network-overlay');
+                if (overlay) overlay.remove();
+                if (provider && account) {
+                    window._arcanaTransitionDone = false;
+                    var sgn = provider.getSigner ? provider.getSigner() : null;
+                    if (sgn) triggerTransitionToSanctuary(provider, sgn, account);
+                }
+            }
+        } catch (e) {
+            if (e.code === 4902) {
+                await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x89', chainName: 'Polygon Mainnet', rpcUrls: ['https://polygon-rpc.com'], nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 }, blockExplorerUrls: ['https://polygonscan.com'] }] });
+                var ov = document.getElementById('oracle-network-overlay');
+                if (ov) ov.remove();
+                if (provider && account) {
+                    window._arcanaTransitionDone = false;
+                    var s = provider.getSigner ? provider.getSigner() : null;
+                    if (s) triggerTransitionToSanctuary(provider, s, account);
+                }
+            }
+        }
+    }
+
+    function updateWalletAddressDisplay(addr) {
+        var existing = document.getElementById('wallet-address-badge');
+        if (existing) existing.remove();
+        if (!addr || addr.length < 10) return;
+        var short = addr.slice(0, 6) + '…' + addr.slice(-4);
+        var badge = document.createElement('div');
+        badge.id = 'wallet-address-badge';
+        badge.className = 'wallet-address-badge';
+        badge.textContent = short;
+        document.body.appendChild(badge);
+    }
+
     function hideGameContent() {
         provider = null; signer = null; account = null;
+        window._arcanaTransitionDone = false;
         var gate = document.getElementById('arcana-connect-gate');
-        var content = document.getElementById('arcana-game-content');
-        if (gate) gate.classList.remove('hidden');
-        if (content) content.classList.remove('visible');
+        var content = gameContainer();
+        if (gate) { gate.classList.remove('hidden', 'fade-out'); }
+        if (content) { content.classList.remove('visible', 'fade-in'); }
+        var frost = document.getElementById('frost-particles');
+        if (frost) { frost.classList.remove('active'); frost.innerHTML = ''; }
+        document.body.classList.remove('frost-transition');
+        var fog = document.getElementById('arcana-fog');
+        if (fog) fog.classList.remove('sanctuary-active');
+        var badge = document.getElementById('wallet-address-badge');
+        if (badge) badge.remove();
+        var overlay = document.getElementById('oracle-network-overlay');
+        if (overlay) overlay.remove();
+    }
+
+    function addOracleChatMessage(msg) {
+        var chatContainer = document.querySelector('#chat-temple div[style*="overflow-y"]') || document.querySelector('#chat-temple > div:nth-child(2)');
+        if (chatContainer) {
+            var p = document.createElement('p');
+            p.style.cssText = 'margin:5px 0; color:var(--gold); font-weight:bold;';
+            p.textContent = msg;
+            chatContainer.appendChild(p);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    }
+
+    function spawnFrostParticles() {
+        var container = document.getElementById('frost-particles');
+        if (!container) return;
+        container.innerHTML = '';
+        for (var i = 0; i < 45; i++) {
+            var dot = document.createElement('div');
+            dot.className = 'frost-dot';
+            dot.style.left = (Math.random() * 100) + '%';
+            dot.style.animationDelay = (Math.random() * 2) + 's';
+            dot.style.animationDuration = (3 + Math.random() * 3) + 's';
+            container.appendChild(dot);
+        }
+        container.classList.add('active');
+    }
+
+    async function triggerTransitionToSanctuary(prov, sgn, addr) {
+        if (window._arcanaTransitionDone) return;
+        provider = prov; signer = sgn; account = addr;
+        var chainId = 0;
+        try {
+            if (prov) {
+                var net = await prov.getNetwork();
+                chainId = net.chainId;
+            }
+        } catch (e) { chainId = 0; }
+        if (chainId !== 137) {
+            showOracleNetworkAlert();
+            return;
+        }
+        window._arcanaTransitionDone = true;
+        updateWalletAddressDisplay(addr);
+        var shortAddr = addr && addr.length > 10 ? addr.slice(0, 6) + '…' + addr.slice(-4) : (addr || 'Initié');
+        var gate = document.getElementById('arcana-connect-gate');
+        var content = gameContainer();
+        if (gate) gate.classList.add('fade-out');
+        document.body.classList.add('frost-transition');
+        var fog = document.getElementById('arcana-fog');
+        if (fog) fog.classList.add('sanctuary-active');
+        spawnFrostParticles();
+        addOracleChatMessage('Oracle : Initié ' + shortAddr + ' reconnu. Le givre se propage...');
+        try {
+            var iceAudio = document.getElementById('ice-crackle-audio');
+            if (iceAudio) { iceAudio.volume = 0.4; iceAudio.currentTime = 0; iceAudio.play().catch(function(){}); }
+        } catch (e) {}
+        setTimeout(function() {
+            if (gate) gate.classList.add('hidden');
+            if (content) {
+                content.classList.add('visible', 'fade-in');
+                setTimeout(function() { content.classList.remove('fade-in'); }, 1100);
+            }
+            setTimeout(function() {
+                document.body.classList.remove('frost-transition');
+                var frost = document.getElementById('frost-particles');
+                if (frost) frost.classList.remove('active');
+            }, 2500);
+            fetchAndDisplayTemperature();
+        }, 650);
     }
 
     window.arcanaOnW3mConnect = function(prov, sgn, acc) {
-        provider = prov; signer = sgn; account = acc;
-        showGameContent();
-        fetchAndDisplayTemperature();
+        triggerTransitionToSanctuary(prov, sgn, acc);
         var btn = document.querySelector('#web3modal-connect-wrap .btn-connect');
         if (btn) btn.innerText = 'Connecté';
     };
