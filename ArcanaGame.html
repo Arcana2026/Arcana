@@ -478,6 +478,43 @@
             pointer-events: none;
             user-select: none;
         }
+        /* Écran d'attente : jeu caché tant que non connecté */
+        #arcana-connect-gate {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 10, 20, 0.92);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            transition: opacity 0.5s ease;
+        }
+        #arcana-connect-gate.hidden { display: none; }
+        #arcana-connect-gate .gate-message {
+            color: var(--gold);
+            font-size: 1.1em;
+            letter-spacing: 0.15em;
+            text-align: center;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+        /* Bouton discret retour accueil — discret pour préserver l'immersion */
+        .btn-back-accueil {
+            position: fixed;
+            bottom: 8px;
+            left: 12px;
+            z-index: 100;
+            font-size: 0.65rem;
+            color: rgba(176, 167, 123, 0.45);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            transition: color 0.2s;
+        }
+        .btn-back-accueil:hover { color: rgba(212, 175, 55, 0.7); }
+        /* Contenu jeu : caché par défaut */
+        #arcana-game-content { display: none; }
+        #arcana-game-content.visible { display: block; }
     </style>
     <!-- Google Fonts for digital effect -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&display=swap" rel="stylesheet">
@@ -485,6 +522,7 @@
 <body>
     <div id="star-container"></div>
     <div id="arcana-fog" aria-hidden="true"></div>
+    <a href="index.html" class="btn-back-accueil" title="Retour au Vault">⌂ Accueil</a>
     <header>
         <div class="logo-area">
             <div style="width:40px; height:40px; background:var(--gold); border-radius:16%; box-shadow:0 0 12px #ffeaa5;"><span style="font-size:1.6em; display:block; line-height:40px; text-align:center;">🎲</span></div>
@@ -493,6 +531,11 @@
         <div id="web3modal-connect-wrap"><w3m-button></w3m-button></div>
     </header>
 
+    <div id="arcana-connect-gate">
+        <p class="gate-message">Le Sanctuaire attend.<br>Connectez votre wallet pour entrer.</p>
+    </div>
+
+    <div id="arcana-game-content">
     <div class="title-vault">THE ARCANA VAULT</div>
     <div id="class-selection" class="glass-panel" style="display:none; text-align:center;">
         <div class="label-gold">Rite d'Engagement / Étape 1</div>
@@ -601,6 +644,7 @@
         <div class="victory-text">✨ JACKPOT DÉVERROUILLÉ<br><span style="font-size:0.62em;color:#fff;letter-spacing:0.09em;">Le Destin, scellé dans l'or éternel</span></div>
         <div class="gold-rain"></div>
     </div>
+    </div><!-- /arcana-game-content -->
     <!-- Web3Modal v3 / Reown AppKit -->
     <script type="module">
     (async function() {
@@ -625,6 +669,8 @@
                     const sgn = prov.getSigner();
                     const acc = await sgn.getAddress();
                     if (window.arcanaOnW3mConnect) window.arcanaOnW3mConnect(prov, sgn, acc);
+                } else {
+                    if (window.arcanaOnW3mDisconnect) window.arcanaOnW3mDisconnect();
                 }
             });
             modal.subscribeEvents((event) => {
@@ -693,12 +739,31 @@
     const POLYGON_CHAIN_ID = "0x89"; // 137
 
     var provider, signer, account;
+
+    function showGameContent() {
+        var gate = document.getElementById('arcana-connect-gate');
+        var content = document.getElementById('arcana-game-content');
+        if (gate) gate.classList.add('hidden');
+        if (content) content.classList.add('visible');
+    }
+
+    function hideGameContent() {
+        provider = null; signer = null; account = null;
+        var gate = document.getElementById('arcana-connect-gate');
+        var content = document.getElementById('arcana-game-content');
+        if (gate) gate.classList.remove('hidden');
+        if (content) content.classList.remove('visible');
+    }
+
     window.arcanaOnW3mConnect = function(prov, sgn, acc) {
         provider = prov; signer = sgn; account = acc;
+        showGameContent();
         fetchAndDisplayTemperature();
         var btn = document.querySelector('#web3modal-connect-wrap .btn-connect');
         if (btn) btn.innerText = 'Connecté';
     };
+
+    window.arcanaOnW3mDisconnect = hideGameContent;
 
     // ----------------------- TEMPÉRATURE ORACLE -----------------------
 
@@ -975,8 +1040,10 @@
                 }
             }
 
-            // Affichage du compte connecté (vous pouvez l'ajouter dans l'UI si besoin)
-            document.querySelector(".btn-connect").innerText = "Connecté";
+            // Affichage du compte connecté + révéler le jeu (fallback si Web3Modal échoue)
+            var btn = document.querySelector(".btn-connect, #web3modal-connect-wrap .btn-connect");
+            if (btn) btn.innerText = "Connecté";
+            if (window.arcanaOnW3mConnect) window.arcanaOnW3mConnect(provider, signer, account);
 
         } catch (err) {
             if (err.code === 4001 || (err?.message && err.message.toLowerCase().includes('reject'))) {
