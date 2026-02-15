@@ -963,7 +963,7 @@
           const { createWeb3Modal, defaultWagmiConfig } = await import('https://esm.sh/@web3modal/wagmi@5.1.11')
           const { mainnet, polygon } = await import('https://esm.sh/viem/chains')
           const { watchAccount, getWalletClient } = await import('https://esm.sh/@wagmi/core@2.13.4')
-          const projectId = '7004f981f33f063167f1395567798132'
+          const projectId = 'A26c2cef0fcf1c593197f7465d71c07e'
           const metadata = {
             name: 'Arcana',
             description: 'Arcana Game - Écosystème Décentralisé sur Polygon',
@@ -1011,7 +1011,7 @@
               url: 'https://arcana-ezl.pages.dev',
               icons: ['https://arcana-ezl.pages.dev/favicon.ico']
             },
-            projectId: '7004f981f33f063167f1395567798132',
+            projectId: 'A26c2cef0fcf1c593197f7465d71c07e',
             features: {
               analytics: false,
               onramp: false,
@@ -1069,7 +1069,7 @@
 </style>
 <script>
     // --- CONFIGURATION OFFICIELLE ARCANA GAME ---
-    const ARCANA_PROJECT_ID = "7004f981f33f063167f1395567798132";
+    const ARCANA_PROJECT_ID = "A26c2cef0fcf1c593197f7465d71c07e";
     const ARCANA_GAME_CONTRACT = "0xFABF1FcFB7dA0Aa861A61747E1e5a2F2F8E9E337";
     const ADMIN_ADDRESS = ""; // À REMPLIR : adresse 0x... du wallet autorisé pour Force Ouverture
     const ARCANA_TOKEN_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
@@ -1986,8 +1986,11 @@
     });
 
     // ===== Wallet connect & Polygon switch
+    const METAMASK_DAPP_LINK = 'https://metamask.app.link/dapp/arcana-ezl.pages.dev';
     async function connectWallet() {
         if (!window.ethereum) {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+            if (isMobile) window.location.href = METAMASK_DAPP_LINK;
             return;
         }
         provider = new ethers.providers.Web3Provider(window.ethereum, "any");
