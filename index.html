@@ -356,15 +356,20 @@
                     });
                 }
             } else {
-                Swal.fire({
-                    title: 'Wallet introuvable',
-                    text: 'Installez MetaMask ou un wallet Web3 compatible (Brave, Trust, etc.) sur votre ordinateur.',
-                    icon: 'warning',
-                    confirmButtonText: 'Installer MetaMask',
-                    background: '#05070a', color: '#D4AF37'
-                }).then((res) => {
-                    if (res.isConfirmed) window.open('https://metamask.io/download/', '_blank');
-                });
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+                if (isMobile) {
+                    window.location.href = 'https://metamask.app.link/dapp/arcana-ezl.pages.dev';
+                } else {
+                    Swal.fire({
+                        title: 'Wallet introuvable',
+                        text: 'Installez MetaMask ou un wallet Web3 compatible (Brave, Trust, etc.) sur votre ordinateur.',
+                        icon: 'warning',
+                        confirmButtonText: 'Installer MetaMask',
+                        background: '#05070a', color: '#D4AF37'
+                    }).then((res) => {
+                        if (res.isConfirmed) window.open('https://metamask.io/download/', '_blank');
+                    });
+                }
             }
         }
 
