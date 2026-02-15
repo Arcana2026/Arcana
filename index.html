@@ -92,31 +92,26 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bloc Sanctuaire — fixé à gauche, bouton + email */
+        /* Bloc Sanctuaire — en début de main, aligné à gauche */
         .sanctuary-block {
-            position: fixed; left: 24px; top: 50%; transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: flex-start;
-            z-index: 800; padding: 16px;
+            margin-bottom: 24px;
         }
         .btn-sanctuary-glow {
+            display: block; width: fit-content; margin-bottom: 10px;
             padding: 14px 28px; font-family: 'Cinzel', serif; font-weight: 700;
             letter-spacing: 0.15em; color: #1a1510; background: linear-gradient(135deg, #d4af37, #f2d06b);
             border: 2px solid #b8860b; border-radius: 8px; cursor: pointer;
-            animation: glow-pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 15px #D4AF37;
+            animation: pulse-gold 2s infinite;
         }
-        @keyframes glow-pulse {
-            0%, 100% { box-shadow: 0 0 5px #FFD700; }
-            50% { box-shadow: 0 0 15px #FFD700, 0 0 25px rgba(255,215,0,0.5); }
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 5px #D4AF37; }
+            50% { box-shadow: 0 0 25px #D4AF37, 0 0 40px rgba(212, 175, 55, 0.6); }
+            100% { box-shadow: 0 0 5px #D4AF37; }
         }
-        .sanctuary-email { margin-top: 14px; font-size: 14px; color: rgba(255,255,255,0.8); }
-        .sanctuary-email a { color: rgba(255,255,255,0.9); text-decoration: underline; }
-        @media (max-width: 900px) {
-            .sanctuary-block { position: static; transform: none; margin-bottom: 24px; }
-            main { padding-left: 0; }
-        }
-        @media (min-width: 901px) {
-            main { padding-left: 220px; }
-        }
+        .sanctuary-email { font-size: 14px; color: white; }
+        .sanctuary-email a { color: white; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -133,7 +128,7 @@
 
     <main class="container mx-auto px-4 py-8">
         <div class="sanctuary-block">
-            <a href="arcanagame.html" style="text-decoration: none;"><button class="btn-sanctuary-glow">ENTRER DANS LE SANCTUAIRE</button></a>
+            <button onclick="window.location.href='arcanagame.html'" class="btn-sanctuary-glow">ENTRER DANS LE SANCTUAIRE</button>
             <p class="sanctuary-email">Contact : <a href="mailto:blockarcana-admin@proton.me">blockarcana-admin@proton.me</a></p>
         </div>
         <div class="glass-vault max-w-4xl mx-auto p-10 md:p-16 text-center">
