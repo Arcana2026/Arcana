@@ -565,9 +565,173 @@
             0% { transform: translateY(-10px) scale(1); opacity: 0.8; }
             100% { transform: translateY(100vh) scale(0.5); opacity: 0; }
         }
+        /* === Système d'obscurité et Lumière === */
+        #arcane-darkness-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; z-index: 450;
+            background: radial-gradient(circle 120px at var(--cursor-x, 50%) var(--cursor-y, 50%), transparent 0%, transparent 35%, rgba(0,0,0,0.97) 100%);
+            transition: background 0.08s ease-out;
+        }
+        #arcane-darkness-overlay.room-lit-1 { --room1-mask: transparent; }
+        #arcane-darkness-overlay.room-lit-2 { --room2-mask: transparent; }
+        .arcane-light-object {
+            position: absolute; width: 48px; height: 48px; cursor: pointer; z-index: 460;
+            display: flex; align-items: center; justify-content: center; font-size: 1.8em;
+            background: radial-gradient(circle, rgba(255,200,100,0.4), transparent);
+            border-radius: 50%; border: 2px solid rgba(255,220,100,0.6);
+            box-shadow: 0 0 20px rgba(255,200,80,0.6); pointer-events: auto;
+            transition: transform 0.3s, opacity 0.5s; animation: light-flicker 2s ease-in-out infinite;
+        }
+        .arcane-light-object:hover { transform: scale(1.15); box-shadow: 0 0 30px rgba(255,220,100,0.9); }
+        .arcane-light-object.collected { opacity: 0; pointer-events: none; }
+        @keyframes light-flicker { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.2); } }
+        /* Inventaire clés */
+        #arcane-inventory { position: fixed; top: 70px; left: 12px; z-index: 520;
+            background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+        }
+        #arcane-inventory .keys-count { color: var(--gold); font-weight: bold; font-size: 1.2em; }
+        #arcane-inventory .keys-label { color: rgba(255,255,255,0.8); font-size: 0.75em; }
+        /* Autel des Clés */
+        #arcane-altar-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            z-index: 510; background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 20px;
+            padding: 24px; max-width: 340px; text-align: center;
+        }
+        .arcane-door { transition: opacity 0.5s, filter 0.5s; }
+        .arcane-door.locked { opacity: 0.35; pointer-events: none; filter: grayscale(0.8); }
+        /* Brouillard sombre */
+        #arcane-dark-fog {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 440;
+            background: radial-gradient(ellipse 150% 150% at 50% 50%, transparent 30%, rgba(10,5,20,0.7) 80%, rgba(5,2,15,0.9) 100%);
+            opacity: var(--fog-opacity, 0.85); transition: opacity 1.5s ease;
+        }
+        /* === Système 100 niveaux === */
+        #arcane-level-counter {
+            position: fixed; top: 12px; right: 80px; z-index: 610;
+            font-family: 'Orbitron', 'VT323', monospace;
+            font-size: 1.8rem; font-weight: 700;
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(212,175,55,0.6);
+            letter-spacing: 0.15em;
+        }
+        .arcane-level-door {
+            min-width: 100px; padding: 16px 24px; margin: 8px;
+            font-size: 1em; cursor: pointer; border-radius: 12px;
+            border: 2px solid var(--glass-border);
+            background: rgba(0,0,0,0.5); color: var(--gold);
+            transition: all 0.3s;
+        }
+        .arcane-level-door:hover { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
+        .arcane-level-door.wrong { border-color: #ff4444; background: rgba(255,68,68,0.2); animation: door-shake 0.4s; }
+        .arcane-level-door.vip-trap { opacity: 0.7; box-shadow: 0 0 12px rgba(255,68,68,0.6); border-color: rgba(255,100,100,0.6); }
+        .arcane-level-door.vip-shortcut { opacity: 0.85; box-shadow: 0 0 14px rgba(212,175,55,0.7); border-color: rgba(212,175,55,0.8); }
+        @keyframes door-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+        #arcane-level-panel { max-width: 520px; }
+        #arcane-doors-container { display: flex; flex-wrap: wrap; justify-content: center; margin: 20px 0; gap: 12px; }
+        .arcane-scroll-object { position: absolute; width: 36px; height: 36px; cursor: pointer; z-index: 465;
+            font-size: 1.4em; opacity: 0.5; transition: opacity 0.3s; pointer-events: auto;
+            filter: drop-shadow(0 0 8px rgba(212,175,55,0.5));
+        }
+        .arcane-scroll-object:hover { opacity: 1; }
+        .arcane-scroll-object.revealed { opacity: 0.3; pointer-events: none; }
+        .arcane-corner-clue { position: absolute; width: 32px; height: 32px; cursor: pointer; z-index: 464;
+            font-size: 1.2em; opacity: 0.35; transition: opacity 0.3s; pointer-events: auto;
+        }
+        .arcane-corner-clue:hover { opacity: 1; }
+        .arcane-corner-clue.used { opacity: 0.2; pointer-events: none; }
+        #arcane-pyramid-map { position: fixed; bottom: 100px; left: 20px; z-index: 515;
+            width: 120px; height: 140px; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 8px; display: none;
+        }
+        .pyramid-row { display: flex; justify-content: center; gap: 2px; margin: 1px 0; font-size: 8px; }
+        .pyramid-cell { width: 10px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 2px; color: #666; }
+        .pyramid-cell.player { background: var(--gold); color: #000; box-shadow: 0 0 6px var(--gold); }
+        #arcane-nav-key-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            z-index: 512; background: rgba(0,0,0,0.92); border: 2px solid var(--gold); border-radius: 16px;
+            padding: 20px; text-align: center;
+        }
+        /* L'Écho du Sanctuaire — Bandeau défilant style parchemin */
+        #arcane-echo-journal {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+            height: 52px; overflow: hidden; padding: 0 16px;
+            background: linear-gradient(180deg, rgba(40,25,15,0.4) 0%, rgba(25,15,8,0.98) 100%);
+            border-top: 3px solid rgba(212,175,55,0.5);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.6), inset 0 0 60px rgba(80,60,30,0.15);
+            font-family: 'Cinzel', Georgia, serif; font-size: 0.8rem;
+            color: rgba(220,200,160,0.95); display: flex; align-items: center;
+        }
+        #arcane-echo-journal .echo-title { color: var(--gold); font-weight: 700; flex-shrink: 0; margin-right: 16px; letter-spacing: 0.12em; }
+        #arcane-echo-ticker { flex: 1; overflow: hidden; white-space: nowrap; }
+        #arcane-echo-ticker .echo-scroll { display: inline-block; padding-left: 100%; animation: echo-scroll 30s linear infinite; }
+        #arcane-echo-ticker .echo-scroll.paused { animation-play-state: paused; }
+        @keyframes echo-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .pyramid-cell.loot { animation: pyramid-loot-blink 1.5s ease-in-out infinite; }
+        @keyframes pyramid-loot-blink { 0%,100% { background: rgba(212,175,55,0.4); box-shadow: 0 0 4px var(--gold); } 50% { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); } }
+        /* === Grimoire d'Arcana === */
+        #grimoire-btn {
+            position: fixed; bottom: 70px; right: 20px; z-index: 505;
+            width: 56px; height: 56px; border-radius: 12px;
+            background: linear-gradient(145deg, #2a2520, #1a1612);
+            border: 2px solid rgba(212,175,55,0.6);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,175,55,0.2);
+            cursor: pointer; font-size: 1.8em; display: flex; align-items: center; justify-content: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        #grimoire-btn:hover { transform: scale(1.08); box-shadow: 0 0 25px rgba(212,175,55,0.5), 0 0 8px var(--gold); }
+        #grimoire-panel {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.85);
+            z-index: 600; width: 94vw; max-width: 420px; max-height: 90vh;
+            background: linear-gradient(180deg, #f4e9d0 0%, #e8dcc4 20%, #dfd0a8 50%, #d4c490 100%);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"),
+                linear-gradient(180deg, #f4e9d0 0%, #e8dcc4 20%, #dfd0a8 50%, #d4c490 100%);
+            border: 3px solid #b8860b;
+            box-shadow: 0 0 30px rgba(184,134,11,0.5), inset 0 1px 0 rgba(255,255,255,0.3), 4px 4px 15px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            font-family: 'Libre Baskerville', 'Times New Roman', Georgia, serif;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        #grimoire-panel.grimoire-open {
+            opacity: 1; transform: translate(-50%,-50%) scale(1);
+            animation: grimoire-book-open 0.5s ease-out forwards;
+        }
+        @keyframes grimoire-book-open {
+            0% { transform: translate(-50%,-50%) scale(0.7); opacity: 0; }
+            60% { transform: translate(-50%,-50%) scale(1.02); opacity: 1; }
+            100% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+        }
+        .grimoire-paper {
+            padding: 20px 22px 24px; margin: 12px; margin-right: 18px;
+            background: rgba(250,245,230,0.5);
+            border: 1px solid rgba(184,134,11,0.3);
+            border-radius: 2px;
+            color: #3d3525;
+            font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+        }
+        .grimoire-tome-title { font-size: clamp(1rem, 3.5vw, 1.25rem); font-weight: 700; color: #5c4a2a; text-align: center; margin-bottom: 16px; letter-spacing: 0.08em; }
+        .grimoire-tome-text { margin-bottom: 20px; text-align: justify; }
+        .grimoire-unlock-btn { width: 100%; padding: 14px 20px; margin: 16px 0; font-size: clamp(0.85rem, 2.8vw, 1rem);
+            background: linear-gradient(180deg, #d4af37 0%, #b8860b 100%); color: #1a1510;
+            border: 2px solid #8b6914; border-radius: 8px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;
+        }
+        .grimoire-unlock-btn:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(212,175,55,0.4); }
+        .grimoire-inv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+        .grimoire-inv-item { display: flex; flex-direction: column; align-items: center; padding: 12px 8px;
+            background: rgba(255,255,255,0.5); border: 1px solid rgba(184,134,11,0.4);
+            border-radius: 8px; font-size: clamp(0.75rem, 2.2vw, 0.9rem); color: #4a3d2a;
+        }
+        .grimoire-inv-icon { font-size: 1.8em; margin-bottom: 6px; }
+        .grimoire-inv-num { font-weight: bold; color: #5c4a2a; }
+        .grimoire-close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border: 1px solid rgba(184,134,11,0.5);
+            background: rgba(220,200,160,0.4); color: #5c4a2a; border-radius: 6px; cursor: pointer; font-size: 1.3em; z-index: 2;
+        }
+        .grimoire-close:hover { background: rgba(184,134,11,0.3); }
     </style>
     <!-- Google Fonts for digital effect -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="star-container"></div>
@@ -589,6 +753,17 @@
         </div>
     </div>
 
+    <div id="arcane-dark-fog" style="opacity:0; pointer-events:none;"></div>
+    <div id="arcane-darkness-overlay" style="opacity:0;"></div>
+    <div id="arcane-inventory" style="display:none;">
+        <span class="keys-label">Clés</span>
+        <span id="arcane-keys-count" class="keys-count">0</span>
+        <span class="keys-label" style="margin-left:12px;">Nav</span>
+        <span id="arcane-navkeys-count" class="keys-count">0</span>
+        <span class="keys-label" style="margin-left:12px;">🛡️</span>
+        <span id="arcane-protection-count" class="keys-count">0</span>
+    </div>
+    <div id="arcane-level-counter" style="display:none;">NIVEAU <span id="arcane-level-num">1</span> / 100</div>
     <div id="game-container" class="arcana-game-content">
     <div class="title-vault">THE ARCANA VAULT</div>
     <div id="class-selection" class="glass-panel" style="display:none; text-align:center;">
@@ -610,7 +785,8 @@
         </div>
     </div>
 
-    <div id="level-2-panel" class="glass-panel">
+    <div id="level-2-panel" class="glass-panel" data-room="1">
+        <div class="arcane-light-object" id="light-1" onclick="collectLight(1)" style="top:15px;right:20px;" title="Allumer la lumière">🕯️</div>
         <div class="label-gold">Guide Poche / Niveau 2</div>
         <div class="oracle-mirror">
             <span id="temp">–</span>
@@ -618,7 +794,11 @@
         <div id="oracle-warning-message" class="oracle-temp-warning" style="display:none;"></div>
         <p style="text-align:center; font-size:0.8em; opacity:0.8;">Saisissez le sceau de l'alignement pour le Niveau 3</p>
         <input type="text" id="sealCodeInput" class="input-arcana" placeholder="CODE DE 6 CARACTÈRES">
-        <button class="btn-connect" id="btnSeal" onclick="onSealClick()" style="width:100%; margin-top:15px;">SCELLER LE DESTIN</button>
+        <button class="btn-connect arcane-door locked" id="btnSeal" onclick="onSealClick()" style="width:100%; margin-top:15px;">SCELLER LE DESTIN</button>
+        <div class="label-gold" style="margin-top:12px;">Autel des Clés</div>
+        <button class="btn-connect" onclick="openAltar()" style="width:100%; margin-top:8px; background:linear-gradient(45deg,#5c3d1e,#8b5a2b);">⚗️ Miser 1 Clé pour 3</button>
+        <div class="label-gold" style="margin-top:16px;">Les 100 Niveaux</div>
+        <button class="btn-connect" onclick="enterLevelMode()" style="width:100%; margin-top:8px; background:linear-gradient(45deg,#2d1f5c,#4a2d8b);">🎲 ENTRER AUX 100 NIVEAUX</button>
         <div class="token-select-group">
             <input id="amountInput" type="number" min="0" step="any" class="input-arcana" placeholder="Montant" style="width: 110px;">
             <select id="tokenSelect" class="input-arcana" style="width: 120px; margin-top: 0;">
@@ -642,6 +822,7 @@
     </div>
 
     <span class="admin-trigger" onclick="toggleAdmin()" title="L'Œil d'Arcana (Ctrl+Shift+A)">👁 Admin</span>
+    <button id="grimoire-btn" onclick="toggleGrimoire()" title="Grimoire d'Arcana" style="display:none;">📖</button>
 
     <div id="admin-dashboard" class="glass-panel" style="display:none;">
         <button class="admin-close" onclick="hideAdmin()" title="Fermer">×</button>
@@ -662,7 +843,8 @@
     </div>
     
     <!-- ==== Sanctuaire du Destin (Niveau 3) ==== -->
-    <div id="level-3-sanctuary" class="glass-panel">
+    <div id="level-3-sanctuary" class="glass-panel" data-room="2" style="display:none;">
+        <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="top:15px;right:20px;" title="Allumer la lumière">🔮</div>
         <div class="digital-timer" id="sanctuary-timer">15:00</div>
         <h2 style="color:var(--gold); letter-spacing:2px; text-align:center; margin-bottom:0.3em;">
             LE SANCTUAIRE DU DESTIN
@@ -692,6 +874,74 @@
         <div id="sanctuary-success" style="display:none; margin-top: 1em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.1em;">
             Sceau aligné ! Le Destin est révélé...
         </div>
+    </div>
+    <!-- Panel 100 niveaux : portes aléatoires -->
+    <div id="arcane-level-panel" class="glass-panel" style="display:none; position:relative;">
+        <div id="arcane-corner-clues-container" style="position:absolute;top:0;left:0;right:0;bottom:0;"></div>
+        <div class="label-gold">Salle Niveau <span id="arcane-panel-level-num">1</span></div>
+        <p style="color:rgba(255,255,255,0.85); font-size:0.85em; margin:12px 0;">Choisissez une porte. Pièges ou propulseurs ?</p>
+        <div id="arcane-doors-container"></div>
+        <div id="arcane-scrolls-container" style="position:relative; min-height:50px; margin-top:12px;"></div>
+        <button class="btn-connect" onclick="useNavKey()" style="margin-top:12px; font-size:0.85em;">🗺️ Clé de Navigation (+5 / -5)</button>
+    </div>
+    <!-- Carte Pyramide -->
+    <div id="arcane-pyramid-map">
+        <div class="label-gold" style="font-size:0.65em; margin-bottom:4px;">Carte</div>
+        <div id="pyramid-grid"></div>
+    </div>
+    <!-- L'Écho du Sanctuaire — Bandeau défilant -->
+    <div id="arcane-echo-journal" style="display:none;">
+        <div class="echo-title">L'ÉCHO DU SANCTUAIRE</div>
+        <div id="arcane-echo-ticker"><span class="echo-scroll" id="arcane-echo-scroll"></span></div>
+    </div>
+    <!-- Panneau Clé de Navigation — Utiliser une Clé -->
+    <div id="arcane-nav-key-panel">
+        <div class="label-gold">Utiliser une Clé</div>
+        <p style="margin:12px 0; font-size:0.9em;">Choisissez votre pouvoir :</p>
+        <button class="btn-connect" onclick="navKeyPropulsion()" style="margin:4px;">⬆️ Propulsion : Saut +1 à +10</button>
+        <button class="btn-connect" onclick="navKeyRappel()" style="margin:4px;">⬇️ Rappel : Ramasser un butin</button>
+        <button class="btn-connect" onclick="closeNavKeyPanel()" style="margin-top:12px; background:transparent; border:1px solid #666;">Annuler</button>
+    </div>
+    <!-- Grimoire d'Arcana (Guide de Poche) -->
+    <div id="grimoire-panel">
+        <button class="grimoire-close" onclick="closeGrimoire()" title="Fermer">×</button>
+        <div class="grimoire-paper">
+            <h2 class="grimoire-tome-title">Tome I : Le Secret de l'Ascension Interdite</h2>
+            <div class="grimoire-tome-text">
+                Au fond des couloirs scellés de la Pyramide, là où l'obscurité avale les pas des initiés, repose un savoir trop ancien pour les mortels. Ce grimoire renferme les runes oubliées de l'ascension — des chemins que les Sages ont tracés à travers cent portes, cent épreuves. Celui qui débloque ces pages verra ses clés se multiplier et ses yeux percer le voile des mirages.
+            </div>
+            <button class="grimoire-unlock-btn" onclick="unlockSavoir2POL()">DÉBLOQUER LE SAVOIR — 2 POL</button>
+            <div class="label-gold" style="color:#5c4a2a; font-size:0.8em; margin-top:16px;">Inventaire de poche</div>
+            <div class="grimoire-inv-grid">
+                <div class="grimoire-inv-item">
+                    <span class="grimoire-inv-icon">⬆️</span>
+                    <span>Clés Propulsion</span>
+                    <span id="grimoire-propulsion" class="grimoire-inv-num">0</span>
+                </div>
+                <div class="grimoire-inv-item">
+                    <span class="grimoire-inv-icon">⬇️</span>
+                    <span>Clés Rappel</span>
+                    <span id="grimoire-rappel" class="grimoire-inv-num">0</span>
+                </div>
+                <div class="grimoire-inv-item">
+                    <span class="grimoire-inv-icon">💎</span>
+                    <span>Butins Récupérés</span>
+                    <span id="grimoire-butins" class="grimoire-inv-num">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Autel des Clés : pari 1→3 -->
+    <div id="arcane-altar-panel">
+        <div class="label-gold">Autel des Clés</div>
+        <p style="color:rgba(255,255,255,0.9); margin:12px 0; font-size:0.9em;">Misez 1 clé pour tenter d'en gagner 3.</p>
+        <div id="arcane-altar-cards" style="display:flex; gap:12px; justify-content:center; margin:16px 0;">
+            <button class="btn-connect" style="width:70px; height:70px; font-size:1.5em;" onclick="pickAltarCard(0)">❓</button>
+            <button class="btn-connect" style="width:70px; height:70px; font-size:1.5em;" onclick="pickAltarCard(1)">❓</button>
+            <button class="btn-connect" style="width:70px; height:70px; font-size:1.5em;" onclick="pickAltarCard(2)">❓</button>
+        </div>
+        <p id="arcane-altar-result" style="color:var(--gold); font-weight:bold; min-height:24px;"></p>
+        <button class="btn-connect" onclick="closeAltar()" style="margin-top:12px;">Fermer</button>
     </div>
     <!-- Victoire JACKPOT : pluie d'or -->
     <div id="victory-jackpot">
@@ -819,6 +1069,7 @@
 </style>
 <script>
     // --- CONFIGURATION OFFICIELLE ARCANA GAME ---
+    const ARCANA_PROJECT_ID = "7004f981f33f063167f1395567798132";
     const ARCANA_GAME_CONTRACT = "0xFABF1FcFB7dA0Aa861A61747E1e5a2F2F8E9E337";
     const ADMIN_ADDRESS = ""; // À REMPLIR : adresse 0x... du wallet autorisé pour Force Ouverture
     const ARCANA_TOKEN_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
@@ -829,6 +1080,12 @@
     const ARCANA_GAME_ORACLE_ABI = [
         "function currentTemp() view returns (int256)",
         "function updateOracle(int256 _temp) external"
+    ];
+    // Contrat de sauvegarde progression (mapping address => level). Sauvegarde persistante sur Polygon.
+    const ARCANA_PROGRESSION_CONTRACT = ARCANA_GAME_CONTRACT; // ou "0x1...876d" pour reprendre où l'on s'est arrêté
+    const ARCANA_PROGRESSION_ABI = [
+        "function playerLevel(address) view returns (uint256)",
+        "function setLevel(uint256 _level) external"
     ];
 
     // ERC20 ABI minimum pour approve/allowance/transferFrom/balanceOf (lecture+Transfert)
@@ -846,6 +1103,476 @@
     var provider, signer, account;
 
     var gameContainer = function() { return document.getElementById('game-container') || document.getElementById('arcana-game-content'); };
+
+    // === Système d'obscurité, Lumière, Clés, Autel ===
+    var arcaneKeys = 0;
+    var arcaneLitRooms = {}; // roomId -> true
+    var arcaneAltarWinIndex = -1;
+
+    function updateArcaneInventory() {
+        var el = document.getElementById('arcane-keys-count');
+        if (el) el.textContent = arcaneKeys;
+        var nav = document.getElementById('arcane-navkeys-count');
+        if (nav) nav.textContent = arcaneNavKeys;
+        var prot = document.getElementById('arcane-protection-count');
+        if (prot) prot.textContent = arcaneProtectionKeys;
+        var inv = document.getElementById('arcane-inventory');
+        if (inv && gameContainer() && gameContainer().classList.contains('visible')) inv.style.display = 'flex';
+        updateGrimoireInventory();
+    }
+    function updateGrimoireInventory() {
+        var el = function(id, val) { var e = document.getElementById(id); if (e) e.textContent = (val !== undefined ? val : 0); };
+        el('grimoire-propulsion', arcaneNavKeys);
+        el('grimoire-rappel', arcaneNavKeys);
+        el('grimoire-butins', arcaneButinsRecuperes + arcaneLootNFTs);
+    }
+    function toggleGrimoire() {
+        var panel = document.getElementById('grimoire-panel');
+        if (panel.style.display === 'block') { closeGrimoire(); return; }
+        panel.style.display = 'block';
+        updateGrimoireInventory();
+        requestAnimationFrame(function() { panel.classList.add('grimoire-open'); });
+    }
+    function closeGrimoire() {
+        var panel = document.getElementById('grimoire-panel');
+        panel.classList.remove('grimoire-open');
+        setTimeout(function() { panel.style.display = 'none'; }, 350);
+    }
+    async function unlockSavoir2POL() {
+        var seller = GRIMOIRE_SELLER_WALLET || (isVipWallet(account) ? account : '');
+        if (!seller || seller.length < 40) { addOracleChatMessage('Définissez GRIMOIRE_SELLER_WALLET (0x1...876d) pour recevoir les 2 POL.'); return; }
+        if (!signer || !account) { addOracleChatMessage('Connectez votre wallet pour débloquer le savoir.'); return; }
+        try {
+            var wei = ethers.utils.parseEther('2');
+            var tx = await signer.sendTransaction({ to: seller, value: wei, gasLimit: 21000 });
+            await tx.wait();
+            addOracleChatMessage('Le savoir est débloqué. 2 POL transmis.');
+            echoAddMessage('Un Initié a débloqué le Tome I.');
+        } catch (e) { addOracleChatMessage('Transaction échouée : ' + (e.message || e)); }
+    }
+    function grimoireUsePropulsion() {
+        closeGrimoire();
+        if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Clé de Propulsion.'); return; }
+        navKeyPropulsion();
+    }
+    function grimoireUseRappel() {
+        closeGrimoire();
+        if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Clé de Rappel.'); return; }
+        navKeyRappel();
+    }
+    function grimoireLightRoom(roomId) {
+        if (arcaneKeys < 1) { addOracleChatMessage('Pas assez de clés pour éclairer.'); return; }
+        if (arcaneLitRooms[roomId]) { addOracleChatMessage('Cette salle est déjà éclairée.'); return; }
+        arcaneKeys--;
+        arcaneLitRooms[roomId] = true;
+        updateArcaneDoors();
+        updateGrimoireInventory();
+        updateArcaneInventory();
+        applyLevelDarkness();
+        addOracleChatMessage('La Salle ' + roomId + ' est désormais éclairée.');
+        echoAddMessage('Un Initié a éclairé la Salle ' + roomId + '.');
+    }
+    async function buyBooklet(level) {
+        var seller = GRIMOIRE_SELLER_WALLET || (isVipWallet(account) ? account : '');
+        if (!seller || seller.length < 40) { addOracleChatMessage('Marché indisponible. Définissez GRIMOIRE_SELLER_WALLET avec l\'adresse du vendeur (0x1...876d).'); return; }
+        if (!signer || !account) { addOracleChatMessage('Connectez votre wallet pour acheter.'); return; }
+        var prices = { 5: 0.01, 15: 0.02, 25: 0.03, 50: 0.05, 100: 0.1 };
+        var price = prices[level] || 0.01;
+        var wei = ethers.utils.parseEther(price.toString());
+        try {
+            var tx = await signer.sendTransaction({ to: seller, value: wei, gasLimit: 21000 });
+            await tx.wait();
+            arcaneLootNFTs++;
+            updateGrimoireInventory();
+            addOracleChatMessage('Livret du Niveau ' + level + ' acheté ! +1 NFT de Butin.');
+            echoAddMessage('Un Initié a acquis le Livret du Niveau ' + level + '.');
+            closeGrimoire();
+        } catch (e) { addOracleChatMessage('Achat échoué : ' + (e.message || e)); }
+    }
+    function updateArcaneFog() {
+        var lit = Object.keys(arcaneLitRooms).length;
+        var fog = document.getElementById('arcane-dark-fog');
+        if (fog) fog.style.setProperty('--fog-opacity', Math.max(0, 0.85 - lit * 0.35).toString());
+    }
+    function updateArcaneDoors() {
+        var btnSeal = document.getElementById('btnSeal');
+        if (btnSeal) {
+            if (arcaneLitRooms[1]) btnSeal.classList.remove('locked'); else btnSeal.classList.add('locked');
+        }
+    }
+    document.addEventListener('mousemove', function(e) {
+        var overlay = document.getElementById('arcane-darkness-overlay');
+        if (!overlay) return;
+        var x = (e.clientX / window.innerWidth * 100).toFixed(2);
+        var y = (e.clientY / window.innerHeight * 100).toFixed(2);
+        overlay.style.setProperty('--cursor-x', x + '%');
+        overlay.style.setProperty('--cursor-y', y + '%');
+        var r = 120 + (arcaneLitRooms[1] ? 80 : 0) + (arcaneLitRooms[2] ? 80 : 0);
+        var shrink = Math.max(0.08, 0.35 * Math.pow(0.95, arcaneCurrentLevel - 1));
+        overlay.style.background = 'radial-gradient(circle ' + r + 'px at ' + x + '% ' + y + '%, transparent 0%, transparent ' + (shrink * 100) + '%, rgba(0,0,0,0.97) 100%)';
+    });
+    document.addEventListener('touchmove', function(e) {
+        if (e.touches && e.touches[0]) {
+            var t = e.touches[0];
+            var overlay = document.getElementById('arcane-darkness-overlay');
+            if (!overlay) return;
+            var x = (t.clientX / window.innerWidth * 100).toFixed(2);
+            var y = (t.clientY / window.innerHeight * 100).toFixed(2);
+            overlay.style.setProperty('--cursor-x', x + '%');
+            overlay.style.setProperty('--cursor-y', y + '%');
+            var r = 120 + (arcaneLitRooms[1] ? 80 : 0) + (arcaneLitRooms[2] ? 80 : 0);
+            var shrink = Math.max(0.08, 0.35 * Math.pow(0.95, arcaneCurrentLevel - 1));
+            overlay.style.background = 'radial-gradient(circle ' + r + 'px at ' + x + '% ' + y + '%, transparent 0%, transparent ' + (shrink * 100) + '%, rgba(0,0,0,0.97) 100%)';
+        }
+    }, { passive: true });
+    function collectLight(roomId) {
+        if (arcaneLitRooms[roomId]) return;
+        var lightEl = document.getElementById('light-' + roomId);
+        if (lightEl) { lightEl.classList.add('collected'); }
+        arcaneLitRooms[roomId] = true;
+        arcaneKeys++;
+        updateArcaneInventory();
+        updateArcaneFog();
+        updateArcaneDoors();
+        addOracleChatMessage('Une lumière éclaire la pièce. +1 Clé.');
+    }
+    function openAltar() {
+        if (arcaneKeys < 1) { addOracleChatMessage('Vous n\'avez pas assez de clés.'); return; }
+        arcaneAltarWinIndex = Math.floor(Math.random() * 3);
+        document.getElementById('arcane-altar-panel').style.display = 'block';
+        document.getElementById('arcane-altar-result').textContent = '';
+        var cards = document.querySelectorAll('#arcane-altar-cards button');
+        cards.forEach(function(b,i){ b.textContent = '❓'; b.disabled = false; });
+    }
+    function pickAltarCard(idx) {
+        var cards = document.querySelectorAll('#arcane-altar-cards button');
+        cards.forEach(function(b){ b.disabled = true; });
+        var win = (idx === arcaneAltarWinIndex);
+        cards[0].textContent = arcaneAltarWinIndex === 0 ? '🗝️' : '✗';
+        cards[1].textContent = arcaneAltarWinIndex === 1 ? '🗝️' : '✗';
+        cards[2].textContent = arcaneAltarWinIndex === 2 ? '🗝️' : '✗';
+        arcaneKeys--;
+        if (win) { arcaneKeys += 3; addOracleChatMessage('Victoire ! +3 Clés.'); }
+        else { addOracleChatMessage('Le destin n\'a pas souri.'); }
+        updateArcaneInventory();
+        document.getElementById('arcane-altar-result').textContent = win ? '✨ +3 Clés !' : 'La clé est perdue.';
+    }
+    function closeAltar() {
+        document.getElementById('arcane-altar-panel').style.display = 'none';
+    }
+
+    // === VIP Bernard : 0x1...876d ===
+    var ARCANA_VIP_WALLET = ''; // Mettez l'adresse complète ou laissez vide
+    var GRIMOIRE_SELLER_WALLET = ''; // Adresse complète du vendeur (0x1...876d) pour recevoir les ventes de livrets
+    function isVipWallet(addr) {
+        if (!addr) return false;
+        var a = (addr + '').toLowerCase();
+        return (a.startsWith('0x1') && a.endsWith('876d') && a.length === 42) || (ARCANA_VIP_WALLET && a === ARCANA_VIP_WALLET.toLowerCase());
+    }
+    // === Système 100 niveaux : progression, portes, difficulté, Web3 ===
+    const ARCANA_MAX_LEVEL = 100;
+    var arcaneCurrentLevel = 1;
+    var arcaneDoorDeltas = [];
+    var arcaneDoorRevealed = [];
+    var arcaneInLevelMode = false;
+    var arcaneNavKeys = 0;
+    var arcaneProtectionKeys = 0;
+    var arcaneLootLevels = [];
+    var arcaneTotalLootSpawned = 0;
+    var arcaneLootNFTs = 0;
+    var arcaneButinsRecuperes = 0;
+
+    function getDoorDestination(type) {
+        if (type === 'trap') return -(1 + Math.floor(Math.random() * 5));
+        if (type === 'propeller') return 2 + Math.floor(Math.random() * 7);
+        return 1;
+    }
+    var arcaneEchoQueue = [];
+    function echoAddMessage(msg) {
+        arcaneEchoQueue.push(msg);
+        if (arcaneEchoQueue.length > 20) arcaneEchoQueue.shift();
+        var scroll = document.getElementById('arcane-echo-scroll');
+        if (scroll) {
+            var txt = arcaneEchoQueue.join('  ◆  ');
+            scroll.textContent = txt + (txt ? '  ◆  ' : '');
+            scroll.style.animation = 'none';
+            scroll.offsetHeight;
+            scroll.style.animation = 'echo-scroll 40s linear infinite';
+        }
+    }
+    function ouvrirPorte(idx) {
+        var delta = arcaneDoorDeltas[idx] !== undefined ? arcaneDoorDeltas[idx] : 1;
+        var newLevel = Math.max(1, Math.min(ARCANA_MAX_LEVEL, arcaneCurrentLevel + delta));
+        var doors = document.querySelectorAll('.arcane-level-door');
+        doors.forEach(function(d){ d.disabled = true; });
+        if (delta < 0) {
+            var lostLevel = arcaneCurrentLevel;
+            if (arcaneLootLevels.indexOf(lostLevel) === -1) {
+                arcaneLootLevels.push(lostLevel);
+                arcaneTotalLootSpawned++;
+                echoAddMessage('Un trésor est apparu au Niveau ' + lostLevel + ' !');
+            }
+            addOracleChatMessage('Piège ! Retour au niveau ' + newLevel + '.');
+        } else {
+            if (delta > 1) echoAddMessage('Un Initié a sauté ' + delta + ' niveaux !');
+            if (delta > 1) addOracleChatMessage('Propulseur ! Saut au niveau ' + newLevel + ' !');
+            else addOracleChatMessage('Niveau ' + newLevel + ' atteint.');
+        }
+        goToLevel(newLevel);
+    }
+    function goToLevel(level, fromRappel) {
+        var targetLevel = Math.max(1, Math.min(ARCANA_MAX_LEVEL, level));
+        var lootLevel = targetLevel;
+        if (fromRappel && arcaneLootLevels.indexOf(lootLevel) !== -1) {
+            var isMirage = Math.random() < 0.10;
+            if (isMirage && arcaneProtectionKeys < 1) {
+                targetLevel = Math.max(1, lootLevel - 5);
+                echoAddMessage('Le Mirage ! Un piège vous renvoie 5 niveaux en arrière.');
+                addOracleChatMessage('Mirage : piège ! -5 niveaux.');
+            } else if (isMirage && arcaneProtectionKeys >= 1) {
+                arcaneProtectionKeys--;
+                updateArcaneInventory();
+                echoAddMessage('Clé de Protection : le Mirage est neutralisé.');
+            }
+            arcaneLootLevels = arcaneLootLevels.filter(function(l){ return l !== lootLevel; });
+            if (!isMirage) { arcaneProtectionKeys++; arcaneButinsRecuperes++; updateArcaneInventory(); }
+        }
+        arcaneCurrentLevel = targetLevel;
+        updateLevelDisplay();
+        updatePyramidMap();
+        generateLevelDoors();
+        if (isVipWallet(account)) {
+            console.log('%c[Omniscience] Butin pyramide — Total accumulé: ' + arcaneTotalLootSpawned + ' | Non ramassés: ' + arcaneLootLevels.length + ' | Niveaux: ' + (arcaneLootLevels.slice(0).sort(function(a,b){return a-b;}).join(', ') || '—') + ' | Niveau actuel: ' + arcaneCurrentLevel, 'color:#d4af37; font-weight:bold;');
+        }
+        spawnScrolls();
+        spawnCornerClues();
+        saveLevelWeb3(arcaneCurrentLevel);
+    }
+    function updateLevelDisplay() {
+        var num = document.getElementById('arcane-level-num');
+        var panelNum = document.getElementById('arcane-panel-level-num');
+        if (num) num.textContent = arcaneCurrentLevel;
+        if (panelNum) panelNum.textContent = arcaneCurrentLevel;
+        applyLevelDarkness();
+    }
+    function applyLevelDarkness() {
+        var overlay = document.getElementById('arcane-darkness-overlay');
+        if (overlay) {
+            var r = 120 + (arcaneLitRooms[1] ? 80 : 0) + (arcaneLitRooms[2] ? 80 : 0);
+            var shrink = Math.max(0.08, 0.35 * Math.pow(0.95, arcaneCurrentLevel - 1));
+            overlay.style.background = 'radial-gradient(circle ' + r + 'px at var(--cursor-x, 50%) var(--cursor-y, 50%), transparent 0%, transparent ' + (shrink * 100) + '%, rgba(0,0,0,0.97) 100%)';
+        }
+    }
+    function generateLevelDoors() {
+        var count = 2 + Math.floor(Math.random() * 3);
+        arcaneDoorDeltas = [];
+        arcaneDoorRevealed = [];
+        var types = ['normal','normal','trap','propeller'];
+        var container = document.getElementById('arcane-doors-container');
+        if (!container) return;
+        container.innerHTML = '';
+        for (var i = 0; i < count; i++) {
+            var type = types[Math.floor(Math.random() * types.length)];
+            var delta = getDoorDestination(type);
+            arcaneDoorDeltas.push(delta);
+            arcaneDoorRevealed.push(false);
+            var btn = document.createElement('button');
+            btn.className = 'arcane-level-door btn-connect' + (isVipWallet(account) ? (delta < 0 ? ' vip-trap' : ' vip-shortcut') : '');
+            btn.textContent = '🚪 Porte ' + (i + 1);
+            btn.dataset.index = i;
+            btn.dataset.delta = delta;
+            btn.onclick = function() { ouvrirPorte(parseInt(this.dataset.index, 10)); };
+            container.appendChild(btn);
+        }
+    }
+    function revealDoorWithScroll(doorIdx) {
+        if (doorIdx < 0 || doorIdx >= arcaneDoorRevealed.length) return;
+        arcaneDoorRevealed[doorIdx] = true;
+        var doors = document.querySelectorAll('.arcane-level-door');
+        var delta = arcaneDoorDeltas[doorIdx];
+        var dest = arcaneCurrentLevel + delta;
+        var lbl = delta < 0 ? '▼ Niv.' + dest : (delta > 1 ? '▲ Niv.' + dest : '→ +1');
+        if (doors[doorIdx]) {
+            doors[doorIdx].textContent = '🚪 ' + lbl;
+            doors[doorIdx].title = 'Destination : niveau ' + dest;
+        }
+    }
+    function spawnCornerClues() {
+        var container = document.getElementById('arcane-corner-clues-container');
+        if (!container || !arcaneDoorDeltas.length) return;
+        container.innerHTML = '';
+        var corners = [
+            { pos: 'top:8px;left:8px;', label: '🔮' },
+            { pos: 'top:8px;right:8px;left:auto;', label: '🔮' },
+            { pos: 'bottom:8px;left:8px;', label: '🔮' },
+            { pos: 'bottom:8px;right:8px;left:auto;', label: '🔮' }
+        ];
+        var n = 1 + Math.floor(Math.random() * 2);
+        var used = [];
+        for (var c = 0; c < n; c++) {
+            var idx = Math.floor(Math.random() * corners.length);
+            while (used.indexOf(idx) !== -1) idx = (idx + 1) % corners.length;
+            used.push(idx);
+            var el = document.createElement('div');
+            el.className = 'arcane-corner-clue';
+            el.style.cssText = corners[idx].pos + 'position:absolute;';
+            el.textContent = corners[idx].label;
+            el.title = 'Indice caché...';
+            el.onclick = (function(clueEl) {
+                return function() {
+                    if (clueEl.classList.contains('used')) return;
+                    var unrevealed = [];
+                    for (var i = 0; i < arcaneDoorRevealed.length; i++) { if (!arcaneDoorRevealed[i]) unrevealed.push(i); }
+                    if (unrevealed.length === 0) return;
+                    var doorIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+                    var delta = arcaneDoorDeltas[doorIdx];
+                    var typ = delta < 0 ? 'Piège' : 'Raccourci';
+                    var doors = document.querySelectorAll('.arcane-level-door');
+                    if (doors[doorIdx]) {
+                        var lbl = typ + (delta < 0 ? ' ▼' + (arcaneCurrentLevel + delta) : ' ▲');
+                        doors[doorIdx].textContent = '🚪 ' + lbl;
+                        doors[doorIdx].title = typ + (delta < 0 ? ' -' + Math.abs(delta) + ' niveaux' : ' vers l\'avant');
+                    }
+                    arcaneDoorRevealed[doorIdx] = true;
+                    clueEl.classList.add('used');
+                    echoAddMessage('Indice : La Porte ' + (doorIdx + 1) + ' est un ' + typ + '.');
+                    addOracleChatMessage('Indice révélé : Porte ' + (doorIdx + 1) + ' = ' + typ + '.');
+                };
+            })(el);
+            container.appendChild(el);
+        }
+    }
+    function spawnScrolls() {
+        var container = document.getElementById('arcane-scrolls-container');
+        if (!container) return;
+        container.innerHTML = '';
+        var n = 1 + Math.floor(Math.random() * 2);
+        for (var i = 0; i < n; i++) {
+            var s = document.createElement('div');
+            s.className = 'arcane-scroll-object';
+            s.textContent = '📜';
+            s.style.left = (15 + Math.random() * 70) + '%';
+            s.style.top = (5 + Math.random() * 20) + 'px';
+            s.onclick = (function() { return function() {
+                if (this.classList.contains('revealed')) return;
+                if (arcaneDoorDeltas.length) {
+                    var doorIdx = Math.floor(Math.random() * arcaneDoorDeltas.length);
+                    var useProbability = Math.random() < 0.5;
+                    if (useProbability) {
+                        var pct = [20, 30, 40, 50, 60][Math.floor(Math.random() * 5)];
+                        var targetLvl = Math.min(ARCANA_MAX_LEVEL, arcaneCurrentLevel + 5 + Math.floor(Math.random() * 45));
+                        var msg = 'Parchemin : La Porte ' + (doorIdx+1) + ' a ' + pct + '% de chance d\'être un raccourci vers le Niveau ' + targetLvl + '.';
+                        addOracleChatMessage(msg);
+                        echoAddMessage(msg);
+                        var doors = document.querySelectorAll('.arcane-level-door');
+                        if (doors[doorIdx]) doors[doorIdx].title = pct + '% raccourci vers Niv.' + targetLvl;
+                    } else {
+                        revealDoorWithScroll(doorIdx);
+                        addOracleChatMessage('Parchemin : la Porte ' + (doorIdx+1) + ' mène au niveau ' + (arcaneCurrentLevel + arcaneDoorDeltas[doorIdx]) + '. +1 Clé Nav.');
+                    }
+                    this.classList.add('revealed');
+                    arcaneNavKeys++;
+                    updateArcaneInventory();
+                }
+            }; })();
+            container.appendChild(s);
+        }
+    }
+    function useNavKey() {
+        if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Clé de Navigation.'); return; }
+        document.getElementById('arcane-nav-key-panel').style.display = 'block';
+    }
+    function navKeyPropulsion() {
+        if (arcaneNavKeys < 1) return;
+        arcaneNavKeys--;
+        updateArcaneInventory();
+        closeNavKeyPanel();
+        var jump = 1 + Math.floor(Math.random() * 10);
+        goToLevel(arcaneCurrentLevel + jump);
+        echoAddMessage('Propulsion activée : saut de ' + jump + ' niveaux !');
+        addOracleChatMessage('Propulsion : +' + jump + ' niveaux.');
+    }
+    function navKeyRappel() {
+        if (arcaneNavKeys < 1) return;
+        arcaneNavKeys--;
+        updateArcaneInventory();
+        closeNavKeyPanel();
+        var target = 0;
+        if (arcaneLootLevels.length > 0) {
+            target = arcaneLootLevels[Math.floor(Math.random() * arcaneLootLevels.length)];
+        } else {
+            target = Math.max(1, arcaneCurrentLevel - (5 + Math.floor(Math.random() * 10)));
+        }
+        goToLevel(target, true);
+        echoAddMessage('Rappel : retour au Niveau ' + target + ' pour ramasser un butin.');
+        addOracleChatMessage('Rappel vers le niveau ' + target + '.');
+    }
+    function closeNavKeyPanel() {
+        document.getElementById('arcane-nav-key-panel').style.display = 'none';
+    }
+    function updatePyramidMap() {
+        var grid = document.getElementById('pyramid-grid');
+        var map = document.getElementById('arcane-pyramid-map');
+        if (!grid || !map) return;
+        grid.innerHTML = '';
+        var rows = 10;
+        var perRow = ARCANA_MAX_LEVEL / rows;
+        for (var r = 0; r < rows; r++) {
+            var rowDiv = document.createElement('div');
+            rowDiv.className = 'pyramid-row';
+            var start = Math.floor(r * perRow) + 1;
+            var end = Math.min(ARCANA_MAX_LEVEL, Math.floor((r + 1) * perRow));
+            for (var l = start; l <= end; l++) {
+                var cell = document.createElement('div');
+                var isPlayer = l === arcaneCurrentLevel;
+                var hasLoot = arcaneLootLevels.indexOf(l) !== -1;
+                cell.className = 'pyramid-cell' + (isPlayer ? ' player' : '') + (hasLoot ? ' loot' : '');
+                cell.textContent = l;
+                rowDiv.appendChild(cell);
+            }
+            grid.appendChild(rowDiv);
+        }
+        map.style.display = arcaneInLevelMode ? 'block' : 'none';
+    }
+    async function loadLevelWeb3() {
+        if (!provider || !account) return;
+        try {
+            var c = new ethers.Contract(ARCANA_PROGRESSION_CONTRACT, ARCANA_PROGRESSION_ABI, provider);
+            var lvl = await c.playerLevel(account);
+            var n = lvl ? (typeof lvl === 'number' ? lvl : parseInt(lvl.toString(), 10)) : 0;
+            if (n > 0 && n <= ARCANA_MAX_LEVEL) arcaneCurrentLevel = n;
+        } catch (e) { console.warn('Load level:', e); }
+    }
+    async function saveLevelWeb3(level) {
+        if (!signer || !account) return;
+        try {
+            var c = new ethers.Contract(ARCANA_PROGRESSION_CONTRACT, ARCANA_PROGRESSION_ABI, signer);
+            var tx = await c.setLevel(level);
+            await tx.wait();
+        } catch (e) { console.warn('Save level:', e); }
+    }
+    function enterLevelMode() {
+        arcaneInLevelMode = true;
+        arcaneNavKeys = (arcaneNavKeys || 0) + 1;
+        updateArcaneInventory();
+        document.getElementById('arcane-level-counter').style.display = 'block';
+        document.getElementById('arcane-level-panel').style.display = 'block';
+        document.getElementById('arcane-pyramid-map').style.display = 'block';
+        var journal = document.getElementById('arcane-echo-journal');
+        if (journal) { journal.style.display = 'block'; echoAddMessage('Le Sanctuaire s\'éveille. Les 100 niveaux vous attendent.'); }
+        updateLevelDisplay();
+        generateLevelDoors();
+        spawnScrolls();
+        spawnCornerClues();
+        updatePyramidMap();
+        if (isVipWallet(account)) {
+            console.log('%c[Omniscience] Entrée aux 100 niveaux — Butin total accumulé: ' + arcaneTotalLootSpawned + ' | Trésors en attente: ' + arcaneLootLevels.length, 'color:#d4af37; font-weight:bold;');
+        }
+        if (Math.random() < 0.3) {
+            var rumourLvl = 1 + Math.floor(Math.random() * ARCANA_MAX_LEVEL);
+            echoAddMessage('Rumeur : un butin a été signalé au Niveau ' + rumourLvl + '.');
+        }
+    }
 
     function showGameContent() {
         var gate = document.getElementById('arcana-connect-gate');
@@ -914,6 +1641,18 @@
         var frost = document.getElementById('frost-particles');
         if (frost) { frost.classList.remove('active'); frost.innerHTML = ''; }
         document.body.classList.remove('frost-transition');
+        var inv = document.getElementById('arcane-inventory');
+        if (inv) inv.style.display = 'none';
+        var gb = document.getElementById('grimoire-btn');
+        if (gb) gb.style.display = 'none';
+        var df = document.getElementById('arcane-dark-fog');
+        var dl = document.getElementById('arcane-darkness-overlay');
+        if (df) df.style.opacity = '0';
+        if (dl) dl.style.opacity = '0';
+        var ej = document.getElementById('arcane-echo-journal');
+        if (ej) ej.style.display = 'none';
+        var pm = document.getElementById('arcane-pyramid-map');
+        if (pm) pm.style.display = 'none';
         var fog = document.getElementById('arcana-fog');
         if (fog) fog.classList.remove('sanctuary-active');
         var badge = document.getElementById('wallet-address-badge');
@@ -972,7 +1711,7 @@
         var fog = document.getElementById('arcana-fog');
         if (fog) fog.classList.add('sanctuary-active');
         spawnFrostParticles();
-        addOracleChatMessage('Bienvenue Bernard. L\'Oracle de Montréal analyse votre présence...');
+        addOracleChatMessage(isVipWallet(addr) ? 'Salutations, Bernard. Le Sanctuaire est sous votre contrôle.' : 'Bienvenue Bernard. L\'Oracle de Montréal analyse votre présence...');
         addOracleChatMessage('Oracle : Initié ' + shortAddr + ' reconnu. Le givre se propage...');
         try {
             var iceAudio = document.getElementById('ice-crackle-audio');
@@ -981,6 +1720,18 @@
         if (content) {
             content.classList.add('visible', 'fade-in');
             setTimeout(function() { content.classList.remove('fade-in'); }, 1100);
+            var inv = document.getElementById('arcane-inventory');
+            if (inv) inv.style.display = 'flex';
+            var gb = document.getElementById('grimoire-btn');
+            if (gb) gb.style.display = 'flex';
+            updateArcaneDoors();
+            setTimeout(function(){
+                var df = document.getElementById('arcane-dark-fog');
+                var dl = document.getElementById('arcane-darkness-overlay');
+                if (df) df.style.opacity = '1';
+                if (dl) dl.style.opacity = '1';
+                loadLevelWeb3();
+            }, 700);
         }
         setTimeout(function() {
             document.body.classList.remove('frost-transition');
@@ -1094,6 +1845,7 @@
     }
 
     async function onSealClick() {
+        if (!arcaneLitRooms[1]) return;
         const level2Panel = document.getElementById('level-2-panel');
         const codeInput = document.getElementById('sealCodeInput');
         const btnSeal = document.getElementById('btnSeal');
