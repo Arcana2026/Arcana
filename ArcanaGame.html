@@ -1173,6 +1173,12 @@
     const ARCANA_TOKEN_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
     const USDT_TOKEN_ADDRESS   = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
     const USDC_TOKEN_ADDRESS   = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+    
+    // ═══════════════════════════════════════════════════════
+    // 🔓 VARIABLE DE TEST : Bypass Oracle Météo
+    // ═══════════════════════════════════════════════════════
+    let bypassOracle = true; // Mettez à true pour forcer l'accès en développement
+    // ═══════════════════════════════════════════════════════
     // Pour MATIC natif, pas besoin d'adresse.
     // Ajouter l'adresse du contrat d'Arcana Game pour la température si c'est un autre contrat
     const ARCANA_GAME_ORACLE_ABI = [
@@ -1907,13 +1913,23 @@
             // Mode Test : Bypass pour wallet de test
             var isTestMode = account && isTestWallet(account);
 
-            // Affiche la température
-            tempDisplay.textContent = `${tempC}°C` + (isTestMode ? ' 🔓' : '');
+            // Console Log : État de l'Oracle
+            console.log('%c📡 Oracle Météo - État', 'color:#d4af37; font-weight:bold;');
+            console.log('   Température actuelle:', tempC + '°C');
+            console.log('   Bypass activé:', bypassOracle);
+            console.log('   Wallet de test:', isTestMode);
+            console.log('   Accès autorisé:', (tempC <= -20 || bypassOracle === true || isTestMode));
+
+            // Affiche la température avec indicateur de bypass
+            tempDisplay.textContent = `${tempC}°C` + ((bypassOracle || isTestMode) ? ' 🔓' : '');
             
-            // Conditions : Temp <= -10 OU wallet de test
-            if (tempC <= -10 || isTestMode) {
+            // ═══ CONDITION DE FORCE : Temp <= -20 OU bypassOracle OU wallet de test ═══
+            if (tempC <= -20 || bypassOracle === true || isTestMode) {
                 if (warningMsg) {
-                    if (isTestMode && tempC > -10) {
+                    if (bypassOracle && tempC > -20) {
+                        warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Bypass Oracle Activé</strong> : Accès forcé</span>';
+                        warningMsg.style.display = "block";
+                    } else if (isTestMode && tempC > -20) {
                         warningMsg.innerHTML = '<span style="color:#00ff88;">🧪 Mode Test : Oracle Bypass Activé</span>';
                         warningMsg.style.display = "block";
                     } else {
@@ -1923,11 +1939,16 @@
                 if (depositBtn) {
                     depositBtn.disabled = false;
                     depositBtn.classList.remove("disabled");
-                    depositBtn.title = isTestMode ? "Mode Test Activé" : "";
+                    depositBtn.title = (bypassOracle || isTestMode) ? "Bypass Oracle Activé" : "";
                 }
                 // Ajoute le style frozen à l'oracle miroir
                 if (oracleMirror) {
                     oracleMirror.classList.add("frozen");
+                }
+                
+                // Console log de confirmation
+                if (bypassOracle && tempC > -20) {
+                    console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès forcé par bypass', 'color:#00ff88; font-weight:bold;');
                 }
             } else {
                 // Bloqué : affiche message d'état discret
@@ -1948,22 +1969,44 @@
         } catch(e) {
             oracleLoading = false;
             console.warn('Oracle fetch error:', e);
-            const tempDisplay = document.getElementById('temp');
-            if (tempDisplay) tempDisplay.textContent = "??°C";
-            const warningMsg = document.getElementById('oracle-warning-message');
-            if (warningMsg) {
-                warningMsg.innerHTML = '⚠️ <strong>Oracle temporairement indisponible</strong><br><small style="font-size:0.85em;opacity:0.75;">Les fonctions seront actives dès que l\'Oracle répond.</small>';
-                warningMsg.style.display = "block";
-            }
-            const depositBtn = document.getElementById('btnDeposit');
-            if (depositBtn) {
-                depositBtn.disabled = true;
-                depositBtn.classList.add("disabled");
-                depositBtn.title = "Oracle : Connexion en cours...";
-            }
-            const oracleMirror = document.querySelector(".oracle-mirror");
-            if (oracleMirror) {
-                oracleMirror.classList.remove("frozen");
+            
+            // En cas d'erreur ET bypass activé, autoriser quand même l'accès
+            if (bypassOracle === true) {
+                console.log('%c🔓 Erreur Oracle détectée | Accès forcé par bypass', 'color:#00ff88; font-weight:bold;');
+                const depositBtn = document.getElementById('btnDeposit');
+                const oracleMirror = document.querySelector(".oracle-mirror");
+                const warningMsg = document.getElementById('oracle-warning-message');
+                
+                if (depositBtn) {
+                    depositBtn.disabled = false;
+                    depositBtn.classList.remove("disabled");
+                    depositBtn.title = "Bypass Oracle Activé";
+                }
+                if (oracleMirror) {
+                    oracleMirror.classList.add("frozen");
+                }
+                if (warningMsg) {
+                    warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Bypass Oracle Activé</strong> : Accès forcé</span>';
+                    warningMsg.style.display = "block";
+                }
+            } else {
+                const tempDisplay = document.getElementById('temp');
+                if (tempDisplay) tempDisplay.textContent = "??°C";
+                const warningMsg = document.getElementById('oracle-warning-message');
+                if (warningMsg) {
+                    warningMsg.innerHTML = '⚠️ <strong>Oracle temporairement indisponible</strong><br><small style="font-size:0.85em;opacity:0.75;">Les fonctions seront actives dès que l\'Oracle répond.</small>';
+                    warningMsg.style.display = "block";
+                }
+                const depositBtn = document.getElementById('btnDeposit');
+                if (depositBtn) {
+                    depositBtn.disabled = true;
+                    depositBtn.classList.add("disabled");
+                    depositBtn.title = "Oracle : Connexion en cours...";
+                }
+                const oracleMirror = document.querySelector(".oracle-mirror");
+                if (oracleMirror) {
+                    oracleMirror.classList.remove("frozen");
+                }
             }
         }
     }
@@ -2035,15 +2078,21 @@
             const tempRaw = await oracle.currentTemp();
             const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
 
-            // Vérification Oracle : Bloqué SAUF si wallet de test
-            if (tempC > -10 && !isTestMode) {
+            // Console Log : État complet
+            console.log('%c🔐 Vérification Oracle pour le Sceau du Sanctuaire', 'color:#d4af37; font-weight:bold;');
+            console.log('   Température actuelle:', tempC + '°C');
+            console.log('   Bypass Oracle:', bypassOracle);
+            console.log('   Wallet de test:', isTestMode);
+
+            // ═══ CONDITION DE FORCE : Temp <= -20 OU bypassOracle OU wallet de test ═══
+            if (tempC > -20 && bypassOracle !== true && !isTestMode) {
                 showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Le givre n\'est pas encore assez profond pour ouvrir le Sanctuaire.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : -20°C');
                 return;
             }
             
-            // Message de confirmation si mode test
-            if (isTestMode && tempC > -10) {
-                console.log('%c🧪 Mode Test Activé : Oracle Bypass pour wallet ' + account, 'color:#00ff88; font-weight:bold;');
+            // Message de confirmation si bypass ou mode test
+            if ((bypassOracle || isTestMode) && tempC > -20) {
+                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès forcé par bypass', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
             }
 
             const code = (codeInput.value || '').trim();
@@ -2067,9 +2116,37 @@
                 startFinalLevel();
             }, 500);
         } catch (e) {
-            showStyledAlert('⚠️ <strong>Erreur Oracle</strong><br><br>Impossible de contacter l\'Oracle météo.<br><br>' + (e.message || e));
+            // En cas d'erreur Oracle, si bypass est activé, continuer quand même
+            if (bypassOracle === true) {
+                console.log('%c🔓 Erreur Oracle détectée | Accès forcé par bypass', 'color:#00ff88; font-weight:bold;');
+                
+                const code = (codeInput.value || '').trim();
+                const isValidCode = VALID_SEAL_CODES.some(c => code.toUpperCase() === c.toUpperCase());
+                
+                if (!isValidCode) {
+                    vibratePanel(level2Panel);
+                    const origBorder = codeInput.style.border;
+                    codeInput.style.border = '2px solid #ff2424';
+                    codeInput.style.transition = 'border 0.2s';
+                    setTimeout(function() {
+                        codeInput.style.border = origBorder || '';
+                    }, 1000);
+                    btnSeal.disabled = false;
+                    return;
+                }
+                
+                level2Panel.style.transition = 'opacity 0.5s ease';
+                level2Panel.style.opacity = '0';
+                setTimeout(function() {
+                    level2Panel.style.display = 'none';
+                    startFinalLevel();
+                }, 500);
+            } else {
+                showStyledAlert('⚠️ <strong>Erreur Oracle</strong><br><br>Impossible de contacter l\'Oracle météo.<br><br>' + (e.message || e));
+                btnSeal.disabled = false;
+            }
         } finally {
-            btnSeal.disabled = false;
+            if (!bypassOracle) btnSeal.disabled = false;
         }
     }
 
