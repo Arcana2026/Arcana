@@ -1,10 +1,30 @@
 <!DOCTYPE html>
 <html lang="fr">
+<!--
+═══════════════════════════════════════════════════════════════
+    ARCANA GAME - Le Sanctuaire du Destin
+    Écosystème Décentralisé sur Polygon | Optimisé Mobile
+    Structure: index.html ⇄ ArcanaGame.html (connexion bidirectionnelle)
+    
+    📡 ORACLE MÉTÉO :
+    - Condition : Température <= -10°C à Montréal
+    - Mode Test : Définir ARCANA_TEST_WALLET avec votre adresse
+    - Bypass automatique pour le wallet de test
+    
+    🧪 MODE TEST :
+    Ligne ~1320 : var ARCANA_TEST_WALLET = 'VOTRE_ADRESSE_0x...';
+═══════════════════════════════════════════════════════════════
+-->
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#1b2735">
+    <meta name="description" content="Arcana Game - Écosystème Décentralisé sur Polygon">
     <title>Arcana Game - Écosystème Décentralisé</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" defer></script>
+    <link rel="preconnect" href="https://polygon-rpc.com">
+    <link rel="preconnect" href="https://cdn.pixabay.com">
+    <link rel="dns-prefetch" href="https://esm.sh">
     <style>
         :root {
             --gold: #d4af37;
@@ -23,6 +43,9 @@
             flex-direction: column;
             align-items: center;
             position: relative;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
         }
         #star-container {
             position: fixed;
@@ -130,11 +153,26 @@
             align-items: center;
             background: radial-gradient(circle, rgba(212, 175, 55, 0.2), transparent);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        .oracle-mirror.loading {
+            border-color: rgba(173, 181, 189, 0.5);
+            animation: oracle-pulse 2s ease-in-out infinite;
+        }
+        @keyframes oracle-pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(173, 181, 189, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(173, 181, 189, 0.6); }
         }
         .oracle-mirror.frozen {
             border: 3px solid #b9e9ff !important;
             background: radial-gradient(circle, rgba(135, 206, 235, 0.4), transparent) !important;
             box-shadow: 0 0 30px #49cafa, 0 0 10px #ffffff inset !important;
+        }
+        .oracle-mirror #temp {
+            font-size: 2.2em;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
         }
         /* Salle 2 (Niveau 2) : matière moins transparente pour immersion */
         #level-2-panel {
@@ -151,9 +189,18 @@
         .oracle-temp-warning {
             color: var(--frost-muted);
             font-weight: 600;
-            font-size: 1.02em;
+            font-size: 0.92em;
             text-align: center;
             margin-top: 1em;
+            padding: 12px;
+            background: rgba(173, 181, 189, 0.08);
+            border-radius: 8px;
+            border: 1px solid rgba(173, 181, 189, 0.2);
+            line-height: 1.5;
+            transition: all 0.3s ease;
+        }
+        .oracle-temp-warning:empty {
+            display: none !important;
         }
         #chat-temple {
             position: fixed;
@@ -226,6 +273,8 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 18px;
             margin: 35px 0 15px 0;
+            contain: layout style paint;
+            will-change: auto;
         }
         .rune-btn {
             font-size: 2.2em;
@@ -239,6 +288,9 @@
             transition: background 0.12s, transform 0.2s, box-shadow 0.2s, border-color 0.17s, color 0.15s;
             outline: none;
             user-select: none;
+            contain: layout paint;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
         }
         .rune-btn:hover:not(:disabled) {
             transform: scale(1.05);
@@ -349,6 +401,20 @@
             #level-3-sanctuary {
                 padding: 5px;
                 max-width: 97vw;
+            }
+            #runes-grid {
+                gap: 12px;
+                margin: 25px 0 12px 0;
+            }
+            .rune-btn {
+                font-size: 1.8em;
+                padding: 18px 0 12px 0;
+                min-height: 60px;
+                touch-action: manipulation;
+            }
+            .btn-back-accueil {
+                font-size: 0.75rem;
+                padding: 6px 10px;
             }
         }
         /* JACKPOT VICTORY style */
@@ -509,12 +575,22 @@
             color: rgba(212, 175, 55, 0.9);
             text-decoration: none;
             letter-spacing: 0.08em;
-            transition: color 0.25s, text-shadow 0.25s;
+            transition: color 0.25s, text-shadow 0.25s, transform 0.25s;
             pointer-events: auto;
+            padding: 8px 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-weight: 600;
         }
         .btn-back-accueil:hover {
             color: #ffd700;
             text-shadow: 0 0 12px rgba(255, 215, 0, 0.6), 0 0 4px rgba(255, 215, 0, 0.4);
+            transform: translateX(-2px);
+            border-color: rgba(212, 175, 55, 0.6);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
         }
         /* Contenu jeu : caché par défaut */
         #game-container, #arcana-game-content { display: none; opacity: 0; }
@@ -525,6 +601,19 @@
             font-size: 0.75rem; font-family: monospace; color: var(--gold);
             background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 8px;
             border: 1px solid rgba(212, 175, 55, 0.4); letter-spacing: 0.05em;
+        }
+        /* Badge Mode Test */
+        .test-mode-badge {
+            position: fixed; top: 12px; right: 12px; z-index: 601;
+            font-size: 0.7rem; font-family: monospace; color: #00ff88;
+            background: rgba(0, 255, 136, 0.15); padding: 4px 10px; border-radius: 6px;
+            border: 1px solid rgba(0, 255, 136, 0.4); letter-spacing: 0.05em;
+            margin-top: 36px; font-weight: 600;
+            animation: test-badge-pulse 2s ease-in-out infinite;
+        }
+        @keyframes test-badge-pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; box-shadow: 0 0 12px rgba(0, 255, 136, 0.4); }
         }
         /* Alerte Oracle stylisée (réseau non Polygon) */
         .oracle-network-alert {
@@ -736,7 +825,7 @@
 <body>
     <div id="star-container"></div>
     <div id="arcana-fog" aria-hidden="true"></div>
-    <a href="index.html" class="btn-back-accueil" style="color: #ff007f; text-decoration: none; font-weight: bold;">← Retour à Arcana Rose</a>
+    <a href="./index.html" class="btn-back-accueil">← RETOUR AU COFFRE</a>
     <header>
         <div class="logo-area">
             <div style="width:40px; height:40px; background:var(--gold); border-radius:16%; box-shadow:0 0 12px #ffeaa5;"><span style="font-size:1.6em; display:block; line-height:40px; text-align:center;">🎲</span></div>
@@ -764,8 +853,10 @@
         <span id="arcane-protection-count" class="keys-count">0</span>
     </div>
     <div id="arcane-level-counter" style="display:none;">NIVEAU <span id="arcane-level-num">1</span> / 100</div>
+    
+    <!-- ═══ CONTENEUR PRINCIPAL DU JEU ═══ -->
     <div id="game-container" class="arcana-game-content">
-    <div class="title-vault">THE ARCANA VAULT</div>
+        <div class="title-vault">THE ARCANA VAULT</div>
     <div id="class-selection" class="glass-panel" style="display:none; text-align:center;">
         <div class="label-gold">Rite d'Engagement / Étape 1</div>
         <h2 style="letter-spacing: 2px;">CHOISISSEZ VOTRE DESTIN</h2>
@@ -856,21 +947,27 @@
             </div>
             <div id="alignement-percent" class="alignement-percentage">0%</div>
         </div>
-        <div id="runes-grid">
-            <!-- Les 12 symboles mystiques -->
-            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)">⏀</button>
-            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)">⏃</button>
-            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)">⏇</button>
-            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)">⎈</button>
-            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)">⎔</button>
-            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)">⌬</button>
-            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)">⏍</button>
-            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)">⏦</button>
-            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)">⧖</button>
-            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)">⧉</button>
-            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)">⨇</button>
-            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)">⩓</button>
+        
+        <!-- ╔═══════════════════════════════════════════════════╗ -->
+        <!-- ║   GRILLE DES 12 RUNES MYSTIQUES - ISOLÉE         ║ -->
+        <!-- ║   Optimisée: Mobile-First, Touch-Friendly        ║ -->
+        <!-- ╚═══════════════════════════════════════════════════╝ -->
+        <div id="runes-grid" role="grid" aria-label="Grille des Runes Mystiques">
+            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)" aria-label="Rune 1">⏀</button>
+            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)" aria-label="Rune 2">⏃</button>
+            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)" aria-label="Rune 3">⏇</button>
+            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)" aria-label="Rune 4">⎈</button>
+            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)" aria-label="Rune 5">⎔</button>
+            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6">⌬</button>
+            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)" aria-label="Rune 7">⏍</button>
+            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)" aria-label="Rune 8">⏦</button>
+            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)" aria-label="Rune 9">⧖</button>
+            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)" aria-label="Rune 10">⧉</button>
+            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)" aria-label="Rune 11">⨇</button>
+            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)" aria-label="Rune 12">⩓</button>
         </div>
+        <!-- ╚═══════════════════════════════════════════════════╝ -->
+        
         <div id="sanctuary-success" style="display:none; margin-top: 1em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.1em;">
             Sceau aligné ! Le Destin est révélé...
         </div>
@@ -942,17 +1039,18 @@
         </div>
         <p id="arcane-altar-result" style="color:var(--gold); font-weight:bold; min-height:24px;"></p>
         <button class="btn-connect" onclick="closeAltar()" style="margin-top:12px;">Fermer</button>
-    </div>
-    <!-- Victoire JACKPOT : pluie d'or -->
-    <div id="victory-jackpot">
-        <div class="victory-text">✨ JACKPOT DÉVERROUILLÉ<br><span style="font-size:0.62em;color:#fff;letter-spacing:0.09em;">Le Destin, scellé dans l'or éternel</span></div>
-        <div class="gold-rain"></div>
-    </div>
-    </div><!-- /game-container -->
-    <!-- Heartbeat audio (muted/loop, started in JS) -->
-    <audio id="heartbeat-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/08/20/audio_12c959d8f4.mp3"></audio>
-    <audio id="triumph-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/01/18/audio_8f0bc6dc2b.mp3"></audio>
-    <audio id="ice-crackle-audio" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2571-ice-break-2571.mp3"></audio>
+        </div>
+        
+        <!-- ═══ VICTOIRE JACKPOT : Pluie d'or ═══ -->
+        <div id="victory-jackpot">
+            <div class="victory-text">✨ JACKPOT DÉVERROUILLÉ<br><span style="font-size:0.62em;color:#fff;letter-spacing:0.09em;">Le Destin, scellé dans l'or éternel</span></div>
+            <div class="gold-rain"></div>
+        </div>
+    </div><!-- ═══ FIN CONTENEUR PRINCIPAL (#game-container) ═══ -->
+    <!-- ═══ EFFETS SONORES - Chargement optimisé ═══ -->
+    <audio id="heartbeat-audio" preload="metadata" src="https://cdn.pixabay.com/audio/2022/08/20/audio_12c959d8f4.mp3"></audio>
+    <audio id="triumph-audio" preload="metadata" src="https://cdn.pixabay.com/audio/2022/01/18/audio_8f0bc6dc2b.mp3"></audio>
+    <audio id="ice-crackle-audio" preload="metadata" src="https://assets.mixkit.co/active_storage/sfx/2571-ice-break-2571.mp3"></audio>
 
     <div class="arcana-mention">Arcana Game - Écosystème Décentralisé</div>
 
@@ -1261,13 +1359,21 @@
         document.getElementById('arcane-altar-panel').style.display = 'none';
     }
 
-    // === VIP Bernard : 0x1...876d ===
+    // === VIP Bernard : 0x1...876d + Mode Test Oracle ===
     var ARCANA_VIP_WALLET = ''; // Mettez l'adresse complète ou laissez vide
+    var ARCANA_TEST_WALLET = ''; // Wallet de test qui bypass l'Oracle (votre adresse complète ici)
     var GRIMOIRE_SELLER_WALLET = ''; // Adresse complète du vendeur (0x1...876d) pour recevoir les ventes de livrets
+    
     function isVipWallet(addr) {
         if (!addr) return false;
         var a = (addr + '').toLowerCase();
         return (a.startsWith('0x1') && a.endsWith('876d') && a.length === 42) || (ARCANA_VIP_WALLET && a === ARCANA_VIP_WALLET.toLowerCase());
+    }
+    
+    function isTestWallet(addr) {
+        if (!addr) return false;
+        var a = (addr + '').toLowerCase();
+        return (ARCANA_TEST_WALLET && a === ARCANA_TEST_WALLET.toLowerCase());
     }
     // === Système 100 niveaux : progression, portes, difficulté, Web3 ===
     const ARCANA_MAX_LEVEL = 100;
@@ -1622,13 +1728,27 @@
     function updateWalletAddressDisplay(addr) {
         var existing = document.getElementById('wallet-address-badge');
         if (existing) existing.remove();
+        var existingTest = document.getElementById('test-mode-badge');
+        if (existingTest) existingTest.remove();
+        
         if (!addr || addr.length < 10) return;
+        
         var short = addr.slice(0, 6) + '…' + addr.slice(-4);
         var badge = document.createElement('div');
         badge.id = 'wallet-address-badge';
         badge.className = 'wallet-address-badge';
         badge.textContent = short;
         document.body.appendChild(badge);
+        
+        // Ajouter badge de mode test si applicable
+        if (isTestWallet(addr)) {
+            var testBadge = document.createElement('div');
+            testBadge.id = 'test-mode-badge';
+            testBadge.className = 'test-mode-badge';
+            testBadge.innerHTML = '🧪 MODE TEST';
+            testBadge.title = 'Oracle Bypass Activé : Toutes les fonctions sont débloquées';
+            document.body.appendChild(testBadge);
+        }
     }
 
     function hideGameContent() {
@@ -1737,7 +1857,15 @@
             document.body.classList.remove('frost-transition');
             var frost = document.getElementById('frost-particles');
             if (frost) frost.classList.remove('active');
+            
+            // Rafraîchir l'Oracle avec le contexte du wallet connecté
             fetchAndDisplayTemperature();
+            
+            // Log pour wallet de test
+            if (isTestWallet(addr)) {
+                console.log('%c🧪 Mode Test Détecté : Wallet ' + addr.slice(0,6) + '...' + addr.slice(-4), 'color:#00ff88; font-weight:bold; font-size:1.1em;');
+                console.log('%cℹ️ Oracle Bypass : Toutes les fonctions sont débloquées indépendamment de la température', 'color:#00ff88;');
+            }
         }, 2500);
     }
 
@@ -1754,6 +1882,10 @@
     // Remplace ici si le contrat de température est un autre ! (Sinon garde ARCANA_GAME_CONTRACT)
     const ARCANA_GAME_ORACLE_CONTRACT = ARCANA_GAME_CONTRACT; 
 
+    // === État de l'Oracle (chargement asynchrone) ===
+    var oracleTemperature = null;
+    var oracleLoading = true;
+    
     async function fetchAndDisplayTemperature() {
         try {
             // Utilise provider public ou connecte au wallet au besoin
@@ -1764,36 +1896,49 @@
 
             let tempRaw = await oracle.currentTemp();
             let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
+            oracleTemperature = tempC;
+            oracleLoading = false;
 
             const tempDisplay = document.getElementById('temp');
             const depositBtn = document.getElementById('btnDeposit');
             const warningMsg = document.getElementById('oracle-warning-message');
             const oracleMirror = document.querySelector(".oracle-mirror");
+            
+            // Mode Test : Bypass pour wallet de test
+            var isTestMode = account && isTestWallet(account);
 
             // Affiche la température
-            if (tempC <= -10) {
-                tempDisplay.textContent = `${tempC}°C`;
-                if (warningMsg) warningMsg.style.display = "none";
+            tempDisplay.textContent = `${tempC}°C` + (isTestMode ? ' 🔓' : '');
+            
+            // Conditions : Temp <= -10 OU wallet de test
+            if (tempC <= -10 || isTestMode) {
+                if (warningMsg) {
+                    if (isTestMode && tempC > -10) {
+                        warningMsg.innerHTML = '<span style="color:#00ff88;">🧪 Mode Test : Oracle Bypass Activé</span>';
+                        warningMsg.style.display = "block";
+                    } else {
+                        warningMsg.style.display = "none";
+                    }
+                }
                 if (depositBtn) {
                     depositBtn.disabled = false;
                     depositBtn.classList.remove("disabled");
-                    depositBtn.title = "";
+                    depositBtn.title = isTestMode ? "Mode Test Activé" : "";
                 }
                 // Ajoute le style frozen à l'oracle miroir
                 if (oracleMirror) {
                     oracleMirror.classList.add("frozen");
                 }
             } else {
-                tempDisplay.textContent = `${tempC}°C`;
-                // Affiche le message seulement si température > -10°C
+                // Bloqué : affiche message d'état discret
                 if (warningMsg) {
-                  warningMsg.textContent = "Le givre ne s'est pas encore formé. Revenez quand Montréal gèlera.";
+                  warningMsg.innerHTML = '❄️ <strong>Conditions Oracle</strong> : En attente du gel (-20°C)<br><small style="font-size:0.85em;opacity:0.75;margin-top:4px;display:block;">Température actuelle à Montréal : ' + tempC + '°C</small>';
                   warningMsg.style.display = "block";
                 }
                 if (depositBtn) {
                   depositBtn.disabled = true;
                   depositBtn.classList.add("disabled");
-                  depositBtn.title = "Les dépôts sont désactivés tant que Montréal n'est pas gelé.";
+                  depositBtn.title = "Oracle : En attente du gel (-20°C à Montréal)";
                 }
                 // Retire le style frozen de l'oracle miroir
                 if (oracleMirror) {
@@ -1801,18 +1946,20 @@
                 }
             }
         } catch(e) {
+            oracleLoading = false;
+            console.warn('Oracle fetch error:', e);
             const tempDisplay = document.getElementById('temp');
             if (tempDisplay) tempDisplay.textContent = "??°C";
             const warningMsg = document.getElementById('oracle-warning-message');
             if (warningMsg) {
-                warningMsg.textContent = "Impossible de récupérer la température de l'oracle.";
+                warningMsg.innerHTML = '⚠️ <strong>Oracle temporairement indisponible</strong><br><small style="font-size:0.85em;opacity:0.75;">Les fonctions seront actives dès que l\'Oracle répond.</small>';
                 warningMsg.style.display = "block";
             }
             const depositBtn = document.getElementById('btnDeposit');
             if (depositBtn) {
                 depositBtn.disabled = true;
                 depositBtn.classList.add("disabled");
-                depositBtn.title = "Erreur sur l'oracle météo.";
+                depositBtn.title = "Oracle : Connexion en cours...";
             }
             const oracleMirror = document.querySelector(".oracle-mirror");
             if (oracleMirror) {
@@ -1821,24 +1968,50 @@
         }
     }
 
+    // === CHARGEMENT ASYNCHRONE : Oracle en arrière-plan ===
     document.addEventListener("DOMContentLoaded", function () {
-        fetchAndDisplayTemperature();
+        // Afficher immédiatement l'interface avec un placeholder
+        var tempDisplay = document.getElementById('temp');
+        if (tempDisplay) tempDisplay.textContent = '⏳';
+        
+        var oracleMirror = document.querySelector('.oracle-mirror');
+        if (oracleMirror) oracleMirror.classList.add('loading');
+        
+        var warningMsg = document.getElementById('oracle-warning-message');
+        if (warningMsg) {
+            warningMsg.innerHTML = '<small style="opacity:0.6;">📡 Oracle en cours de connexion...</small>';
+            warningMsg.style.display = "block";
+        }
+        
+        // Lancer l'Oracle en arrière-plan (non-bloquant)
+        setTimeout(function() {
+            fetchAndDisplayTemperature().then(function() {
+                var mirror = document.querySelector('.oracle-mirror');
+                if (mirror) mirror.classList.remove('loading');
+            });
+        }, 500); // Petit délai pour laisser le DOM se charger complètement
 
-        // Optionnel : rafraîchit auto toutes les 3 minutes (si tu veux)
-        setInterval(fetchAndDisplayTemperature, 180*1000);
+        // Rafraîchissement automatique toutes les 3 minutes
+        setInterval(function() {
+            fetchAndDisplayTemperature();
+        }, 180*1000);
     });
 
     // Codes valides pour ouvrir le Sanctuaire (Niveau 3)
     const VALID_SEAL_CODES = ['ARCANA2026'];
 
     function showStyledAlert(message) {
+        // Supprimer toute alerte existante
+        var existingOverlay = document.getElementById('arcana-alert-overlay');
+        if (existingOverlay) existingOverlay.remove();
+        
         const overlay = document.createElement('div');
         overlay.id = 'arcana-alert-overlay';
-        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(5px);';
         const box = document.createElement('div');
         box.className = 'glass-panel';
-        box.style.cssText = 'max-width:360px;text-align:center;position:relative;';
-        box.innerHTML = '<p style="color:var(--gold);margin:0 0 20px 0;font-size:1em;line-height:1.4;">' + message + '</p><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;">OK</button>';
+        box.style.cssText = 'max-width:380px;text-align:center;position:relative;padding:24px;';
+        box.innerHTML = '<div style="color:var(--gold);margin:0 0 20px 0;font-size:0.95em;line-height:1.6;">' + message + '</div><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;width:100%;margin-top:8px;">OK</button>';
         overlay.appendChild(box);
         overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
         document.body.appendChild(overlay);
@@ -1852,6 +2025,9 @@
 
         btnSeal.disabled = true;
         try {
+            // Mode Test : Bypass pour wallet de test
+            var isTestMode = account && isTestWallet(account);
+            
             if (!provider) {
                 provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
             }
@@ -1859,9 +2035,15 @@
             const tempRaw = await oracle.currentTemp();
             const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
 
-            if (tempC > -10) {
-                showStyledAlert('Le givre n\'est pas encore assez profond pour ouvrir les portes du Sanctuaire.');
+            // Vérification Oracle : Bloqué SAUF si wallet de test
+            if (tempC > -10 && !isTestMode) {
+                showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Le givre n\'est pas encore assez profond pour ouvrir le Sanctuaire.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : -20°C');
                 return;
+            }
+            
+            // Message de confirmation si mode test
+            if (isTestMode && tempC > -10) {
+                console.log('%c🧪 Mode Test Activé : Oracle Bypass pour wallet ' + account, 'color:#00ff88; font-weight:bold;');
             }
 
             const code = (codeInput.value || '').trim();
@@ -1885,7 +2067,7 @@
                 startFinalLevel();
             }, 500);
         } catch (e) {
-            showStyledAlert('Erreur : impossible de contacter l\'Oracle. ' + (e.message || e));
+            showStyledAlert('⚠️ <strong>Erreur Oracle</strong><br><br>Impossible de contacter l\'Oracle météo.<br><br>' + (e.message || e));
         } finally {
             btnSeal.disabled = false;
         }
@@ -2467,6 +2649,64 @@
             console.error("Erreur Oracle:", error);
             alert("Erreur de synchronisation : " + error.message);
         }
-    }// Vous pouvez appeler startFinalLevel() pour faire apparaître la salle.
+    }
+
+    // === SCRIPT DE SÉCURITÉ : Mode Consultation si Web3 ne charge pas ===
+    // Vérification progressive de la disponibilité Web3
+    var web3CheckAttempts = 0;
+    var web3CheckInterval = setInterval(function() {
+        web3CheckAttempts++;
+        
+        // Si Web3 est détecté, arrêter les vérifications
+        if (window.ethereum || provider) {
+            clearInterval(web3CheckInterval);
+            return;
+        }
+        
+        // Après 5 tentatives (5 secondes), activer le mode consultation
+        if (web3CheckAttempts >= 5) {
+            clearInterval(web3CheckInterval);
+            console.warn('Arcana: Web3 non détecté après 5 secondes, activation du mode consultation');
+            
+            var gate = document.getElementById('arcana-connect-gate');
+            if (gate) {
+                var msg = gate.querySelector('.gate-message');
+                if (msg) {
+                    msg.innerHTML = '🔒 Mode Consultation<br><small style="font-size:0.85em;opacity:0.8;line-height:1.6;display:block;margin-top:8px;">Le Sanctuaire est visible mais figé.<br>Installez MetaMask pour débloquer les interactions.</small>';
+                }
+                
+                // Ajouter un bouton d'aide
+                var helpBtn = document.createElement('button');
+                helpBtn.className = 'btn-connect';
+                helpBtn.textContent = 'Comment installer MetaMask ?';
+                helpBtn.style.marginTop = '15px';
+                helpBtn.onclick = function() {
+                    window.open('https://metamask.io/download/', '_blank');
+                };
+                gate.appendChild(helpBtn);
+            }
+            
+            // Affiche le contenu en lecture seule
+            var content = gameContainer();
+            if (content) {
+                content.style.display = 'block';
+                content.style.opacity = '0.6';
+                content.style.pointerEvents = 'none';
+                content.style.filter = 'grayscale(0.3)';
+            }
+            
+            // Afficher les runes en mode consultation
+            var sanctuary = document.getElementById('level-3-sanctuary');
+            if (sanctuary) {
+                sanctuary.style.display = 'block';
+                sanctuary.style.opacity = '0.7';
+                var runeButtons = sanctuary.querySelectorAll('.rune-btn');
+                runeButtons.forEach(function(btn) {
+                    btn.disabled = true;
+                    btn.style.cursor = 'not-allowed';
+                });
+            }
+        }
+    }, 1000); // Vérifier toutes les secondes
 </script>
 </html>
