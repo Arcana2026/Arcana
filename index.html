@@ -85,9 +85,9 @@
         .pouch-window.active { display: block; animation: slideUp 0.4s ease; }
         
         .trust-icon-box {
-            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--gold); width: 55px; height: 55px;
+            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--gold); width: 45px !important; height: 45px !important;
             border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;
-            box-shadow: 0 0 15px var(--gold-glow); font-size: 20px;
+            box-shadow: 0 0 15px var(--gold-glow); font-size: 18px;
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -112,7 +112,7 @@
             50% { box-shadow: 0 0 15px #00a2ff, 0 0 25px rgba(0, 162, 255, 0.5); }
         }
         @media (max-width: 768px) {
-            .title-vault-mobile { font-size: 1rem !important; letter-spacing: 0.12em !important; }
+            .title-vault-mobile { font-size: 1.5rem !important; letter-spacing: 0.12em !important; }
         }
     </style>
 </head>
@@ -128,15 +128,12 @@
         </button>
     </nav>
 
-    <div class="sanctuary-bottom-left" style="position: fixed; bottom: 30px; left: 24px; z-index: 10000; display: flex; flex-direction: column; gap: 15px;">
+    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 999999;">
         <a href="arcanagame.html" style="text-decoration: none;">
-            <button type="button" class="btn-sanctuary-glow" style="width: 240px; height: 50px; font-size: 13px; cursor: pointer;">
+            <button type="button" style="background: rgba(0, 102, 255, 0.2); border: 1px solid #00a2ff; color: white; padding: 12px 24px; border-radius: 8px; font-family: 'Cinzel', serif; box-shadow: 0 0 15px #00a2ff; cursor: pointer;">
                 ENTRER DANS LE SANCTUAIRE
             </button>
         </a>
-        <p style="font-size: 11px; color: rgba(255,255,255,0.6); margin: 0;">
-            Contact : <a href="mailto:blockarcana-admin@proton.me" style="color: #D4AF37; text-decoration: underline;">blockarcana-admin@proton.me</a>
-        </p>
     </div>
 
     <main class="container mx-auto px-4 py-8">
