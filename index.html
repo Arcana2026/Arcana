@@ -606,14 +606,22 @@
 
         function showLoading(e, anchorEl) {
             e.preventDefault();
-            alert('Entrée au Sanctuaire... Assurez-vous que votre MetaMask est déverrouillé.');
+            // Vérifier si MetaMask est déjà connecté
+            const isMetaMaskConnected = window.ethereum && window.ethereum.selectedAddress;
+            
+            // Si MetaMask n'est pas connecté, afficher l'alerte
+            if (!isMetaMaskConnected) {
+                alert('Entrée au Sanctuaire... Assurez-vous que votre MetaMask est déverrouillé.');
+            }
+            
+            // Redirection immédiate pour éviter le blocage
             setTimeout(function() {
                 window.location.href = anchorEl.getAttribute('href') || 'arcanagame.html';
-            }, 800);
+            }, isMetaMaskConnected ? 300 : 800);
         }
     </script>
 
-    <div style="text-align: center; margin: 60px 0; padding-bottom: 40px;">
+    <div style="text-align: center; margin-top: 90px; margin-bottom: 60px; padding-bottom: 40px;">
         <a href="arcanagame.html" onclick="showLoading(event, this)" style="text-decoration: none;">
             <button type="button" class="btn-sanctuary-glow" style="width: 260px; height: 55px; cursor: pointer; position: relative; z-index: 100; font-family: 'Cinzel', serif; background: rgba(0, 162, 255, 0.1); border: 1px solid #00a2ff; color: #fff; border-radius: 4px; font-size: 14px; font-weight: 600; letter-spacing: 1px;">
                 ENTRER DANS LE SANCTUAIRE

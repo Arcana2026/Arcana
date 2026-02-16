@@ -2729,6 +2729,50 @@
     }
 
     // === SCRIPT DE SÉCURITÉ : Mode Consultation si Web3 ne charge pas ===
+    // 🔓 SI BYPASS ORACLE ACTIVÉ : Affichage immédiat des runes en lecture seule
+    if (bypassOracle === true) {
+        console.log('%c🔓 Bypass Oracle Activé : Affichage immédiat du Sanctuaire en mode Démo', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
+        
+        // Afficher le contenu immédiatement
+        setTimeout(function() {
+            var gate = document.getElementById('arcana-connect-gate');
+            if (gate && !window.ethereum && !provider) {
+                gate.classList.add('hidden');
+            }
+            
+            var content = gameContainer();
+            if (content) {
+                content.style.display = 'block';
+                content.classList.add('visible');
+                content.style.opacity = '1';
+            }
+            
+            // Afficher les runes IMMÉDIATEMENT en mode démo
+            var sanctuary = document.getElementById('level-3-sanctuary');
+            if (sanctuary) {
+                sanctuary.style.display = 'block';
+                sanctuary.style.opacity = '1';
+                sanctuary.style.transition = 'all 0.5s ease';
+                
+                // Message de mode démo
+                var demoMsg = document.createElement('div');
+                demoMsg.style.cssText = 'position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,255,136,0.15);color:#00ff88;padding:8px 16px;border-radius:8px;font-size:0.75em;font-weight:600;border:1px solid rgba(0,255,136,0.4);z-index:9999;';
+                demoMsg.innerHTML = '🔓 MODE DÉMO : Lecture seule activée';
+                sanctuary.insertBefore(demoMsg, sanctuary.firstChild);
+                
+                // Runes en lecture seule si pas de wallet
+                if (!window.ethereum && !provider) {
+                    var runeButtons = sanctuary.querySelectorAll('.rune-btn');
+                    runeButtons.forEach(function(btn) {
+                        btn.disabled = true;
+                        btn.style.cursor = 'not-allowed';
+                        btn.style.opacity = '0.6';
+                    });
+                }
+            }
+        }, 500);
+    }
+    
     // Vérification progressive de la disponibilité Web3
     var web3CheckAttempts = 0;
     var web3CheckInterval = setInterval(function() {
@@ -2740,9 +2784,16 @@
             return;
         }
         
-        // Après 5 tentatives (5 secondes), activer le mode consultation
+        // Après 5 tentatives (5 secondes), activer le mode consultation (seulement si bypass non activé)
         if (web3CheckAttempts >= 5) {
             clearInterval(web3CheckInterval);
+            
+            // Si bypass déjà actif, ne pas afficher le mode consultation
+            if (bypassOracle === true) {
+                console.log('%c🔓 Bypass Oracle : Mode Consultation ignoré', 'color:#00ff88;');
+                return;
+            }
+            
             console.warn('Arcana: Web3 non détecté après 5 secondes, activation du mode consultation');
             
             var gate = document.getElementById('arcana-connect-gate');
