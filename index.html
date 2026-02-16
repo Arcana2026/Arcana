@@ -606,18 +606,8 @@
 
         function showLoading(e, anchorEl) {
             e.preventDefault();
-            // Vérifier si MetaMask est déjà connecté
-            const isMetaMaskConnected = window.ethereum && window.ethereum.selectedAddress;
-            
-            // Si MetaMask n'est pas connecté, afficher l'alerte
-            if (!isMetaMaskConnected) {
-                alert('Entrée au Sanctuaire... Assurez-vous que votre MetaMask est déverrouillé.');
-            }
-            
-            // Redirection immédiate pour éviter le blocage
-            setTimeout(function() {
-                window.location.href = anchorEl.getAttribute('href') || 'arcanagame.html';
-            }, isMetaMaskConnected ? 300 : 800);
+            // Redirection immédiate sans popup bloquante
+            window.location.href = anchorEl.getAttribute('href') || 'arcanagame.html';
         }
     </script>
 

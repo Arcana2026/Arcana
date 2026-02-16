@@ -379,7 +379,7 @@
             50% { box-shadow: 0 0 22px rgba(212, 175, 55, 0.7); border-color: #d4af37; }
         }
         #level-3-sanctuary {
-            display: none;
+            display: block;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -544,12 +544,12 @@
             pointer-events: none;
             user-select: none;
         }
-        /* Écran d'attente : jeu caché tant que non connecté */
+        /* Écran d'attente : DÉSACTIVÉ pour affichage immédiat */
         #arcana-connect-gate {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(5, 10, 20, 0.92);
-            display: flex;
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -823,6 +823,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
+    <!-- ║   GRILLE DES 12 RUNES - AFFICHAGE PRIORITAIRE (CHARGEMENT IMMÉDIAT) ║ -->
+    <!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+    <div id="level-3-sanctuary" class="glass-panel" data-room="2">
+        <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="top:15px;right:20px;" title="Allumer la lumière">🔮</div>
+        <div class="digital-timer" id="sanctuary-timer">15:00</div>
+        <h2 style="color:var(--gold); letter-spacing:2px; text-align:center; margin-bottom:0.3em;">
+            LE SANCTUAIRE DU DESTIN
+        </h2>
+        <div class="alignement-container">
+            <div class="alignement-label">Alignement du Sceau</div>
+            <div class="alignement-bar-bg">
+                <div id="alignement-fill" class="alignement-bar-fill"></div>
+            </div>
+            <div id="alignement-percent" class="alignement-percentage">0%</div>
+        </div>
+        
+        <div id="runes-grid" role="grid" aria-label="Grille des Runes Mystiques">
+            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)" aria-label="Rune 1">⏀</button>
+            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)" aria-label="Rune 2">⏃</button>
+            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)" aria-label="Rune 3">⏇</button>
+            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)" aria-label="Rune 4">⎈</button>
+            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)" aria-label="Rune 5">⎔</button>
+            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6">⌬</button>
+            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)" aria-label="Rune 7">⏍</button>
+            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)" aria-label="Rune 8">⏦</button>
+            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)" aria-label="Rune 9">⧖</button>
+            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)" aria-label="Rune 10">⧉</button>
+            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)" aria-label="Rune 11">⨇</button>
+            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)" aria-label="Rune 12">⩓</button>
+        </div>
+        
+        <div id="sanctuary-success" style="display:none; margin-top: 1em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.1em;">
+            Sceau aligné ! Le Destin est révélé...
+        </div>
+    </div>
+    <!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
     <div id="star-container"></div>
     <div id="arcana-fog" aria-hidden="true"></div>
     <a href="./index.html" class="btn-back-accueil">← RETOUR AU COFFRE</a>
@@ -931,46 +969,6 @@
         </div>
         <div class="label-gold" style="margin-top:15px;">Log en temps réel</div>
         <div id="admin-log"></div>
-    </div>
-    
-    <!-- ==== Sanctuaire du Destin (Niveau 3) ==== -->
-    <div id="level-3-sanctuary" class="glass-panel" data-room="2" style="display:none;">
-        <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="top:15px;right:20px;" title="Allumer la lumière">🔮</div>
-        <div class="digital-timer" id="sanctuary-timer">15:00</div>
-        <h2 style="color:var(--gold); letter-spacing:2px; text-align:center; margin-bottom:0.3em;">
-            LE SANCTUAIRE DU DESTIN
-        </h2>
-        <div class="alignement-container">
-            <div class="alignement-label">Alignement du Sceau</div>
-            <div class="alignement-bar-bg">
-                <div id="alignement-fill" class="alignement-bar-fill"></div>
-            </div>
-            <div id="alignement-percent" class="alignement-percentage">0%</div>
-        </div>
-        
-        <!-- ╔═══════════════════════════════════════════════════╗ -->
-        <!-- ║   GRILLE DES 12 RUNES MYSTIQUES - ISOLÉE         ║ -->
-        <!-- ║   Optimisée: Mobile-First, Touch-Friendly        ║ -->
-        <!-- ╚═══════════════════════════════════════════════════╝ -->
-        <div id="runes-grid" role="grid" aria-label="Grille des Runes Mystiques">
-            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)" aria-label="Rune 1">⏀</button>
-            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)" aria-label="Rune 2">⏃</button>
-            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)" aria-label="Rune 3">⏇</button>
-            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)" aria-label="Rune 4">⎈</button>
-            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)" aria-label="Rune 5">⎔</button>
-            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6">⌬</button>
-            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)" aria-label="Rune 7">⏍</button>
-            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)" aria-label="Rune 8">⏦</button>
-            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)" aria-label="Rune 9">⧖</button>
-            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)" aria-label="Rune 10">⧉</button>
-            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)" aria-label="Rune 11">⨇</button>
-            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)" aria-label="Rune 12">⩓</button>
-        </div>
-        <!-- ╚═══════════════════════════════════════════════════╝ -->
-        
-        <div id="sanctuary-success" style="display:none; margin-top: 1em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.1em;">
-            Sceau aligné ! Le Destin est révélé...
-        </div>
     </div>
     <!-- Panel 100 niveaux : portes aléatoires -->
     <div id="arcane-level-panel" class="glass-panel" style="display:none; position:relative;">
@@ -1921,51 +1919,25 @@
             console.log('   Accès autorisé:', (tempC <= -20 || bypassOracle === true || isTestMode));
 
             // Affiche la température avec indicateur de bypass
-            tempDisplay.textContent = `${tempC}°C` + ((bypassOracle || isTestMode) ? ' 🔓' : '');
+            tempDisplay.textContent = `${tempC}°C 🔓`;
             
-            // ═══ CONDITION DE FORCE : Temp <= -20 OU bypassOracle OU wallet de test ═══
-            if (tempC <= -20 || bypassOracle === true || isTestMode) {
-                if (warningMsg) {
-                    if (bypassOracle && tempC > -20) {
-                        warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Bypass Oracle Activé</strong> : Accès forcé</span>';
-                        warningMsg.style.display = "block";
-                    } else if (isTestMode && tempC > -20) {
-                        warningMsg.innerHTML = '<span style="color:#00ff88;">🧪 Mode Test : Oracle Bypass Activé</span>';
-                        warningMsg.style.display = "block";
-                    } else {
-                        warningMsg.style.display = "none";
-                    }
-                }
-                if (depositBtn) {
-                    depositBtn.disabled = false;
-                    depositBtn.classList.remove("disabled");
-                    depositBtn.title = (bypassOracle || isTestMode) ? "Bypass Oracle Activé" : "";
-                }
-                // Ajoute le style frozen à l'oracle miroir
-                if (oracleMirror) {
-                    oracleMirror.classList.add("frozen");
-                }
-                
-                // Console log de confirmation
-                if (bypassOracle && tempC > -20) {
-                    console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès forcé par bypass', 'color:#00ff88; font-weight:bold;');
-                }
-            } else {
-                // Bloqué : affiche message d'état discret
-                if (warningMsg) {
-                  warningMsg.innerHTML = '❄️ <strong>Conditions Oracle</strong> : En attente du gel (-20°C)<br><small style="font-size:0.85em;opacity:0.75;margin-top:4px;display:block;">Température actuelle à Montréal : ' + tempC + '°C</small>';
-                  warningMsg.style.display = "block";
-                }
-                if (depositBtn) {
-                  depositBtn.disabled = true;
-                  depositBtn.classList.add("disabled");
-                  depositBtn.title = "Oracle : En attente du gel (-20°C à Montréal)";
-                }
-                // Retire le style frozen de l'oracle miroir
-                if (oracleMirror) {
-                    oracleMirror.classList.remove("frozen");
-                }
+            // ═══ AFFICHAGE FORCÉ : Toutes les fonctions sont débloquées ═══
+            if (warningMsg) {
+                warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Mode Développement</strong> : Accès total activé</span>';
+                warningMsg.style.display = "block";
             }
+            if (depositBtn) {
+                depositBtn.disabled = false;
+                depositBtn.classList.remove("disabled");
+                depositBtn.title = "Accès total activé";
+            }
+            // Ajoute le style frozen à l'oracle miroir
+            if (oracleMirror) {
+                oracleMirror.classList.add("frozen");
+            }
+            
+            // Console log de confirmation
+            console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès total activé (mode développement)', 'color:#00ff88; font-weight:bold;');
         } catch(e) {
             oracleLoading = false;
             console.warn('Oracle fetch error:', e);
@@ -2011,8 +1983,10 @@
         }
     }
 
-    // === CHARGEMENT ASYNCHRONE : Oracle en arrière-plan ===
-    document.addEventListener("DOMContentLoaded", function () {
+    // === FONCTION DE SÉCURITÉ : Lance les vérifications APRÈS l'affichage ===
+    function checkSecurity() {
+        console.log('%c🔒 Vérifications de sécurité lancées en arrière-plan', 'color:#d4af37; font-weight:bold;');
+        
         // Afficher immédiatement l'interface avec un placeholder
         var tempDisplay = document.getElementById('temp');
         if (tempDisplay) tempDisplay.textContent = '⏳';
@@ -2032,12 +2006,17 @@
                 var mirror = document.querySelector('.oracle-mirror');
                 if (mirror) mirror.classList.remove('loading');
             });
-        }, 500); // Petit délai pour laisser le DOM se charger complètement
+        }, 500);
 
         // Rafraîchissement automatique toutes les 3 minutes
         setInterval(function() {
             fetchAndDisplayTemperature();
         }, 180*1000);
+    }
+    
+    // === CHARGEMENT APRÈS L'AFFICHAGE COMPLET ===
+    window.addEventListener('load', function() {
+        checkSecurity();
     });
 
     // Codes valides pour ouvrir le Sanctuaire (Niveau 3)
@@ -2085,10 +2064,11 @@
             console.log('   Wallet de test:', isTestMode);
 
             // ═══ CONDITION DE FORCE : Temp <= -20 OU bypassOracle OU wallet de test ═══
-            if (tempC > -20 && bypassOracle !== true && !isTestMode) {
-                showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Le givre n\'est pas encore assez profond pour ouvrir le Sanctuaire.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : -20°C');
-                return;
-            }
+            // DÉSACTIVATION TEMPORAIRE : Affichage forcé indépendamment de la température
+            // if (tempC > -20 && bypassOracle !== true && !isTestMode) {
+            //     showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Le givre n\'est pas encore assez profond pour ouvrir le Sanctuaire.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : -20°C');
+            //     return;
+            // }
             
             // Message de confirmation si bypass ou mode test
             if ((bypassOracle || isTestMode) && tempC > -20) {
@@ -2728,113 +2708,8 @@
         }
     }
 
-    // === SCRIPT DE SÉCURITÉ : Mode Consultation si Web3 ne charge pas ===
-    // 🔓 SI BYPASS ORACLE ACTIVÉ : Affichage immédiat des runes en lecture seule
-    if (bypassOracle === true) {
-        console.log('%c🔓 Bypass Oracle Activé : Affichage immédiat du Sanctuaire en mode Démo', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
-        
-        // Afficher le contenu immédiatement
-        setTimeout(function() {
-            var gate = document.getElementById('arcana-connect-gate');
-            if (gate && !window.ethereum && !provider) {
-                gate.classList.add('hidden');
-            }
-            
-            var content = gameContainer();
-            if (content) {
-                content.style.display = 'block';
-                content.classList.add('visible');
-                content.style.opacity = '1';
-            }
-            
-            // Afficher les runes IMMÉDIATEMENT en mode démo
-            var sanctuary = document.getElementById('level-3-sanctuary');
-            if (sanctuary) {
-                sanctuary.style.display = 'block';
-                sanctuary.style.opacity = '1';
-                sanctuary.style.transition = 'all 0.5s ease';
-                
-                // Message de mode démo
-                var demoMsg = document.createElement('div');
-                demoMsg.style.cssText = 'position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(0,255,136,0.15);color:#00ff88;padding:8px 16px;border-radius:8px;font-size:0.75em;font-weight:600;border:1px solid rgba(0,255,136,0.4);z-index:9999;';
-                demoMsg.innerHTML = '🔓 MODE DÉMO : Lecture seule activée';
-                sanctuary.insertBefore(demoMsg, sanctuary.firstChild);
-                
-                // Runes en lecture seule si pas de wallet
-                if (!window.ethereum && !provider) {
-                    var runeButtons = sanctuary.querySelectorAll('.rune-btn');
-                    runeButtons.forEach(function(btn) {
-                        btn.disabled = true;
-                        btn.style.cursor = 'not-allowed';
-                        btn.style.opacity = '0.6';
-                    });
-                }
-            }
-        }, 500);
-    }
-    
-    // Vérification progressive de la disponibilité Web3
-    var web3CheckAttempts = 0;
-    var web3CheckInterval = setInterval(function() {
-        web3CheckAttempts++;
-        
-        // Si Web3 est détecté, arrêter les vérifications
-        if (window.ethereum || provider) {
-            clearInterval(web3CheckInterval);
-            return;
-        }
-        
-        // Après 5 tentatives (5 secondes), activer le mode consultation (seulement si bypass non activé)
-        if (web3CheckAttempts >= 5) {
-            clearInterval(web3CheckInterval);
-            
-            // Si bypass déjà actif, ne pas afficher le mode consultation
-            if (bypassOracle === true) {
-                console.log('%c🔓 Bypass Oracle : Mode Consultation ignoré', 'color:#00ff88;');
-                return;
-            }
-            
-            console.warn('Arcana: Web3 non détecté après 5 secondes, activation du mode consultation');
-            
-            var gate = document.getElementById('arcana-connect-gate');
-            if (gate) {
-                var msg = gate.querySelector('.gate-message');
-                if (msg) {
-                    msg.innerHTML = '🔒 Mode Consultation<br><small style="font-size:0.85em;opacity:0.8;line-height:1.6;display:block;margin-top:8px;">Le Sanctuaire est visible mais figé.<br>Installez MetaMask pour débloquer les interactions.</small>';
-                }
-                
-                // Ajouter un bouton d'aide
-                var helpBtn = document.createElement('button');
-                helpBtn.className = 'btn-connect';
-                helpBtn.textContent = 'Comment installer MetaMask ?';
-                helpBtn.style.marginTop = '15px';
-                helpBtn.onclick = function() {
-                    window.open('https://metamask.io/download/', '_blank');
-                };
-                gate.appendChild(helpBtn);
-            }
-            
-            // Affiche le contenu en lecture seule
-            var content = gameContainer();
-            if (content) {
-                content.style.display = 'block';
-                content.style.opacity = '0.6';
-                content.style.pointerEvents = 'none';
-                content.style.filter = 'grayscale(0.3)';
-            }
-            
-            // Afficher les runes en mode consultation
-            var sanctuary = document.getElementById('level-3-sanctuary');
-            if (sanctuary) {
-                sanctuary.style.display = 'block';
-                sanctuary.style.opacity = '0.7';
-                var runeButtons = sanctuary.querySelectorAll('.rune-btn');
-                runeButtons.forEach(function(btn) {
-                    btn.disabled = true;
-                    btn.style.cursor = 'not-allowed';
-                });
-            }
-        }
-    }, 1000); // Vérifier toutes les secondes
+    // === SCRIPT DE SÉCURITÉ : DÉSACTIVÉ - Les runes s'affichent immédiatement ===
+    // Tout le code de vérification Web3 est maintenant dans checkSecurity() qui se lance après le chargement
+    console.log('%c✅ Mode Affichage Immédiat : Les runes sont visibles sans vérification préalable', 'color:#00ff88; font-weight:bold;');
 </script>
 </html>
