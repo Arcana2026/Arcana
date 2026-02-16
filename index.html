@@ -85,31 +85,26 @@
         .pouch-window.active { display: block; animation: slideUp 0.4s ease; }
         
         .trust-icon-box {
-            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--gold); width: 45px !important; height: 45px !important;
+            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--gold); width: 40px !important; height: 40px !important;
             border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;
-            box-shadow: 0 0 15px var(--gold-glow); font-size: 18px;
+            box-shadow: 0 0 15px var(--gold-glow); font-size: 16px;
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bouton Sanctuaire — lueur bleue pulsante, fixé en bas à gauche */
-        .sanctuary-bottom-left {
-            position: fixed; bottom: 24px; left: 24px; z-index: 10002;
-            display: flex; flex-direction: column; align-items: flex-start;
-            pointer-events: none;
-        }
+        /* Bouton Sanctuaire — design professionnel avec animation d'entrée */
         .btn-sanctuary-glow {
-            pointer-events: auto;
-            padding: 8px 16px; font-size: 12px; font-family: 'Cinzel', serif; font-weight: 600;
-            letter-spacing: 0.1em; color: white;
-            background: rgba(0, 100, 255, 0.15);
-            border: 1px solid #00a2ff; border-radius: 6px; cursor: pointer;
-            box-shadow: 0 0 15px #00a2ff;
-            animation: blue-glow 2s infinite;
+            box-shadow: 0 0 10px rgba(0, 162, 255, 0.5), 0 0 15px rgba(212, 175, 55, 0.3);
+            animation: goldenGlow 3s ease-in-out infinite;
         }
-        @keyframes blue-glow {
-            0%, 100% { box-shadow: 0 0 5px #00a2ff; }
-            50% { box-shadow: 0 0 15px #00a2ff, 0 0 25px rgba(0, 162, 255, 0.5); }
+        .btn-sanctuary-glow:hover {
+            background: rgba(0, 162, 255, 0.3);
+            box-shadow: 0 0 25px #00a2ff, 0 0 20px rgba(212, 175, 55, 0.5);
+            transform: translateY(-2px);
+        }
+        @keyframes goldenGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 162, 255, 0.5), 0 0 12px rgba(212, 175, 55, 0.25); }
+            50% { box-shadow: 0 0 15px rgba(0, 162, 255, 0.6), 0 0 20px rgba(212, 175, 55, 0.45); }
         }
         @media (max-width: 768px) {
             .title-vault-mobile { font-size: 1.5rem !important; letter-spacing: 0.12em !important; }
@@ -128,10 +123,11 @@
         </button>
     </nav>
 
-    <div style="position: fixed; bottom: 20px; left: 20px; z-index: 999999;">
-        <a href="arcanagame.html" style="text-decoration: none;">
-            <button type="button" style="background: rgba(0, 102, 255, 0.2); border: 1px solid #00a2ff; color: white; padding: 12px 24px; border-radius: 8px; font-family: 'Cinzel', serif; box-shadow: 0 0 15px #00a2ff; cursor: pointer;">
-                ENTRER DANS LE SANCTUAIRE
+    <div id="sanctuary-trigger" style="text-align: center; margin: 50px auto; padding-bottom: 50px;">
+        <a href="arcanagame.html" onclick="showLoading(event, this)" style="text-decoration: none;">
+            <button type="button" class="btn-sanctuary-glow" style="width: 220px; height: 50px; font-family: 'Cinzel', serif; background: rgba(0, 162, 255, 0.1); border: 1px solid #00a2ff; color: #fff; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;">
+                <span id="btn-text">ENTRER DANS LE SANCTUAIRE</span>
+                <span id="btn-loader" style="display: none;">CHARGEMENT DU GRIMOIRE...</span>
             </button>
         </a>
     </div>
@@ -294,6 +290,18 @@
     </div>
 
     <script>
+        function showLoading(e, anchorEl) {
+            e.preventDefault();
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+            if (btnText && btnLoader) {
+                btnText.style.display = 'none';
+                btnLoader.style.display = 'inline';
+            }
+            setTimeout(function() {
+                window.location.href = anchorEl.getAttribute('href') || 'arcanagame.html';
+            }, 1200);
+        }
         const PROJECT_ID = "A26c2cef0fcf1c593197f7465d71c07e"; 
         const VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
         
