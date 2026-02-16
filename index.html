@@ -263,25 +263,6 @@
         </div>
     </main>
 
-    <!-- Bouton Sanctuaire et Contact - Bloc Final Unique -->
-    <div id="sanctuary-trigger" style="text-align: center; margin: 60px auto 80px; padding: 0;">
-        <a href="arcanagame.html" onclick="showLoading(event, this)" style="text-decoration: none; display: inline-block;">
-            <button type="button" class="btn-sanctuary-glow" style="width: 220px; height: 50px; font-family: 'Cinzel', serif; background: rgba(0, 162, 255, 0.1); border: 1px solid #00a2ff; color: #fff; border-radius: 4px; cursor: pointer; transition: all 0.3s ease;">
-                <span id="btn-text">ENTRER DANS LE SANCTUAIRE</span>
-                <span id="btn-loader" style="display: none;">CHARGEMENT DU GRIMOIRE...</span>
-            </button>
-        </a>
-        
-        <!-- Icône Email Contact -->
-        <div style="margin-top: 30px;">
-            <a href="mailto:blockarcana-admin@proton.me" style="text-decoration: none; display: inline-block; transition: transform 0.3s ease, filter 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'; this.style.filter='drop-shadow(0 0 12px #D4AF37)';" onmouseout="this.style.transform='scale(1)'; this.style.filter='drop-shadow(0 0 8px rgba(212, 175, 55, 0.5))';" title="Contacter l'équipe Arcana">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));">
-                    <path d="M3 8L10.89 13.26C11.2187 13.4793 11.6049 13.5963 12 13.5963C12.3951 13.5963 12.7813 13.4793 13.11 13.26L21 8M5 19H19C19.5304 19 20.0391 18.7893 20.4142 18.4142C20.7893 18.0391 21 17.5304 21 17V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V17C3 17.5304 3.21071 18.0391 3.58579 18.4142C3.96086 18.7893 4.46957 19 5 19Z" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
-        </div>
-    </div>
-
     <div id="guide-poche">
         <div id="pouchWindow" class="glass-vault pouch-window">
             <h4 class="font-prestige text-[10px] text-[#D4AF37] mb-6 tracking-widest">GUIDE POCHE</h4>
@@ -303,18 +284,6 @@
     </div>
 
     <script>
-        function showLoading(e, anchorEl) {
-            e.preventDefault();
-            const btnText = document.getElementById('btn-text');
-            const btnLoader = document.getElementById('btn-loader');
-            if (btnText && btnLoader) {
-                btnText.style.display = 'none';
-                btnLoader.style.display = 'inline';
-            }
-            setTimeout(function() {
-                window.location.href = anchorEl.getAttribute('href') || 'arcanagame.html';
-            }, 1200);
-        }
         const PROJECT_ID = "A26c2cef0fcf1c593197f7465d71c07e"; 
         const VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
         
@@ -634,6 +603,26 @@
         function extractAmount(str) {
             return Number(extractCleanAmount(str));
         }
+
+        function showLoading(e, anchorEl) {
+            e.preventDefault();
+            setTimeout(function() {
+                window.location.href = anchorEl.getAttribute('href') || 'arcanagame.html';
+            }, 800);
+        }
     </script>
+
+    <div style="text-align: center; margin: 60px 0; padding-bottom: 40px;">
+        <a href="arcanagame.html" onclick="showLoading(event, this)" style="text-decoration: none;">
+            <button type="button" class="btn-sanctuary-glow" style="width: 260px; height: 55px; cursor: pointer; position: relative; z-index: 9999; font-family: 'Cinzel', serif; background: rgba(0, 162, 255, 0.1); border: 1px solid #00a2ff; color: #fff; border-radius: 4px; font-size: 14px; font-weight: 600; letter-spacing: 1px;">
+                ENTRER DANS LE SANCTUAIRE
+            </button>
+        </a>
+        <div style="margin-top: 30px;">
+            <a href="mailto:blockarcana-admin@proton.me">
+                <img src="https://img.icons8.com/ios-filled/50/D4AF37/mail.png" width="35" alt="Email" style="transition: transform 0.3s ease, filter 0.3s ease; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));" onmouseover="this.style.transform='scale(1.15)'; this.style.filter='drop-shadow(0 0 15px #D4AF37)';" onmouseout="this.style.transform='scale(1)'; this.style.filter='drop-shadow(0 0 8px rgba(212, 175, 55, 0.5))';">
+            </a>
+        </div>
+    </div>
 </body>
 </html>
