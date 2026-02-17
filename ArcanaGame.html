@@ -110,23 +110,24 @@
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.1); }
         }
+        /* Glass panels normaux - Fond léger pour les menus */
         .glass-panel {
             font-family: 'Cinzel', serif;
-            background: transparent !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            border: 1px solid rgba(212, 175, 55, 0.25);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(212, 175, 55, 0.35);
             border-radius: 15px;
-            box-shadow: none !important;
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.75);
             padding: 20px;
             margin: 15px;
             width: 90%;
             max-width: 500px;
             position: relative;
             z-index: 1;
-            transition: border 0.19s;
+            transition: border 0.19s, box-shadow 0.19s;
         }
-        /* Exception: le sanctuaire des runes n'a aucun style */
+        /* EXCEPTION CRITIQUE: Sanctuaire totalement transparent */
         #level-3-sanctuary.glass-panel,
         #level-3-sanctuary {
             background: transparent !important;
@@ -134,10 +135,10 @@
             -webkit-backdrop-filter: none !important;
             border: none !important;
             box-shadow: none !important;
-            margin: 0;
-            padding: 20px;
-            width: 100vw;
-            max-width: none;
+            margin: 0 !important;
+            padding: 20px !important;
+            width: 100vw !important;
+            max-width: none !important;
         }
         .glass-panel.glitch {
             /* Glitch border red effect */
@@ -298,8 +299,8 @@
         .input-arcana {
             font-family: 'Cinzel', serif;
             width: 100%;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(212, 175, 55, 0.4);
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.5);
             color: var(--gold);
             padding: 12px;
             border-radius: 10px;
@@ -307,6 +308,8 @@
             box-sizing: border-box;
             font-weight: 400;
             letter-spacing: 0.05em;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         .label-gold {
             font-family: 'Cinzel', serif;
@@ -345,7 +348,7 @@
             border-color: #ff2424aa;
             animation: glitch-border 0.15s steps(1) infinite alternate;
         }
-        /* Runes - Cercles dorés comme dans l'image */
+        /* Runes - Cercles dorés fins totalement transparents */
         .runes-column .rune-btn {
             width: 70px;
             height: 70px;
@@ -362,9 +365,9 @@
             align-items: center;
             justify-content: center;
             
-            /* Cercle doré fin transparent */
-            background: rgba(0, 0, 0, 0.3) !important;
-            border: 2px solid rgba(212, 175, 55, 0.6);
+            /* Transparence totale avec bordure dorée fine */
+            background: transparent !important;
+            border: 1px solid rgba(212, 175, 55, 0.35);
             border-radius: 50%;
             
             /* Symbole doré */
@@ -378,16 +381,17 @@
             user-select: none;
         }
         
-        /* Effet de surbrillance doré au survol */
+        /* Effet de surbrillance doré au survol - reste transparent */
         .rune-btn:hover:not(:disabled) {
-            background: rgba(0, 0, 0, 0.5) !important;
-            border-color: rgba(212, 175, 55, 1);
+            background: transparent !important;
+            border-color: rgba(212, 175, 55, 0.9);
             color: rgba(255, 215, 0, 1);
             text-shadow: 
-                0 0 20px rgba(255, 215, 0, 1),
-                0 0 30px rgba(212, 175, 55, 0.8);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
-            transform: scale(1.05);
+                0 0 25px rgba(255, 215, 0, 1),
+                0 0 35px rgba(212, 175, 55, 0.9),
+                0 0 45px rgba(212, 175, 55, 0.6);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
+            transform: scale(1.12);
         }
         
         /* Animation quête active - Pulse doré */
@@ -509,30 +513,45 @@
         #level-3-sanctuary.sac-ouvert {
             opacity: 0.6;
         }
-        /* Colonnes de runes - Alignement vertical comme dans l'image */
+        /* Colonnes de runes - Totalement invisibles (comme dans l'image) */
         .runes-column {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-evenly;
-            align-items: center;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-evenly !important;
+            align-items: center !important;
             min-height: 85vh;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 10;
             position: relative;
             padding: 40px 0;
         }
         .runes-column.left {
             justify-self: start;
-            align-items: flex-start;
+            align-items: flex-start !important;
             padding-left: 35px;
         }
         .runes-column.right {
             justify-self: end;
-            align-items: flex-end;
+            align-items: flex-end !important;
             padding-right: 35px;
+        }
+        /* Forcer la transparence absolue sur tous les enfants des colonnes */
+        .runes-column,
+        .runes-column * {
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+        .runes-column .rune-btn {
+            background: transparent !important;
+        }
+        /* Temple-center : aucun fond visible */
+        .temple-center,
+        .temple-center * {
+            background-color: transparent !important;
         }
         /* Zone centrale - Totalement transparente pour voir le décor body */
         .temple-center {
@@ -796,6 +815,13 @@
             display: block;
             background: transparent !important;
         }
+        /* Masquer tous les panels sauf le sanctuaire par défaut */
+        #class-selection,
+        #level-2-panel,
+        #arcane-level-panel,
+        #arcane-altar-panel {
+            display: none !important;
+        }
         /* Identification wallet : coin de l'écran */
         .wallet-address-badge {
             position: fixed; top: 12px; right: 12px; z-index: 600;
@@ -1033,7 +1059,7 @@
         }
         .grimoire-close:hover { background: rgba(184,134,11,0.3); }
         
-        /* === PAPYRUS ANCIEN - Modal Centrée (comme dans l'image) === */
+        /* === PAPYRUS ANCIEN - Modal Centrée avec fond transparent === */
         #papyrus-modal {
             display: none;
             position: fixed;
@@ -1041,9 +1067,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 3000;
             align-items: center;
             justify-content: center;
@@ -1836,6 +1862,35 @@
         
         /* Responsive Tablette et Mobile */
         @media (max-width: 768px) {
+            /* Sanctuaire - Layout adaptatif */
+            #level-3-sanctuary {
+                grid-template-columns: 90px 1fr 90px;
+                padding: 15px;
+                background: transparent !important;
+            }
+            .runes-column {
+                min-height: 80vh;
+                padding: 30px 0;
+                background: transparent !important;
+            }
+            .runes-column.left {
+                padding-left: 20px;
+            }
+            .runes-column.right {
+                padding-right: 20px;
+            }
+            .rune-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 1.6em;
+                background: transparent !important;
+                border-width: 1px;
+            }
+            .temple-center {
+                padding: 40px 10px;
+                background: transparent !important;
+            }
+            /* Sac à dos */
             #sac-inventaire {
                 max-height: 80vh;
                 padding: 20px 16px 16px;
@@ -1854,8 +1909,7 @@
             #level-3-sanctuary.sac-ouvert {
                 opacity: 0.5;
             }
-        }
-        @media (max-width: 768px) {
+            /* Sacoche */
             #btn-sacoche {
                 width: 65px;
                 height: 65px;
