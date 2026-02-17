@@ -7,12 +7,12 @@
     Structure: index.html ⇄ ArcanaGame.html (connexion bidirectionnelle)
     
     📡 ORACLE MÉTÉO :
-    - Condition : Température <= -10°C à Montréal
+    - Condition : Température <= +10°C à Montréal (Mode Test Activé)
     - Mode Test : Définir ARCANA_TEST_WALLET avec votre adresse
     - Bypass automatique pour le wallet de test
     
     🧪 MODE TEST :
-    Ligne ~1320 : var ARCANA_TEST_WALLET = 'VOTRE_ADRESSE_0x...';
+    Ligne ~1368 : var ARCANA_TEST_WALLET = 'VOTRE_ADRESSE_0x...';
 ═══════════════════════════════════════════════════════════════
 -->
 <head>
@@ -1916,28 +1916,51 @@
             console.log('   Température actuelle:', tempC + '°C');
             console.log('   Bypass activé:', bypassOracle);
             console.log('   Wallet de test:', isTestMode);
-            console.log('   Accès autorisé:', (tempC <= -20 || bypassOracle === true || isTestMode));
+            console.log('   Accès autorisé:', (tempC <= 10 || bypassOracle === true || isTestMode));
 
-            // Affiche la température avec indicateur de bypass
-            tempDisplay.textContent = `${tempC}°C 🔓`;
-            
-            // ═══ AFFICHAGE FORCÉ : Toutes les fonctions sont débloquées ═══
-            if (warningMsg) {
-                warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Mode Développement</strong> : Accès total activé</span>';
-                warningMsg.style.display = "block";
+            // Vérifier si l'accès est autorisé (temp <= +10°C OU bypass OU test mode)
+            var accessGranted = (tempC <= 10 || bypassOracle === true || isTestMode);
+
+            if (accessGranted) {
+                // Affiche la température avec indicateur d'accès autorisé
+                tempDisplay.textContent = `${tempC}°C 🔓`;
+                
+                // ═══ ACCÈS AUTORISÉ : Toutes les fonctions sont débloquées ═══
+                if (warningMsg) {
+                    warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Accès Autorisé</strong> : Température ≤ +10°C</span>';
+                    warningMsg.style.display = "block";
+                }
+                if (depositBtn) {
+                    depositBtn.disabled = false;
+                    depositBtn.classList.remove("disabled");
+                    depositBtn.title = "Dépôt autorisé";
+                }
+                // Ajoute le style frozen à l'oracle miroir
+                if (oracleMirror) {
+                    oracleMirror.classList.add("frozen");
+                }
+                
+                // Console log de confirmation
+                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès autorisé (≤ +10°C)', 'color:#00ff88; font-weight:bold;');
+            } else {
+                // Accès refusé
+                tempDisplay.textContent = `${tempC}°C 🔒`;
+                
+                if (warningMsg) {
+                    warningMsg.innerHTML = '<span style="color:#ff6b6b;">🔒 <strong>Accès Restreint</strong> : Température trop élevée (> +10°C)</span>';
+                    warningMsg.style.display = "block";
+                }
+                if (depositBtn) {
+                    depositBtn.disabled = true;
+                    depositBtn.classList.add("disabled");
+                    depositBtn.title = "Température trop élevée";
+                }
+                if (oracleMirror) {
+                    oracleMirror.classList.remove("frozen");
+                }
+                
+                console.log('%c🔒 Température actuelle: ' + tempC + '°C | Accès refusé (> +10°C)', 'color:#ff6b6b; font-weight:bold;');
             }
-            if (depositBtn) {
-                depositBtn.disabled = false;
-                depositBtn.classList.remove("disabled");
-                depositBtn.title = "Accès total activé";
-            }
-            // Ajoute le style frozen à l'oracle miroir
-            if (oracleMirror) {
-                oracleMirror.classList.add("frozen");
-            }
-            
-            // Console log de confirmation
-            console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès total activé (mode développement)', 'color:#00ff88; font-weight:bold;');
         } catch(e) {
             oracleLoading = false;
             console.warn('Oracle fetch error:', e);
@@ -2060,19 +2083,20 @@
             // Console Log : État complet
             console.log('%c🔐 Vérification Oracle pour le Sceau du Sanctuaire', 'color:#d4af37; font-weight:bold;');
             console.log('   Température actuelle:', tempC + '°C');
+            console.log('   Seuil requis: ≤ +10°C');
             console.log('   Bypass Oracle:', bypassOracle);
             console.log('   Wallet de test:', isTestMode);
 
-            // ═══ CONDITION DE FORCE : Temp <= -20 OU bypassOracle OU wallet de test ═══
-            // DÉSACTIVATION TEMPORAIRE : Affichage forcé indépendamment de la température
-            // if (tempC > -20 && bypassOracle !== true && !isTestMode) {
-            //     showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Le givre n\'est pas encore assez profond pour ouvrir le Sanctuaire.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : -20°C');
-            //     return;
-            // }
+            // ═══ CONDITION DE FORCE : Temp <= +10 OU bypassOracle OU wallet de test ═══
+            // Mode Test : Accès autorisé jusqu'à +10°C pour faciliter les tests
+            if (tempC > 10 && bypassOracle !== true && !isTestMode) {
+                showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Conditions d\'accès non remplies.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : ≤ +10°C');
+                return;
+            }
             
             // Message de confirmation si bypass ou mode test
-            if ((bypassOracle || isTestMode) && tempC > -20) {
-                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès forcé par bypass', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
+            if ((bypassOracle || isTestMode) && tempC > 10) {
+                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès forcé par bypass/test', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
             }
 
             const code = (codeInput.value || '').trim();
