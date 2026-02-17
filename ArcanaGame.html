@@ -819,57 +819,186 @@
         }
         .grimoire-close:hover { background: rgba(184,134,11,0.3); }
         
-        /* === SAC À DOS INVENTAIRE === */
+        /* === BOUTON SACOCHE FLOTTANT === */
+        #btn-sacoche {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 550;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #2a2520, #1a1612);
+            border: 2px solid rgba(212, 175, 55, 0.7);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        #btn-sacoche:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5), 0 0 8px var(--gold);
+        }
+        #btn-sacoche-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            border-radius: 50%;
+            border: 2px solid #1a1612;
+            font-size: 0.55em;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            color: #1a1510;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.6);
+        }
+        
+        /* === OVERLAY DRAWER === */
+        #sac-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 580;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #sac-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* === DRAWER INVENTAIRE === */
         #sac-inventaire {
             position: fixed;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 520;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 2px solid rgba(212, 175, 55, 0.6);
-            border-radius: 12px;
-            padding: 10px 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 590;
+            background: linear-gradient(180deg, #2a2520 0%, #1e1c1a 20%, #1a1816 50%, #151412 100%);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
+                linear-gradient(180deg, #2a2520 0%, #1e1c1a 20%, #1a1816 50%, #151412 100%);
+            border-top: 3px solid #b8860b;
+            border-left: 3px solid rgba(212, 175, 55, 0.3);
+            border-right: 3px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.8), inset 0 2px 0 rgba(212, 175, 55, 0.15);
+            padding: 24px 20px 20px;
+            max-height: 75vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sac-inventaire.open {
+            transform: translateY(0);
+        }
+        #sac-inventaire-header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
         }
         #sac-inventaire-titre {
             font-family: 'Cinzel', serif;
             color: var(--gold);
-            font-size: 0.75em;
+            font-size: 1.1em;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            opacity: 0.9;
-            margin-bottom: 2px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
         }
-        #sac-slots-container {
+        #sac-btn-fermer {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: rgba(139, 0, 0, 0.3);
+            border: 1px solid rgba(255, 68, 68, 0.4);
+            color: #ff6b6b;
+            font-size: 1.4em;
+            cursor: pointer;
             display: flex;
-            gap: 6px;
             align-items: center;
             justify-content: center;
+            transition: all 0.25s ease;
+        }
+        #sac-btn-fermer:hover {
+            background: rgba(139, 0, 0, 0.5);
+            border-color: #ff4444;
+            transform: scale(1.08);
+        }
+        .sac-section {
+            margin-bottom: 24px;
+        }
+        .sac-section-titre {
+            font-family: 'Cinzel', serif;
+            color: rgba(212, 175, 55, 0.9);
+            font-size: 0.85em;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sac-section-titre::before {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.3));
+        }
+        .sac-section-titre::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.3));
+        }
+        #sac-slots-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
         }
         .sac-slot {
-            width: 38px;
-            height: 38px;
+            aspect-ratio: 1;
+            min-height: 60px;
             background: rgba(0, 0, 0, 0.6);
-            border: 1.5px solid rgba(212, 175, 55, 0.4);
-            border-radius: 6px;
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            border-radius: 8px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-family: 'Orbitron', monospace;
-            font-size: 0.85em;
+            font-size: 0.9em;
             color: var(--gold);
             font-weight: bold;
             transition: all 0.25s ease;
             position: relative;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+        .sac-slot:hover {
+            border-color: rgba(212, 175, 55, 0.7);
+            background: rgba(212, 175, 55, 0.08);
+            transform: translateY(-2px);
         }
         .sac-slot:empty::after {
             content: '—';
@@ -883,11 +1012,64 @@
         }
         .sac-slot.filled::before {
             content: '🗝️';
+            font-size: 1.5em;
+            margin-bottom: 4px;
+        }
+        
+        /* === OBJETS DE QUÊTE === */
+        #sac-objets-quete {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            min-height: 100px;
+        }
+        .objet-quete {
+            aspect-ratio: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(73, 202, 250, 0.4);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+        .objet-quete:hover {
+            border-color: rgba(73, 202, 250, 0.8);
+            background: rgba(73, 202, 250, 0.1);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 20px rgba(73, 202, 250, 0.3);
+        }
+        .objet-quete-nom {
             position: absolute;
-            top: -6px;
-            left: -4px;
-            font-size: 0.7em;
-            opacity: 0.7;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.35em;
+            font-family: 'Cinzel', serif;
+            color: rgba(73, 202, 250, 0.9);
+            text-align: center;
+            white-space: nowrap;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #sac-objets-quete-vide {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Cinzel', serif;
+            font-size: 0.85em;
+            font-style: italic;
+            padding: 20px;
         }
         #sac-alerte-surcharge {
             position: absolute;
@@ -918,39 +1100,53 @@
         }
         
         /* Responsive Mobile */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             #sac-inventaire {
-                bottom: 6px;
-                padding: 8px 10px;
+                max-height: 80vh;
+                padding: 20px 16px 16px;
             }
             #sac-inventaire-titre {
-                font-size: 0.65em;
-            }
-            .sac-slot {
-                width: 32px;
-                height: 32px;
-                font-size: 0.75em;
+                font-size: 1em;
             }
             #sac-slots-container {
-                gap: 4px;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 8px;
             }
-            #sac-alerte-surcharge {
-                font-size: 0.7em;
-                padding: 5px 12px;
-                top: -30px;
+            .sac-slot {
+                min-height: 55px;
+                font-size: 0.8em;
             }
         }
         @media (max-width: 480px) {
-            .sac-slot {
-                width: 28px;
-                height: 28px;
-                font-size: 0.7em;
-            }
-            #sac-slots-container {
-                gap: 3px;
+            #btn-sacoche {
+                width: 50px;
+                height: 50px;
+                font-size: 1.6em;
+                bottom: 16px;
+                right: 16px;
             }
             #sac-inventaire {
-                padding: 6px 8px;
+                padding: 16px 12px 12px;
+            }
+            #sac-inventaire-titre {
+                font-size: 0.95em;
+            }
+            #sac-slots-container {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 6px;
+                padding: 8px;
+            }
+            .sac-slot {
+                min-height: 48px;
+                font-size: 0.75em;
+                border-width: 1.5px;
+            }
+            #sac-objets-quete {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 8px;
+            }
+            .sac-section-titre {
+                font-size: 0.75em;
             }
         }
     </style>
@@ -1187,21 +1383,47 @@
 
     <div class="arcana-mention">Arcana Game - Écosystème Décentralisé</div>
 
-    <!-- ═══ SAC À DOS INVENTAIRE ═══ -->
+    <!-- ═══ BOUTON SACOCHE FLOTTANT ═══ -->
+    <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire">
+        🎒
+        <span id="btn-sacoche-badge">0</span>
+    </button>
+
+    <!-- ═══ OVERLAY DRAWER ═══ -->
+    <div id="sac-overlay" onclick="fermerSacInventaire()"></div>
+
+    <!-- ═══ DRAWER INVENTAIRE ═══ -->
     <div id="sac-inventaire">
         <div id="sac-alerte-surcharge">⚠️ SAC TROP LOURD - RISQUE DE PERTE</div>
-        <div id="sac-inventaire-titre">Sac à Dos</div>
-        <div id="sac-slots-container">
-            <div class="sac-slot" data-slot="0"></div>
-            <div class="sac-slot" data-slot="1"></div>
-            <div class="sac-slot" data-slot="2"></div>
-            <div class="sac-slot" data-slot="3"></div>
-            <div class="sac-slot" data-slot="4"></div>
-            <div class="sac-slot" data-slot="5"></div>
-            <div class="sac-slot" data-slot="6"></div>
-            <div class="sac-slot" data-slot="7"></div>
-            <div class="sac-slot" data-slot="8"></div>
-            <div class="sac-slot" data-slot="9"></div>
+        
+        <div id="sac-inventaire-header">
+            <div id="sac-inventaire-titre">📦 Inventaire</div>
+            <button id="sac-btn-fermer" onclick="fermerSacInventaire()" title="Fermer">×</button>
+        </div>
+
+        <!-- Section Clés -->
+        <div class="sac-section">
+            <div class="sac-section-titre">🗝️ Clés du Destin</div>
+            <div id="sac-slots-container">
+                <div class="sac-slot" data-slot="0"></div>
+                <div class="sac-slot" data-slot="1"></div>
+                <div class="sac-slot" data-slot="2"></div>
+                <div class="sac-slot" data-slot="3"></div>
+                <div class="sac-slot" data-slot="4"></div>
+                <div class="sac-slot" data-slot="5"></div>
+                <div class="sac-slot" data-slot="6"></div>
+                <div class="sac-slot" data-slot="7"></div>
+                <div class="sac-slot" data-slot="8"></div>
+                <div class="sac-slot" data-slot="9"></div>
+            </div>
+        </div>
+
+        <!-- Section Objets de Quête -->
+        <div class="sac-section">
+            <div class="sac-section-titre">✨ Objets de Quête</div>
+            <div id="sac-objets-quete">
+                <div id="sac-objets-quete-vide">Aucun objet de quête</div>
+            </div>
         </div>
     </div>
 
@@ -2890,10 +3112,57 @@
     console.log('%c✅ Mode Affichage Immédiat : Les runes sont visibles sans vérification préalable', 'color:#00ff88; font-weight:bold;');
 
     // ═══════════════════════════════════════════════════════
-    // SAC À DOS INVENTAIRE - Gestion des Clés
+    // SAC À DOS INVENTAIRE - Gestion des Clés et Objets
     // ═══════════════════════════════════════════════════════
     var sacInventaire = [];
+    var sacObjetsQuete = [];
     var sacAlerteTimeout = null;
+    var sacIsOpen = false;
+
+    function toggleSacInventaire() {
+        if (sacIsOpen) {
+            fermerSacInventaire();
+        } else {
+            ouvrirSacInventaire();
+        }
+    }
+
+    function ouvrirSacInventaire() {
+        var drawer = document.getElementById('sac-inventaire');
+        var overlay = document.getElementById('sac-overlay');
+        
+        drawer.classList.add('open');
+        overlay.classList.add('active');
+        sacIsOpen = true;
+        
+        // Empêcher le scroll du body
+        document.body.style.overflow = 'hidden';
+        
+        console.log('%c📦 Inventaire ouvert', 'color:#d4af37;');
+    }
+
+    function fermerSacInventaire() {
+        var drawer = document.getElementById('sac-inventaire');
+        var overlay = document.getElementById('sac-overlay');
+        
+        drawer.classList.remove('open');
+        overlay.classList.remove('active');
+        sacIsOpen = false;
+        
+        // Réactiver le scroll du body
+        document.body.style.overflow = '';
+        
+        console.log('%c📦 Inventaire fermé', 'color:#888;');
+    }
+
+    function updateSacBadge() {
+        var badge = document.getElementById('btn-sacoche-badge');
+        var total = sacInventaire.length;
+        if (badge) {
+            badge.textContent = total;
+            badge.style.display = total > 0 ? 'flex' : 'none';
+        }
+    }
 
     function ajouterCleDansSac(numero) {
         var slots = document.querySelectorAll('.sac-slot');
@@ -2943,6 +3212,9 @@
             
             // Message dans le chat Oracle
             addOracleChatMessage('Clé ' + numero + ' rangée dans le sac (' + sacInventaire.length + '/10)');
+            
+            // Mettre à jour le badge
+            updateSacBadge();
         }
         
         return true;
@@ -2973,6 +3245,9 @@
         console.log('%c🗝️ Clé ' + cleRetiree + ' retirée du sac', 'color:#888; font-weight:bold;');
         addOracleChatMessage('Clé ' + cleRetiree + ' utilisée (' + sacInventaire.length + '/10 restantes)');
         
+        // Mettre à jour le badge
+        updateSacBadge();
+        
         return cleRetiree;
     }
 
@@ -2983,6 +3258,7 @@
             slot.textContent = '';
             slot.classList.remove('filled');
         });
+        updateSacBadge();
         console.log('%c🗝️ Sac vidé', 'color:#888;');
     }
 
@@ -2990,17 +3266,128 @@
         return sacInventaire.length;
     }
 
-    // Fonction de test (à appeler dans la console pour tester)
+    // ═══════════════════════════════════════════════════════
+    // OBJETS DE QUÊTE - Gestion
+    // ═══════════════════════════════════════════════════════
+    
+    function ajouterObjetQuete(icone, nom, id) {
+        // Vérifier si l'objet existe déjà
+        if (sacObjetsQuete.find(function(obj) { return obj.id === id; })) {
+            console.warn('Objet de quête déjà présent:', nom);
+            return false;
+        }
+        
+        var objet = {
+            id: id || 'objet_' + Date.now(),
+            icone: icone,
+            nom: nom
+        };
+        
+        sacObjetsQuete.push(objet);
+        afficherObjetsQuete();
+        updateSacBadge();
+        
+        console.log('%c✨ Objet de quête ajouté:', 'color:#49cafa; font-weight:bold;', nom);
+        addOracleChatMessage('Objet de quête obtenu : ' + nom);
+        
+        return true;
+    }
+
+    function retirerObjetQuete(id) {
+        var index = sacObjetsQuete.findIndex(function(obj) { return obj.id === id; });
+        if (index === -1) return null;
+        
+        var objet = sacObjetsQuete[index];
+        sacObjetsQuete.splice(index, 1);
+        afficherObjetsQuete();
+        updateSacBadge();
+        
+        console.log('%c✨ Objet de quête retiré:', 'color:#888;', objet.nom);
+        addOracleChatMessage('Objet de quête utilisé : ' + objet.nom);
+        
+        return objet;
+    }
+
+    function afficherObjetsQuete() {
+        var container = document.getElementById('sac-objets-quete');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (sacObjetsQuete.length === 0) {
+            var vide = document.createElement('div');
+            vide.id = 'sac-objets-quete-vide';
+            vide.textContent = 'Aucun objet de quête';
+            container.appendChild(vide);
+            return;
+        }
+        
+        sacObjetsQuete.forEach(function(objet) {
+            var div = document.createElement('div');
+            div.className = 'objet-quete';
+            div.dataset.id = objet.id;
+            div.innerHTML = objet.icone + '<span class="objet-quete-nom">' + objet.nom + '</span>';
+            div.onclick = function() {
+                console.log('Objet de quête cliqué:', objet.nom);
+                // Ici vous pouvez ajouter une action (utiliser l'objet, afficher info, etc.)
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function viderObjetsQuete() {
+        sacObjetsQuete = [];
+        afficherObjetsQuete();
+        updateSacBadge();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // CONTRÔLES CLAVIER - Fermer l'inventaire avec Échap
+    // ═══════════════════════════════════════════════════════
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && sacIsOpen) {
+            fermerSacInventaire();
+        }
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // FONCTIONS DE TEST - Console
+    // ═══════════════════════════════════════════════════════
     window.testSac = function() {
         console.log('%c=== TEST DU SAC À DOS ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
         viderSac();
+        viderObjetsQuete();
+        ouvrirSacInventaire();
+        
+        // Test ajout de clés
         for (var i = 1; i <= 12; i++) {
             setTimeout(function(num) {
                 return function() {
                     ajouterCleDansSac(num);
                 };
-            }(i), i * 500);
+            }(i), i * 400);
         }
+        
+        // Test ajout d'objets de quête
+        setTimeout(function() {
+            ajouterObjetQuete('📜', 'Parchemin Ancien', 'parchemin_1');
+        }, 5000);
+        setTimeout(function() {
+            ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
+        }, 5500);
+        setTimeout(function() {
+            ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
+        }, 6000);
+    };
+
+    window.testObjetsQuete = function() {
+        console.log('%c=== TEST OBJETS DE QUÊTE ===', 'color:#49cafa; font-size:1.2em; font-weight:bold;');
+        ouvrirSacInventaire();
+        ajouterObjetQuete('📜', 'Parchemin Ancien', 'parchemin_1');
+        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
+        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
+        ajouterObjetQuete('⚗️', 'Fiole Magique', 'fiole_1');
+        ajouterObjetQuete('🗡️', 'Lame Enchantée', 'lame_1');
     };
 </script>
 </html>
