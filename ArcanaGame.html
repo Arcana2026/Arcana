@@ -251,21 +251,23 @@
             font-size: 2em;
             margin-bottom: 5px;
         }
-        /* Digital Countdown style */
+        /* Digital Countdown style - Épuré */
         .digital-timer {
-            font-family: 'Orbitron', 'VT323', monospace;
-            font-size: 2.2em;
-            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 1.4em;
+            color: rgba(212, 175, 55, 0.7);
             text-align: center;
-            letter-spacing: 0.08em;
-            background: rgba(64,43,3,0.12);
-            text-shadow: 0 0 5px #d4af37, 0 0 18px rgba(212,175,55,0.25);
-            padding: 8px 0;
-            border-radius: 14px;
-            margin-bottom: 25px;
+            letter-spacing: 0.15em;
+            background: rgba(0, 0, 0, 0.3);
+            text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+            padding: 6px 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             font-variant-numeric: tabular-nums;
-            border: 1px solid rgba(212, 175, 55, 0.11);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
             transition: color 0.3s, background 0.3s;
+            font-weight: 300;
         }
         .digital-timer.danger {
             color: #fff0f0;
@@ -283,6 +285,11 @@
             font-size: 2em;
             padding: 18px 10px 12px 10px;
             aspect-ratio: 1;
+            /* Runes ressortent sur le fond sombre */
+            filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.7)) brightness(1.05);
+        }
+        .rune-btn:hover:not(:disabled) {
+            filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6)) brightness(1.1);
         }
         /* Animation clignotement doré pour la Rune n°1 (quête active) */
         .rune-btn.quete-active {
@@ -355,46 +362,53 @@
             50%{filter:contrast(4);}
             100%{filter:none;}
         }
-        /* Progress bar */
+        /* Progress bar - Style épuré */
         .alignement-container {
             width: 100%;
             margin: 18px 0 8px 0;
         }
         .alignement-label {
-            font-size: 1em;
-            color: var(--gold);
-            opacity: 0.92;
-            text-align: left;
-            margin-bottom: 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75em;
+            color: rgba(212, 175, 55, 0.85);
+            opacity: 1;
+            text-align: center;
+            margin-bottom: 6px;
             line-height: 1.2;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.15em;
+            font-weight: 300;
+            text-transform: uppercase;
         }
         .alignement-bar-bg {
-            background: rgba(255,255,255,0.09);
-            border-radius: 9px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
             width: 100%;
-            height: 18px;
+            height: 12px;
             overflow: hidden;
-            border: 1px solid var(--gold);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
             margin-bottom: 2px;
         }
         .alignement-bar-fill {
-            background: linear-gradient(90deg, #d4af37 30%, #f5df99 100%);
+            background: linear-gradient(90deg, rgba(184, 134, 11, 0.8) 0%, rgba(212, 175, 55, 0.9) 50%, rgba(255, 215, 0, 0.7) 100%);
             height: 100%;
             width: 0%;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px 0 rgba(212,175,55,0.32);
+            border-radius: 7px;
+            box-shadow: 
+                0 0 8px rgba(212, 175, 55, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
             transition: width 0.5s cubic-bezier(.62,1.41,.84,.74);
         }
         .alignement-percentage {
-            font-size: 0.96em;
-            color: var(--gold);
-            text-align: right;
-            margin-right: 5px;
-            margin-top: -15px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7em;
+            color: rgba(212, 175, 55, 0.8);
+            text-align: center;
+            margin-top: 4px;
             margin-bottom: 0;
-            opacity: 0.84;
-            letter-spacing: 0.03em;
+            opacity: 1;
+            letter-spacing: 0.1em;
+            font-weight: 300;
         }
         /* Salle 3 (Sanctuaire) : pierre ancienne, bordure dorée pulsante */
         @keyframes golden-border-pulse {
@@ -508,7 +522,7 @@
                 -5px 0 20px rgba(184, 134, 11, 0.2),
                 inset 0 0 50px rgba(0, 0, 0, 0.3);
         }
-        /* Zone centrale pour le temple et animations - Point Focal */
+        /* Zone centrale pour le temple - Couloir de Pierre en Perspective */
         .temple-center {
             flex: 1;
             display: flex;
@@ -516,25 +530,251 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            padding: 40px 20px;
+            padding: 30px;
+            margin: 20px;
+            /* Texture de pierre ancienne avec ambiance mystique */
             background: 
-                radial-gradient(ellipse at 50% 50%, rgba(184, 134, 11, 0.08) 0%, transparent 40%),
-                radial-gradient(ellipse at 50% 50%, rgba(28, 26, 24, 0.4) 0%, transparent 70%);
+                /* Lueurs de torches latérales (suggestion) */
+                radial-gradient(ellipse 15% 20% at 10% 30%, 
+                    rgba(255, 140, 50, 0.08) 0%, 
+                    transparent 50%),
+                radial-gradient(ellipse 15% 20% at 90% 30%, 
+                    rgba(255, 140, 50, 0.08) 0%, 
+                    transparent 50%),
+                /* Vignettage progressif (bords très sombres) */
+                radial-gradient(ellipse at 50% 50%, 
+                    transparent 0%, 
+                    transparent 15%,
+                    rgba(0, 0, 0, 0.2) 35%,
+                    rgba(0, 0, 0, 0.5) 60%,
+                    rgba(0, 0, 0, 0.8) 85%,
+                    rgba(0, 0, 0, 0.95) 100%),
+                /* Blocs de pierre (texture murale) */
+                repeating-linear-gradient(0deg, 
+                    transparent 0px, 
+                    transparent 85px, 
+                    rgba(0, 0, 0, 0.25) 85px, 
+                    rgba(0, 0, 0, 0.25) 88px),
+                repeating-linear-gradient(90deg, 
+                    transparent 0px, 
+                    transparent 130px, 
+                    rgba(0, 0, 0, 0.2) 130px, 
+                    rgba(0, 0, 0, 0.2) 133px),
+                /* Fond de pierre ancienne sombre */
+                linear-gradient(180deg, 
+                    #1a1512 0%, 
+                    #12100d 30%,
+                    #0f0d0a 60%, 
+                    #0a0805 100%),
+                /* Texture granuleuse de roche */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='stone-noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='6' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stone-noise)' opacity='0.15'/%3E%3C/svg%3E");
+            background-blend-mode: screen, screen, overlay, normal, normal, normal, normal;
+            border: 2px solid rgba(212, 175, 55, 0.6);
+            border-radius: 15px;
+            box-shadow: 
+                0 0 30px rgba(212, 175, 55, 0.3),
+                inset 0 0 60px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 rgba(212, 175, 55, 0.1);
             z-index: 1;
             min-width: 0;
-            animation: temple-focal-pulse 4s ease-in-out infinite;
+            overflow: hidden;
         }
-        @keyframes temple-focal-pulse {
+        /* Arches en perspective - Effet de profondeur */
+        .temple-center::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 100%;
+            background: 
+                /* Arche proche (grande) - haut */
+                radial-gradient(ellipse 60% 20% at 50% 12%, 
+                    transparent 0%, 
+                    transparent 47%,
+                    rgba(139, 115, 85, 0.25) 50%,
+                    transparent 53%),
+                /* Piliers latéraux de l'arche proche */
+                linear-gradient(90deg,
+                    rgba(92, 61, 42, 0.15) 0%,
+                    transparent 5%,
+                    transparent 95%,
+                    rgba(92, 61, 42, 0.15) 100%),
+                /* Arche moyenne */
+                radial-gradient(ellipse 45% 15% at 50% 32%, 
+                    transparent 0%, 
+                    transparent 47%,
+                    rgba(139, 115, 85, 0.18) 50%,
+                    transparent 53%),
+                /* Arche lointaine (petite) */
+                radial-gradient(ellipse 28% 10% at 50% 48%, 
+                    transparent 0%, 
+                    transparent 47%,
+                    rgba(139, 115, 85, 0.12) 50%,
+                    transparent 53%),
+                /* Point de fuite lumineux mystique au centre */
+                radial-gradient(circle at 50% 50%, 
+                    rgba(212, 175, 55, 0.08) 0%, 
+                    rgba(212, 175, 55, 0.04) 15%,
+                    transparent 35%),
+                /* Lueur dorée diffuse */
+                radial-gradient(ellipse at 50% 50%, 
+                    rgba(73, 202, 250, 0.03) 0%,
+                    transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+            animation: temple-ambient-pulse 6s ease-in-out infinite;
+        }
+        @keyframes temple-ambient-pulse {
             0%, 100% {
-                background: 
-                    radial-gradient(ellipse at 50% 50%, rgba(184, 134, 11, 0.08) 0%, transparent 40%),
-                    radial-gradient(ellipse at 50% 50%, rgba(28, 26, 24, 0.4) 0%, transparent 70%);
+                opacity: 1;
             }
             50% {
-                background: 
-                    radial-gradient(ellipse at 50% 50%, rgba(184, 134, 11, 0.12) 0%, transparent 45%),
-                    radial-gradient(ellipse at 50% 50%, rgba(28, 26, 24, 0.5) 0%, transparent 75%);
+                opacity: 0.85;
             }
+        }
+        /* Bordure décorative externe */
+        .temple-center::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 17px;
+            pointer-events: none;
+            z-index: -1;
+        }
+        /* Murs latéraux en pierre - Perspective */
+        .temple-center-pillars {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .temple-center-pillars::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 18%;
+            background: 
+                /* Texture de roche */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='rock-texture'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23rock-texture)' opacity='0.2'/%3E%3C/svg%3E"),
+                /* Dégradé du mur gauche */
+                linear-gradient(90deg, 
+                    rgba(25, 20, 15, 0.9) 0%, 
+                    rgba(35, 28, 22, 0.7) 40%,
+                    transparent 100%);
+            box-shadow: 
+                inset -25px 0 50px rgba(0, 0, 0, 0.9),
+                inset -10px 0 20px rgba(0, 0, 0, 0.6);
+        }
+        .temple-center-pillars::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 18%;
+            background: 
+                /* Texture de roche */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='rock-texture'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23rock-texture)' opacity='0.2'/%3E%3C/svg%3E"),
+                /* Dégradé du mur droit */
+                linear-gradient(270deg, 
+                    rgba(25, 20, 15, 0.9) 0%, 
+                    rgba(35, 28, 22, 0.7) 40%,
+                    transparent 100%);
+            box-shadow: 
+                inset 25px 0 50px rgba(0, 0, 0, 0.9),
+                inset 10px 0 20px rgba(0, 0, 0, 0.6);
+        }
+        /* Sol en dalles - Effet de profondeur avec perspective */
+        .temple-center-floor {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 35%;
+            background: 
+                /* Joints entre dalles horizontales (perspective) */
+                repeating-linear-gradient(180deg,
+                    transparent 0px,
+                    transparent 40px,
+                    rgba(0, 0, 0, 0.4) 40px,
+                    rgba(0, 0, 0, 0.4) 42px),
+                /* Joints verticaux (convergent au centre) */
+                repeating-linear-gradient(135deg,
+                    transparent 0px,
+                    transparent 60px,
+                    rgba(0, 0, 0, 0.3) 60px,
+                    rgba(0, 0, 0, 0.3) 61px),
+                repeating-linear-gradient(45deg,
+                    transparent 0px,
+                    transparent 60px,
+                    rgba(0, 0, 0, 0.3) 60px,
+                    rgba(0, 0, 0, 0.3) 61px),
+                /* Texture de pierre du sol */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='floor-stone'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23floor-stone)' opacity='0.25'/%3E%3C/svg%3E"),
+                /* Dégradé du sol (plus sombre en bas) */
+                linear-gradient(180deg, 
+                    transparent 0%, 
+                    rgba(15, 12, 9, 0.5) 30%,
+                    rgba(10, 8, 5, 0.7) 60%, 
+                    rgba(5, 4, 2, 0.95) 100%);
+            pointer-events: none;
+            z-index: 0;
+            transform-origin: center bottom;
+            perspective: 500px;
+        }
+        /* Brume mystique dans le couloir */
+        .temple-center-mist {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            background: 
+                /* Nappes de brume basses */
+                radial-gradient(ellipse 80% 30% at 50% 85%, 
+                    rgba(180, 200, 220, 0.03) 0%,
+                    rgba(160, 180, 200, 0.02) 40%,
+                    transparent 70%),
+                /* Brume diffuse au centre */
+                radial-gradient(ellipse at 50% 50%, 
+                    rgba(200, 215, 230, 0.02) 0%,
+                    transparent 50%);
+            animation: temple-mist-drift 8s ease-in-out infinite alternate;
+        }
+        @keyframes temple-mist-drift {
+            0% {
+                opacity: 0.6;
+                transform: translateY(0px);
+            }
+            100% {
+                opacity: 0.8;
+                transform: translateY(-5px);
+            }
+        }
+        /* Contenu au-dessus du décor */
+        .temple-center > * {
+            position: relative;
+            z-index: 2;
+        }
+        /* Le titre et les éléments importants ressortent */
+        .temple-center h2 {
+            position: relative;
+            z-index: 10;
+            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.8));
+        }
+        .temple-center .alignement-container {
+            position: relative;
+            z-index: 10;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+        }
+        .temple-center #runes-legende {
+            position: relative;
+            z-index: 10;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7));
         }
         #level-3-sanctuary.sac-ouvert .digital-timer {
             background: rgba(64, 43, 3, 0.35);
@@ -586,6 +826,12 @@
             }
             .temple-center {
                 padding: 15px 8px;
+                margin: 10px;
+            }
+            /* Murs plus étroits sur mobile */
+            .temple-center-pillars::before,
+            .temple-center-pillars::after {
+                width: 12%;
             }
             .temple-center h2 {
                 font-size: 1.1rem;
@@ -952,7 +1198,11 @@
         @keyframes pyramid-loot-blink { 0%,100% { background: rgba(212,175,55,0.4); box-shadow: 0 0 4px var(--gold); } 50% { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); } }
         /* === Grimoire d'Arcana === */
         #grimoire-btn {
-            position: fixed; bottom: 85px; right: 20px; z-index: 2000;
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            z-index: 2000;
+            display: none; /* Caché par défaut pour épuration */
             width: 56px; height: 56px; border-radius: 12px;
             background: linear-gradient(145deg, #2a2520, #1a1612);
             border: 2px solid rgba(212,175,55,0.6);
@@ -1021,9 +1271,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             z-index: 3000;
             align-items: center;
             justify-content: center;
@@ -1048,7 +1298,8 @@
             border-right: 30px solid #8b7355;
             border-radius: 4px;
             box-shadow: 
-                0 0 40px rgba(0, 0, 0, 0.8),
+                0 0 60px rgba(0, 0, 0, 0.95),
+                0 0 100px rgba(212, 175, 55, 0.3),
                 inset 0 0 60px rgba(139, 115, 85, 0.3),
                 inset 10px 0 30px rgba(0, 0, 0, 0.2),
                 inset -10px 0 30px rgba(0, 0, 0, 0.2);
@@ -1056,6 +1307,7 @@
             transform: scaleY(0);
             transform-origin: top center;
             animation: papyrus-unroll 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            z-index: 10;
         }
         @keyframes papyrus-unroll {
             0% {
@@ -1282,48 +1534,81 @@
             }
         }
         
-        /* === BOUTON SACOCHE FLOTTANT === */
+        /* === BOUTON SACOCHE EN CUIR - BAS CENTRE === */
         #btn-sacoche {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 2000;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #2a2520, #1a1612);
-            border: 2px solid rgba(212, 175, 55, 0.7);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            background: 
+                linear-gradient(135deg, #5c4a35 0%, #4a3d2f 50%, #3d2f23 100%),
+                repeating-linear-gradient(90deg, transparent 0, transparent 1px, rgba(0, 0, 0, 0.1) 1px, rgba(0, 0, 0, 0.1) 2px);
+            border: 3px solid rgba(139, 115, 85, 0.8);
+            box-shadow: 
+                0 6px 25px rgba(0, 0, 0, 0.7), 
+                inset 0 2px 0 rgba(212, 175, 55, 0.15),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(139, 115, 85, 0.3);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8em;
+            font-size: 2.2em;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+        #btn-sacoche::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 1px solid rgba(139, 115, 85, 0.3);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        #btn-sacoche::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(92, 61, 42, 0.3), transparent);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
         }
         #btn-sacoche:hover {
-            transform: scale(1.08);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.5), 0 0 8px var(--gold);
+            transform: translateX(-50%) scale(1.08);
+            box-shadow: 
+                0 8px 30px rgba(0, 0, 0, 0.8), 
+                0 0 30px rgba(139, 115, 85, 0.6),
+                inset 0 2px 0 rgba(212, 175, 55, 0.25);
         }
         #btn-sacoche.resonance {
             animation: sac-resonance-pulse 1.5s ease-in-out infinite;
         }
         @keyframes sac-resonance-pulse {
             0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+                transform: translateX(-50%) scale(1);
+                box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(212, 175, 55, 0.15);
             }
             25% {
-                transform: scale(1.08);
-                box-shadow: 0 0 30px rgba(212, 175, 55, 0.8), 0 0 15px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(212, 175, 55, 0.4);
+                transform: translateX(-50%) scale(1.08);
+                box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), 0 0 18px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.4);
             }
             50% {
-                transform: scale(1.12);
-                box-shadow: 0 0 40px rgba(212, 175, 55, 1), 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.6);
+                transform: translateX(-50%) scale(1.12);
+                box-shadow: 0 0 45px rgba(212, 175, 55, 1), 0 0 25px rgba(255, 215, 0, 0.8), inset 0 0 18px rgba(212, 175, 55, 0.6);
             }
             75% {
-                transform: scale(1.08);
-                box-shadow: 0 0 30px rgba(212, 175, 55, 0.8), 0 0 15px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(212, 175, 55, 0.4);
+                transform: translateX(-50%) scale(1.08);
+                box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), 0 0 18px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.4);
             }
         }
         #btn-sacoche.resonance::before {
@@ -1776,13 +2061,20 @@
                 opacity: 0.5;
             }
         }
+        @media (max-width: 768px) {
+            #btn-sacoche {
+                width: 60px;
+                height: 60px;
+                font-size: 2em;
+                bottom: 12px;
+            }
+        }
         @media (max-width: 480px) {
             #btn-sacoche {
-                width: 50px;
-                height: 50px;
-                font-size: 1.6em;
-                bottom: 16px;
-                right: 16px;
+                width: 55px;
+                height: 55px;
+                font-size: 1.8em;
+                bottom: 10px;
             }
             #sac-inventaire {
                 padding: 16px 12px 12px;
@@ -1829,10 +2121,15 @@
 
         <!-- ═══ ZONE CENTRALE - TEMPLE & ANIMATIONS ═══ -->
         <div class="temple-center" role="main" aria-label="Zone centrale du temple">
-            <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="position:absolute; top:20px; right:20px;" title="Allumer la lumière">🔮</div>
-            <div class="digital-timer" id="sanctuary-timer" style="position:absolute; top:20px; left:50%; transform:translateX(-50%);">15:00</div>
+            <!-- Décor de fond : couloir en perspective -->
+            <div class="temple-center-pillars" aria-hidden="true"></div>
+            <div class="temple-center-floor" aria-hidden="true"></div>
+            <div class="temple-center-mist" aria-hidden="true"></div>
             
-            <h2 style="color:var(--gold); letter-spacing:2px; text-align:center; margin-bottom:1em; font-size: clamp(1.3rem, 3.5vw, 2rem);">
+            <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="position:absolute; top:20px; right:20px; z-index: 10;" title="Allumer la lumière">🔮</div>
+            <div class="digital-timer" id="sanctuary-timer" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index: 10;">15:00</div>
+            
+            <h2 style="font-family: 'Cinzel', serif; color:var(--gold); letter-spacing:0.2em; text-align:center; margin-bottom:1em; font-size: clamp(1.2rem, 3.2vw, 1.8rem); font-weight: 400; text-shadow: 0 0 20px rgba(212, 175, 55, 0.4), 0 2px 4px rgba(0, 0, 0, 0.6);">
                 LE SANCTUAIRE DU DESTIN
             </h2>
             
@@ -1845,39 +2142,21 @@
             </div>
             
             <!-- Légende des Runes -->
-            <div id="runes-legende" style="max-width: 450px; width: 90%; margin: 2em auto 0; padding: 16px; background: rgba(0,0,0,0.5); border-radius: 12px; border: 2px solid rgba(184, 134, 11, 0.3); box-shadow: 0 0 20px rgba(184, 134, 11, 0.2);">
-                <div style="font-size: 0.85em; color: rgba(212, 175, 55, 0.95); text-align: center; margin-bottom: 12px; letter-spacing: 0.15em; font-weight: 600;">📖 FONCTIONS DES RUNES</div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.75em; color: rgba(255, 255, 255, 0.8);">
-                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px;">🔍 <strong>1-4</strong> : Chercheurs</div>
-                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px;">🚪 <strong>5-8</strong> : Verrous</div>
-                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px;">📜 <strong>9-10</strong> : Atelier</div>
-                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px;">🍺 <strong>11</strong> : Taverne</div>
-                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px; grid-column: span 2; text-align: center;">👁️ <strong>12</strong> : Oracle</div>
+            <div id="runes-legende" style="font-family: 'Cinzel', serif; max-width: 400px; width: 85%; margin: 2em auto 0; padding: 14px 18px; background: rgba(0,0,0,0.6); border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.4); box-shadow: 0 0 15px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(212, 175, 55, 0.1);">
+                <div style="font-size: 0.7em; color: rgba(212, 175, 55, 0.9); text-align: center; margin-bottom: 10px; letter-spacing: 0.2em; font-weight: 400; text-transform: uppercase;">Fonctions des Runes</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.65em; color: rgba(255, 255, 255, 0.7); font-weight: 300;">
+                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15);">🔍 <strong style="font-weight: 600;">1-4</strong> : Chercheurs</div>
+                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15);">🚪 <strong style="font-weight: 600;">5-8</strong> : Verrous</div>
+                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15);">📜 <strong style="font-weight: 600;">9-10</strong> : Atelier</div>
+                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15);">🍺 <strong style="font-weight: 600;">11</strong> : Taverne</div>
+                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15); grid-column: span 2; text-align: center;">👁️ <strong style="font-weight: 600;">12</strong> : Oracle</div>
                 </div>
             </div>
             
-            <div id="sanctuary-success" style="display:none; margin-top: 2em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.2em; text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);">
+            <div id="sanctuary-success" style="font-family: 'Cinzel', serif; display:none; margin-top: 2em; text-align:center; color:var(--gold); font-weight: 400; font-size:1.1em; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); letter-spacing: 0.1em;">
                 Sceau aligné ! Le Destin est révélé...
             </div>
-            
-            <!-- Marqueur de point focal -->
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: radial-gradient(circle, rgba(184, 134, 11, 0.8) 0%, transparent 70%); border-radius: 50%; animation: focal-point-pulse 2s ease-in-out infinite; pointer-events: none; z-index: -1;"></div>
         </div>
-        
-        <style>
-            @keyframes focal-point-pulse {
-                0%, 100% {
-                    width: 8px;
-                    height: 8px;
-                    opacity: 0.6;
-                }
-                50% {
-                    width: 120px;
-                    height: 120px;
-                    opacity: 0.2;
-                }
-            }
-        </style>
 
         <!-- ═══ COLONNE DROITE - RUNES 7-12 ═══ -->
         <div class="runes-column right" role="region" aria-label="Runes droites">
@@ -2103,9 +2382,9 @@
         </div>
     </div>
 
-    <!-- ═══ BOUTON SACOCHE FLOTTANT ═══ -->
+    <!-- ═══ BOUTON SACOCHE EN CUIR - BAS CENTRE ═══ -->
     <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire">
-        🎒
+        <span style="filter: sepia(0.3) contrast(1.1);">💼</span>
         <span id="btn-sacoche-badge">0</span>
     </button>
 
