@@ -604,15 +604,10 @@
             return Number(extractCleanAmount(str));
         }
 
-        function showLoading(e, anchorEl) {
-            e.preventDefault();
-            // Redirection immédiate sans popup bloquante
-            window.location.href = anchorEl.getAttribute('href') || 'arcanagame.html';
-        }
     </script>
 
     <div style="text-align: center; margin-top: 90px; margin-bottom: 60px; padding-bottom: 40px;">
-        <a href="arcanagame.html" onclick="showLoading(event, this)" style="text-decoration: none;">
+        <a href="arcanagame.html" style="text-decoration: none;">
             <button type="button" class="btn-sanctuary-glow" style="width: 260px; height: 55px; cursor: pointer; position: relative; z-index: 100; font-family: 'Cinzel', serif; background: rgba(0, 162, 255, 0.1); border: 1px solid #00a2ff; color: #fff; border-radius: 4px; font-size: 14px; font-weight: 600; letter-spacing: 1px;">
                 ENTRER DANS LE SANCTUAIRE
             </button>
