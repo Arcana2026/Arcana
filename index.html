@@ -607,14 +607,69 @@
     </script>
 
     <div style="text-align: center; margin: 100px 0; padding-bottom: 50px;">
-        <a href="ArcanaGame.html" style="display: inline-block; padding: 20px 40px; background-color: #00a2ff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Cinzel', serif; border: 1px solid white;">
+        <a id="sanctuary-btn" href="ArcanaGame.html" style="display: inline-block; padding: 20px 40px; background-color: #00a2ff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Cinzel', serif; border: 1px solid white;">
             ENTRER DANS LE SANCTUAIRE
         </a>
         <div style="margin-top: 40px;">
             <a href="mailto:blockarcana-admin@proton.me">
                 <img src="https://img.icons8.com/ios-filled/50/D4AF37/mail.png" width="35" alt="Email">
             </a>
+            <div id="weather-display" style="margin-top: 15px; font-family: 'Cinzel', serif; color: #d4af37; font-size: 14px;">
+                <span id="temp-value">Chargement...</span>
+            </div>
         </div>
     </div>
+
+    <script>
+        // ═══ ORACLE MÉTÉO : Affichage en temps réel sur index.html ═══
+        const ARCANA_ORACLE_THRESHOLD = -2; // Seuil d'activation : -2°C
+        const ARCANA_GAME_ORACLE_CONTRACT = "0xFABF1FcFB7dA0Aa861A61747E1e5a2F2F8E9E337"; // Contrat Oracle sur Polygon
+        const ARCANA_GAME_ORACLE_ABI = [
+            "function currentTemp() view returns (int256)",
+            "function updateOracle(int256 _temp) external"
+        ];
+
+        async function checkOracleAndUpdateButton() {
+            const sanctuaryBtn = document.getElementById('sanctuary-btn');
+            const tempDisplay = document.getElementById('temp-value');
+            
+            try {
+                // Connexion au contrat Oracle sur Polygon
+                const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
+                const tempRaw = await oracle.currentTemp();
+                const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
+
+                // Affichage de la température
+                tempDisplay.innerHTML = `🌡️ Montréal-Est : <strong>${tempC}°C</strong>`;
+
+                // Modification du texte du bouton selon la température
+                if (tempC <= ARCANA_ORACLE_THRESHOLD) {
+                    sanctuaryBtn.textContent = 'ENTRER DANS LE SANCTUAIRE';
+                    sanctuaryBtn.style.backgroundColor = '#00a2ff';
+                    console.log('%c🔓 Oracle : Accès autorisé (' + tempC + '°C ≤ ' + ARCANA_ORACLE_THRESHOLD + '°C)', 'color:#00ff88; font-weight:bold;');
+                } else {
+                    sanctuaryBtn.textContent = 'SANCTUAIRE EN ATTENTE DE GEL';
+                    sanctuaryBtn.style.backgroundColor = '#666';
+                    console.log('%c🔒 Oracle : Accès restreint (' + tempC + '°C > ' + ARCANA_ORACLE_THRESHOLD + '°C)', 'color:#ff6b6b; font-weight:bold;');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération de la température:', error);
+                tempDisplay.innerHTML = '🌡️ <em>Oracle indisponible</em>';
+                sanctuaryBtn.textContent = 'ENTRER DANS LE SANCTUAIRE';
+            }
+        }
+
+        // Chargement de ethers.js et vérification au chargement de la page
+        window.addEventListener('load', function() {
+            if (typeof ethers !== 'undefined') {
+                checkOracleAndUpdateButton();
+                // Rafraîchissement toutes les 5 minutes
+                setInterval(checkOracleAndUpdateButton, 300000);
+            } else {
+                console.warn('ethers.js non disponible - Affichage par défaut');
+            }
+        });
+    </script>
 </body>
 </html>

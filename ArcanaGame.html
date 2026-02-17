@@ -7,11 +7,11 @@
     Structure: index.html ⇄ ArcanaGame.html (connexion bidirectionnelle)
     
     📡 ORACLE MÉTÉO :
-    - Condition : Température <= +10°C à Montréal (Mode Test Activé)
-    - Mode Test : Définir ARCANA_TEST_WALLET avec votre adresse
-    - Bypass automatique pour le wallet de test
+    - Condition : Température <= -2°C à Montréal-Est (Gel requis)
+    - Mode Admin : Définir ARCANA_TEST_WALLET avec votre adresse
+    - Bypass automatique pour le wallet admin (fonctionne même à +20°C)
     
-    🧪 MODE TEST :
+    🔑 MODE ADMIN :
     Ligne ~1368 : var ARCANA_TEST_WALLET = 'VOTRE_ADRESSE_0x...';
 ═══════════════════════════════════════════════════════════════
 -->
@@ -818,6 +818,141 @@
             background: rgba(220,200,160,0.4); color: #5c4a2a; border-radius: 6px; cursor: pointer; font-size: 1.3em; z-index: 2;
         }
         .grimoire-close:hover { background: rgba(184,134,11,0.3); }
+        
+        /* === SAC À DOS INVENTAIRE === */
+        #sac-inventaire {
+            position: fixed;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 520;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 2px solid rgba(212, 175, 55, 0.6);
+            border-radius: 12px;
+            padding: 10px 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        #sac-inventaire-titre {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 0.75em;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+        #sac-slots-container {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+        }
+        .sac-slot {
+            width: 38px;
+            height: 38px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1.5px solid rgba(212, 175, 55, 0.4);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.85em;
+            color: var(--gold);
+            font-weight: bold;
+            transition: all 0.25s ease;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .sac-slot:empty::after {
+            content: '—';
+            color: rgba(212, 175, 55, 0.2);
+            font-size: 1.2em;
+        }
+        .sac-slot.filled {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .sac-slot.filled::before {
+            content: '🗝️';
+            position: absolute;
+            top: -6px;
+            left: -4px;
+            font-size: 0.7em;
+            opacity: 0.7;
+        }
+        #sac-alerte-surcharge {
+            position: absolute;
+            top: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(139, 0, 0, 0.95);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: 2px solid #ff4444;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75em;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.5), 0 4px 12px rgba(0, 0, 0, 0.6);
+            animation: sac-alerte-pulse 0.8s ease-in-out infinite;
+            display: none;
+            white-space: nowrap;
+            text-align: center;
+        }
+        #sac-alerte-surcharge.active {
+            display: block;
+        }
+        @keyframes sac-alerte-pulse {
+            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.85; transform: translateX(-50%) scale(1.03); }
+        }
+        
+        /* Responsive Mobile */
+        @media (max-width: 600px) {
+            #sac-inventaire {
+                bottom: 6px;
+                padding: 8px 10px;
+            }
+            #sac-inventaire-titre {
+                font-size: 0.65em;
+            }
+            .sac-slot {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75em;
+            }
+            #sac-slots-container {
+                gap: 4px;
+            }
+            #sac-alerte-surcharge {
+                font-size: 0.7em;
+                padding: 5px 12px;
+                top: -30px;
+            }
+        }
+        @media (max-width: 480px) {
+            .sac-slot {
+                width: 28px;
+                height: 28px;
+                font-size: 0.7em;
+            }
+            #sac-slots-container {
+                gap: 3px;
+            }
+            #sac-inventaire {
+                padding: 6px 8px;
+            }
+        }
     </style>
     <!-- Google Fonts for digital effect -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -1051,6 +1186,24 @@
     <audio id="ice-crackle-audio" preload="metadata" src="https://assets.mixkit.co/active_storage/sfx/2571-ice-break-2571.mp3"></audio>
 
     <div class="arcana-mention">Arcana Game - Écosystème Décentralisé</div>
+
+    <!-- ═══ SAC À DOS INVENTAIRE ═══ -->
+    <div id="sac-inventaire">
+        <div id="sac-alerte-surcharge">⚠️ SAC TROP LOURD - RISQUE DE PERTE</div>
+        <div id="sac-inventaire-titre">Sac à Dos</div>
+        <div id="sac-slots-container">
+            <div class="sac-slot" data-slot="0"></div>
+            <div class="sac-slot" data-slot="1"></div>
+            <div class="sac-slot" data-slot="2"></div>
+            <div class="sac-slot" data-slot="3"></div>
+            <div class="sac-slot" data-slot="4"></div>
+            <div class="sac-slot" data-slot="5"></div>
+            <div class="sac-slot" data-slot="6"></div>
+            <div class="sac-slot" data-slot="7"></div>
+            <div class="sac-slot" data-slot="8"></div>
+            <div class="sac-slot" data-slot="9"></div>
+        </div>
+    </div>
 
     <script type="module">
       (async function() {
@@ -1916,10 +2069,10 @@
             console.log('   Température actuelle:', tempC + '°C');
             console.log('   Bypass activé:', bypassOracle);
             console.log('   Wallet de test:', isTestMode);
-            console.log('   Accès autorisé:', (tempC <= 10 || bypassOracle === true || isTestMode));
+            console.log('   Accès autorisé:', (tempC <= -2 || bypassOracle === true || isTestMode));
 
-            // Vérifier si l'accès est autorisé (temp <= +10°C OU bypass OU test mode)
-            var accessGranted = (tempC <= 10 || bypassOracle === true || isTestMode);
+            // Vérifier si l'accès est autorisé (temp <= -2°C OU bypass OU test mode)
+            var accessGranted = (tempC <= -2 || bypassOracle === true || isTestMode);
 
             if (accessGranted) {
                 // Affiche la température avec indicateur d'accès autorisé
@@ -1927,13 +2080,13 @@
                 
                 // ═══ ACCÈS AUTORISÉ : Toutes les fonctions sont débloquées ═══
                 if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Accès Autorisé</strong> : Température ≤ +10°C</span>';
+                    warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Accès Autorisé</strong> : Gel confirmé (≤ -2°C)</span>';
                     warningMsg.style.display = "block";
                 }
                 if (depositBtn) {
                     depositBtn.disabled = false;
                     depositBtn.classList.remove("disabled");
-                    depositBtn.title = "Dépôt autorisé";
+                    depositBtn.title = "Dépôt autorisé - Gel actif";
                 }
                 // Ajoute le style frozen à l'oracle miroir
                 if (oracleMirror) {
@@ -1941,25 +2094,25 @@
                 }
                 
                 // Console log de confirmation
-                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès autorisé (≤ +10°C)', 'color:#00ff88; font-weight:bold;');
+                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès autorisé (≤ -2°C)', 'color:#00ff88; font-weight:bold;');
             } else {
                 // Accès refusé
                 tempDisplay.textContent = `${tempC}°C 🔒`;
                 
                 if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#ff6b6b;">🔒 <strong>Accès Restreint</strong> : Température trop élevée (> +10°C)</span>';
+                    warningMsg.innerHTML = '<span style="color:#ff6b6b;">🔒 <strong>Sanctuaire en Attente</strong> : Le gel n\'est pas assez profond (> -2°C)</span>';
                     warningMsg.style.display = "block";
                 }
                 if (depositBtn) {
                     depositBtn.disabled = true;
                     depositBtn.classList.add("disabled");
-                    depositBtn.title = "Température trop élevée";
+                    depositBtn.title = "Gel insuffisant - Attendez le froid";
                 }
                 if (oracleMirror) {
                     oracleMirror.classList.remove("frozen");
                 }
                 
-                console.log('%c🔒 Température actuelle: ' + tempC + '°C | Accès refusé (> +10°C)', 'color:#ff6b6b; font-weight:bold;');
+                console.log('%c🔒 Température actuelle: ' + tempC + '°C | Accès refusé (> -2°C)', 'color:#ff6b6b; font-weight:bold;');
             }
         } catch(e) {
             oracleLoading = false;
@@ -2083,20 +2236,20 @@
             // Console Log : État complet
             console.log('%c🔐 Vérification Oracle pour le Sceau du Sanctuaire', 'color:#d4af37; font-weight:bold;');
             console.log('   Température actuelle:', tempC + '°C');
-            console.log('   Seuil requis: ≤ +10°C');
+            console.log('   Seuil requis: ≤ -2°C');
             console.log('   Bypass Oracle:', bypassOracle);
             console.log('   Wallet de test:', isTestMode);
 
-            // ═══ CONDITION DE FORCE : Temp <= +10 OU bypassOracle OU wallet de test ═══
-            // Mode Test : Accès autorisé jusqu'à +10°C pour faciliter les tests
-            if (tempC > 10 && bypassOracle !== true && !isTestMode) {
-                showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Conditions d\'accès non remplies.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : ≤ +10°C');
+            // ═══ CONDITION DE FORCE : Temp <= -2 OU bypassOracle OU wallet de test ═══
+            // Seuil réaliste : Accès autorisé uniquement si température ≤ -2°C
+            if (tempC > -2 && bypassOracle !== true && !isTestMode) {
+                showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Le Sanctuaire attend le gel profond.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : ≤ -2°C');
                 return;
             }
             
             // Message de confirmation si bypass ou mode test
-            if ((bypassOracle || isTestMode) && tempC > 10) {
-                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès forcé par bypass/test', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
+            if ((bypassOracle || isTestMode) && tempC > -2) {
+                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès forcé par bypass/admin', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
             }
 
             const code = (codeInput.value || '').trim();
@@ -2735,5 +2888,119 @@
     // === SCRIPT DE SÉCURITÉ : DÉSACTIVÉ - Les runes s'affichent immédiatement ===
     // Tout le code de vérification Web3 est maintenant dans checkSecurity() qui se lance après le chargement
     console.log('%c✅ Mode Affichage Immédiat : Les runes sont visibles sans vérification préalable', 'color:#00ff88; font-weight:bold;');
+
+    // ═══════════════════════════════════════════════════════
+    // SAC À DOS INVENTAIRE - Gestion des Clés
+    // ═══════════════════════════════════════════════════════
+    var sacInventaire = [];
+    var sacAlerteTimeout = null;
+
+    function ajouterCleDansSac(numero) {
+        var slots = document.querySelectorAll('.sac-slot');
+        var alerte = document.getElementById('sac-alerte-surcharge');
+        
+        // Vérifier si le sac est plein (10 clés maximum)
+        if (sacInventaire.length >= 10) {
+            // Afficher l'alerte de surcharge
+            alerte.classList.add('active');
+            
+            // Faire vibrer le sac
+            var sacContainer = document.getElementById('sac-inventaire');
+            sacContainer.style.animation = 'border-shake 0.3s linear 2';
+            
+            // Log pour debug
+            console.log('%c⚠️ SAC PLEIN : Impossible d\'ajouter la clé ' + numero, 'color:#ff4444; font-weight:bold;');
+            
+            // Masquer l'alerte après 3 secondes
+            if (sacAlerteTimeout) clearTimeout(sacAlerteTimeout);
+            sacAlerteTimeout = setTimeout(function() {
+                alerte.classList.remove('active');
+                sacContainer.style.animation = '';
+            }, 3000);
+            
+            return false;
+        }
+        
+        // Ajouter la clé dans le premier slot vide
+        sacInventaire.push(numero);
+        var slotIndex = sacInventaire.length - 1;
+        var slot = slots[slotIndex];
+        
+        if (slot) {
+            slot.textContent = numero;
+            slot.classList.add('filled');
+            
+            // Animation d'ajout
+            slot.style.transform = 'scale(1.2)';
+            slot.style.boxShadow = '0 0 20px rgba(212, 175, 55, 0.8)';
+            setTimeout(function() {
+                slot.style.transform = '';
+                slot.style.boxShadow = '';
+            }, 300);
+            
+            // Log de confirmation
+            console.log('%c🗝️ Clé ' + numero + ' ajoutée au sac (slot ' + (slotIndex + 1) + '/10)', 'color:#d4af37; font-weight:bold;');
+            
+            // Message dans le chat Oracle
+            addOracleChatMessage('Clé ' + numero + ' rangée dans le sac (' + sacInventaire.length + '/10)');
+        }
+        
+        return true;
+    }
+
+    function retirerCleDuSac(slotIndex) {
+        var slots = document.querySelectorAll('.sac-slot');
+        
+        if (slotIndex < 0 || slotIndex >= sacInventaire.length) {
+            console.warn('Slot invalide:', slotIndex);
+            return null;
+        }
+        
+        var cleRetiree = sacInventaire[slotIndex];
+        sacInventaire.splice(slotIndex, 1);
+        
+        // Réorganiser l'affichage
+        slots.forEach(function(slot, idx) {
+            if (idx < sacInventaire.length) {
+                slot.textContent = sacInventaire[idx];
+                slot.classList.add('filled');
+            } else {
+                slot.textContent = '';
+                slot.classList.remove('filled');
+            }
+        });
+        
+        console.log('%c🗝️ Clé ' + cleRetiree + ' retirée du sac', 'color:#888; font-weight:bold;');
+        addOracleChatMessage('Clé ' + cleRetiree + ' utilisée (' + sacInventaire.length + '/10 restantes)');
+        
+        return cleRetiree;
+    }
+
+    function viderSac() {
+        sacInventaire = [];
+        var slots = document.querySelectorAll('.sac-slot');
+        slots.forEach(function(slot) {
+            slot.textContent = '';
+            slot.classList.remove('filled');
+        });
+        console.log('%c🗝️ Sac vidé', 'color:#888;');
+    }
+
+    function obtenirNombreClesDansSac() {
+        return sacInventaire.length;
+    }
+
+    // Fonction de test (à appeler dans la console pour tester)
+    window.testSac = function() {
+        console.log('%c=== TEST DU SAC À DOS ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
+        viderSac();
+        for (var i = 1; i <= 12; i++) {
+            setTimeout(function(num) {
+                return function() {
+                    ajouterCleDansSac(num);
+                };
+            }(i), i * 500);
+        }
+    };
 </script>
 </html>
