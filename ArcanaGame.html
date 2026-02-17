@@ -110,22 +110,25 @@
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.1); }
         }
-        /* Glass panels normaux - Fond léger pour les menus */
+        /* Glass panels normaux - Fond léger semi-transparent pour les menus */
         .glass-panel {
             font-family: 'Cinzel', serif;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(212, 175, 55, 0.35);
-            border-radius: 15px;
-            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.75);
-            padding: 20px;
-            margin: 15px;
+            background: rgba(15, 12, 8, 0.88);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            border-radius: 18px;
+            box-shadow: 
+                0 0 60px rgba(0, 0, 0, 0.9),
+                0 0 100px rgba(212, 175, 55, 0.15),
+                inset 0 0 40px rgba(0, 0, 0, 0.3);
+            padding: 28px;
+            margin: 20px;
             width: 90%;
-            max-width: 500px;
+            max-width: 520px;
             position: relative;
             z-index: 1;
-            transition: border 0.19s, box-shadow 0.19s;
+            transition: all 0.3s ease;
         }
         /* EXCEPTION CRITIQUE: Sanctuaire totalement transparent */
         #level-3-sanctuary.glass-panel,
@@ -212,13 +215,7 @@
             opacity: 0.68;
         }
         .title-vault {
-            font-family: 'Cinzel', serif;
-            text-align: center;
-            font-size: 1.8em;
-            letter-spacing: 0.2em;
-            margin: 30px 0;
-            font-weight: 400;
-            color: var(--gold);
+            display: none; /* Caché pour interface épurée selon image */
         }
         /* Section Oracle (Niveau 2) */
         .oracle-mirror {
@@ -596,45 +593,10 @@
         @media (max-width: 768px) {
             #level-3-sanctuary {
                 grid-template-columns: 95px 1fr 95px;
-                padding: 15px 10px;
+                padding: 15px 5px;
             }
             .runes-column {
-                min-height: 80vh;
-                padding: 30px 0;
-            }
-            .runes-column.left {
-                padding-left: 20px;
-            }
-            .runes-column.right {
-                padding-right: 20px;
-            }
-            .runes-column .rune-btn {
-                width: 55px;
-                height: 55px;
-            }
-            .rune-btn {
-                font-size: 1.6em;
-                width: 55px;
-                height: 55px;
-            }
-            .temple-center {
-                padding: 40px 20px;
-            }
-            #btn-sacoche {
-                bottom: 20px;
-                width: 65px;
-                height: 65px;
-                font-size: 2em;
-            }
-        }
-        @media (max-width: 480px) {
-            #level-3-sanctuary {
-                grid-template-columns: 75px 1fr 75px;
-                padding: 10px 5px;
-            }
-            .runes-column {
-                min-height: 75vh;
-                padding: 25px 0;
+                min-height: 78vh;
             }
             .runes-column.left {
                 padding-left: 15px;
@@ -643,21 +605,54 @@
                 padding-right: 15px;
             }
             .runes-column .rune-btn {
-                width: 48px;
-                height: 48px;
+                width: 58px;
+                height: 58px;
             }
             .rune-btn {
-                font-size: 1.4em;
-                width: 48px;
-                height: 48px;
+                font-size: 1.7em;
+                width: 58px;
+                height: 58px;
             }
             .temple-center {
-                padding: 30px 15px;
+                padding: 50px 20px;
             }
             #btn-sacoche {
-                bottom: 15px;
-                width: 60px;
-                height: 60px;
+                bottom: 20px;
+                width: 68px;
+                height: 68px;
+                font-size: 2em;
+            }
+        }
+        @media (max-width: 480px) {
+            #level-3-sanctuary {
+                grid-template-columns: 75px 1fr 75px;
+                padding: 12px 3px;
+            }
+            .runes-column {
+                min-height: 72vh;
+            }
+            .runes-column.left {
+                padding-left: 12px;
+            }
+            .runes-column.right {
+                padding-right: 12px;
+            }
+            .runes-column .rune-btn {
+                width: 50px;
+                height: 50px;
+            }
+            .rune-btn {
+                font-size: 1.5em;
+                width: 50px;
+                height: 50px;
+            }
+            .temple-center {
+                padding: 40px 15px;
+            }
+            #btn-sacoche {
+                bottom: 18px;
+                width: 62px;
+                height: 62px;
                 font-size: 1.9em;
             }
             .btn-back-accueil {
@@ -749,11 +744,11 @@
         .arcana-mention {
             display: none;
         }
-        /* Écran d'attente : transparent pour voir le décor */
+        /* Écran d'attente : complètement transparent */
         #arcana-connect-gate {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: transparent;
+            background: transparent !important;
             display: none;
             flex-direction: column;
             align-items: center;
@@ -766,6 +761,7 @@
             font-family: 'Cinzel', serif;
             color: var(--gold);
             font-size: 1.1em;
+            background: transparent !important;
             letter-spacing: 0.15em;
             text-align: center;
             margin-bottom: 25px;
@@ -776,34 +772,38 @@
             border-radius: 15px;
             border: 1px solid rgba(212, 175, 55, 0.3);
         }
-        /* Lien retour page principale — haut gauche, toujours visible au-dessus de la brume et du gate */
+        /* Lien retour page principale — haut gauche, toujours visible */
         .btn-back-accueil {
             font-family: 'Cinzel', serif;
             position: fixed;
-            top: 12px;
-            left: 12px;
+            top: 75px;
+            left: 20px;
             z-index: 6000;
-            font-size: 0.7rem;
-            color: rgba(212, 175, 55, 0.85);
+            font-size: 0.75rem;
+            color: var(--gold);
             text-decoration: none;
-            letter-spacing: 0.12em;
-            transition: color 0.25s, text-shadow 0.25s, transform 0.25s;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
             pointer-events: auto;
-            padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            border-radius: 8px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            padding: 10px 20px;
+            background: rgba(20, 15, 10, 0.88);
+            border: 1.5px solid rgba(212, 175, 55, 0.5);
+            border-radius: 10px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             font-weight: 400;
             text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
         }
         .btn-back-accueil:hover {
-            color: #ffd700;
-            text-shadow: 0 0 12px rgba(255, 215, 0, 0.6), 0 0 4px rgba(255, 215, 0, 0.4);
-            transform: translateX(-2px);
-            border-color: rgba(212, 175, 55, 0.6);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            color: rgba(255, 215, 0, 1);
+            text-shadow: 0 0 18px rgba(255, 215, 0, 0.9);
+            transform: scale(1.06);
+            border-color: rgba(212, 175, 55, 0.85);
+            background: rgba(28, 22, 16, 0.95);
+            box-shadow: 
+                0 0 35px rgba(212, 175, 55, 0.45),
+                0 6px 28px rgba(0, 0, 0, 0.85);
         }
         /* Contenu jeu : transparent pour voir le décor */
         #game-container, #arcana-game-content { 
@@ -864,15 +864,26 @@
             0%, 100% { opacity: 0.8; }
             50% { opacity: 1; box-shadow: 0 0 12px rgba(0, 255, 136, 0.4); }
         }
-        /* Alerte Oracle stylisée (réseau non Polygon) */
+        /* Alerte Oracle stylisée */
         .oracle-network-alert {
+            font-family: 'Cinzel', serif;
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 9999; background: rgba(10, 15, 25, 0.98); border: 2px solid #49cafa;
-            border-radius: 16px; padding: 24px; max-width: 320px; text-align: center;
-            box-shadow: 0 0 40px rgba(73, 202, 250, 0.3);
+            z-index: 9999; 
+            background: rgba(20, 15, 10, 0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 2px solid rgba(212, 175, 55, 0.6);
+            border-radius: 16px; padding: 28px; max-width: 380px; text-align: center;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 80px rgba(212, 175, 55, 0.2);
         }
-        .oracle-network-alert p { color: #b9e9ff; margin: 0 0 16px 0; line-height: 1.5; }
-        .oracle-network-alert .btn-connect { margin-top: 8px; }
+        .oracle-network-alert p { 
+            font-family: 'Cinzel', serif;
+            color: var(--gold); 
+            margin: 0 0 18px 0; 
+            line-height: 1.7;
+            letter-spacing: 0.05em;
+        }
+        .oracle-network-alert .btn-connect { margin-top: 12px; }
         /* Transition connexion : fade-out message / fade-in Sanctuaire */
         #arcana-connect-gate.fade-out { opacity: 0; pointer-events: none; }
         #arcana-connect-gate.fade-out .gate-message,
@@ -3284,11 +3295,11 @@
         
         const overlay = document.createElement('div');
         overlay.id = 'arcana-alert-overlay';
-        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
         const box = document.createElement('div');
         box.className = 'glass-panel';
-        box.style.cssText = 'font-family:"Cinzel",serif;max-width:420px;text-align:center;position:relative;padding:30px;background:rgba(0,0,0,0.7);border:2px solid rgba(212,175,55,0.6);border-radius:15px;box-shadow:0 0 30px rgba(212,175,55,0.3),inset 0 0 20px rgba(0,0,0,0.5);';
-        box.innerHTML = '<div style="font-family:inherit;color:var(--gold);margin:0 0 24px 0;font-size:1em;line-height:1.7;font-weight:300;letter-spacing:0.02em;">' + message + '</div><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;width:100%;margin-top:8px;">FERMER</button>';
+        box.style.cssText = 'font-family:"Cinzel",serif;max-width:450px;text-align:center;position:relative;padding:35px;background:rgba(20,15,10,0.95)!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important;border:2px solid rgba(212,175,55,0.7)!important;border-radius:15px;box-shadow:0 0 60px rgba(0,0,0,0.9),0 0 100px rgba(212,175,55,0.3)!important;';
+        box.innerHTML = '<div style="font-family:inherit;color:var(--gold);margin:0 0 24px 0;font-size:1.05em;line-height:1.8;font-weight:400;letter-spacing:0.05em;">' + message + '</div><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;width:100%;margin-top:12px;">FERMER</button>';
         overlay.appendChild(box);
         overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
         document.body.appendChild(overlay);
