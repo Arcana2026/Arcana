@@ -106,8 +106,15 @@
             align-items: center;
             padding: 10px 20px;
             box-sizing: border-box;
-            position: relative;
-            z-index: 1;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 5000;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            pointer-events: auto;
         }
         .logo-area {
             display: flex;
@@ -267,18 +274,34 @@
             border-color: #ff2424aa;
             animation: glitch-border 0.15s steps(1) infinite alternate;
         }
-        /* Runes grid */
-        #runes-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            margin: 35px 0 15px 0;
-            contain: layout style paint;
-            will-change: auto;
+        /* Runes - Plus de grid, les runes sont dans les colonnes */
+        .runes-column .rune-btn {
+            width: 100%;
+            margin: 0;
         }
         .rune-btn {
-            font-size: 2.2em;
-            padding: 22px 0 14px 0;
+            font-size: 2em;
+            padding: 18px 10px 12px 10px;
+            aspect-ratio: 1;
+        }
+        /* Animation clignotement doré pour la Rune n°1 (quête active) */
+        .rune-btn.quete-active {
+            animation: rune-quete-clignotement 3s ease-in-out infinite;
+        }
+        @keyframes rune-quete-clignotement {
+            0%, 100% {
+                border-color: rgba(73, 202, 250, 0.5);
+                box-shadow: 
+                    0 0 4px rgba(73, 202, 250, 0.4), 
+                    inset 0 0 8px rgba(73, 202, 250, 0.1);
+            }
+            50% {
+                border-color: rgba(212, 175, 55, 0.9);
+                box-shadow: 
+                    0 0 25px rgba(212, 175, 55, 0.8), 
+                    0 0 15px rgba(255, 215, 0, 0.6),
+                    inset 0 0 15px rgba(212, 175, 55, 0.3);
+            }
             border: 2px solid var(--glass-border);
             border-radius: 15px;
             background: linear-gradient(120deg, rgba(255, 255, 255, 0.08) 60%, rgba(212, 175, 55, 0.13));
@@ -400,36 +423,118 @@
             }
         }
         #level-3-sanctuary {
-            display: block;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             z-index: 1111;
-            transform: translate(-50%, -50%);
-            max-width: 480px;
-            width: 94vw;
-            background-color: #1c1a18;
-            background-image: repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px), repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px), linear-gradient(145deg, #252220 0%, #1a1816 18%, #2a2622 38%, #1e1c1a 55%, #252220 72%, #181614 88%, #0f0e0c 100%);
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            background-image: 
+                radial-gradient(ellipse at 50% 50%, rgba(28, 26, 24, 0.9) 0%, rgba(0, 0, 0, 1) 70%),
+                repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px), 
+                repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            border: 3px solid #b8860b;
-            border-radius: 20px;
-            box-shadow: 0 0 18px rgba(184, 134, 11, 0.35), inset 0 1px 0 rgba(212, 175, 55, 0.15), 0 0 0 1px rgba(212, 175, 55, 0.2);
-            animation: golden-border-pulse 2.5s ease-in-out infinite;
             box-sizing: border-box;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+            transition: opacity 0.5s ease;
             pointer-events: auto;
+            padding: 0;
+            overflow: hidden;
         }
         #level-3-sanctuary.sac-ouvert {
-            transform: translate(-50%, -50%) translateY(-20%) scale(0.85);
-            opacity: 0.95;
+            opacity: 0.6;
         }
-        /* Améliorer la lisibilité et l'interactivité quand le sac est ouvert */
-        #level-3-sanctuary.sac-ouvert {
-            /* Ajouter un léger effet de brillance au conteneur */
-            box-shadow: 0 0 25px rgba(184, 134, 11, 0.5), 
-                        inset 0 1px 0 rgba(212, 175, 55, 0.25), 
-                        0 0 0 1px rgba(212, 175, 55, 0.3);
+        /* Colonnes latérales pour les runes - Style Console */
+        .runes-column {
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 18px;
+            padding: 20px 15px;
+            background: 
+                linear-gradient(180deg, rgba(28, 26, 24, 0.7) 0%, rgba(0, 0, 0, 0.9) 50%, rgba(28, 26, 24, 0.7) 100%),
+                repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(184, 134, 11, 0.03) 2px, rgba(184, 134, 11, 0.03) 4px);
+            border: 2px solid rgba(184, 134, 11, 0.3);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .runes-column::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg, transparent 0%, rgba(184, 134, 11, 0.4) 50%, transparent 100%);
+            animation: column-scan 3s ease-in-out infinite;
+        }
+        .runes-column.left::before {
+            right: 5px;
+        }
+        .runes-column.right::before {
+            left: 5px;
+        }
+        @keyframes column-scan {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        .runes-column.left {
+            border-right: 3px solid rgba(184, 134, 11, 0.5);
+            border-left: none;
+            border-radius: 0 15px 15px 0;
+            box-shadow: 
+                inset -15px 0 25px rgba(0, 0, 0, 0.6),
+                5px 0 20px rgba(184, 134, 11, 0.2),
+                inset 0 0 50px rgba(0, 0, 0, 0.3);
+        }
+        .runes-column.right {
+            border-left: 3px solid rgba(184, 134, 11, 0.5);
+            border-right: none;
+            border-radius: 15px 0 0 15px;
+            box-shadow: 
+                inset 15px 0 25px rgba(0, 0, 0, 0.6),
+                -5px 0 20px rgba(184, 134, 11, 0.2),
+                inset 0 0 50px rgba(0, 0, 0, 0.3);
+        }
+        /* Zone centrale pour le temple et animations - Point Focal */
+        .temple-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 40px 20px;
+            background: 
+                radial-gradient(ellipse at 50% 50%, rgba(184, 134, 11, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, rgba(28, 26, 24, 0.4) 0%, transparent 70%);
+            z-index: 1;
+            min-width: 0;
+            animation: temple-focal-pulse 4s ease-in-out infinite;
+        }
+        @keyframes temple-focal-pulse {
+            0%, 100% {
+                background: 
+                    radial-gradient(ellipse at 50% 50%, rgba(184, 134, 11, 0.08) 0%, transparent 40%),
+                    radial-gradient(ellipse at 50% 50%, rgba(28, 26, 24, 0.4) 0%, transparent 70%);
+            }
+            50% {
+                background: 
+                    radial-gradient(ellipse at 50% 50%, rgba(184, 134, 11, 0.12) 0%, transparent 45%),
+                    radial-gradient(ellipse at 50% 50%, rgba(28, 26, 24, 0.5) 0%, transparent 75%);
+            }
         }
         #level-3-sanctuary.sac-ouvert .digital-timer {
             background: rgba(64, 43, 3, 0.35);
@@ -452,23 +557,54 @@
         #level-3-sanctuary.sac-ouvert h2 {
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 2px 4px rgba(0, 0, 0, 0.5);
         }
-        @media (max-width: 600px) {
-            #level-3-sanctuary {
-                padding: 5px;
-                max-width: 97vw;
-            }
-            #level-3-sanctuary.sac-ouvert {
-                transform: translate(-50%, -50%) translateY(-25%) scale(0.75);
-            }
-            #runes-grid {
-                gap: 12px;
-                margin: 25px 0 12px 0;
+        @media (max-width: 768px) {
+            .runes-column {
+                width: 90px;
+                gap: 14px;
+                padding: 15px 10px;
             }
             .rune-btn {
-                font-size: 1.8em;
-                padding: 18px 0 12px 0;
-                min-height: 60px;
+                font-size: 1.6em;
+                padding: 14px 8px 10px 8px;
+                min-height: 55px;
                 touch-action: manipulation;
+            }
+            .temple-center {
+                padding: 25px 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            .runes-column {
+                width: 65px;
+                gap: 8px;
+                padding: 8px 4px;
+            }
+            .rune-btn {
+                font-size: 1.2em;
+                padding: 10px 4px 6px 4px;
+                min-height: 42px;
+            }
+            .temple-center {
+                padding: 15px 8px;
+            }
+            .temple-center h2 {
+                font-size: 1.1rem;
+                margin-bottom: 0.8em;
+            }
+            #runes-legende {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+            #runes-legende > div:first-child {
+                font-size: 0.75em;
+                margin-bottom: 8px;
+            }
+            #runes-legende > div:last-child {
+                font-size: 0.65em;
+                gap: 6px;
+            }
+            #runes-legende > div:last-child > div {
+                padding: 4px;
             }
             .btn-back-accueil {
                 font-size: 0.75rem;
@@ -628,7 +764,7 @@
             position: fixed;
             top: 12px;
             left: 12px;
-            z-index: 700;
+            z-index: 6000;
             font-size: 0.78rem;
             color: rgba(212, 175, 55, 0.9);
             text-decoration: none;
@@ -816,7 +952,7 @@
         @keyframes pyramid-loot-blink { 0%,100% { background: rgba(212,175,55,0.4); box-shadow: 0 0 4px var(--gold); } 50% { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); } }
         /* === Grimoire d'Arcana === */
         #grimoire-btn {
-            position: fixed; bottom: 70px; right: 20px; z-index: 505;
+            position: fixed; bottom: 85px; right: 20px; z-index: 2000;
             width: 56px; height: 56px; border-radius: 12px;
             background: linear-gradient(145deg, #2a2520, #1a1612);
             border: 2px solid rgba(212,175,55,0.6);
@@ -1017,6 +1153,50 @@
             filter: contrast(1.1) brightness(0.95);
             font-weight: 500;
         }
+        .papyrus-text-russe {
+            font-family: 'Libre Baskerville', 'Times New Roman', serif;
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            text-align: center;
+            font-style: italic;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #4a3520;
+            text-shadow: 
+                2px 2px 3px rgba(92, 61, 42, 0.4),
+                0 0 3px rgba(61, 42, 26, 0.3),
+                1px 1px 0 rgba(201, 185, 147, 0.2);
+            filter: contrast(1.25) brightness(0.88) sepia(0.2);
+            margin: 30px 0;
+            padding: 25px 20px;
+            background: 
+                linear-gradient(135deg, rgba(92, 61, 42, 0.08) 0%, rgba(92, 61, 42, 0.04) 100%),
+                repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(92, 61, 42, 0.02) 2px, rgba(92, 61, 42, 0.02) 4px);
+            border: 2px solid rgba(92, 61, 42, 0.2);
+            border-radius: 10px;
+            box-shadow: 
+                inset 0 2px 5px rgba(92, 61, 42, 0.15),
+                0 2px 8px rgba(0, 0, 0, 0.1);
+            text-indent: 0;
+            position: relative;
+        }
+        .papyrus-text-russe::before {
+            content: '❄️';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
+            opacity: 0.6;
+        }
+        .papyrus-text-russe::after {
+            content: '❄️';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
+            opacity: 0.6;
+        }
         .papyrus-hieroglyph {
             text-align: center;
             font-size: 2em;
@@ -1107,7 +1287,7 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            z-index: 550;
+            z-index: 2000;
             width: 56px;
             height: 56px;
             border-radius: 50%;
@@ -1194,7 +1374,7 @@
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(3px);
             -webkit-backdrop-filter: blur(3px);
-            z-index: 580;
+            z-index: 2400;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.4s ease;
@@ -1203,11 +1383,6 @@
             opacity: 1;
             pointer-events: auto;
         }
-        /* Zone cliquable du sanctuaire reste interactive */
-        #sac-overlay.active ~ #level-3-sanctuary {
-            pointer-events: auto;
-            z-index: 1111;
-        }
         
         /* === DRAWER INVENTAIRE === */
         #sac-inventaire {
@@ -1215,7 +1390,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            z-index: 590;
+            z-index: 2500;
             background: linear-gradient(180deg, rgba(42, 37, 32, 0.85) 0%, rgba(30, 28, 26, 0.90) 20%, rgba(26, 24, 22, 0.92) 50%, rgba(21, 20, 18, 0.95) 100%);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
                 linear-gradient(180deg, rgba(42, 37, 32, 0.85) 0%, rgba(30, 28, 26, 0.90) 20%, rgba(26, 24, 22, 0.92) 50%, rgba(21, 20, 18, 0.95) 100%);
@@ -1598,7 +1773,7 @@
                 font-size: 0.8em;
             }
             #level-3-sanctuary.sac-ouvert {
-                transform: translate(-50%, -50%) translateY(-22%) scale(0.80);
+                opacity: 0.5;
             }
         }
         @media (max-width: 480px) {
@@ -1642,48 +1817,76 @@
     <!-- ║   GRILLE DES 12 RUNES - AFFICHAGE PRIORITAIRE (CHARGEMENT IMMÉDIAT) ║ -->
     <!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
     <div id="level-3-sanctuary" class="glass-panel" data-room="2">
-        <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="top:15px;right:20px;" title="Allumer la lumière">🔮</div>
-        <div class="digital-timer" id="sanctuary-timer">15:00</div>
-        <h2 style="color:var(--gold); letter-spacing:2px; text-align:center; margin-bottom:0.3em;">
-            LE SANCTUAIRE DU DESTIN
-        </h2>
-        <div class="alignement-container">
-            <div class="alignement-label">Alignement du Sceau</div>
-            <div class="alignement-bar-bg">
-                <div id="alignement-fill" class="alignement-bar-fill"></div>
+        <!-- ═══ COLONNE GAUCHE - RUNES 1-6 ═══ -->
+        <div class="runes-column left" role="region" aria-label="Runes gauches">
+            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)" aria-label="Rune 1" title="🔍 Rune 1 : Le Chercheur">⏀</button>
+            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)" aria-label="Rune 2" title="🔍 Rune 2 : Le Chercheur">⏃</button>
+            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)" aria-label="Rune 3" title="🔍 Rune 3 : Le Chercheur">⏇</button>
+            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)" aria-label="Rune 4" title="🔍 Rune 4 : Le Chercheur">⎈</button>
+            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)" aria-label="Rune 5" title="🚪 Rune 5 : Le Verrou">⎔</button>
+            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6" title="🚪 Rune 6 : Le Verrou">⌬</button>
+        </div>
+
+        <!-- ═══ ZONE CENTRALE - TEMPLE & ANIMATIONS ═══ -->
+        <div class="temple-center" role="main" aria-label="Zone centrale du temple">
+            <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="position:absolute; top:20px; right:20px;" title="Allumer la lumière">🔮</div>
+            <div class="digital-timer" id="sanctuary-timer" style="position:absolute; top:20px; left:50%; transform:translateX(-50%);">15:00</div>
+            
+            <h2 style="color:var(--gold); letter-spacing:2px; text-align:center; margin-bottom:1em; font-size: clamp(1.3rem, 3.5vw, 2rem);">
+                LE SANCTUAIRE DU DESTIN
+            </h2>
+            
+            <div class="alignement-container" style="max-width: 400px; width: 90%; margin: 0 auto 2em;">
+                <div class="alignement-label">Alignement du Sceau</div>
+                <div class="alignement-bar-bg">
+                    <div id="alignement-fill" class="alignement-bar-fill"></div>
+                </div>
+                <div id="alignement-percent" class="alignement-percentage">0%</div>
             </div>
-            <div id="alignement-percent" class="alignement-percentage">0%</div>
-        </div>
-        
-        <div id="runes-grid" role="grid" aria-label="Grille des Runes Mystiques">
-            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)" aria-label="Rune 1" title="🔍 Rune 1 : Le Chercheur - Fouiller la zone">⏀</button>
-            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)" aria-label="Rune 2" title="🔍 Rune 2 : Le Chercheur - Fouiller la zone">⏃</button>
-            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)" aria-label="Rune 3" title="🔍 Rune 3 : Le Chercheur - Fouiller la zone">⏇</button>
-            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)" aria-label="Rune 4" title="🔍 Rune 4 : Le Chercheur - Fouiller la zone">⎈</button>
-            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)" aria-label="Rune 5" title="🚪 Rune 5 : Le Verrou - Ouvrir Porte 1">⎔</button>
-            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6" title="🚪 Rune 6 : Le Verrou - Ouvrir Porte 2">⌬</button>
-            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)" aria-label="Rune 7" title="🚪 Rune 7 : Le Verrou - Ouvrir Porte 3">⏍</button>
-            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)" aria-label="Rune 8" title="🚪 Rune 8 : Le Verrou - Ouvrir Porte 4">⏦</button>
-            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)" aria-label="Rune 9" title="📜 Rune 9 : L'Atelier - Assembler papyrus russes">⧖</button>
-            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)" aria-label="Rune 10" title="📜 Rune 10 : L'Atelier - Assembler papyrus russes">⧉</button>
-            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)" aria-label="Rune 11" title="🍺 Rune 11 : La Taverne - Ouvrir le chat">⨇</button>
-            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)" aria-label="Rune 12" title="👁️ Rune 12 : L'Œil de l'Oracle - Météo + Jackpot">⩓</button>
-        </div>
-        
-        <!-- Légende des Runes -->
-        <div id="runes-legende" style="margin-top: 1.5em; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.2);">
-            <div style="font-size: 0.75em; color: rgba(212, 175, 55, 0.9); text-align: center; margin-bottom: 8px; letter-spacing: 0.1em;">📖 FONCTIONS DES RUNES</div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 0.65em; color: rgba(255, 255, 255, 0.7);">
-                <div style="padding: 4px;">🔍 <strong>1-4</strong> : Chercheurs</div>
-                <div style="padding: 4px;">🚪 <strong>5-8</strong> : Verrous</div>
-                <div style="padding: 4px;">📜 <strong>9-10</strong> : Atelier</div>
-                <div style="padding: 4px;">🍺 <strong>11</strong> : Taverne</div>
-                <div style="padding: 4px; grid-column: span 2; text-align: center;">👁️ <strong>12</strong> : Oracle</div>
+            
+            <!-- Légende des Runes -->
+            <div id="runes-legende" style="max-width: 450px; width: 90%; margin: 2em auto 0; padding: 16px; background: rgba(0,0,0,0.5); border-radius: 12px; border: 2px solid rgba(184, 134, 11, 0.3); box-shadow: 0 0 20px rgba(184, 134, 11, 0.2);">
+                <div style="font-size: 0.85em; color: rgba(212, 175, 55, 0.95); text-align: center; margin-bottom: 12px; letter-spacing: 0.15em; font-weight: 600;">📖 FONCTIONS DES RUNES</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.75em; color: rgba(255, 255, 255, 0.8);">
+                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px;">🔍 <strong>1-4</strong> : Chercheurs</div>
+                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px;">🚪 <strong>5-8</strong> : Verrous</div>
+                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px;">📜 <strong>9-10</strong> : Atelier</div>
+                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px;">🍺 <strong>11</strong> : Taverne</div>
+                    <div style="padding: 6px; background: rgba(184, 134, 11, 0.1); border-radius: 6px; grid-column: span 2; text-align: center;">👁️ <strong>12</strong> : Oracle</div>
+                </div>
             </div>
+            
+            <div id="sanctuary-success" style="display:none; margin-top: 2em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.2em; text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);">
+                Sceau aligné ! Le Destin est révélé...
+            </div>
+            
+            <!-- Marqueur de point focal -->
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: radial-gradient(circle, rgba(184, 134, 11, 0.8) 0%, transparent 70%); border-radius: 50%; animation: focal-point-pulse 2s ease-in-out infinite; pointer-events: none; z-index: -1;"></div>
         </div>
         
-        <div id="sanctuary-success" style="display:none; margin-top: 1em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.1em;">
-            Sceau aligné ! Le Destin est révélé...
+        <style>
+            @keyframes focal-point-pulse {
+                0%, 100% {
+                    width: 8px;
+                    height: 8px;
+                    opacity: 0.6;
+                }
+                50% {
+                    width: 120px;
+                    height: 120px;
+                    opacity: 0.2;
+                }
+            }
+        </style>
+
+        <!-- ═══ COLONNE DROITE - RUNES 7-12 ═══ -->
+        <div class="runes-column right" role="region" aria-label="Runes droites">
+            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)" aria-label="Rune 7" title="🚪 Rune 7 : Le Verrou">⏍</button>
+            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)" aria-label="Rune 8" title="🚪 Rune 8 : Le Verrou">⏦</button>
+            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)" aria-label="Rune 9" title="📜 Rune 9 : L'Atelier">⧖</button>
+            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)" aria-label="Rune 10" title="📜 Rune 10 : L'Atelier">⧉</button>
+            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)" aria-label="Rune 11" title="🍺 Rune 11 : La Taverne">⨇</button>
+            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)" aria-label="Rune 12" title="👁️ Rune 12 : L'Oracle">⩓</button>
         </div>
     </div>
     <!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
@@ -2936,9 +3139,46 @@
         }, 180*1000);
     }
     
+    // ═══════════════════════════════════════════════════════
+    // INITIALISATION DE LA PREMIÈRE QUÊTE (RUNE N°1)
+    // ═══════════════════════════════════════════════════════
+    
+    function initialiserQueteRune1() {
+        // Si la quête n'a pas encore été complétée, faire clignoter la Rune n°1
+        if (!runesDecouvertes.rune1PremierClic) {
+            var runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
+            if (runes[0]) {
+                runes[0].classList.add('quete-active');
+                
+                // Message console stylisé
+                console.log('%c╔═══════════════════════════════════════════════════╗', 'color:#d4af37; font-weight:bold;');
+                console.log('%c║      🌟 QUÊTE ACTIVE : LE PREMIER FRAGMENT       ║', 'color:#d4af37; font-weight:bold; font-size:1.1em;');
+                console.log('%c╚═══════════════════════════════════════════════════╝', 'color:#d4af37; font-weight:bold;');
+                console.log('%c\n✨ La Rune n°1 (⏀) clignote doucement en doré...', 'color:#d4af37; font-weight:bold;');
+                console.log('%c💡 Cliquez sur cette rune pour découvrir le premier secret !', 'color:#49cafa; font-size:1.05em;');
+                console.log('%c\n🔍 Indices :', 'color:#888; font-weight:bold;');
+                console.log('%c   → La rune se trouve dans la colonne de gauche', 'color:#888;');
+                console.log('%c   → Symbole : ⏀ (première rune en haut)', 'color:#888;');
+                console.log('%c   → Un papyrus ancien vous attend...', 'color:#888;');
+                console.log('%c\n🎁 Récompense : Papyrus Ancien avec texte russe mystique', 'color:#00ff88;');
+                console.log(' ');
+                
+                // Message dans le chat Oracle
+                setTimeout(function() {
+                    addOracleChatMessage('🌟 Une quête vous attend... Observez la première rune qui clignote doucement.');
+                }, 2000);
+            }
+        }
+    }
+    
     // === CHARGEMENT APRÈS L'AFFICHAGE COMPLET ===
     window.addEventListener('load', function() {
         checkSecurity();
+        
+        // Initialiser la première quête après un court délai
+        setTimeout(function() {
+            initialiserQueteRune1();
+        }, 1000);
     });
 
     // Codes valides pour ouvrir le Sanctuaire (Niveau 3)
@@ -3449,7 +3689,7 @@
     function showSanctuarySuccess() {
         document.getElementById('sanctuary-success').style.display = 'block';
         document.getElementById('sanctuary-success').innerText = "JACKPOT DÉVERROUILLÉ ! Le Destin est révélé...";
-        Array.from(document.querySelectorAll('#runes-grid .rune-btn')).forEach(b=>b.disabled=true);
+        Array.from(document.querySelectorAll('.runes-column .rune-btn')).forEach(b=>b.disabled=true);
         sanctuaryLocked = true;
         stopHeartbeat();
         broadcastVictory(account);
@@ -3499,7 +3739,7 @@
             sanctuaryLocked = true;
             stopHeartbeat();
             enableGlitchPanel();
-            Array.from(document.querySelectorAll('#runes-grid .rune-btn')).forEach(b=>b.disabled=true);
+            Array.from(document.querySelectorAll('.runes-column .rune-btn')).forEach(b=>b.disabled=true);
             document.getElementById('sanctuary-success').style.display = 'block';
             document.getElementById('sanctuary-success').innerText = "Temps écoulé. Le sceau s'efface...";
             return;
@@ -3561,7 +3801,7 @@
     function onRuneClick(runeId){
         if (sanctuaryLocked) return;
         
-        const runes = Array.from(document.querySelectorAll('#runes-grid .rune-btn'));
+        const runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
         const btn = runes[runeId];
         btn.blur();
         
@@ -3601,26 +3841,31 @@
         if (runeId === 0 && !runesDecouvertes.rune1PremierClic) {
             runesDecouvertes.rune1PremierClic = true;
             
-            // Message mystique
-            showStyledAlert('🗿 <strong>Sous la pierre froide</strong><br><br>Un secret de papier attend...<br><br><em style="color:#49cafa;">Un rouleau de papyrus ancien apparaît dans votre inventaire.<br>Cliquez dessus pour le dérouler et lire son contenu.</em>');
+            // Vibration mobile de 200ms pour la découverte
+            if (navigator.vibrate) {
+                navigator.vibrate(200);
+            }
             
-            // Ajouter le premier papyrus ancien (rouleau égyptien)
+            // Retirer l'animation de clignotement de la rune
+            var runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
+            if (runes[0]) {
+                runes[0].classList.remove('quete-active');
+            }
+            
+            // Ajouter le premier papyrus ancien (rouleau égyptien) au sac
             ajouterObjetQuete('📜', 'Papyrus Ancien I', 'papyrus_ancien_1');
             runesDecouvertes.papyrusCollectes.push('papyrus_ancien_1');
             
-            // Vibration du sac
-            vibrerSac(2);
-            
-            // Message chat avec instruction
+            // Message chat
             addOracleChatMessage('🗿 La Rune des Chercheurs révèle son premier secret...');
             
-            // Instruction pour ouvrir le papyrus
+            // Ouvrir directement le papyrus avec animation de déroulement
             setTimeout(function() {
-                addOracleChatMessage('💡 Ouvrez votre inventaire et cliquez sur le papyrus pour lire son contenu !');
-            }, 2000);
+                ouvrirPapyrus('papyrus_ancien_1', 'Papyrus Ancien I');
+            }, 500);
             
-            console.log('%c✨ Énigme #1 résolue : Premier papyrus obtenu !', 'color:#00ff88; font-weight:bold;');
-            console.log('%c💡 Le papyrus peut être déroulé en cliquant dessus dans l\'inventaire', 'color:#d4af37;');
+            console.log('%c✨ Énigme #1 résolue : Premier papyrus découvert !', 'color:#00ff88; font-weight:bold;');
+            console.log('%c📜 Le papyrus se déroule automatiquement...', 'color:#d4af37;');
             
             return;
         }
@@ -4402,8 +4647,9 @@
         'papyrus_ancien_1': {
             titre: 'Papyrus Ancien I - Le Fragment du Givre',
             hieroglyphes: '𓂀 𓆣 𓃭 𓅓',
-            texte: 'Sous la pierre froide, là où le givre se dépose en silence, repose le premier secret des Gardiens de l\'Ancien Temps. Celui qui lit ces mots a franchi le premier seuil. Les anciens ont gravé dans l\'éternité trois fragments dispersés à travers le Sanctuaire. Seul celui qui maîtrise le froid et comprend la lumière de l\'or pourra assembler la vérité enfouie.',
-            indice: '« Fragment I : LE TRÉSOR... »'
+            texte: 'Sous la pierre froide, là où le givre se dépose en silence, repose le premier secret des Gardiens de l\'Ancien Temps. Celui qui lit ces mots a franchi le premier seuil.',
+            indice: '« Первый шаг замерз в снегу »',
+            messageRusse: 'Первый шаг замерз в снегу'
         },
         'papyrus_ancien_2': {
             titre: 'Papyrus Ancien II - Le Fragment des Ombres',
@@ -4437,7 +4683,15 @@
         // Remplir le contenu
         if (titre) titre.textContent = data.titre;
         if (texte) texte.textContent = data.texte;
-        if (indice) indice.textContent = data.indice;
+        
+        // Si un message russe est présent, l'afficher avec un style spécial
+        if (data.messageRusse && indice) {
+            indice.innerHTML = '<div class="papyrus-text-russe">' + data.messageRusse + '</div>';
+            indice.style.textAlign = 'center';
+        } else if (indice) {
+            indice.textContent = data.indice;
+        }
+        
         if (hieroglyphes[0]) hieroglyphes[0].textContent = data.hieroglyphes;
         
         // Afficher la modal avec animation
@@ -4506,9 +4760,10 @@
     // 
     // GUIDE DE TEST DANS LA CONSOLE :
     // 
+    // testQueteRune1()             - Test de la première quête (Rune n°1) (NEW!)
     // testSac()                    - Test complet du sac (clés + objets + alerte surcharge)
     // testObjetsQuete()            - Test des objets de quête uniquement
-    // testPapyrus()                - Test papyrus anciens avec déroulement (NEW!)
+    // testPapyrus()                - Test papyrus anciens avec déroulement
     // testResonance()              - Test des effets de résonance magique
     // testZoneInteractive()        - Test de détection de zone avec objet requis
     // testInteractionSanctuaire()  - Test interaction inventaire ↔ sanctuaire
@@ -4595,6 +4850,25 @@
             console.log('%c\n📜 Ouverture automatique du Papyrus I...', 'color:#8b7355; font-weight:bold;');
             ouvrirPapyrus('papyrus_ancien_1', 'Papyrus Ancien I');
         }, 2000);
+    };
+
+    window.testQueteRune1 = function() {
+        console.log('%c=== TEST QUÊTE RUNE N°1 ===', 'color:#00ff88; font-size:1.3em; font-weight:bold;');
+        
+        // Réinitialiser l'état de la quête
+        runesDecouvertes.rune1PremierClic = false;
+        viderSac();
+        viderObjetsQuete();
+        
+        // Activer le clignotement de la Rune n°1
+        initialiserQueteRune1();
+        
+        console.log('%c✨ La Rune n°1 clignote doucement en doré', 'color:#d4af37;');
+        console.log('%c💡 Cliquez sur la première rune (⏀) pour découvrir le papyrus !', 'color:#49cafa; font-weight:bold;');
+        console.log('%c   → Vibration de 200ms sur mobile', 'color:#888;');
+        console.log('%c   → Animation de déroulement automatique', 'color:#888;');
+        console.log('%c   → Texte russe : "Первый шаг замерз в снегу"', 'color:#888;');
+        console.log('%c   → Papyrus ajouté dans le sac automatiquement', 'color:#888;');
     };
 
     window.testResonance = function() {
