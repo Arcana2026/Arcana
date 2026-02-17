@@ -36,7 +36,7 @@
         body {
             background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
             color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Cinzel', serif;
             margin: 0;
             min-height: 100vh;
             display: flex;
@@ -66,12 +66,13 @@
             50% { opacity: 1; transform: scale(1.1); }
         }
         .glass-panel {
-            background: rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            font-family: 'Cinzel', serif;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
             padding: 20px;
             margin: 15px;
             width: 90%;
@@ -120,16 +121,19 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            font-family: 'Cinzel', serif;
         }
         .btn-connect {
+            font-family: 'Cinzel', serif;
             background: linear-gradient(45deg, #d4af37, #f2d06b);
             color: black;
             border: none;
             padding: 10px 20px;
             border-radius: 25px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.05em;
         }
         .btn-connect:hover:not([disabled]):not(.disabled) {
             transform: scale(1.05);
@@ -210,12 +214,14 @@
             display: none !important;
         }
         #chat-temple {
+            display: none; /* Caché par défaut - s'affiche via la Taverne */
             position: fixed;
             bottom: 20px;
             right: 20px;
             width: 300px;
             max-height: 200px;
             font-size: 0.9em;
+            font-family: 'Cinzel', serif;
         }
         .input-arcana {
             width: 100%;
@@ -251,23 +257,9 @@
             font-size: 2em;
             margin-bottom: 5px;
         }
-        /* Digital Countdown style - Épuré */
+        /* Digital Countdown - Caché par défaut */
         .digital-timer {
-            font-family: 'Cinzel', serif;
-            font-size: 1.4em;
-            color: rgba(212, 175, 55, 0.7);
-            text-align: center;
-            letter-spacing: 0.15em;
-            background: rgba(0, 0, 0, 0.3);
-            text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
-            padding: 6px 14px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-variant-numeric: tabular-nums;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
-            transition: color 0.3s, background 0.3s;
-            font-weight: 300;
+            display: none;
         }
         .digital-timer.danger {
             color: #fff0f0;
@@ -276,139 +268,112 @@
             border-color: #ff2424aa;
             animation: glitch-border 0.15s steps(1) infinite alternate;
         }
-        /* Runes - Plus de grid, les runes sont dans les colonnes */
+        /* Runes transparentes - Symboles dorés flottants */
         .runes-column .rune-btn {
-            width: 100%;
+            width: 60px;
+            height: 60px;
             margin: 0;
         }
         .rune-btn {
-            font-size: 2em;
-            padding: 18px 10px 12px 10px;
-            aspect-ratio: 1;
-            /* Runes ressortent sur le fond sombre */
-            filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.7)) brightness(1.05);
-        }
-        .rune-btn:hover:not(:disabled) {
-            filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6)) brightness(1.1);
-        }
-        /* Animation clignotement doré pour la Rune n°1 (quête active) */
-        .rune-btn.quete-active {
-            animation: rune-quete-clignotement 3s ease-in-out infinite;
-        }
-        @keyframes rune-quete-clignotement {
-            0%, 100% {
-                border-color: rgba(73, 202, 250, 0.5);
-                box-shadow: 
-                    0 0 4px rgba(73, 202, 250, 0.4), 
-                    inset 0 0 8px rgba(73, 202, 250, 0.1);
-            }
-            50% {
-                border-color: rgba(212, 175, 55, 0.9);
-                box-shadow: 
-                    0 0 25px rgba(212, 175, 55, 0.8), 
-                    0 0 15px rgba(255, 215, 0, 0.6),
-                    inset 0 0 15px rgba(212, 175, 55, 0.3);
-            }
-            border: 2px solid var(--glass-border);
-            border-radius: 15px;
-            background: linear-gradient(120deg, rgba(255, 255, 255, 0.08) 60%, rgba(212, 175, 55, 0.13));
-            color: var(--gold);
-            box-shadow: 0 0 10px rgba(212,175,55,0.13);
+            /* Structure */
+            font-family: 'Cinzel', serif;
+            font-size: 2.8em;
+            padding: 0;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            /* Transparence totale */
+            background: transparent;
+            border: none;
+            
+            /* Symbole doré */
+            color: rgba(212, 175, 55, 0.85);
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+            
+            /* Interactions */
             cursor: pointer;
-            transition: background 0.12s, transform 0.2s, box-shadow 0.2s, border-color 0.17s, color 0.15s;
+            transition: all 0.3s ease;
             outline: none;
             user-select: none;
-            contain: layout paint;
-            backface-visibility: hidden;
-            -webkit-font-smoothing: antialiased;
+            
+            /* Profondeur */
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
         }
+        
+        /* Surbrillance au survol */
         .rune-btn:hover:not(:disabled) {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px var(--gold);
-            cursor: pointer;
+            color: rgba(255, 215, 0, 1);
+            text-shadow: 
+                0 0 25px rgba(255, 215, 0, 0.9),
+                0 0 35px rgba(212, 175, 55, 0.7),
+                0 0 45px rgba(212, 175, 55, 0.5);
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
         }
-        .rune-btn.selected {
-            background: linear-gradient(120deg, #d4af37 45%, #f2d06b 85%);
-            color: #181312;
-            border-color: #d4af37;
-            box-shadow: 0 0 18px #f5df99, 0 0 6.5px #fffba8;
-            transform: translateY(-2px) scale(1.09);
+        
+        /* Animation quête active */
+        .rune-btn.quete-active {
+            animation: rune-quete-pulse 2.5s ease-in-out infinite;
         }
+        @keyframes rune-quete-pulse {
+            0%, 100% {
+                color: rgba(212, 175, 55, 0.85);
+                text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+                transform: scale(1);
+            }
+            50% {
+                color: rgba(255, 215, 0, 1);
+                text-shadow: 
+                    0 0 30px rgba(255, 215, 0, 1),
+                    0 0 40px rgba(212, 175, 55, 0.8);
+                transform: scale(1.1);
+            }
+        }
+        /* Feedback visuel simple pour les runes */
+        .rune-btn.selected,
         .rune-btn.good {
-            /* Bonne rune s'illumine bleu/or */
-            background: linear-gradient(120deg, var(--rune-glow-blue) 10%, #d4af37 70%);
-            color: #fff;
-            border-color: var(--rune-glow-blue);
-            box-shadow: 0 0 23px var(--rune-glow-blue), 0 0 12px #d4af37;
-            animation: glow-highlight 0.8s 1;
+            color: rgba(73, 202, 250, 1);
+            text-shadow: 
+                0 0 30px rgba(73, 202, 250, 1),
+                0 0 40px rgba(73, 202, 250, 0.8);
+            animation: rune-feedback-good 0.6s ease;
         }
         .rune-btn.bad {
-            /* Rune cliquée erreurr : effet rouge */
-            background: linear-gradient(120deg,#ed1c24 30%,#d4af37 99%);
-            color: #fff;
-            border-color: #fb5599;
-            box-shadow: 0 0 22px #ed1c24, 0 0 6px #fff7;
-            animation: wrongBtn 0.36s;
+            color: rgba(255, 68, 68, 1);
+            text-shadow: 
+                0 0 25px rgba(255, 68, 68, 1),
+                0 0 35px rgba(255, 68, 68, 0.7);
+            animation: rune-feedback-bad 0.4s ease;
         }
-        @keyframes glow-highlight {
-            0%{ box-shadow: 0 0 0 #fff0, 0 0 0 #fff0;}
-            8%{ box-shadow: 0 0 8px 4px var(--rune-glow-blue), 0 0 1px 1px #eaffff;}
-            80%{ box-shadow: 0 0 23px var(--rune-glow-blue), 0 0 12px #d4af37;}
-            100%{ }
+        @keyframes rune-feedback-good {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.25);
+            }
         }
-        @keyframes wrongBtn {
-            0%{filter:none;}
-            25%{filter:brightness(2) saturate(2.4);}
-            50%{filter:contrast(4);}
-            100%{filter:none;}
+        @keyframes rune-feedback-bad {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            75% {
+                transform: translateX(5px);
+            }
         }
-        /* Progress bar - Style épuré */
-        .alignement-container {
-            width: 100%;
-            margin: 18px 0 8px 0;
-        }
-        .alignement-label {
-            font-family: 'Cinzel', serif;
-            font-size: 0.75em;
-            color: rgba(212, 175, 55, 0.85);
-            opacity: 1;
-            text-align: center;
-            margin-bottom: 6px;
-            line-height: 1.2;
-            letter-spacing: 0.15em;
-            font-weight: 300;
-            text-transform: uppercase;
-        }
-        .alignement-bar-bg {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            width: 100%;
-            height: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-            margin-bottom: 2px;
-        }
-        .alignement-bar-fill {
-            background: linear-gradient(90deg, rgba(184, 134, 11, 0.8) 0%, rgba(212, 175, 55, 0.9) 50%, rgba(255, 215, 0, 0.7) 100%);
-            height: 100%;
-            width: 0%;
-            border-radius: 7px;
-            box-shadow: 
-                0 0 8px rgba(212, 175, 55, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transition: width 0.5s cubic-bezier(.62,1.41,.84,.74);
-        }
+        /* Progress bar - Cachée (épuration) */
+        .alignement-container,
+        .alignement-label,
+        .alignement-bar-bg,
+        .alignement-bar-fill,
         .alignement-percentage {
-            font-family: 'Cinzel', serif;
-            font-size: 0.7em;
-            color: rgba(212, 175, 55, 0.8);
-            text-align: center;
-            margin-top: 4px;
-            margin-bottom: 0;
-            opacity: 1;
-            letter-spacing: 0.1em;
-            font-weight: 300;
+            display: none;
         }
         /* Salle 3 (Sanctuaire) : pierre ancienne, bordure dorée pulsante */
         @keyframes golden-border-pulse {
@@ -464,63 +429,28 @@
         #level-3-sanctuary.sac-ouvert {
             opacity: 0.6;
         }
-        /* Colonnes latérales pour les runes - Style Console */
+        /* Colonnes latérales - Runes flottantes sans bordures, parfaitement symétriques */
         .runes-column {
-            width: 120px;
+            width: 100px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 18px;
-            padding: 20px 15px;
-            background: 
-                linear-gradient(180deg, rgba(28, 26, 24, 0.7) 0%, rgba(0, 0, 0, 0.9) 50%, rgba(28, 26, 24, 0.7) 100%),
-                repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(184, 134, 11, 0.03) 2px, rgba(184, 134, 11, 0.03) 4px);
-            border: 2px solid rgba(184, 134, 11, 0.3);
-            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+            align-items: center;
+            gap: 40px;
+            padding: 60px 0;
+            background: transparent;
+            border: none;
             z-index: 10;
             flex-shrink: 0;
             position: relative;
         }
-        .runes-column::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background: linear-gradient(180deg, transparent 0%, rgba(184, 134, 11, 0.4) 50%, transparent 100%);
-            animation: column-scan 3s ease-in-out infinite;
-        }
-        .runes-column.left::before {
-            right: 5px;
-        }
-        .runes-column.right::before {
-            left: 5px;
-        }
-        @keyframes column-scan {
-            0%, 100% {
-                opacity: 0.3;
-            }
-            50% {
-                opacity: 0.8;
-            }
-        }
         .runes-column.left {
-            border-right: 3px solid rgba(184, 134, 11, 0.5);
-            border-left: none;
-            border-radius: 0 15px 15px 0;
-            box-shadow: 
-                inset -15px 0 25px rgba(0, 0, 0, 0.6),
-                5px 0 20px rgba(184, 134, 11, 0.2),
-                inset 0 0 50px rgba(0, 0, 0, 0.3);
+            padding-left: 40px;
+            padding-right: 20px;
         }
         .runes-column.right {
-            border-left: 3px solid rgba(184, 134, 11, 0.5);
-            border-right: none;
-            border-radius: 15px 0 0 15px;
-            box-shadow: 
-                inset 15px 0 25px rgba(0, 0, 0, 0.6),
-                -5px 0 20px rgba(184, 134, 11, 0.2),
-                inset 0 0 50px rgba(0, 0, 0, 0.3);
+            padding-right: 40px;
+            padding-left: 20px;
         }
         /* Zone centrale pour le temple - Couloir de Pierre en Perspective */
         .temple-center {
@@ -530,8 +460,8 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            padding: 30px;
-            margin: 20px;
+            padding: 40px;
+            margin: 30px 40px;
             /* Texture de pierre ancienne avec ambiance mystique */
             background: 
                 /* Lueurs de torches latérales (suggestion) */
@@ -760,97 +690,76 @@
             position: relative;
             z-index: 2;
         }
-        /* Le titre et les éléments importants ressortent */
-        .temple-center h2 {
-            position: relative;
-            z-index: 10;
-            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.8));
-        }
-        .temple-center .alignement-container {
-            position: relative;
-            z-index: 10;
-            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
-        }
-        .temple-center #runes-legende {
-            position: relative;
-            z-index: 10;
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7));
-        }
-        #level-3-sanctuary.sac-ouvert .digital-timer {
-            background: rgba(64, 43, 3, 0.35);
-            text-shadow: 0 0 8px #d4af37, 0 0 25px rgba(212, 175, 55, 0.4);
-            border-color: rgba(212, 175, 55, 0.2);
-        }
+        /* Quand le sac est ouvert - runes restent visibles mais légèrement atténuées */
         #level-3-sanctuary.sac-ouvert .rune-btn {
-            border-width: 2.5px;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
-            cursor: pointer;
-        }
-        #level-3-sanctuary.sac-ouvert .rune-btn:not(:disabled) {
-            /* Indicateur visuel que c'est cliquable */
-            filter: brightness(1.05);
+            opacity: 0.7;
         }
         #level-3-sanctuary.sac-ouvert .rune-btn:hover:not(:disabled) {
-            box-shadow: 0 0 25px var(--gold), 0 0 12px rgba(255, 215, 0, 0.4);
-            transform: scale(1.08);
-        }
-        #level-3-sanctuary.sac-ouvert h2 {
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 2px 4px rgba(0, 0, 0, 0.5);
+            opacity: 1;
         }
         @media (max-width: 768px) {
             .runes-column {
-                width: 90px;
-                gap: 14px;
-                padding: 15px 10px;
+                width: 80px;
+                gap: 28px;
+                padding: 40px 0;
+            }
+            .runes-column.left {
+                padding-left: 25px;
+                padding-right: 15px;
+            }
+            .runes-column.right {
+                padding-right: 25px;
+                padding-left: 15px;
+            }
+            .runes-column .rune-btn {
+                width: 50px;
+                height: 50px;
             }
             .rune-btn {
-                font-size: 1.6em;
-                padding: 14px 8px 10px 8px;
-                min-height: 55px;
-                touch-action: manipulation;
+                font-size: 2.3em;
+                width: 50px;
+                height: 50px;
             }
             .temple-center {
-                padding: 25px 15px;
+                padding: 30px 20px;
+                margin: 20px 25px;
             }
         }
         @media (max-width: 480px) {
             .runes-column {
-                width: 65px;
-                gap: 8px;
-                padding: 8px 4px;
+                width: 60px;
+                gap: 20px;
+                padding: 30px 0;
+            }
+            .runes-column.left {
+                padding-left: 18px;
+                padding-right: 10px;
+            }
+            .runes-column.right {
+                padding-right: 18px;
+                padding-left: 10px;
+            }
+            .runes-column .rune-btn {
+                width: 42px;
+                height: 42px;
             }
             .rune-btn {
-                font-size: 1.2em;
-                padding: 10px 4px 6px 4px;
-                min-height: 42px;
+                font-size: 1.9em;
+                width: 42px;
+                height: 42px;
             }
             .temple-center {
-                padding: 15px 8px;
-                margin: 10px;
+                padding: 20px 15px;
+                margin: 15px 18px;
             }
             /* Murs plus étroits sur mobile */
             .temple-center-pillars::before,
             .temple-center-pillars::after {
-                width: 12%;
+                width: 10%;
             }
-            .temple-center h2 {
-                font-size: 1.1rem;
-                margin-bottom: 0.8em;
-            }
-            #runes-legende {
-                font-size: 0.8em;
-                padding: 10px;
-            }
-            #runes-legende > div:first-child {
-                font-size: 0.75em;
-                margin-bottom: 8px;
-            }
-            #runes-legende > div:last-child {
-                font-size: 0.65em;
-                gap: 6px;
-            }
-            #runes-legende > div:last-child > div {
-                padding: 4px;
+            /* Sacoche mobile */
+            #btn-sacoche {
+                bottom: 12px;
             }
             .btn-back-accueil {
                 font-size: 0.75rem;
@@ -1007,23 +916,25 @@
         }
         /* Lien retour page principale — haut gauche, toujours visible au-dessus de la brume et du gate */
         .btn-back-accueil {
+            font-family: 'Cinzel', serif;
             position: fixed;
             top: 12px;
             left: 12px;
             z-index: 6000;
-            font-size: 0.78rem;
-            color: rgba(212, 175, 55, 0.9);
+            font-size: 0.7rem;
+            color: rgba(212, 175, 55, 0.85);
             text-decoration: none;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.12em;
             transition: color 0.25s, text-shadow 0.25s, transform 0.25s;
             pointer-events: auto;
-            padding: 8px 14px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.4);
             border-radius: 8px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            font-weight: 600;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            font-weight: 400;
+            text-transform: uppercase;
         }
         .btn-back-accueil:hover {
             color: #ffd700;
@@ -1044,12 +955,7 @@
         }
         /* Badge Mode Test */
         .test-mode-badge {
-            position: fixed; top: 12px; right: 12px; z-index: 601;
-            font-size: 0.7rem; font-family: monospace; color: #00ff88;
-            background: rgba(0, 255, 136, 0.15); padding: 4px 10px; border-radius: 6px;
-            border: 1px solid rgba(0, 255, 136, 0.4); letter-spacing: 0.05em;
-            margin-top: 36px; font-weight: 600;
-            animation: test-badge-pulse 2s ease-in-out infinite;
+            display: none; /* Caché pour épuration */
         }
         @keyframes test-badge-pulse {
             0%, 100% { opacity: 0.8; }
@@ -1104,20 +1010,11 @@
         #arcane-darkness-overlay.room-lit-1 { --room1-mask: transparent; }
         #arcane-darkness-overlay.room-lit-2 { --room2-mask: transparent; }
         .arcane-light-object {
-            position: absolute; width: 48px; height: 48px; cursor: pointer; z-index: 460;
-            display: flex; align-items: center; justify-content: center; font-size: 1.8em;
-            background: radial-gradient(circle, rgba(255,200,100,0.4), transparent);
-            border-radius: 50%; border: 2px solid rgba(255,220,100,0.6);
-            box-shadow: 0 0 20px rgba(255,200,80,0.6); pointer-events: auto;
-            transition: transform 0.3s, opacity 0.5s; animation: light-flicker 2s ease-in-out infinite;
+            display: none; /* Caché pour épuration */
         }
-        .arcane-light-object:hover { transform: scale(1.15); box-shadow: 0 0 30px rgba(255,220,100,0.9); }
-        .arcane-light-object.collected { opacity: 0; pointer-events: none; }
-        @keyframes light-flicker { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.2); } }
-        /* Inventaire clés */
-        #arcane-inventory { position: fixed; top: 70px; left: 12px; z-index: 520;
-            background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 12px;
-            padding: 10px 16px; display: flex; align-items: center; gap: 10px;
+        /* Inventaire clés - Caché (tout passe par la sacoche) */
+        #arcane-inventory {
+            display: none;
         }
         #arcane-inventory .keys-count { color: var(--gold); font-weight: bold; font-size: 1.2em; }
         #arcane-inventory .keys-label { color: rgba(255,255,255,0.8); font-size: 0.75em; }
@@ -1168,9 +1065,8 @@
         }
         .arcane-corner-clue:hover { opacity: 1; }
         .arcane-corner-clue.used { opacity: 0.2; pointer-events: none; }
-        #arcane-pyramid-map { position: fixed; bottom: 100px; left: 20px; z-index: 515;
-            width: 120px; height: 140px; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 8px; display: none;
+        #arcane-pyramid-map {
+            display: none; /* Caché pour épuration */
         }
         .pyramid-row { display: flex; justify-content: center; gap: 2px; margin: 1px 0; font-size: 8px; }
         .pyramid-cell { width: 10px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 2px; color: #666; }
@@ -1181,13 +1077,7 @@
         }
         /* L'Écho du Sanctuaire — Bandeau défilant style parchemin */
         #arcane-echo-journal {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
-            height: 52px; overflow: hidden; padding: 0 16px;
-            background: linear-gradient(180deg, rgba(40,25,15,0.4) 0%, rgba(25,15,8,0.98) 100%);
-            border-top: 3px solid rgba(212,175,55,0.5);
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.6), inset 0 0 60px rgba(80,60,30,0.15);
-            font-family: 'Cinzel', Georgia, serif; font-size: 0.8rem;
-            color: rgba(220,200,160,0.95); display: flex; align-items: center;
+            display: none; /* Caché pour épuration */
         }
         #arcane-echo-journal .echo-title { color: var(--gold); font-weight: 700; flex-shrink: 0; margin-right: 16px; letter-spacing: 0.12em; }
         #arcane-echo-ticker { flex: 1; overflow: hidden; white-space: nowrap; }
@@ -1632,21 +1522,22 @@
         }
         #btn-sacoche-badge {
             position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 22px;
-            height: 22px;
+            top: -6px;
+            right: -6px;
+            width: 24px;
+            height: 24px;
             background: linear-gradient(135deg, #d4af37, #b8860b);
             border-radius: 50%;
-            border: 2px solid #1a1612;
-            font-size: 0.55em;
-            font-family: 'Orbitron', monospace;
-            font-weight: bold;
-            color: #1a1510;
+            border: 2px solid #000;
+            font-size: 0.45em;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            color: #000;
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.6);
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.8);
+            letter-spacing: 0;
         }
         
         /* === OVERLAY DRAWER === */
@@ -1669,8 +1560,9 @@
             pointer-events: auto;
         }
         
-        /* === DRAWER INVENTAIRE === */
+        /* === DRAWER INVENTAIRE - Typographie Cinzel === */
         #sac-inventaire {
+            font-family: 'Cinzel', serif;
             position: fixed;
             bottom: 0;
             left: 0;
@@ -1679,8 +1571,8 @@
             background: linear-gradient(180deg, rgba(42, 37, 32, 0.85) 0%, rgba(30, 28, 26, 0.90) 20%, rgba(26, 24, 22, 0.92) 50%, rgba(21, 20, 18, 0.95) 100%);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
                 linear-gradient(180deg, rgba(42, 37, 32, 0.85) 0%, rgba(30, 28, 26, 0.90) 20%, rgba(26, 24, 22, 0.92) 50%, rgba(21, 20, 18, 0.95) 100%);
-            backdrop-filter: blur(12px) saturate(1.2);
-            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            backdrop-filter: blur(15px) saturate(1.2);
+            -webkit-backdrop-filter: blur(15px) saturate(1.2);
             border-top: 3px solid rgba(184, 134, 11, 0.9);
             border-left: 3px solid rgba(212, 175, 55, 0.4);
             border-right: 3px solid rgba(212, 175, 55, 0.4);
@@ -2063,18 +1955,18 @@
         }
         @media (max-width: 768px) {
             #btn-sacoche {
-                width: 60px;
-                height: 60px;
+                width: 65px;
+                height: 65px;
                 font-size: 2em;
-                bottom: 12px;
+                bottom: 15px;
             }
         }
         @media (max-width: 480px) {
             #btn-sacoche {
-                width: 55px;
-                height: 55px;
-                font-size: 1.8em;
-                bottom: 10px;
+                width: 60px;
+                height: 60px;
+                font-size: 1.9em;
+                bottom: 12px;
             }
             #sac-inventaire {
                 padding: 16px 12px 12px;
@@ -2119,43 +2011,14 @@
             <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6" title="🚪 Rune 6 : Le Verrou">⌬</button>
         </div>
 
-        <!-- ═══ ZONE CENTRALE - TEMPLE & ANIMATIONS ═══ -->
+        <!-- ═══ ZONE CENTRALE - TEMPLE (VIDE) ═══ -->
         <div class="temple-center" role="main" aria-label="Zone centrale du temple">
             <!-- Décor de fond : couloir en perspective -->
             <div class="temple-center-pillars" aria-hidden="true"></div>
             <div class="temple-center-floor" aria-hidden="true"></div>
             <div class="temple-center-mist" aria-hidden="true"></div>
             
-            <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="position:absolute; top:20px; right:20px; z-index: 10;" title="Allumer la lumière">🔮</div>
-            <div class="digital-timer" id="sanctuary-timer" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index: 10;">15:00</div>
-            
-            <h2 style="font-family: 'Cinzel', serif; color:var(--gold); letter-spacing:0.2em; text-align:center; margin-bottom:1em; font-size: clamp(1.2rem, 3.2vw, 1.8rem); font-weight: 400; text-shadow: 0 0 20px rgba(212, 175, 55, 0.4), 0 2px 4px rgba(0, 0, 0, 0.6);">
-                LE SANCTUAIRE DU DESTIN
-            </h2>
-            
-            <div class="alignement-container" style="max-width: 400px; width: 90%; margin: 0 auto 2em;">
-                <div class="alignement-label">Alignement du Sceau</div>
-                <div class="alignement-bar-bg">
-                    <div id="alignement-fill" class="alignement-bar-fill"></div>
-                </div>
-                <div id="alignement-percent" class="alignement-percentage">0%</div>
-            </div>
-            
-            <!-- Légende des Runes -->
-            <div id="runes-legende" style="font-family: 'Cinzel', serif; max-width: 400px; width: 85%; margin: 2em auto 0; padding: 14px 18px; background: rgba(0,0,0,0.6); border-radius: 10px; border: 1px solid rgba(212, 175, 55, 0.4); box-shadow: 0 0 15px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(212, 175, 55, 0.1);">
-                <div style="font-size: 0.7em; color: rgba(212, 175, 55, 0.9); text-align: center; margin-bottom: 10px; letter-spacing: 0.2em; font-weight: 400; text-transform: uppercase;">Fonctions des Runes</div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.65em; color: rgba(255, 255, 255, 0.7); font-weight: 300;">
-                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15);">🔍 <strong style="font-weight: 600;">1-4</strong> : Chercheurs</div>
-                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15);">🚪 <strong style="font-weight: 600;">5-8</strong> : Verrous</div>
-                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15);">📜 <strong style="font-weight: 600;">9-10</strong> : Atelier</div>
-                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15);">🍺 <strong style="font-weight: 600;">11</strong> : Taverne</div>
-                    <div style="padding: 5px; background: rgba(184, 134, 11, 0.08); border-radius: 5px; border: 1px solid rgba(184, 134, 11, 0.15); grid-column: span 2; text-align: center;">👁️ <strong style="font-weight: 600;">12</strong> : Oracle</div>
-                </div>
-            </div>
-            
-            <div id="sanctuary-success" style="font-family: 'Cinzel', serif; display:none; margin-top: 2em; text-align:center; color:var(--gold); font-weight: 400; font-size:1.1em; text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); letter-spacing: 0.1em;">
-                Sceau aligné ! Le Destin est révélé...
-            </div>
+            <!-- Zone vide pour papyrus et animations -->
         </div>
 
         <!-- ═══ COLONNE DROITE - RUNES 7-12 ═══ -->
@@ -3470,11 +3333,11 @@
         
         const overlay = document.createElement('div');
         overlay.id = 'arcana-alert-overlay';
-        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(5px);';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
         const box = document.createElement('div');
         box.className = 'glass-panel';
-        box.style.cssText = 'max-width:380px;text-align:center;position:relative;padding:24px;';
-        box.innerHTML = '<div style="color:var(--gold);margin:0 0 20px 0;font-size:0.95em;line-height:1.6;">' + message + '</div><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;width:100%;margin-top:8px;">OK</button>';
+        box.style.cssText = 'font-family:"Cinzel",serif;max-width:420px;text-align:center;position:relative;padding:30px;background:rgba(0,0,0,0.7);border:2px solid rgba(212,175,55,0.6);border-radius:15px;box-shadow:0 0 30px rgba(212,175,55,0.3),inset 0 0 20px rgba(0,0,0,0.5);';
+        box.innerHTML = '<div style="font-family:inherit;color:var(--gold);margin:0 0 24px 0;font-size:1em;line-height:1.7;font-weight:300;letter-spacing:0.02em;">' + message + '</div><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;width:100%;margin-top:8px;">FERMER</button>';
         overlay.appendChild(box);
         overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
         document.body.appendChild(overlay);
