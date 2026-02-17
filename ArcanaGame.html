@@ -164,32 +164,231 @@
         }
         header {
             width: 100%;
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            padding: 12px 25px;
+            padding: 16px 30px;
             box-sizing: border-box;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 5000;
-            background: linear-gradient(180deg, rgba(20, 15, 10, 0.88) 0%, rgba(15, 12, 8, 0.5) 70%, transparent 100%);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background: linear-gradient(180deg, rgba(18, 14, 10, 0.94) 0%, rgba(14, 11, 8, 0.65) 80%, transparent 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             pointer-events: auto;
+            gap: 25px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
         }
-        .logo-area {
+        /* Logo Arkana - Discret et élégant à gauche */
+        .logo-arkana {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
             font-family: 'Cinzel', serif;
-            letter-spacing: 0.08em;
+            font-size: 0.75em;
+            color: rgba(212, 175, 55, 0.8);
+            letter-spacing: 0.12em;
+            font-weight: 300;
+            text-transform: uppercase;
+            opacity: 0.85;
+            justify-self: start;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-        .logo-area strong {
+        .logo-arkana:hover {
+            opacity: 1;
             color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+        }
+        .logo-arkana-symbol {
+            font-size: 1.4em;
+            color: var(--gold);
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+            transition: filter 0.3s ease;
+        }
+        .logo-arkana:hover .logo-arkana-symbol {
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8));
+        }
+        /* Titre central avec plaque décorative */
+        .header-title-plate {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 32px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            border-radius: 18px;
+            box-shadow: 
+                0 0 35px rgba(0, 0, 0, 0.8),
+                inset 0 0 25px rgba(212, 175, 55, 0.06);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            justify-self: center;
+        }
+        .header-title-main {
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            color: var(--gold);
+            letter-spacing: 0.2em;
             font-weight: 400;
-            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin: 0;
+            padding: 0;
+            line-height: 1.3;
+            text-shadow: 0 0 18px rgba(212, 175, 55, 0.5);
+        }
+        .header-title-separator {
+            width: 80%;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(212, 175, 55, 0.2) 20%, 
+                rgba(212, 175, 55, 0.6) 50%, 
+                rgba(212, 175, 55, 0.2) 80%, 
+                transparent 100%);
+            margin: 6px auto 5px;
+        }
+        .header-title-level {
+            font-family: 'Cinzel', serif;
+            font-size: 0.65em;
+            color: rgba(212, 175, 55, 0.7);
+            letter-spacing: 0.3em;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+        /* Boutons navigation - Forme pilule transparente */
+        .header-nav-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-self: end;
+        }
+        .header-btn-pill {
+            font-family: 'Cinzel', serif;
+            background: transparent;
+            color: rgba(212, 175, 55, 0.85);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 7px 18px;
+            border-radius: 50px;
+            font-size: 0.7em;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .header-btn-pill:hover {
+            background: rgba(212, 175, 55, 0.12);
+            border-color: rgba(212, 175, 55, 0.9);
+            color: rgba(255, 215, 0, 1);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+            transform: translateY(-1px);
+        }
+        /* Masquer les boutons w3m par défaut (on utilise nos boutons personnalisés) */
+        w3m-button {
+            display: none !important;
+        }
+        /* Responsive Header */
+        @media (max-width: 1024px) {
+            header {
+                padding: 15px 20px;
+                gap: 15px;
+            }
+            .header-title-plate {
+                padding: 10px 25px;
+            }
+            .header-title-main {
+                font-size: 0.95em;
+            }
+            .header-btn-pill {
+                padding: 7px 16px;
+                font-size: 0.7em;
+            }
+        }
+        @media (max-width: 768px) {
+            header {
+                grid-template-columns: auto 1fr auto;
+                padding: 12px 15px;
+                gap: 10px;
+            }
+            .logo-arkana {
+                font-size: 0.7em;
+            }
+            .logo-arkana-symbol {
+                font-size: 1.3em;
+            }
+            .header-title-plate {
+                padding: 8px 18px;
+                border-radius: 14px;
+            }
+            .header-title-main {
+                font-size: 0.7em;
+                letter-spacing: 0.15em;
+            }
+            .header-title-separator {
+                margin: 4px auto 3px;
+                width: 75%;
+            }
+            .header-title-level {
+                font-size: 0.55em;
+            }
+            .header-nav-buttons {
+                gap: 6px;
+            }
+            .header-btn-pill {
+                padding: 6px 12px;
+                font-size: 0.6em;
+            }
+        }
+        @media (max-width: 480px) {
+            header {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                padding: 10px;
+                gap: 8px;
+            }
+            .logo-arkana {
+                justify-self: center;
+                order: 3;
+                font-size: 0.65em;
+            }
+            .header-title-plate {
+                order: 1;
+                justify-self: center;
+                padding: 7px 16px;
+            }
+            .header-title-main {
+                font-size: 0.65em;
+                letter-spacing: 0.12em;
+            }
+            .header-title-separator {
+                margin: 3px auto 2px;
+                width: 70%;
+            }
+            .header-title-level {
+                font-size: 0.5em;
+            }
+            .header-nav-buttons {
+                order: 2;
+                justify-self: center;
+                width: 100%;
+                justify-content: center;
+                gap: 8px;
+            }
+            .header-btn-pill {
+                flex: 1;
+                text-align: center;
+                padding: 7px 10px;
+                font-size: 0.55em;
+            }
         }
         .btn-connect {
             font-family: 'Cinzel', serif;
@@ -504,7 +703,7 @@
             box-sizing: border-box;
             transition: opacity 0.5s ease;
             pointer-events: auto;
-            padding: 20px;
+            padding: 100px 20px 20px 20px;
             overflow: hidden;
         }
         #level-3-sanctuary.sac-ouvert {
@@ -772,38 +971,9 @@
             border-radius: 15px;
             border: 1px solid rgba(212, 175, 55, 0.3);
         }
-        /* Lien retour page principale — haut gauche, toujours visible */
+        /* Ancien bouton retour - Désormais intégré dans le header */
         .btn-back-accueil {
-            font-family: 'Cinzel', serif;
-            position: fixed;
-            top: 75px;
-            left: 20px;
-            z-index: 6000;
-            font-size: 0.75rem;
-            color: var(--gold);
-            text-decoration: none;
-            letter-spacing: 0.1em;
-            transition: all 0.3s ease;
-            pointer-events: auto;
-            padding: 10px 20px;
-            background: rgba(20, 15, 10, 0.88);
-            border: 1.5px solid rgba(212, 175, 55, 0.5);
-            border-radius: 10px;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            font-weight: 400;
-            text-transform: uppercase;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
-        }
-        .btn-back-accueil:hover {
-            color: rgba(255, 215, 0, 1);
-            text-shadow: 0 0 18px rgba(255, 215, 0, 0.9);
-            transform: scale(1.06);
-            border-color: rgba(212, 175, 55, 0.85);
-            background: rgba(28, 22, 16, 0.95);
-            box-shadow: 
-                0 0 35px rgba(212, 175, 55, 0.45),
-                0 6px 28px rgba(0, 0, 0, 0.85);
+            display: none;
         }
         /* Contenu jeu : transparent pour voir le décor */
         #game-container, #arcana-game-content { 
@@ -1997,13 +2167,25 @@
     
     <div id="star-container"></div>
     <div id="arcana-fog" aria-hidden="true"></div>
-    <a href="./index.html" class="btn-back-accueil">← RETOUR AU COFFRE</a>
     <header>
-        <div class="logo-area">
-            <div style="width:40px; height:40px; background:var(--gold); border-radius:16%; box-shadow:0 0 12px #ffeaa5;"><span style="font-size:1.6em; display:block; line-height:40px; text-align:center;">🎲</span></div>
-            <div><strong>ARCANA GAME</strong><br><span style="font-size:0.68em; color:var(--gold); font-weight:500;">ÉCOSYSTÈME</span></div>
+        <!-- Logo Arkana à gauche -->
+        <div class="logo-arkana">
+            <span class="logo-arkana-symbol">⧫</span>
+            <span>ARKANA</span>
         </div>
-        <div id="web3modal-connect-wrap"><w3m-button></w3m-button></div>
+        
+        <!-- Titre central avec plaque décorative -->
+        <div class="header-title-plate">
+            <h1 class="header-title-main">LE SANCTUAIRE DU DESTIN</h1>
+            <div class="header-title-separator"></div>
+            <div class="header-title-level">LEVEL <span id="header-level-num">1</span></div>
+        </div>
+        
+        <!-- Boutons de navigation à droite -->
+        <div class="header-nav-buttons">
+            <a href="./index.html" class="header-btn-pill">RETOUR AU COFFRE</a>
+            <button class="header-btn-pill" id="header-connect-wallet-btn">CONNECT WALLET</button>
+        </div>
     </header>
 
     <div id="frost-particles" aria-hidden="true"></div>
@@ -2667,8 +2849,10 @@
     function updateLevelDisplay() {
         var num = document.getElementById('arcane-level-num');
         var panelNum = document.getElementById('arcane-panel-level-num');
+        var headerNum = document.getElementById('header-level-num');
         if (num) num.textContent = arcaneCurrentLevel;
         if (panelNum) panelNum.textContent = arcaneCurrentLevel;
+        if (headerNum) headerNum.textContent = arcaneCurrentLevel;
         applyLevelDarkness();
     }
     function applyLevelDarkness() {
@@ -3283,6 +3467,21 @@
         setTimeout(function() {
             initialiserQueteRune1();
         }, 1000);
+        
+        // Gestionnaire pour le bouton "CONNECT WALLET" du header
+        const headerConnectBtn = document.getElementById('header-connect-wallet-btn');
+        if (headerConnectBtn) {
+            headerConnectBtn.addEventListener('click', function() {
+                // Chercher le bouton w3m natif et simuler un clic
+                const w3mButton = document.querySelector('w3m-button');
+                if (w3mButton && w3mButton.shadowRoot) {
+                    const innerBtn = w3mButton.shadowRoot.querySelector('button');
+                    if (innerBtn) {
+                        innerBtn.click();
+                    }
+                }
+            });
+        }
     });
 
     // Codes valides pour ouvrir le Sanctuaire (Niveau 3)
