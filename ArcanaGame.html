@@ -33,8 +33,38 @@
             --rune-glow-blue: #49cafa;
             --frost-muted: #adb5bd;
         }
+        * {
+            font-family: 'Cinzel', serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cinzel', serif;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+        }
         body {
-            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            /* Couloir de pierre en perspective - arrière-plan principal */
+            background: 
+                /* Murs latéraux sombres */
+                linear-gradient(90deg, 
+                    rgba(20, 15, 10, 1) 0%, 
+                    rgba(30, 25, 20, 0.9) 10%,
+                    transparent 25%,
+                    transparent 75%,
+                    rgba(30, 25, 20, 0.9) 90%,
+                    rgba(20, 15, 10, 1) 100%),
+                /* Sol en dalles */
+                linear-gradient(180deg,
+                    transparent 0%,
+                    transparent 50%,
+                    rgba(25, 20, 15, 0.8) 70%,
+                    rgba(20, 15, 10, 1) 100%),
+                /* Fond de pierre sombre */
+                radial-gradient(ellipse at 50% 50%, 
+                    rgba(40, 35, 30, 1) 0%, 
+                    rgba(25, 20, 15, 1) 50%,
+                    rgba(15, 10, 5, 1) 100%);
+            background-size: 100% 100%;
+            background-attachment: fixed;
             color: white;
             font-family: 'Cinzel', serif;
             margin: 0;
@@ -47,19 +77,34 @@
             -webkit-touch-callout: none;
             touch-action: manipulation;
         }
-        #star-container {
+        /* Texture de pierre sur le body */
+        body::before {
+            content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
+            inset: 0;
+            background: 
+                /* Joints de dalles au sol */
+                repeating-linear-gradient(90deg,
+                    transparent 0,
+                    transparent 150px,
+                    rgba(0, 0, 0, 0.3) 150px,
+                    rgba(0, 0, 0, 0.3) 152px),
+                repeating-linear-gradient(0deg,
+                    transparent 0,
+                    transparent 100px,
+                    rgba(0, 0, 0, 0.25) 100px,
+                    rgba(0, 0, 0, 0.25) 102px),
+                /* Texture granuleuse */
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #star-container {
+            display: none; /* Étoiles désactivées pour correspondre à l'interface finale */
         }
         .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
+            display: none;
         }
         @keyframes twinkle {
             0%, 100% { opacity: 0.3; transform: scale(1); }
@@ -67,10 +112,10 @@
         }
         .glass-panel {
             font-family: 'Cinzel', serif;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
             border-radius: 20px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
             padding: 20px;
@@ -80,6 +125,18 @@
             position: relative;
             z-index: 1;
             transition: border 0.19s, box-shadow 0.16s;
+        }
+        /* Exception: le sanctuaire des runes n'a pas de fond */
+        #level-3-sanctuary.glass-panel {
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            margin: 0;
+            padding: 20px;
+            width: 100vw;
+            max-width: none;
         }
         .glass-panel.glitch {
             /* Glitch border red effect */
@@ -105,23 +162,29 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 12px 25px;
             box-sizing: border-box;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 5000;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 70%, transparent 100%);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             pointer-events: auto;
         }
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-family: 'Cinzel', serif;
+            letter-spacing: 0.08em;
+        }
+        .logo-area strong {
+            color: var(--gold);
+            font-weight: 400;
+            letter-spacing: 0.15em;
         }
         .btn-connect {
             font-family: 'Cinzel', serif;
@@ -147,10 +210,13 @@
             opacity: 0.68;
         }
         .title-vault {
+            font-family: 'Cinzel', serif;
             text-align: center;
             font-size: 1.8em;
-            letter-spacing: 3px;
+            letter-spacing: 0.2em;
             margin: 30px 0;
+            font-weight: 400;
+            color: var(--gold);
         }
         /* Section Oracle (Niveau 2) */
         .oracle-mirror {
@@ -182,8 +248,9 @@
         }
         .oracle-mirror #temp {
             font-size: 2.2em;
-            font-weight: bold;
-            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.08em;
         }
         /* Salle 2 (Niveau 2) : matière moins transparente pour immersion */
         #level-2-panel {
@@ -198,17 +265,19 @@
             opacity: 0.98;
         }
         .oracle-temp-warning {
+            font-family: 'Cinzel', serif;
             color: var(--frost-muted);
-            font-weight: 600;
-            font-size: 0.92em;
+            font-weight: 400;
+            font-size: 0.85em;
             text-align: center;
             margin-top: 1em;
             padding: 12px;
             background: rgba(173, 181, 189, 0.08);
             border-radius: 8px;
             border: 1px solid rgba(173, 181, 189, 0.2);
-            line-height: 1.5;
+            line-height: 1.6;
             transition: all 0.3s ease;
+            letter-spacing: 0.05em;
         }
         .oracle-temp-warning:empty {
             display: none !important;
@@ -224,20 +293,25 @@
             font-family: 'Cinzel', serif;
         }
         .input-arcana {
+            font-family: 'Cinzel', serif;
             width: 100%;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212, 175, 55, 0.4);
             color: var(--gold);
             padding: 12px;
             border-radius: 10px;
             margin-top: 10px;
             box-sizing: border-box;
+            font-weight: 400;
+            letter-spacing: 0.05em;
         }
         .label-gold {
+            font-family: 'Cinzel', serif;
             color: var(--gold);
             text-transform: uppercase;
-            font-size: 0.7em;
-            letter-spacing: 1px;
+            font-size: 0.75em;
+            letter-spacing: 0.15em;
+            font-weight: 400;
         }
         .class-card {
             cursor: pointer;
@@ -268,84 +342,90 @@
             border-color: #ff2424aa;
             animation: glitch-border 0.15s steps(1) infinite alternate;
         }
-        /* Runes transparentes - Symboles dorés flottants */
+        /* Runes - Cercles dorés comme dans l'image */
         .runes-column .rune-btn {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             margin: 0;
         }
         .rune-btn {
             /* Structure */
             font-family: 'Cinzel', serif;
-            font-size: 2.8em;
+            font-size: 2em;
             padding: 0;
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
             
-            /* Transparence totale */
-            background: transparent;
-            border: none;
+            /* Cercle doré fin transparent */
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 2px solid rgba(212, 175, 55, 0.6);
+            border-radius: 50%;
             
             /* Symbole doré */
-            color: rgba(212, 175, 55, 0.85);
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+            color: rgba(212, 175, 55, 1);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
             
             /* Interactions */
             cursor: pointer;
             transition: all 0.3s ease;
             outline: none;
             user-select: none;
-            
-            /* Profondeur */
-            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
         }
         
-        /* Surbrillance au survol */
+        /* Effet de surbrillance doré au survol */
         .rune-btn:hover:not(:disabled) {
+            background: rgba(0, 0, 0, 0.5) !important;
+            border-color: rgba(212, 175, 55, 1);
             color: rgba(255, 215, 0, 1);
             text-shadow: 
-                0 0 25px rgba(255, 215, 0, 0.9),
-                0 0 35px rgba(212, 175, 55, 0.7),
-                0 0 45px rgba(212, 175, 55, 0.5);
-            transform: scale(1.2);
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 1));
+                0 0 20px rgba(255, 215, 0, 1),
+                0 0 30px rgba(212, 175, 55, 0.8);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+            transform: scale(1.05);
         }
         
-        /* Animation quête active */
+        /* Animation quête active - Pulse doré */
         .rune-btn.quete-active {
             animation: rune-quete-pulse 2.5s ease-in-out infinite;
         }
         @keyframes rune-quete-pulse {
             0%, 100% {
-                color: rgba(212, 175, 55, 0.85);
-                text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
-                transform: scale(1);
+                border-color: rgba(212, 175, 55, 0.25);
+                color: rgba(212, 175, 55, 0.9);
+                text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+                box-shadow: none;
             }
             50% {
+                border-color: rgba(255, 215, 0, 0.8);
                 color: rgba(255, 215, 0, 1);
                 text-shadow: 
-                    0 0 30px rgba(255, 215, 0, 1),
-                    0 0 40px rgba(212, 175, 55, 0.8);
-                transform: scale(1.1);
+                    0 0 20px rgba(255, 215, 0, 1),
+                    0 0 30px rgba(212, 175, 55, 0.8);
+                box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+                transform: scale(1.05);
             }
         }
-        /* Feedback visuel simple pour les runes */
+        /* Feedback visuel pour les runes avec cercle doré */
         .rune-btn.selected,
         .rune-btn.good {
+            border-color: rgba(73, 202, 250, 0.9);
             color: rgba(73, 202, 250, 1);
             text-shadow: 
-                0 0 30px rgba(73, 202, 250, 1),
-                0 0 40px rgba(73, 202, 250, 0.8);
+                0 0 20px rgba(73, 202, 250, 1),
+                0 0 30px rgba(73, 202, 250, 0.7);
+            box-shadow: 0 0 25px rgba(73, 202, 250, 0.5);
             animation: rune-feedback-good 0.6s ease;
         }
         .rune-btn.bad {
+            border-color: rgba(255, 68, 68, 0.9);
             color: rgba(255, 68, 68, 1);
             text-shadow: 
-                0 0 25px rgba(255, 68, 68, 1),
-                0 0 35px rgba(255, 68, 68, 0.7);
+                0 0 20px rgba(255, 68, 68, 1),
+                0 0 30px rgba(255, 68, 68, 0.7);
+            box-shadow: 0 0 25px rgba(255, 68, 68, 0.5);
             animation: rune-feedback-bad 0.4s ease;
         }
         @keyframes rune-feedback-good {
@@ -353,7 +433,7 @@
                 transform: scale(1);
             }
             50% {
-                transform: scale(1.25);
+                transform: scale(1.15);
             }
         }
         @keyframes rune-feedback-bad {
@@ -361,10 +441,10 @@
                 transform: translateX(0);
             }
             25% {
-                transform: translateX(-5px);
+                transform: translateX(-6px);
             }
             75% {
-                transform: translateX(5px);
+                transform: translateX(6px);
             }
         }
         /* Progress bar - Cachée (épuration) */
@@ -402,9 +482,10 @@
             }
         }
         #level-3-sanctuary {
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
+            /* Nettoyage complet - Vue dégagée sur le décor */
+            display: grid;
+            grid-template-columns: 120px 1fr 120px;
+            gap: 0;
             position: fixed;
             top: 0;
             left: 0;
@@ -413,277 +494,68 @@
             z-index: 1111;
             width: 100vw;
             height: 100vh;
-            background-color: #000000;
-            background-image: 
-                radial-gradient(ellipse at 50% 50%, rgba(28, 26, 24, 0.9) 0%, rgba(0, 0, 0, 1) 70%),
-                repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px), 
-                repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             box-sizing: border-box;
             transition: opacity 0.5s ease;
             pointer-events: auto;
-            padding: 0;
+            padding: 20px;
             overflow: hidden;
         }
         #level-3-sanctuary.sac-ouvert {
             opacity: 0.6;
         }
-        /* Colonnes latérales - Runes flottantes sans bordures, parfaitement symétriques */
+        /* Colonnes de runes - Alignement vertical comme dans l'image */
         .runes-column {
-            width: 100px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-evenly;
             align-items: center;
-            gap: 40px;
-            padding: 60px 0;
-            background: transparent;
-            border: none;
+            min-height: 85vh;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
             z-index: 10;
-            flex-shrink: 0;
             position: relative;
+            padding: 40px 0;
         }
         .runes-column.left {
-            padding-left: 40px;
-            padding-right: 20px;
+            justify-self: start;
+            padding-left: 30px;
         }
         .runes-column.right {
-            padding-right: 40px;
-            padding-left: 20px;
+            justify-self: end;
+            padding-right: 30px;
         }
-        /* Zone centrale pour le temple - Couloir de Pierre en Perspective */
+        /* Zone centrale - Totalement transparente pour voir le décor body */
         .temple-center {
-            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            padding: 40px;
-            margin: 30px 40px;
-            /* Texture de pierre ancienne avec ambiance mystique */
-            background: 
-                /* Lueurs de torches latérales (suggestion) */
-                radial-gradient(ellipse 15% 20% at 10% 30%, 
-                    rgba(255, 140, 50, 0.08) 0%, 
-                    transparent 50%),
-                radial-gradient(ellipse 15% 20% at 90% 30%, 
-                    rgba(255, 140, 50, 0.08) 0%, 
-                    transparent 50%),
-                /* Vignettage progressif (bords très sombres) */
-                radial-gradient(ellipse at 50% 50%, 
-                    transparent 0%, 
-                    transparent 15%,
-                    rgba(0, 0, 0, 0.2) 35%,
-                    rgba(0, 0, 0, 0.5) 60%,
-                    rgba(0, 0, 0, 0.8) 85%,
-                    rgba(0, 0, 0, 0.95) 100%),
-                /* Blocs de pierre (texture murale) */
-                repeating-linear-gradient(0deg, 
-                    transparent 0px, 
-                    transparent 85px, 
-                    rgba(0, 0, 0, 0.25) 85px, 
-                    rgba(0, 0, 0, 0.25) 88px),
-                repeating-linear-gradient(90deg, 
-                    transparent 0px, 
-                    transparent 130px, 
-                    rgba(0, 0, 0, 0.2) 130px, 
-                    rgba(0, 0, 0, 0.2) 133px),
-                /* Fond de pierre ancienne sombre */
-                linear-gradient(180deg, 
-                    #1a1512 0%, 
-                    #12100d 30%,
-                    #0f0d0a 60%, 
-                    #0a0805 100%),
-                /* Texture granuleuse de roche */
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='stone-noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='6' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stone-noise)' opacity='0.15'/%3E%3C/svg%3E");
-            background-blend-mode: screen, screen, overlay, normal, normal, normal, normal;
-            border: 2px solid rgba(212, 175, 55, 0.6);
-            border-radius: 15px;
-            box-shadow: 
-                0 0 30px rgba(212, 175, 55, 0.3),
-                inset 0 0 60px rgba(0, 0, 0, 0.7),
-                inset 0 1px 0 rgba(212, 175, 55, 0.1);
+            padding: 60px;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 1;
             min-width: 0;
-            overflow: hidden;
+            overflow: visible;
         }
-        /* Arches en perspective - Effet de profondeur */
-        .temple-center::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            height: 100%;
-            background: 
-                /* Arche proche (grande) - haut */
-                radial-gradient(ellipse 60% 20% at 50% 12%, 
-                    transparent 0%, 
-                    transparent 47%,
-                    rgba(139, 115, 85, 0.25) 50%,
-                    transparent 53%),
-                /* Piliers latéraux de l'arche proche */
-                linear-gradient(90deg,
-                    rgba(92, 61, 42, 0.15) 0%,
-                    transparent 5%,
-                    transparent 95%,
-                    rgba(92, 61, 42, 0.15) 100%),
-                /* Arche moyenne */
-                radial-gradient(ellipse 45% 15% at 50% 32%, 
-                    transparent 0%, 
-                    transparent 47%,
-                    rgba(139, 115, 85, 0.18) 50%,
-                    transparent 53%),
-                /* Arche lointaine (petite) */
-                radial-gradient(ellipse 28% 10% at 50% 48%, 
-                    transparent 0%, 
-                    transparent 47%,
-                    rgba(139, 115, 85, 0.12) 50%,
-                    transparent 53%),
-                /* Point de fuite lumineux mystique au centre */
-                radial-gradient(circle at 50% 50%, 
-                    rgba(212, 175, 55, 0.08) 0%, 
-                    rgba(212, 175, 55, 0.04) 15%,
-                    transparent 35%),
-                /* Lueur dorée diffuse */
-                radial-gradient(ellipse at 50% 50%, 
-                    rgba(73, 202, 250, 0.03) 0%,
-                    transparent 40%);
-            pointer-events: none;
-            z-index: 0;
-            animation: temple-ambient-pulse 6s ease-in-out infinite;
-        }
-        @keyframes temple-ambient-pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.85;
-            }
-        }
-        /* Bordure décorative externe */
+        /* Pseudo-éléments désactivés pour vue dégagée */
+        .temple-center::before,
         .temple-center::after {
-            content: '';
-            position: absolute;
-            inset: -6px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 17px;
-            pointer-events: none;
-            z-index: -1;
+            display: none;
         }
-        /* Murs latéraux en pierre - Perspective */
-        .temple-center-pillars {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .temple-center-pillars::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 18%;
-            background: 
-                /* Texture de roche */
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='rock-texture'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23rock-texture)' opacity='0.2'/%3E%3C/svg%3E"),
-                /* Dégradé du mur gauche */
-                linear-gradient(90deg, 
-                    rgba(25, 20, 15, 0.9) 0%, 
-                    rgba(35, 28, 22, 0.7) 40%,
-                    transparent 100%);
-            box-shadow: 
-                inset -25px 0 50px rgba(0, 0, 0, 0.9),
-                inset -10px 0 20px rgba(0, 0, 0, 0.6);
-        }
-        .temple-center-pillars::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 18%;
-            background: 
-                /* Texture de roche */
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='rock-texture'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23rock-texture)' opacity='0.2'/%3E%3C/svg%3E"),
-                /* Dégradé du mur droit */
-                linear-gradient(270deg, 
-                    rgba(25, 20, 15, 0.9) 0%, 
-                    rgba(35, 28, 22, 0.7) 40%,
-                    transparent 100%);
-            box-shadow: 
-                inset 25px 0 50px rgba(0, 0, 0, 0.9),
-                inset 10px 0 20px rgba(0, 0, 0, 0.6);
-        }
-        /* Sol en dalles - Effet de profondeur avec perspective */
-        .temple-center-floor {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 35%;
-            background: 
-                /* Joints entre dalles horizontales (perspective) */
-                repeating-linear-gradient(180deg,
-                    transparent 0px,
-                    transparent 40px,
-                    rgba(0, 0, 0, 0.4) 40px,
-                    rgba(0, 0, 0, 0.4) 42px),
-                /* Joints verticaux (convergent au centre) */
-                repeating-linear-gradient(135deg,
-                    transparent 0px,
-                    transparent 60px,
-                    rgba(0, 0, 0, 0.3) 60px,
-                    rgba(0, 0, 0, 0.3) 61px),
-                repeating-linear-gradient(45deg,
-                    transparent 0px,
-                    transparent 60px,
-                    rgba(0, 0, 0, 0.3) 60px,
-                    rgba(0, 0, 0, 0.3) 61px),
-                /* Texture de pierre du sol */
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='floor-stone'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23floor-stone)' opacity='0.25'/%3E%3C/svg%3E"),
-                /* Dégradé du sol (plus sombre en bas) */
-                linear-gradient(180deg, 
-                    transparent 0%, 
-                    rgba(15, 12, 9, 0.5) 30%,
-                    rgba(10, 8, 5, 0.7) 60%, 
-                    rgba(5, 4, 2, 0.95) 100%);
-            pointer-events: none;
-            z-index: 0;
-            transform-origin: center bottom;
-            perspective: 500px;
-        }
-        /* Brume mystique dans le couloir */
+        /* Éléments de décor - Cachés pour vue dégagée sur le fond étoilé */
+        .temple-center-pillars,
+        .temple-center-floor,
         .temple-center-mist {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            background: 
-                /* Nappes de brume basses */
-                radial-gradient(ellipse 80% 30% at 50% 85%, 
-                    rgba(180, 200, 220, 0.03) 0%,
-                    rgba(160, 180, 200, 0.02) 40%,
-                    transparent 70%),
-                /* Brume diffuse au centre */
-                radial-gradient(ellipse at 50% 50%, 
-                    rgba(200, 215, 230, 0.02) 0%,
-                    transparent 50%);
-            animation: temple-mist-drift 8s ease-in-out infinite alternate;
-        }
-        @keyframes temple-mist-drift {
-            0% {
-                opacity: 0.6;
-                transform: translateY(0px);
-            }
-            100% {
-                opacity: 0.8;
-                transform: translateY(-5px);
-            }
+            display: none;
         }
         /* Contenu au-dessus du décor */
         .temple-center > * {
@@ -698,72 +570,75 @@
             opacity: 1;
         }
         @media (max-width: 768px) {
+            #level-3-sanctuary {
+                grid-template-columns: 95px 1fr 95px;
+                padding: 15px 10px;
+            }
             .runes-column {
-                width: 80px;
-                gap: 28px;
-                padding: 40px 0;
-            }
-            .runes-column.left {
-                padding-left: 25px;
-                padding-right: 15px;
-            }
-            .runes-column.right {
-                padding-right: 25px;
-                padding-left: 15px;
-            }
-            .runes-column .rune-btn {
-                width: 50px;
-                height: 50px;
-            }
-            .rune-btn {
-                font-size: 2.3em;
-                width: 50px;
-                height: 50px;
-            }
-            .temple-center {
-                padding: 30px 20px;
-                margin: 20px 25px;
-            }
-        }
-        @media (max-width: 480px) {
-            .runes-column {
-                width: 60px;
-                gap: 20px;
+                min-height: 80vh;
                 padding: 30px 0;
             }
             .runes-column.left {
-                padding-left: 18px;
-                padding-right: 10px;
+                padding-left: 20px;
             }
             .runes-column.right {
-                padding-right: 18px;
-                padding-left: 10px;
+                padding-right: 20px;
             }
             .runes-column .rune-btn {
-                width: 42px;
-                height: 42px;
+                width: 55px;
+                height: 55px;
             }
             .rune-btn {
-                font-size: 1.9em;
-                width: 42px;
-                height: 42px;
+                font-size: 1.6em;
+                width: 55px;
+                height: 55px;
             }
             .temple-center {
-                padding: 20px 15px;
-                margin: 15px 18px;
+                padding: 40px 20px;
             }
-            /* Murs plus étroits sur mobile */
-            .temple-center-pillars::before,
-            .temple-center-pillars::after {
-                width: 10%;
-            }
-            /* Sacoche mobile */
             #btn-sacoche {
-                bottom: 12px;
+                bottom: 20px;
+                width: 65px;
+                height: 65px;
+                font-size: 2em;
+            }
+        }
+        @media (max-width: 480px) {
+            #level-3-sanctuary {
+                grid-template-columns: 75px 1fr 75px;
+                padding: 10px 5px;
+            }
+            .runes-column {
+                min-height: 75vh;
+                padding: 25px 0;
+            }
+            .runes-column.left {
+                padding-left: 15px;
+            }
+            .runes-column.right {
+                padding-right: 15px;
+            }
+            .runes-column .rune-btn {
+                width: 48px;
+                height: 48px;
+            }
+            .rune-btn {
+                font-size: 1.4em;
+                width: 48px;
+                height: 48px;
+            }
+            .temple-center {
+                padding: 30px 15px;
+            }
+            #btn-sacoche {
+                bottom: 15px;
+                width: 60px;
+                height: 60px;
+                font-size: 1.9em;
             }
             .btn-back-accueil {
-                font-size: 0.75rem;
-                padding: 6px 10px;
+                font-size: 0.65rem;
+                padding: 6px 12px;
             }
         }
         /* JACKPOT VICTORY style */
@@ -877,21 +752,9 @@
             50% { transform: translateX(5%); opacity: 1; }
         }
 
-        /* Mentions légales / discrètes en bas de page */
+        /* Mentions légales - Cachées pour épuration */
         .arcana-mention {
-            width: 100%;
-            text-align: center;
-            color: #b0a77b;
-            opacity: 0.44;
-            font-size: 0.98em;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            letter-spacing: 0.05em;
-            position: fixed;
-            left: 0;
-            bottom: 5px;
-            z-index: 3;
-            pointer-events: none;
-            user-select: none;
+            display: none;
         }
         /* Écran d'attente : DÉSACTIVÉ pour affichage immédiat */
         #arcana-connect-gate {
@@ -949,13 +812,40 @@
         /* Identification wallet : coin de l'écran */
         .wallet-address-badge {
             position: fixed; top: 12px; right: 12px; z-index: 600;
-            font-size: 0.75rem; font-family: monospace; color: var(--gold);
-            background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 8px;
-            border: 1px solid rgba(212, 175, 55, 0.4); letter-spacing: 0.05em;
+            font-size: 0.7rem; font-family: 'Cinzel', serif; color: var(--gold);
+            background: rgba(0,0,0,0.6); padding: 7px 14px; border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.4); letter-spacing: 0.08em;
+            font-weight: 400;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         /* Badge Mode Test */
         .test-mode-badge {
-            display: none; /* Caché pour épuration */
+            display: none;
+        }
+        /* Admin trigger - Discret */
+        .admin-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.7rem;
+            color: rgba(212, 175, 55, 0.3);
+            cursor: pointer;
+            z-index: 500;
+            transition: color 0.3s;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.1em;
+        }
+        .admin-trigger:hover {
+            color: rgba(212, 175, 55, 0.7);
+        }
+        .admin-stat {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85em;
+            margin: 8px 0;
+        }
+        .admin-close {
+            font-family: 'Cinzel', serif;
         }
         @keyframes test-badge-pulse {
             0%, 100% { opacity: 0.8; }
@@ -1034,18 +924,21 @@
         /* === Système 100 niveaux === */
         #arcane-level-counter {
             position: fixed; top: 12px; right: 80px; z-index: 610;
-            font-family: 'Orbitron', 'VT323', monospace;
-            font-size: 1.8rem; font-weight: 700;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem; font-weight: 400;
             color: var(--gold);
-            text-shadow: 0 0 20px rgba(212,175,55,0.6);
-            letter-spacing: 0.15em;
+            text-shadow: 0 0 15px rgba(212,175,55,0.5);
+            letter-spacing: 0.2em;
         }
         .arcane-level-door {
+            font-family: 'Cinzel', serif;
             min-width: 100px; padding: 16px 24px; margin: 8px;
-            font-size: 1em; cursor: pointer; border-radius: 12px;
-            border: 2px solid var(--glass-border);
-            background: rgba(0,0,0,0.5); color: var(--gold);
+            font-size: 0.9em; cursor: pointer; border-radius: 12px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            background: rgba(0,0,0,0.6); color: var(--gold);
             transition: all 0.3s;
+            font-weight: 400;
+            letter-spacing: 0.05em;
         }
         .arcane-level-door:hover { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
         .arcane-level-door.wrong { border-color: #ff4444; background: rgba(255,68,68,0.2); animation: door-shake 0.4s; }
@@ -1161,14 +1054,14 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 3000;
             align-items: center;
             justify-content: center;
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.5s ease;
         }
         #papyrus-modal.active {
             display: flex;
@@ -1176,23 +1069,26 @@
         }
         .papyrus-scroll {
             position: relative;
-            width: 90vw;
-            max-width: 600px;
-            height: 70vh;
-            max-height: 800px;
-            background: linear-gradient(180deg, #e8dcc4 0%, #d9c9a3 50%, #c9b993 100%);
+            width: 85vw;
+            max-width: 650px;
+            height: 75vh;
+            max-height: 850px;
+            /* Fond de parchemin beige/doré comme dans l'image */
+            background: linear-gradient(180deg, #e8d5b5 0%, #d9c8a8 30%, #c9b898 70%, #b9a888 100%);
             background-image: 
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='paper-noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper-noise)' opacity='0.15'/%3E%3C/svg%3E"),
-                linear-gradient(180deg, #e8dcc4 0%, #d9c9a3 50%, #c9b993 100%);
-            border-left: 30px solid #8b7355;
-            border-right: 30px solid #8b7355;
-            border-radius: 4px;
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='paper-noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper-noise)' opacity='0.2'/%3E%3C/svg%3E"),
+                linear-gradient(180deg, #e8d5b5 0%, #d9c8a8 30%, #c9b898 70%, #b9a888 100%);
+            border-left: 35px solid #6b5745;
+            border-right: 35px solid #6b5745;
+            border-top: 20px solid transparent;
+            border-bottom: 20px solid transparent;
+            border-radius: 8px;
             box-shadow: 
-                0 0 60px rgba(0, 0, 0, 0.95),
-                0 0 100px rgba(212, 175, 55, 0.3),
-                inset 0 0 60px rgba(139, 115, 85, 0.3),
-                inset 10px 0 30px rgba(0, 0, 0, 0.2),
-                inset -10px 0 30px rgba(0, 0, 0, 0.2);
+                0 0 80px rgba(0, 0, 0, 0.9),
+                0 0 120px rgba(0, 0, 0, 0.7),
+                inset 0 0 80px rgba(139, 115, 85, 0.25),
+                inset 15px 0 40px rgba(0, 0, 0, 0.3),
+                inset -15px 0 40px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             transform: scaleY(0);
             transform-origin: top center;
@@ -1234,28 +1130,34 @@
             content: '';
             position: absolute;
             top: 0;
-            left: -30px;
-            width: 30px;
+            left: -35px;
+            width: 35px;
             height: 100%;
-            background: linear-gradient(90deg, #6b5745, #8b7355);
-            box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(90deg, #5a4735 0%, #6b5745 50%, #5a4735 100%);
+            box-shadow: 
+                inset -8px 0 15px rgba(0, 0, 0, 0.5),
+                inset 0 0 5px rgba(0, 0, 0, 0.3);
+            border-radius: 8px 0 0 8px;
         }
         .papyrus-scroll::after {
             content: '';
             position: absolute;
             top: 0;
-            right: -30px;
-            width: 30px;
+            right: -35px;
+            width: 35px;
             height: 100%;
-            background: linear-gradient(90deg, #8b7355, #6b5745);
-            box-shadow: inset 5px 0 10px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(90deg, #6b5745 0%, #5a4735 50%, #6b5745 100%);
+            box-shadow: 
+                inset 8px 0 15px rgba(0, 0, 0, 0.5),
+                inset 0 0 5px rgba(0, 0, 0, 0.3);
+            border-radius: 0 8px 8px 0;
         }
         .papyrus-content {
-            padding: 60px 40px;
+            padding: 70px 50px;
             height: 100%;
             overflow-y: auto;
             font-family: 'Cinzel', 'Times New Roman', serif;
-            color: #3d2a1a;
+            color: #2d1f15;
             position: relative;
             opacity: 0;
             animation: papyrus-text-fade 0.8s ease 0.8s forwards;
@@ -1271,29 +1173,31 @@
             }
         }
         .papyrus-title {
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            font-weight: 700;
+            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+            font-weight: 400;
             text-align: center;
-            margin-bottom: 30px;
-            color: #5c3d2a;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-            letter-spacing: 0.1em;
-            border-bottom: 2px solid rgba(92, 61, 42, 0.3);
-            padding-bottom: 15px;
+            margin-bottom: 35px;
+            color: #4a3520;
+            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.12em;
+            border-bottom: 1px solid rgba(92, 61, 42, 0.25);
+            padding-bottom: 20px;
+            text-transform: uppercase;
         }
         .papyrus-text {
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            line-height: 1.8;
-            text-align: justify;
-            margin-bottom: 25px;
-            text-indent: 40px;
-            font-style: italic;
+            font-size: clamp(0.95rem, 2.8vw, 1.1rem);
+            line-height: 1.9;
+            text-align: left;
+            margin-bottom: 20px;
+            text-indent: 0;
+            font-style: normal;
             /* Effet encre ancienne */
+            color: #3d2a1a;
             text-shadow: 
-                1px 1px 1px rgba(92, 61, 42, 0.2),
-                0 0 1px rgba(61, 42, 26, 0.15);
-            filter: contrast(1.1) brightness(0.95);
-            font-weight: 500;
+                0.5px 0.5px 1px rgba(92, 61, 42, 0.15);
+            filter: contrast(1.05);
+            font-weight: 400;
+            letter-spacing: 0.02em;
         }
         .papyrus-text-russe {
             font-family: 'Libre Baskerville', 'Times New Roman', serif;
@@ -1341,32 +1245,36 @@
         }
         .papyrus-hieroglyph {
             text-align: center;
-            font-size: 2em;
-            margin: 30px 0;
-            opacity: 0.8;
+            font-size: 1.8em;
+            margin: 25px 0;
+            opacity: 0.7;
+            color: #5a4535;
+            letter-spacing: 0.3em;
         }
         .papyrus-close-btn {
             position: absolute;
-            bottom: 20px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 12px 30px;
-            background: linear-gradient(180deg, #8b7355, #6b5745);
-            color: #f4e9d0;
-            border: 2px solid #5c4a35;
-            border-radius: 8px;
+            padding: 14px 35px;
+            background: linear-gradient(180deg, #6b5745, #5a4735);
+            color: #e8d5b5;
+            border: 2px solid #4a3520;
+            border-radius: 10px;
             font-family: 'Cinzel', serif;
-            font-size: 0.9rem;
-            font-weight: bold;
+            font-size: 0.85rem;
+            font-weight: 400;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
         }
         .papyrus-close-btn:hover {
-            background: linear-gradient(180deg, #9b8365, #7b6755);
+            background: linear-gradient(180deg, #7b6755, #6b5745);
             transform: translateX(-50%) translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.7);
+            border-color: #5a4735;
         }
         .papyrus-scroll-bar::-webkit-scrollbar {
             width: 10px;
@@ -1424,61 +1332,53 @@
             }
         }
         
-        /* === BOUTON SACOCHE EN CUIR - BAS CENTRE === */
+        /* === BOUTON SACOCHE - BAS CENTRE (style cuir) === */
         #btn-sacoche {
             position: fixed;
-            bottom: 15px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2000;
             width: 70px;
             height: 70px;
             border-radius: 8px;
+            /* Texture cuir marron */
             background: 
-                linear-gradient(135deg, #5c4a35 0%, #4a3d2f 50%, #3d2f23 100%),
-                repeating-linear-gradient(90deg, transparent 0, transparent 1px, rgba(0, 0, 0, 0.1) 1px, rgba(0, 0, 0, 0.1) 2px);
-            border: 3px solid rgba(139, 115, 85, 0.8);
+                linear-gradient(135deg, 
+                    rgba(92, 74, 53, 0.95) 0%, 
+                    rgba(74, 61, 47, 1) 50%, 
+                    rgba(61, 47, 35, 1) 100%);
+            border: 3px solid rgba(139, 115, 85, 0.9);
             box-shadow: 
-                0 6px 25px rgba(0, 0, 0, 0.7), 
-                inset 0 2px 0 rgba(212, 175, 55, 0.15),
-                inset 0 -2px 5px rgba(0, 0, 0, 0.4),
-                0 0 20px rgba(139, 115, 85, 0.3);
+                0 8px 30px rgba(0, 0, 0, 0.8),
+                inset 0 2px 0 rgba(212, 175, 55, 0.2),
+                inset 0 -3px 8px rgba(0, 0, 0, 0.4);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.2em;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
             position: relative;
         }
         #btn-sacoche::before {
             content: '';
             position: absolute;
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            bottom: 8px;
+            inset: 6px;
             border: 1px solid rgba(139, 115, 85, 0.3);
             border-radius: 4px;
             pointer-events: none;
         }
         #btn-sacoche::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 30%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, rgba(92, 61, 42, 0.3), transparent);
-            transform: translate(-50%, -50%);
-            pointer-events: none;
+            display: none;
         }
         #btn-sacoche:hover {
-            transform: translateX(-50%) scale(1.08);
+            border-color: rgba(212, 175, 55, 1);
             box-shadow: 
-                0 8px 30px rgba(0, 0, 0, 0.8), 
-                0 0 30px rgba(139, 115, 85, 0.6),
-                inset 0 2px 0 rgba(212, 175, 55, 0.25);
+                0 10px 35px rgba(0, 0, 0, 0.9),
+                0 0 25px rgba(212, 175, 55, 0.5),
+                inset 0 2px 0 rgba(212, 175, 55, 0.3);
+            transform: translateX(-50%) scale(1.06);
         }
         #btn-sacoche.resonance {
             animation: sac-resonance-pulse 1.5s ease-in-out infinite;
@@ -2011,14 +1911,9 @@
             <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6" title="🚪 Rune 6 : Le Verrou">⌬</button>
         </div>
 
-        <!-- ═══ ZONE CENTRALE - TEMPLE (VIDE) ═══ -->
+        <!-- ═══ ZONE CENTRALE - TEMPLE (TOTALEMENT VIDE) ═══ -->
         <div class="temple-center" role="main" aria-label="Zone centrale du temple">
-            <!-- Décor de fond : couloir en perspective -->
-            <div class="temple-center-pillars" aria-hidden="true"></div>
-            <div class="temple-center-floor" aria-hidden="true"></div>
-            <div class="temple-center-mist" aria-hidden="true"></div>
-            
-            <!-- Zone vide pour papyrus et animations -->
+            <!-- Espace libre pour papyrus, animations et vue sur le décor étoilé -->
         </div>
 
         <!-- ═══ COLONNE DROITE - RUNES 7-12 ═══ -->
