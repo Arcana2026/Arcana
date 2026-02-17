@@ -378,6 +378,27 @@
             0%, 100% { box-shadow: 0 0 12px rgba(212, 175, 55, 0.5); border-color: rgba(212, 175, 55, 0.9); }
             50% { box-shadow: 0 0 22px rgba(212, 175, 55, 0.7); border-color: #d4af37; }
         }
+        /* Animation d'entrée douce pour le sanctuaire */
+        @keyframes sanctuaire-shift-up {
+            0% {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) translateY(-20%) scale(0.85);
+                opacity: 0.95;
+            }
+        }
+        @keyframes sanctuaire-shift-down {
+            0% {
+                transform: translate(-50%, -50%) translateY(-20%) scale(0.85);
+                opacity: 0.95;
+            }
+            100% {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
         #level-3-sanctuary {
             display: block;
             position: fixed;
@@ -396,11 +417,48 @@
             box-shadow: 0 0 18px rgba(184, 134, 11, 0.35), inset 0 1px 0 rgba(212, 175, 55, 0.15), 0 0 0 1px rgba(212, 175, 55, 0.2);
             animation: golden-border-pulse 2.5s ease-in-out infinite;
             box-sizing: border-box;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+            pointer-events: auto;
+        }
+        #level-3-sanctuary.sac-ouvert {
+            transform: translate(-50%, -50%) translateY(-20%) scale(0.85);
+            opacity: 0.95;
+        }
+        /* Améliorer la lisibilité et l'interactivité quand le sac est ouvert */
+        #level-3-sanctuary.sac-ouvert {
+            /* Ajouter un léger effet de brillance au conteneur */
+            box-shadow: 0 0 25px rgba(184, 134, 11, 0.5), 
+                        inset 0 1px 0 rgba(212, 175, 55, 0.25), 
+                        0 0 0 1px rgba(212, 175, 55, 0.3);
+        }
+        #level-3-sanctuary.sac-ouvert .digital-timer {
+            background: rgba(64, 43, 3, 0.35);
+            text-shadow: 0 0 8px #d4af37, 0 0 25px rgba(212, 175, 55, 0.4);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+        #level-3-sanctuary.sac-ouvert .rune-btn {
+            border-width: 2.5px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+            cursor: pointer;
+        }
+        #level-3-sanctuary.sac-ouvert .rune-btn:not(:disabled) {
+            /* Indicateur visuel que c'est cliquable */
+            filter: brightness(1.05);
+        }
+        #level-3-sanctuary.sac-ouvert .rune-btn:hover:not(:disabled) {
+            box-shadow: 0 0 25px var(--gold), 0 0 12px rgba(255, 215, 0, 0.4);
+            transform: scale(1.08);
+        }
+        #level-3-sanctuary.sac-ouvert h2 {
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6), 0 2px 4px rgba(0, 0, 0, 0.5);
         }
         @media (max-width: 600px) {
             #level-3-sanctuary {
                 padding: 5px;
                 max-width: 97vw;
+            }
+            #level-3-sanctuary.sac-ouvert {
+                transform: translate(-50%, -50%) translateY(-25%) scale(0.75);
             }
             #runes-grid {
                 gap: 12px;
@@ -842,6 +900,46 @@
             transform: scale(1.08);
             box-shadow: 0 0 25px rgba(212, 175, 55, 0.5), 0 0 8px var(--gold);
         }
+        #btn-sacoche.resonance {
+            animation: sac-resonance-pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes sac-resonance-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+            }
+            25% {
+                transform: scale(1.08);
+                box-shadow: 0 0 30px rgba(212, 175, 55, 0.8), 0 0 15px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(212, 175, 55, 0.4);
+            }
+            50% {
+                transform: scale(1.12);
+                box-shadow: 0 0 40px rgba(212, 175, 55, 1), 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.6);
+            }
+            75% {
+                transform: scale(1.08);
+                box-shadow: 0 0 30px rgba(212, 175, 55, 0.8), 0 0 15px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(212, 175, 55, 0.4);
+            }
+        }
+        #btn-sacoche.resonance::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+            animation: sac-resonance-ring 1.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes sac-resonance-ring {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+        }
         #btn-sacoche-badge {
             position: absolute;
             top: -4px;
@@ -868,9 +966,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             z-index: 580;
             opacity: 0;
             pointer-events: none;
@@ -880,6 +978,11 @@
             opacity: 1;
             pointer-events: auto;
         }
+        /* Zone cliquable du sanctuaire reste interactive */
+        #sac-overlay.active ~ #level-3-sanctuary {
+            pointer-events: auto;
+            z-index: 1111;
+        }
         
         /* === DRAWER INVENTAIRE === */
         #sac-inventaire {
@@ -888,12 +991,14 @@
             left: 0;
             right: 0;
             z-index: 590;
-            background: linear-gradient(180deg, #2a2520 0%, #1e1c1a 20%, #1a1816 50%, #151412 100%);
+            background: linear-gradient(180deg, rgba(42, 37, 32, 0.85) 0%, rgba(30, 28, 26, 0.90) 20%, rgba(26, 24, 22, 0.92) 50%, rgba(21, 20, 18, 0.95) 100%);
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"),
-                linear-gradient(180deg, #2a2520 0%, #1e1c1a 20%, #1a1816 50%, #151412 100%);
-            border-top: 3px solid #b8860b;
-            border-left: 3px solid rgba(212, 175, 55, 0.3);
-            border-right: 3px solid rgba(212, 175, 55, 0.3);
+                linear-gradient(180deg, rgba(42, 37, 32, 0.85) 0%, rgba(30, 28, 26, 0.90) 20%, rgba(26, 24, 22, 0.92) 50%, rgba(21, 20, 18, 0.95) 100%);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            border-top: 3px solid rgba(184, 134, 11, 0.9);
+            border-left: 3px solid rgba(212, 175, 55, 0.4);
+            border-right: 3px solid rgba(212, 175, 55, 0.4);
             border-radius: 20px 20px 0 0;
             box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.8), inset 0 2px 0 rgba(212, 175, 55, 0.15);
             padding: 24px 20px 20px;
@@ -904,6 +1009,27 @@
         }
         #sac-inventaire.open {
             transform: translateY(0);
+        }
+        /* Scrollbar stylisée pour l'inventaire */
+        #sac-inventaire::-webkit-scrollbar {
+            width: 8px;
+        }
+        #sac-inventaire::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        #sac-inventaire::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.6), rgba(184, 134, 11, 0.6));
+            border-radius: 10px;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+        }
+        #sac-inventaire::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(212, 175, 55, 0.8), rgba(184, 134, 11, 0.8));
+        }
+        /* Firefox scrollbar */
+        #sac-inventaire {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(212, 175, 55, 0.6) rgba(0, 0, 0, 0.3);
         }
         #sac-inventaire-header {
             display: flex;
@@ -1015,6 +1141,21 @@
             font-size: 1.5em;
             margin-bottom: 4px;
         }
+        .sac-slot.objet-actif {
+            border-color: rgba(212, 175, 55, 1);
+            background: rgba(212, 175, 55, 0.2);
+            animation: objet-resonance-glow 2s ease-in-out infinite;
+        }
+        .sac-slot.objet-actif::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 8px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%);
+            animation: objet-resonance-aura 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
         
         /* === OBJETS DE QUÊTE === */
         #sac-objets-quete {
@@ -1047,6 +1188,61 @@
             background: rgba(73, 202, 250, 0.1);
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 0 20px rgba(73, 202, 250, 0.3);
+        }
+        .objet-quete.objet-actif {
+            border-color: rgba(212, 175, 55, 1);
+            background: rgba(212, 175, 55, 0.2);
+            animation: objet-resonance-glow 2s ease-in-out infinite;
+            position: relative;
+        }
+        .objet-quete.objet-actif::before {
+            content: '✨';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 1.2em;
+            animation: objet-resonance-sparkle 1.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.8));
+        }
+        .objet-quete.objet-actif::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 10px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%);
+            animation: objet-resonance-aura 2s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+        @keyframes objet-resonance-glow {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.2);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 35px rgba(212, 175, 55, 0.9), 0 0 20px rgba(255, 215, 0, 0.6), inset 0 0 20px rgba(212, 175, 55, 0.4);
+                transform: scale(1.05);
+            }
+        }
+        @keyframes objet-resonance-sparkle {
+            0%, 100% {
+                opacity: 0.6;
+                transform: rotate(0deg) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: rotate(180deg) scale(1.2);
+            }
+        }
+        @keyframes objet-resonance-aura {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.3);
+            }
         }
         .objet-quete-nom {
             position: absolute;
@@ -1099,7 +1295,7 @@
             50% { opacity: 0.85; transform: translateX(-50%) scale(1.03); }
         }
         
-        /* Responsive Mobile */
+        /* Responsive Tablette et Mobile */
         @media (max-width: 768px) {
             #sac-inventaire {
                 max-height: 80vh;
@@ -1115,6 +1311,9 @@
             .sac-slot {
                 min-height: 55px;
                 font-size: 0.8em;
+            }
+            #level-3-sanctuary.sac-ouvert {
+                transform: translate(-50%, -50%) translateY(-22%) scale(0.80);
             }
         }
         @media (max-width: 480px) {
@@ -1712,6 +1911,9 @@
         updateArcaneFog();
         updateArcaneDoors();
         addOracleChatMessage('Une lumière éclaire la pièce. +1 Clé.');
+        
+        // Ajouter automatiquement la clé dans le sac
+        ajouterCleDansSac(roomId);
     }
     function openAltar() {
         if (arcaneKeys < 1) { addOracleChatMessage('Vous n\'avez pas assez de clés.'); return; }
@@ -3119,6 +3321,25 @@
     var sacAlerteTimeout = null;
     var sacIsOpen = false;
 
+    // ═══════════════════════════════════════════════════════
+    // INTERACTION INVENTAIRE ↔ SANCTUAIRE
+    // ═══════════════════════════════════════════════════════
+    // 
+    // Quand l'inventaire s'ouvre :
+    // 1. Le drawer monte depuis le bas de l'écran (transition 0.5s)
+    // 2. Le sanctuaire se déplace vers le haut (-20%) et se réduit (85%)
+    // 3. L'overlay s'affiche avec transparence (40%) pour voir le sanctuaire
+    // 4. Les runes restent CLIQUABLES grâce au z-index élevé
+    // 5. Le fond du drawer est semi-transparent (85-95%) avec blur
+    // 
+    // Quand l'inventaire se ferme :
+    // 1. Le drawer redescend (transition fluide)
+    // 2. Le sanctuaire reprend sa position centrale (transition 0.6s)
+    // 3. L'overlay disparaît en fondu
+    // 4. Toutes les animations sont coordonnées pour un effet harmonieux
+    // 
+    // ═══════════════════════════════════════════════════════
+    
     function toggleSacInventaire() {
         if (sacIsOpen) {
             fermerSacInventaire();
@@ -3130,29 +3351,55 @@
     function ouvrirSacInventaire() {
         var drawer = document.getElementById('sac-inventaire');
         var overlay = document.getElementById('sac-overlay');
+        var sanctuaire = document.getElementById('level-3-sanctuary');
         
         drawer.classList.add('open');
         overlay.classList.add('active');
         sacIsOpen = true;
         
+        // Déplacer le sanctuaire vers le haut avec animation fluide
+        if (sanctuaire) {
+            sanctuaire.classList.add('sac-ouvert');
+            
+            // Petit effet de pulse pour indiquer que c'est toujours interactif
+            sanctuaire.style.animation = 'none';
+            setTimeout(function() {
+                sanctuaire.style.animation = '';
+            }, 50);
+            
+            // Message subtil la première fois (localStorage)
+            if (!localStorage.getItem('arcana_sac_hint_shown')) {
+                setTimeout(function() {
+                    addOracleChatMessage('💡 Les runes du Sanctuaire restent cliquables même quand l\'inventaire est ouvert.');
+                    localStorage.setItem('arcana_sac_hint_shown', 'true');
+                }, 800);
+            }
+        }
+        
         // Empêcher le scroll du body
         document.body.style.overflow = 'hidden';
         
-        console.log('%c📦 Inventaire ouvert', 'color:#d4af37;');
+        console.log('%c📦 Inventaire ouvert - Sanctuaire repositionné (reste cliquable)', 'color:#d4af37; font-weight:bold;');
     }
 
     function fermerSacInventaire() {
         var drawer = document.getElementById('sac-inventaire');
         var overlay = document.getElementById('sac-overlay');
+        var sanctuaire = document.getElementById('level-3-sanctuary');
         
         drawer.classList.remove('open');
         overlay.classList.remove('active');
         sacIsOpen = false;
         
+        // Restaurer la position du sanctuaire
+        if (sanctuaire) {
+            sanctuaire.classList.remove('sac-ouvert');
+        }
+        
         // Réactiver le scroll du body
         document.body.style.overflow = '';
         
-        console.log('%c📦 Inventaire fermé', 'color:#888;');
+        console.log('%c📦 Inventaire fermé - Sanctuaire restauré', 'color:#888;');
     }
 
     function updateSacBadge() {
@@ -3342,6 +3589,192 @@
     }
 
     // ═══════════════════════════════════════════════════════
+    // RÉSONANCE MAGIQUE - Effets Visuels et Haptiques
+    // ═══════════════════════════════════════════════════════
+    // 
+    // GUIDE D'UTILISATION RAPIDE :
+    // 
+    // 1. Vibrer le bouton sacoche uniquement :
+    //    vibrerSac(intensite);  // intensite: 1=doux, 2=moyen, 3=fort
+    // 
+    // 2. Activer la résonance d'un objet dans l'inventaire :
+    //    activerResonanceObjet(objetId, 'quete');  // ou 'cle' pour une clé
+    // 
+    // 3. Déclencher une résonance complète (bouton + objet + vibration) :
+    //    declencherResonanceMagique(objetId, 'quete', intensite);
+    // 
+    // 4. Vérifier si le joueur a l'objet requis et déclencher la résonance :
+    //    verifierResonanceZone('nom_zone', 'id_objet_requis');
+    // 
+    // 5. Arrêter toute résonance :
+    //    arreterResonanceMagique();
+    // 
+    // EXEMPLE D'INTÉGRATION AVEC UNE PORTE :
+    // 
+    //    function onRuneClick(runeId) {
+    //        // Vérifier si le joueur s'approche de la bonne rune
+    //        if (runeId === SANCTUARY_SEQUENCE[sanctuaryProgress]) {
+    //            // Déclencher une résonance si une clé spéciale est dans l'inventaire
+    //            if (sacInventaire.indexOf(7) !== -1) {
+    //                declencherResonanceMagique(7, 'cle', 2);
+    //            }
+    //        }
+    //    }
+    // 
+    // ═══════════════════════════════════════════════════════
+    var sacResonanceActive = false;
+    var sacResonanceObjetActif = null;
+
+    function vibrerSac(intensite) {
+        intensite = intensite || 1; // Intensité par défaut : 1
+        var btnSacoche = document.getElementById('btn-sacoche');
+        
+        // Ajouter la classe de résonance
+        btnSacoche.classList.add('resonance');
+        
+        // Vibration haptique si supportée
+        if (navigator.vibrate) {
+            // Pattern de vibration selon l'intensité
+            var pattern;
+            switch(Math.floor(intensite)) {
+                case 1:
+                    pattern = [100, 50, 100]; // Doux
+                    break;
+                case 2:
+                    pattern = [150, 50, 150, 50, 150]; // Moyen
+                    break;
+                case 3:
+                    pattern = [200, 50, 200, 50, 200, 50, 200]; // Fort
+                    break;
+                default:
+                    pattern = [100, 50, 100];
+            }
+            navigator.vibrate(pattern);
+            console.log('%c📳 Vibration haptique déclenchée (intensité: ' + intensite + ')', 'color:#d4af37;');
+        } else {
+            console.log('%c📳 Vibration haptique non supportée sur cet appareil', 'color:#888;');
+        }
+        
+        sacResonanceActive = true;
+        
+        console.log('%c✨ Résonance magique activée (intensité: ' + intensite + ')', 'color:#d4af37; font-weight:bold;');
+    }
+
+    function arreterVibrationSac() {
+        var btnSacoche = document.getElementById('btn-sacoche');
+        btnSacoche.classList.remove('resonance');
+        
+        // Arrêter la vibration haptique
+        if (navigator.vibrate) {
+            navigator.vibrate(0);
+        }
+        
+        sacResonanceActive = false;
+        
+        console.log('%c✨ Résonance magique désactivée', 'color:#888;');
+    }
+
+    function activerResonanceObjet(objetId, typeObjet) {
+        // typeObjet: 'cle' ou 'quete'
+        typeObjet = typeObjet || 'quete';
+        
+        // Retirer l'ancienne résonance
+        if (sacResonanceObjetActif) {
+            desactiverResonanceObjet();
+        }
+        
+        var element;
+        if (typeObjet === 'cle') {
+            // Trouver le slot de clé
+            var slots = document.querySelectorAll('.sac-slot');
+            var index = sacInventaire.indexOf(objetId);
+            if (index !== -1 && slots[index]) {
+                element = slots[index];
+            }
+        } else {
+            // Trouver l'objet de quête
+            element = document.querySelector('.objet-quete[data-id="' + objetId + '"]');
+        }
+        
+        if (element) {
+            element.classList.add('objet-actif');
+            sacResonanceObjetActif = { id: objetId, type: typeObjet, element: element };
+            
+            console.log('%c✨ Objet en résonance:', 'color:#d4af37; font-weight:bold;', objetId);
+            return true;
+        }
+        
+        return false;
+    }
+
+    function desactiverResonanceObjet() {
+        if (sacResonanceObjetActif && sacResonanceObjetActif.element) {
+            sacResonanceObjetActif.element.classList.remove('objet-actif');
+            console.log('%c✨ Résonance d\'objet désactivée:', 'color:#888;', sacResonanceObjetActif.id);
+            sacResonanceObjetActif = null;
+        }
+    }
+
+    function declencherResonanceMagique(objetId, typeObjet, intensite) {
+        // Fonction principale pour activer la résonance complète
+        intensite = intensite || 1;
+        
+        // Vibrer le bouton sacoche
+        vibrerSac(intensite);
+        
+        // Activer la résonance de l'objet dans l'inventaire
+        var objetTrouve = activerResonanceObjet(objetId, typeObjet);
+        
+        if (objetTrouve) {
+            // Message dans le chat Oracle
+            addOracleChatMessage('✨ Résonance magique détectée ! Un objet de votre inventaire réagit à la zone...');
+            
+            // Auto-désactiver après 5 secondes
+            setTimeout(function() {
+                arreterResonanceMagique();
+            }, 5000);
+            
+            return true;
+        }
+        
+        return false;
+    }
+
+    function arreterResonanceMagique() {
+        arreterVibrationSac();
+        desactiverResonanceObjet();
+    }
+
+    function verifierResonanceZone(zoneId, objetRequis) {
+        // Vérifier si le joueur possède l'objet requis
+        var objetPresent = false;
+        var typeObjet = 'quete';
+        
+        // Vérifier dans les objets de quête
+        var objet = sacObjetsQuete.find(function(obj) { return obj.id === objetRequis; });
+        if (objet) {
+            objetPresent = true;
+            typeObjet = 'quete';
+        } else {
+            // Vérifier dans les clés
+            var index = sacInventaire.indexOf(objetRequis);
+            if (index !== -1) {
+                objetPresent = true;
+                typeObjet = 'cle';
+            }
+        }
+        
+        if (objetPresent) {
+            console.log('%c🌟 Zone ' + zoneId + ' : Objet requis détecté (' + objetRequis + ')', 'color:#d4af37; font-weight:bold;');
+            declencherResonanceMagique(objetRequis, typeObjet, 2);
+            return true;
+        } else {
+            console.log('%c🔒 Zone ' + zoneId + ' : Objet requis manquant (' + objetRequis + ')', 'color:#888;');
+            return false;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
     // CONTRÔLES CLAVIER - Fermer l'inventaire avec Échap
     // ═══════════════════════════════════════════════════════
     document.addEventListener('keydown', function(e) {
@@ -3352,6 +3785,25 @@
 
     // ═══════════════════════════════════════════════════════
     // FONCTIONS DE TEST - Console
+    // ═══════════════════════════════════════════════════════
+    // 
+    // GUIDE DE TEST DANS LA CONSOLE :
+    // 
+    // testSac()                    - Test complet du sac (clés + objets + alerte surcharge)
+    // testObjetsQuete()            - Test des objets de quête uniquement
+    // testResonance()              - Test des effets de résonance magique
+    // testZoneInteractive()        - Test de détection de zone avec objet requis
+    // testInteractionSanctuaire()  - Test interaction inventaire ↔ sanctuaire (NEW!)
+    // testScenarioComplet()        - Scénario complet de quête avec résonances
+    // 
+    // FONCTIONS RAPIDES :
+    // 
+    // resonner('cristal_1', 'quete', 2)  - Déclencher résonance rapide
+    // vibrerSac(3)                        - Vibrer le bouton (intensité 1-3)
+    // ouvrirSacInventaire()              - Ouvrir le drawer
+    // fermerSacInventaire()              - Fermer le drawer
+    // toggleSacInventaire()              - Ouvrir/fermer le drawer
+    // 
     // ═══════════════════════════════════════════════════════
     window.testSac = function() {
         console.log('%c=== TEST DU SAC À DOS ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
@@ -3389,5 +3841,269 @@
         ajouterObjetQuete('⚗️', 'Fiole Magique', 'fiole_1');
         ajouterObjetQuete('🗡️', 'Lame Enchantée', 'lame_1');
     };
+
+    window.testResonance = function() {
+        console.log('%c=== TEST RÉSONANCE MAGIQUE ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
+        
+        // Ajouter des objets de test
+        viderSac();
+        viderObjetsQuete();
+        ajouterCleDansSac(42);
+        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
+        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
+        ajouterObjetQuete('📜', 'Parchemin Ancien', 'parchemin_1');
+        
+        // Ouvrir l'inventaire
+        ouvrirSacInventaire();
+        
+        // Test 1 : Vibration simple du bouton
+        console.log('%cTest 1: Vibration simple du bouton', 'color:#49cafa;');
+        setTimeout(function() {
+            vibrerSac(1);
+        }, 1000);
+        
+        // Test 2 : Résonance d'un objet de quête
+        console.log('%cTest 2: Résonance objet de quête (Cristal)', 'color:#49cafa;');
+        setTimeout(function() {
+            arreterVibrationSac();
+            declencherResonanceMagique('cristal_1', 'quete', 2);
+        }, 3000);
+        
+        // Test 3 : Changement d'objet actif
+        console.log('%cTest 3: Changement vers Orbe Mystique', 'color:#49cafa;');
+        setTimeout(function() {
+            arreterResonanceMagique();
+            declencherResonanceMagique('orbe_1', 'quete', 1);
+        }, 8000);
+        
+        // Test 4 : Résonance d'une clé
+        console.log('%cTest 4: Résonance clé numéro 42', 'color:#49cafa;');
+        setTimeout(function() {
+            arreterResonanceMagique();
+            declencherResonanceMagique(42, 'cle', 3);
+        }, 13000);
+        
+        // Test 5 : Arrêt complet
+        setTimeout(function() {
+            arreterResonanceMagique();
+            console.log('%c✅ Test de résonance terminé', 'color:#00ff88; font-weight:bold;');
+        }, 18000);
+    };
+
+    window.testZoneInteractive = function() {
+        console.log('%c=== TEST ZONE INTERACTIVE ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
+        
+        // Préparer l'inventaire
+        viderSac();
+        viderObjetsQuete();
+        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_mystique');
+        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_givre');
+        ajouterCleDansSac(7);
+        
+        ouvrirSacInventaire();
+        
+        // Simuler l'approche d'une zone qui requiert l'Orbe
+        console.log('%c🚪 Approche de la Porte du Mystère...', 'color:#49cafa;');
+        setTimeout(function() {
+            var result = verifierResonanceZone('porte_mystere', 'orbe_mystique');
+            if (result) {
+                console.log('%c✅ La porte reconnaît votre objet !', 'color:#00ff88;');
+            }
+        }, 1500);
+        
+        // Arrêt après 6 secondes
+        setTimeout(function() {
+            arreterResonanceMagique();
+            console.log('%c✅ Test de zone terminé', 'color:#00ff88; font-weight:bold;');
+        }, 7500);
+    };
+
+    window.testInteractionSanctuaire = function() {
+        console.log('%c=== TEST INTERACTION INVENTAIRE ↔ SANCTUAIRE ===', 'color:#d4af37; font-size:1.3em; font-weight:bold;');
+        
+        // Préparer l'inventaire avec quelques objets
+        viderSac();
+        viderObjetsQuete();
+        ajouterCleDansSac(1);
+        ajouterCleDansSac(5);
+        ajouterCleDansSac(7);
+        ajouterObjetQuete('💎', 'Cristal', 'cristal_1');
+        ajouterObjetQuete('🔮', 'Orbe', 'orbe_1');
+        
+        console.log('%c📦 Ouverture de l\'inventaire...', 'color:#49cafa;');
+        console.log('%c   → Le sanctuaire va se déplacer vers le haut et se réduire', 'color:#888;');
+        console.log('%c   → Les runes restent CLIQUABLES', 'color:#00ff88; font-weight:bold;');
+        ouvrirSacInventaire();
+        
+        setTimeout(function() {
+            console.log('%c✨ L\'inventaire est ouvert !', 'color:#d4af37;');
+            console.log('%c   → Essayez de cliquer sur les runes du sanctuaire', 'color:#49cafa;');
+            console.log('%c   → Vous pouvez voir le sanctuaire à travers le fond semi-transparent', 'color:#49cafa;');
+        }, 600);
+        
+        setTimeout(function() {
+            console.log('%c📦 Fermeture de l\'inventaire...', 'color:#888;');
+            console.log('%c   → Le sanctuaire reprend sa position centrale', 'color:#888;');
+            fermerSacInventaire();
+        }, 4000);
+        
+        setTimeout(function() {
+            console.log('%c✅ Test terminé - Interaction fluide confirmée !', 'color:#00ff88; font-size:1.1em; font-weight:bold;');
+            console.log('%c💡 Astuce : Appuyez sur Échap pour fermer l\'inventaire rapidement', 'color:#d4af37;');
+        }, 4700);
+    };
+
+    window.testScenarioComplet = function() {
+        console.log('%c=== SCÉNARIO COMPLET : QUÊTE DU SANCTUAIRE ===', 'color:#d4af37; font-size:1.3em; font-weight:bold; text-shadow: 0 0 10px rgba(212,175,55,0.5);');
+        
+        // Préparer l'inventaire
+        viderSac();
+        viderObjetsQuete();
+        
+        // Étape 1 : Le joueur reçoit des objets
+        console.log('%c📦 Étape 1/5 : Collecte d\'objets...', 'color:#49cafa; font-weight:bold;');
+        ajouterCleDansSac(1);
+        ajouterCleDansSac(5);
+        ajouterObjetQuete('🗝️', 'Clé Antique', 'cle_antique');
+        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_givre');
+        ajouterObjetQuete('🔮', 'Orbe de Vision', 'orbe_vision');
+        
+        // Ouvrir l'inventaire
+        setTimeout(function() {
+            ouvrirSacInventaire();
+        }, 500);
+        
+        // Étape 2 : Approche d'une première porte (nécessite cristal)
+        setTimeout(function() {
+            console.log('%c❄️ Étape 2/5 : Approche de la Porte de Glace...', 'color:#49cafa; font-weight:bold;');
+            enregistrerZoneResonance('porte_glace', 'cristal_givre', function() {
+                console.log('%c🎉 La Porte de Glace s\'ouvre !', 'color:#00ff88;');
+                retirerObjetQuete('cristal_givre');
+            });
+            declencherZoneResonance('porte_glace');
+        }, 3000);
+        
+        // Étape 3 : Le cristal disparaît, résonance s'arrête
+        setTimeout(function() {
+            arreterResonanceMagique();
+            console.log('%c✨ Le Cristal de Givre se dissout dans un éclat de lumière...', 'color:#888; font-style:italic;');
+        }, 8000);
+        
+        // Étape 4 : Nouvelle zone nécessitant l'Orbe
+        setTimeout(function() {
+            console.log('%c🔮 Étape 3/5 : Salle des Miroirs...', 'color:#49cafa; font-weight:bold;');
+            enregistrerZoneResonance('salle_miroirs', 'orbe_vision', function() {
+                console.log('%c👁️ L\'Orbe révèle le chemin caché !', 'color:#00ff88;');
+            });
+            declencherZoneResonance('salle_miroirs');
+        }, 10000);
+        
+        // Étape 5 : Arrêt et nouvelle clé découverte
+        setTimeout(function() {
+            arreterResonanceMagique();
+            console.log('%c🗝️ Étape 4/5 : Une nouvelle clé apparaît !', 'color:#49cafa; font-weight:bold;');
+            ajouterCleDansSac(13);
+        }, 15000);
+        
+        // Étape 6 : Porte finale nécessitant clé 13
+        setTimeout(function() {
+            console.log('%c🚪 Étape 5/5 : Porte du Sanctuaire Final...', 'color:#d4af37; font-weight:bold;');
+            verifierResonanceRune(12); // Rune 12 nécessite clé 13
+            console.log('%c✨ La clé 13 vibre intensément !', 'color:#d4af37;');
+        }, 17000);
+        
+        // Fin du scénario
+        setTimeout(function() {
+            arreterResonanceMagique();
+            fermerSacInventaire();
+            console.log('%c🎊 QUÊTE TERMINÉE ! Le Sanctuaire s\'ouvre devant vous...', 'color:#00ff88; font-size:1.2em; font-weight:bold; text-shadow: 0 0 20px rgba(0,255,136,0.8);');
+        }, 22000);
+    };
+
+
+    // Fonction utilitaire : Déclencher résonance simple (pour intégration facile)
+    window.resonner = function(objetId, type, intensite) {
+        type = type || 'quete';
+        intensite = intensite || 1;
+        declencherResonanceMagique(objetId, type, intensite);
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // INTÉGRATION ZONES INTERACTIVES - Détection de proximité
+    // ═══════════════════════════════════════════════════════
+    
+    // Exemple d'intégration avec les runes du Sanctuaire
+    function verifierResonanceRune(runeId) {
+        // Vérifier si une clé spéciale peut débloquer cette rune
+        var cleSpeciale = runeId + 1; // Exemple : rune 0 nécessite clé 1
+        
+        if (sacInventaire.indexOf(cleSpeciale) !== -1) {
+            console.log('%c🌟 Rune ' + runeId + ' : Clé spéciale détectée !', 'color:#d4af37;');
+            declencherResonanceMagique(cleSpeciale, 'cle', 1);
+            return true;
+        }
+        return false;
+    }
+
+    // Exemple d'intégration avec les portes des 100 niveaux
+    function verifierResonancePorte(doorIndex) {
+        // Vérifier si un objet de quête peut aider à identifier la bonne porte
+        var objetsUtiles = ['orbe_vision', 'cristal_clarte', 'parchemin_sagesse'];
+        
+        for (var i = 0; i < objetsUtiles.length; i++) {
+            var objet = sacObjetsQuete.find(function(obj) { return obj.id === objetsUtiles[i]; });
+            if (objet) {
+                console.log('%c🔮 Porte ' + doorIndex + ' : Objet de guidance détecté !', 'color:#49cafa;');
+                declencherResonanceMagique(objet.id, 'quete', 2);
+                
+                // Révéler la destination de la porte
+                if (typeof revealDoorWithScroll === 'function') {
+                    revealDoorWithScroll(doorIndex);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Hook global : Surveiller les événements de proximité
+    var resonanceZonesActives = {};
+    
+    function enregistrerZoneResonance(zoneId, objetRequis, callback) {
+        resonanceZonesActives[zoneId] = {
+            objetRequis: objetRequis,
+            callback: callback || function() {}
+        };
+        console.log('%c📍 Zone de résonance enregistrée:', 'color:#d4af37;', zoneId);
+    }
+
+    function declencherZoneResonance(zoneId) {
+        var zone = resonanceZonesActives[zoneId];
+        if (!zone) {
+            console.warn('Zone de résonance inconnue:', zoneId);
+            return false;
+        }
+        
+        var result = verifierResonanceZone(zoneId, zone.objetRequis);
+        if (result && zone.callback) {
+            zone.callback();
+        }
+        return result;
+    }
+
+    // Exemple d'utilisation avec les runes :
+    // Ajoutez ceci dans onRuneClick pour activer la résonance au survol
+    /*
+    function onRuneClick(runeId) {
+        // Code existant...
+        
+        // Ajouter détection de résonance
+        if (verifierResonanceRune(runeId)) {
+            addOracleChatMessage('✨ Votre clé vibre en présence de cette rune !');
+        }
+        
+        // Reste du code...
+    }
+    */
 </script>
 </html>
