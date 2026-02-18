@@ -308,6 +308,10 @@
         .wallet-button-wrap w3m-button {
             display: block !important;
         }
+        .wallet-button-wrap {
+            transform: scale(0.8);
+            transform-origin: center;
+        }
         /* Responsive Header */
         @media (max-width: 1024px) {
             header {
@@ -556,11 +560,12 @@
             border-color: #ff2424aa;
             animation: glitch-border 0.15s steps(1) infinite alternate;
         }
-        /* Runes - Cercles dorés fins totalement transparents */
+        /* Runes - Cercles dorés (réduits 20%) */
         .runes-column .rune-btn {
             width: 70px;
             height: 70px;
             margin: 0;
+            transform: scale(0.8);
         }
         .rune-btn {
             /* Structure */
@@ -600,7 +605,7 @@
                 0 0 35px rgba(212, 175, 55, 0.9),
                 0 0 45px rgba(212, 175, 55, 0.6);
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
-            transform: scale(1.12);
+            transform: scale(0.9);
         }
         
         /* Animation quête active - Pulse doré */
@@ -621,7 +626,7 @@
                     0 0 20px rgba(255, 215, 0, 1),
                     0 0 30px rgba(212, 175, 55, 0.8);
                 box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
-                transform: scale(1.05);
+                transform: scale(0.84);
             }
         }
         /* Feedback visuel pour les runes avec cercle doré */
@@ -651,10 +656,10 @@
         }
         @keyframes rune-feedback-good {
             0%, 100% {
-                transform: scale(1);
+                transform: scale(0.8);
             }
             50% {
-                transform: scale(1.15);
+                transform: scale(0.92);
             }
         }
         @keyframes rune-feedback-bad {
@@ -734,6 +739,7 @@
             flex-direction: column !important;
             justify-content: space-evenly !important;
             align-items: center !important;
+            gap: 10px;
             min-height: 85vh;
             background: transparent !important;
             border: none !important;
@@ -819,6 +825,7 @@
             }
             .runes-column {
                 min-height: 78vh;
+                gap: 8px;
                 padding-top: 140px !important;
             }
             .runes-column.left {
@@ -832,9 +839,10 @@
             .runes-column .rune-btn {
                 width: 58px;
                 height: 58px;
+                transform: scale(0.8);
             }
             .rune-btn {
-                font-size: 1.7em;
+                font-size: 1.4em;
                 width: 58px;
                 height: 58px;
             }
@@ -843,9 +851,9 @@
             }
             #btn-sacoche {
                 bottom: 20px;
-                width: 68px;
-                height: 68px;
-                font-size: 2em;
+                width: 54px;
+                height: 54px;
+                font-size: 1.6em;
             }
         }
         @media (max-width: 480px) {
@@ -855,6 +863,7 @@
             }
             .runes-column {
                 min-height: 72vh;
+                gap: 6px;
                 padding-top: 160px !important;
             }
             .runes-column.left {
@@ -868,9 +877,10 @@
             .runes-column .rune-btn {
                 width: 50px;
                 height: 50px;
+                transform: scale(0.8);
             }
             .rune-btn {
-                font-size: 1.5em;
+                font-size: 1.2em;
                 width: 50px;
                 height: 50px;
             }
@@ -879,9 +889,9 @@
             }
             #btn-sacoche {
                 bottom: 18px;
-                width: 62px;
-                height: 62px;
-                font-size: 1.9em;
+                width: 50px;
+                height: 50px;
+                font-size: 1.5em;
             }
             .btn-back-accueil {
                 font-size: 0.65rem;
@@ -1576,8 +1586,8 @@
             visibility: visible !important;
             opacity: 1 !important;
             animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 75px;
-            height: 75px;
+            width: 60px;
+            height: 60px;
             border-radius: 10px;
             background: 
                 linear-gradient(135deg, 
@@ -1598,7 +1608,7 @@
             cursor: pointer;
             align-items: center;
             justify-content: center;
-            font-size: 2.2em;
+            font-size: 1.8em;
             transition: all 0.3s ease;
         }
         #btn-sacoche::before {
@@ -2098,6 +2108,7 @@
             }
             .runes-column {
                 min-height: 80vh;
+                gap: 10px;
                 padding: 30px 0;
                 padding-top: 140px !important;
                 background: transparent !important;
@@ -2142,17 +2153,17 @@
             }
             /* Sacoche */
             #btn-sacoche {
-                width: 65px;
-                height: 65px;
-                font-size: 2em;
+                width: 52px;
+                height: 52px;
+                font-size: 1.6em;
                 bottom: 15px;
             }
         }
         @media (max-width: 480px) {
             #btn-sacoche {
-                width: 60px;
-                height: 60px;
-                font-size: 1.9em;
+                width: 48px;
+                height: 48px;
+                font-size: 1.5em;
                 bottom: 12px;
             }
             #sac-inventaire {
