@@ -320,13 +320,16 @@
         .wallet-button-wrap {
             transform-origin: center;
         }
-        /* FORCE: Wallet tout en haut */
+        /* FORCE: Wallet en haut à droite */
         #gate-connect-wrap {
             position: fixed !important;
-            top: 10px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            z-index: 99999 !important;
+            top: 15px !important;
+            right: 15px !important;
+            left: auto !important;
+            transform: none !important;
+            z-index: 100000 !important;
+            margin: 0 !important;
+            justify-content: flex-end !important;
         }
         .wallet-button-wrap {
             transform: scale(0.8) !important;
@@ -761,7 +764,7 @@
             gap: 6px;
             min-height: 85vh;
             background: transparent !important;
-            border: 0.5px solid rgba(212, 175, 55, 0.3) !important;
+            border: 0.5px solid rgba(212, 175, 55, 0.2) !important;
             box-shadow: none !important;
             filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
             backdrop-filter: none !important;
@@ -2246,7 +2249,7 @@
     <div id="frost-particles" aria-hidden="true"></div>
     <div id="arcana-connect-gate">
         <p class="gate-message">Le Sanctuaire attend.<br>Connectez votre wallet pour entrer.</p>
-        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center;">
+        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:flex-end; margin:0;">
             <div class="wallet-button-wrap" style="position:relative; z-index:99999 !important; pointer-events:auto !important;">
                 <w3m-button></w3m-button>
             </div>
