@@ -979,7 +979,7 @@
             transition: opacity 0.5s ease;
             overflow: hidden;
         }
-        #arcana-connect-gate.hidden { display: none; }
+        #arcana-connect-gate.hidden { display: none; pointer-events: none !important; }
         #arcana-connect-gate:not(.hidden) { display: flex !important; }
         body:has(#arcana-connect-gate:not(.hidden)) { overflow: hidden; height: 100vh; }
         #arcana-connect-gate .gate-message {
@@ -1570,10 +1570,11 @@
         }
         #btn-sacoche {
             position: fixed !important;
-            bottom: 25px !important;
+            bottom: 20px !important;
             left: 50% !important;
             transform: translateX(-50%) rotateX(2deg);
-            z-index: 9999 !important;
+            z-index: 100001 !important;
+            pointer-events: auto !important;
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
@@ -1591,7 +1592,7 @@
                     transparent 1px, 
                     rgba(0, 0, 0, 0.08) 1px, 
                     rgba(0, 0, 0, 0.08) 2px);
-            border: 3px solid rgba(139, 115, 85, 0.9);
+            border: 0.5px solid rgba(212, 175, 55, 0.4);
             box-shadow: 
                 0 8px 35px rgba(0, 0, 0, 0.85),
                 inset 0 2px 0 rgba(212, 175, 55, 0.2),
@@ -2452,7 +2453,7 @@
     <!-- ═══ BRUME ANIMÉE - Derrière l'inventaire ═══ -->
     <div class="mist-layer" aria-hidden="true"></div>
     <!-- ═══ BOUTON SACOCHE - Flotte au-dessus du sanctuaire ═══ -->
-    <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire" style="position:fixed;bottom:25px;left:50%;transform:translateX(-50%) rotateX(2deg);z-index:9999;display:block!important;">
+    <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) rotateX(2deg);z-index:100001;pointer-events:auto;display:block!important;">
         <span style="filter: sepia(0.3) contrast(1.1);">💼</span>
         <span id="btn-sacoche-badge">0</span>
     </button>
