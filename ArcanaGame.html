@@ -181,8 +181,8 @@
             gap: 25px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
         }
-        /* Logo Arkana - Discret et élégant à gauche */
-        .logo-arkana {
+        /* Logo Arcana - Discret et élégant à gauche */
+        .logo-arcana {
             display: flex;
             align-items: center;
             gap: 6px;
@@ -197,19 +197,26 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        .logo-arkana:hover {
+        .logo-arcana:hover {
             opacity: 1;
             color: var(--gold);
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
         }
-        .logo-arkana-symbol {
-            font-size: 1.4em;
-            color: var(--gold);
+        .logo-arcana img {
+            height: 45px;
             filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
             transition: filter 0.3s ease;
         }
-        .logo-arkana:hover .logo-arkana-symbol {
+        .logo-arcana:hover img {
             filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8));
+        }
+        .logo-arcana-title {
+            font-family: 'Cinzel', serif !important;
+            font-size: 0.75em;
+            color: #d4af37 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.12em;
+            font-weight: 300;
         }
         /* Titre central avec plaque décorative */
         .header-title-plate {
@@ -319,11 +326,11 @@
                 padding: 12px 15px;
                 gap: 10px;
             }
-            .logo-arkana {
+            .logo-arcana {
                 font-size: 0.7em;
             }
-            .logo-arkana-symbol {
-                font-size: 1.3em;
+            .logo-arcana img {
+                height: 40px;
             }
             .header-title-plate {
                 padding: 8px 18px;
@@ -355,7 +362,7 @@
                 padding: 10px;
                 gap: 8px;
             }
-            .logo-arkana {
+            .logo-arcana {
                 justify-self: center;
                 order: 3;
                 font-size: 0.65em;
@@ -2182,10 +2189,10 @@
     <div id="star-container"></div>
     <div id="arcana-fog" aria-hidden="true"></div>
     <header>
-        <!-- Logo Arkana à gauche -->
-        <div class="logo-arkana">
-            <span class="logo-arkana-symbol">⧫</span>
-            <span>ARKANA</span>
+        <!-- Logo Arcana à gauche -->
+        <div class="logo-arcana">
+            <img src="Arcana_logo.png" alt="Arcana Logo" style="height: 45px;">
+            <span class="logo-arcana-title">ARCANA</span>
         </div>
         
         <!-- Titre central avec plaque décorative -->
