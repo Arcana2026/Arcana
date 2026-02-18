@@ -586,7 +586,7 @@
             justify-content: center;
             z-index: 10;
             
-            /* Transparence totale avec bordure dorée ultra-fine (lueur) */
+            /* Transparence totale avec bordure dorée ultra-fine */
             background: transparent !important;
             border: 0.5px solid rgba(212, 175, 55, 0.2);
             border-radius: 50%;
@@ -947,11 +947,14 @@
         .arcana-mention {
             display: none;
         }
-        /* Écran d'attente : complètement transparent */
+        /* Écran d'attente : complètement transparent, pas de boîte */
         #arcana-connect-gate {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
             display: none;
             flex-direction: column;
             align-items: center;
@@ -968,7 +971,7 @@
             font-family: 'Cinzel', serif;
             color: var(--gold);
             font-size: 1.1em;
-            background: none !important;
+            background: transparent !important;
             letter-spacing: 0.15em;
             text-align: center;
             margin: 0;
@@ -978,9 +981,8 @@
             border: none !important;
             box-shadow: none !important;
         }
-        #arcana-connect-gate,
-        #gate-connect-wrap {
-            background: none !important;
+        #arcana-connect-gate .gate-connect-wrap {
+            background: transparent !important;
             border: none !important;
             box-shadow: none !important;
         }
