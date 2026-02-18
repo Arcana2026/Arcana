@@ -42,6 +42,7 @@
             letter-spacing: 0.15em;
         }
         body {
+            perspective: 1000px;
             /* Couloir de pierre en perspective - arrière-plan principal */
             background: 
                 /* Murs latéraux sombres */
@@ -722,7 +723,7 @@
         #level-3-sanctuary.sac-ouvert {
             opacity: 0.6;
         }
-        /* Colonnes de runes - Totalement invisibles (comme dans l'image) */
+        /* Colonnes de runes - Parallaxe (ombre portée) */
         .runes-column {
             display: flex !important;
             flex-direction: column !important;
@@ -732,6 +733,7 @@
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
             z-index: 10;
@@ -997,15 +999,17 @@
         .btn-back-accueil {
             display: none;
         }
-        /* Contenu jeu : transparent pour voir le décor */
+        /* Contenu jeu : effet de salle (tunnel/temple) */
         #game-container, #arcana-game-content { 
             display: none; 
             opacity: 0;
-            background: transparent !important;
+            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
+            background-size: cover !important;
         }
         #game-container.visible, #arcana-game-content.visible { 
             display: block;
-            background: transparent !important;
+            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
+            background-size: cover !important;
         }
         /* Masquer tous les panels sauf le sanctuaire par défaut */
         #class-selection,
@@ -1550,16 +1554,16 @@
         
         /* === BOUTON SACOCHE - Centre bas, animation de rebond === */
         @keyframes bounceIn {
-            0% { transform: translateX(-50%) scale(0); opacity: 0; }
-            60% { transform: translateX(-50%) scale(1.1); opacity: 1; }
-            80% { transform: translateX(-50%) scale(0.95); }
-            100% { transform: translateX(-50%) scale(1); }
+            0% { transform: translateX(-50%) rotateX(2deg) scale(0); opacity: 0; }
+            60% { transform: translateX(-50%) rotateX(2deg) scale(1.1); opacity: 1; }
+            80% { transform: translateX(-50%) rotateX(2deg) scale(0.95); }
+            100% { transform: translateX(-50%) rotateX(2deg) scale(1); }
         }
         #btn-sacoche {
             position: fixed !important;
             bottom: 25px !important;
             left: 50% !important;
-            transform: translateX(-50%);
+            transform: translateX(-50%) rotateX(2deg);
             z-index: 9999 !important;
             display: block !important;
             visibility: visible !important;
@@ -1607,26 +1611,26 @@
                 0 10px 35px rgba(0, 0, 0, 0.9),
                 0 0 25px rgba(212, 175, 55, 0.5),
                 inset 0 2px 0 rgba(212, 175, 55, 0.3);
-            transform: translateX(-50%) scale(1.06);
+            transform: translateX(-50%) rotateX(2deg) scale(1.06);
         }
         #btn-sacoche.resonance {
             animation: sac-resonance-pulse 1.5s ease-in-out infinite;
         }
         @keyframes sac-resonance-pulse {
             0%, 100% {
-                transform: translateX(-50%) scale(1);
+                transform: translateX(-50%) rotateX(2deg) scale(1);
                 box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(212, 175, 55, 0.15);
             }
             25% {
-                transform: translateX(-50%) scale(1.08);
+                transform: translateX(-50%) rotateX(2deg) scale(1.08);
                 box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), 0 0 18px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.4);
             }
             50% {
-                transform: translateX(-50%) scale(1.12);
+                transform: translateX(-50%) rotateX(2deg) scale(1.12);
                 box-shadow: 0 0 45px rgba(212, 175, 55, 1), 0 0 25px rgba(255, 215, 0, 0.8), inset 0 0 18px rgba(212, 175, 55, 0.6);
             }
             75% {
-                transform: translateX(-50%) scale(1.08);
+                transform: translateX(-50%) rotateX(2deg) scale(1.08);
                 box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), 0 0 18px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.4);
             }
         }
@@ -1697,7 +1701,7 @@
             left: 0;
             right: 0;
             z-index: 10000;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)) !important;
+            background: rgba(10, 10, 15, 0.4) !important;
             backdrop-filter: blur(20px) saturate(180%) !important;
             -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -2151,7 +2155,7 @@
         }
         /* --- SANCTUAIRE TRANSPARENT ET DORÉ --- */
         #level-3-sanctuary {
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.9) 100%), 
+            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), 
                         url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
             background-size: cover !important;
             display: flex !important;
@@ -2424,7 +2428,7 @@
     </div>
 
     <!-- ═══ BOUTON SACOCHE - Flotte au-dessus du sanctuaire ═══ -->
-    <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire" style="position:fixed;bottom:25px;left:50%;transform:translateX(-50%);z-index:9999;display:block!important;">
+    <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire" style="position:fixed;bottom:25px;left:50%;transform:translateX(-50%) rotateX(2deg);z-index:9999;display:block!important;">
         <span style="filter: sepia(0.3) contrast(1.1);">💼</span>
         <span id="btn-sacoche-badge">0</span>
     </button>
