@@ -2129,34 +2129,19 @@
                 font-size: 0.75em;
             }
         }
-        /* --- CONFIGURATION PREMIUM ARCANA --- */
+        /* --- SANCTUAIRE TRANSPARENT ET DORÉ --- */
         #level-3-sanctuary {
             background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.9) 100%), 
                         url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
             background-size: cover !important;
-            min-height: 100vh !important;
             display: flex !important;
             justify-content: space-between !important;
         }
 
-        /* REND LES COLONNES ET LES PANNEAUX TRANSPARENTS */
-        .glass-panel, .rune-column, [class*="panel"], .rune-container {
+        .glass-panel, .rune-column, .rune-container {
             background: transparent !important;
             border: none !important;
-            backdrop-filter: none !important;
             box-shadow: none !important;
-        }
-
-        /* POSITIONNEMENT DU HEADER POUR LE LOGO ARCANA */
-        .arcana-header {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            display: flex !important;
-            justify-content: space-between !important;
-            padding: 20px !important;
-            z-index: 9999 !important;
         }
     </style>
     <!-- Google Fonts for digital effect -->
