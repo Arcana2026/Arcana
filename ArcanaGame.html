@@ -707,7 +707,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 1111;
+            z-index: 100;
             width: 100vw;
             height: 100vh;
             background: transparent !important;
@@ -1548,17 +1548,18 @@
             }
         }
         
-        /* === BOUTON SACOCHE - Centré en bas (identique à l'image) === */
+        /* === BOUTON SACOCHE - Flotte au-dessus du sanctuaire === */
         #btn-sacoche {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
+            position: fixed !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            z-index: 9999 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
             width: 75px;
             height: 75px;
             border-radius: 10px;
-            /* Texture cuir marron authentique */
             background: 
                 linear-gradient(135deg, 
                     rgba(92, 74, 53, 0.98) 0%, 
@@ -1576,12 +1577,10 @@
                 inset 0 -3px 10px rgba(0, 0, 0, 0.5),
                 0 0 25px rgba(139, 115, 85, 0.35);
             cursor: pointer;
-            display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.2em;
             transition: all 0.3s ease;
-            position: relative;
         }
         #btn-sacoche::before {
             content: '';
@@ -1600,26 +1599,26 @@
                 0 10px 35px rgba(0, 0, 0, 0.9),
                 0 0 25px rgba(212, 175, 55, 0.5),
                 inset 0 2px 0 rgba(212, 175, 55, 0.3);
-            transform: translateX(-50%) scale(1.06);
+            transform: scale(1.06);
         }
         #btn-sacoche.resonance {
             animation: sac-resonance-pulse 1.5s ease-in-out infinite;
         }
         @keyframes sac-resonance-pulse {
             0%, 100% {
-                transform: translateX(-50%) scale(1);
+                transform: scale(1);
                 box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(212, 175, 55, 0.15);
             }
             25% {
-                transform: translateX(-50%) scale(1.08);
+                transform: scale(1.08);
                 box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), 0 0 18px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.4);
             }
             50% {
-                transform: translateX(-50%) scale(1.12);
+                transform: scale(1.12);
                 box-shadow: 0 0 45px rgba(212, 175, 55, 1), 0 0 25px rgba(255, 215, 0, 0.8), inset 0 0 18px rgba(212, 175, 55, 0.6);
             }
             75% {
-                transform: translateX(-50%) scale(1.08);
+                transform: scale(1.08);
                 box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), 0 0 18px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.4);
             }
         }
@@ -1689,7 +1688,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            z-index: 2500;
+            z-index: 10000;
             background: 
                 linear-gradient(180deg, 
                     rgba(42, 37, 32, 0.92) 0%, 
@@ -2398,7 +2397,8 @@
             <div class="victory-text">✨ JACKPOT DÉVERROUILLÉ<br><span style="font-size:0.62em;color:#fff;letter-spacing:0.09em;">Le Destin, scellé dans l'or éternel</span></div>
             <div class="gold-rain"></div>
         </div>
-    </div><!-- ═══ FIN CONTENEUR PRINCIPAL (#game-container) ═══ -->
+    </div>
+    <!-- ═══ FIN CONTENEUR PRINCIPAL (#game-container) ═══ -->
     <!-- ═══ EFFETS SONORES - Chargement optimisé ═══ -->
     <audio id="heartbeat-audio" preload="metadata" src="https://cdn.pixabay.com/audio/2022/08/20/audio_12c959d8f4.mp3"></audio>
     <audio id="triumph-audio" preload="metadata" src="https://cdn.pixabay.com/audio/2022/01/18/audio_8f0bc6dc2b.mp3"></audio>
@@ -2427,8 +2427,8 @@
         </div>
     </div>
 
-    <!-- ═══ BOUTON SACOCHE EN CUIR - BAS CENTRE ═══ -->
-    <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire">
+    <!-- ═══ BOUTON SACOCHE - Flotte au-dessus du sanctuaire ═══ -->
+    <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire" style="position:fixed;bottom:20px;right:20px;z-index:9999;display:block!important;">
         <span style="filter: sepia(0.3) contrast(1.1);">💼</span>
         <span id="btn-sacoche-badge">0</span>
     </button>
