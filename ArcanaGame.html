@@ -2097,125 +2097,157 @@
             #level-3-sanctuary.sac-ouvert {
                 opacity: 0.5;
             }
-            <!-- 2100 -->
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            /* Sacoche */
+            #btn-sacoche {
+                width: 65px;
+                height: 65px;
+                font-size: 2em;
+                bottom: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            #btn-sacoche {
+                width: 60px;
+                height: 60px;
+                font-size: 1.9em;
+                bottom: 12px;
+            }
+            #sac-inventaire {
+                padding: 16px 12px 12px;
+            }
+            #sac-inventaire-titre {
+                font-size: 0.95em;
+            }
+            #sac-slots-container {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 6px;
+                padding: 8px;
+            }
+            .sac-slot {
+                min-height: 48px;
+                font-size: 0.75em;
+                border-width: 1.5px;
+            }
+            #sac-objets-quete {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 8px;
+            }
+            .sac-section-titre {
+                font-size: 0.75em;
+            }
+        }
+        /* --- SANCTUAIRE TRANSPARENT ET DORÉ --- */
+        #level-3-sanctuary {
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.9) 100%), 
+                        url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
+            background-size: cover !important;
+            display: flex !important;
+            justify-content: space-between !important;
         }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 800px;
-            padding: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #f0f0f0;
-            padding-bottom: 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 2.5em;
-            letter-spacing: 2px;
-        }
-
-        .arcana-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 50px;
-            display: inline-block;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        /* 2200 */
-        .content {
-            line-height: 1.8;
-            color: #555;
-        }
-
-        .arcana-highlight {
-            background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin: 20px 0;
-            font-style: italic;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #f0f0f0;
-            color: #888;
-        }
-
-        .arcana-link {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-
-        .arcana-link:hover {
-            color: #764ba2;
+        .glass-panel, .rune-column, .rune-container {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
     </style>
+    <!-- Google Fonts for digital effect -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">
-                <img src="Arcana_logo.png" style="height:45px;" alt="ARCANA Logo">
-                <h1>ARCANA</h1>
-            </div>
-            <div class="arcana-badge">Version 2.0</div>
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
+    <!-- ║   GRILLE DES 12 RUNES - AFFICHAGE PRIORITAIRE (CHARGEMENT IMMÉDIAT) ║ -->
+    <!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+    <div id="level-3-sanctuary" class="glass-panel" data-room="2">
+        <!-- ═══ COLONNE GAUCHE - RUNES 1-6 ═══ -->
+        <div class="runes-column left" role="region" aria-label="Runes gauches">
+            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)" aria-label="Rune 1" title="🔍 Rune 1 : Le Chercheur">⏀</button>
+            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)" aria-label="Rune 2" title="🔍 Rune 2 : Le Chercheur">⏃</button>
+            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)" aria-label="Rune 3" title="🔍 Rune 3 : Le Chercheur">⏇</button>
+            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)" aria-label="Rune 4" title="🔍 Rune 4 : Le Chercheur">⎈</button>
+            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)" aria-label="Rune 5" title="🚪 Rune 5 : Le Verrou">⎔</button>
+            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6" title="🚪 Rune 6 : Le Verrou">⌬</button>
         </div>
-        
-        <div class="content">
-            <p>Bienvenue dans l'univers d'<strong>ARCANA</strong>, votre plateforme de référence pour la découverte des mystères du code.</p>
-            
-            <div class="arcana-highlight">
-                "ARCANA - Là où la magie du développement prend vie."
-            </div>
-            
-            <p>Avec ARCANA, explorez les profondeurs de la programmation à travers des tutoriels interactifs, des défis captivants et une communauté passionnée. Que vous soyez débutant ou expert, ARCANA vous guide dans votre quête de connaissance.</p>
-            
-            <p>Rejoignez l'aventure ARCANA dès aujourd'hui et transformez votre façon de coder !</p>
+
+        <!-- ═══ ZONE CENTRALE - TEMPLE (TOTALEMENT VIDE) ═══ -->
+        <div class="temple-center" role="main" aria-label="Zone centrale du temple">
+            <!-- Espace libre pour papyrus, animations et vue sur le décor étoilé -->
         </div>
-        
-        <div class="footer">
-            <p>&copy; 2024 <a href="#" class="arcana-link">ARCANA</a> - Tous droits réservés</p>
-            <p style="font-size: 0.9em; margin-top: 10px;">Propulsé par la magie d'ARCANA ✨</p>
+
+        <!-- ═══ COLONNE DROITE - RUNES 7-12 ═══ -->
+        <div class="runes-column right" role="region" aria-label="Runes droites">
+            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)" aria-label="Rune 7" title="🚪 Rune 7 : Le Verrou">⏍</button>
+            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)" aria-label="Rune 8" title="🚪 Rune 8 : Le Verrou">⏦</button>
+            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)" aria-label="Rune 9" title="📜 Rune 9 : L'Atelier">⧖</button>
+            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)" aria-label="Rune 10" title="📜 Rune 10 : L'Atelier">⧉</button>
+            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)" aria-label="Rune 11" title="🍺 Rune 11 : La Taverne">⨇</button>
+            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)" aria-label="Rune 12" title="👁️ Rune 12 : L'Oracle">⩓</button>
         </div>
     </div>
-</body>
-</html>>
+    <!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <div id="star-container"></div>
+    <div id="arcana-fog" aria-hidden="true"></div>
+    <header>
+        <!-- Logo Arcana à gauche -->
+        <div class="logo-arcana">
+            <img src="Arcana_logo.png" alt="Arcana" style="height: 45px; margin-right: 10px;">
+            <span class="logo-arcana-title">ARCANA</span>
+        </div>
+        
+        <!-- Titre central avec plaque décorative -->
+        <div class="header-title-plate">
+            <h1 class="header-title-main">LE SANCTUAIRE DU DESTIN</h1>
+            <div class="header-title-separator"></div>
+            <div class="header-title-level">LEVEL <span id="header-level-num">1</span></div>
+        </div>
+        
+        <!-- Boutons de navigation à droite -->
+        <div class="header-nav-buttons">
+            <a href="./index.html" class="header-btn-pill">RETOUR AU COFFRE</a>
+            <button class="header-btn-pill" id="header-connect-wallet-btn">CONNECT WALLET</button>
+        </div>
+    </header>
+
+    <div id="frost-particles" aria-hidden="true"></div>
+    <div id="arcana-connect-gate">
+        <p class="gate-message">Le Sanctuaire attend.<br>Connectez votre wallet pour entrer.</p>
+        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center; margin-top:20px;">
+            <w3m-button></w3m-button>
+        </div>
+    </div>
+
+    <div id="arcane-dark-fog" style="opacity:0; pointer-events:none;"></div>
+    <div id="arcane-darkness-overlay" style="opacity:0;"></div>
+    <div id="arcane-inventory" style="display:none;">
+        <span class="keys-label">Clés</span>
+        <span id="arcane-keys-count" class="keys-count">0</span>
+        <span class="keys-label" style="margin-left:12px;">Nav</span>
+        <span id="arcane-navkeys-count" class="keys-count">0</span>
+        <span class="keys-label" style="margin-left:12px;">🛡️</span>
+        <span id="arcane-protection-count" class="keys-count">0</span>
+    </div>
+    <div id="arcane-level-counter" style="display:none;">NIVEAU <span id="arcane-level-num">1</span> / 100</div>
+    
+    <!-- ═══ CONTENEUR PRINCIPAL DU JEU ═══ -->
+    <div id="game-container" class="arcana-game-content">
+        <div class="title-vault">THE ARCANA VAULT</div>
+    <div id="class-selection" class="glass-panel" style="display:none; text-align:center;">
+        <div class="label-gold">Rite d'Engagement / Étape 1</div>
+        <h2 style="letter-spacing: 2px;">CHOISISSEZ VOTRE DESTIN</h2>
+        <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+            <div class="class-card" onclick="selectClass('Scribe')">
+                <div class="class-icon">📜</div>
+                <p>SCRIBE</p>
+            </div>
+            <div class="class-card" onclick="selectClass('Invocateur')">
+                <div class="class-icon">🔥</div>
+                <p>INVOCATEUR</p>
+            </div>
+            <div class="class-card" onclick="selectClass('Gardien')">
+                <div class="class-icon">🛡️</div>
+                <p>GARDIEN</p>
+            </div>
         </div>
     </div>
 
