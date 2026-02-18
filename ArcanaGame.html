@@ -739,7 +739,7 @@
             flex-direction: column !important;
             justify-content: space-evenly !important;
             align-items: center !important;
-            gap: 10px;
+            gap: 6px;
             min-height: 85vh;
             background: transparent !important;
             border: none !important;
@@ -778,22 +778,12 @@
         .temple-center * {
             background-color: transparent !important;
         }
-        /* Zone centrale - Totalement transparente pour voir le décor body */
+        /* Zone centrale - Invisible mais garde l'espace pour la grille */
         .temple-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding: 60px;
+            visibility: hidden !important;
+            padding: 0 !important;
+            min-width: 0 !important;
             background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            z-index: 1;
-            min-width: 0;
-            overflow: visible;
         }
         /* Pseudo-éléments désactivés pour vue dégagée */
         .temple-center::before,
@@ -825,7 +815,7 @@
             }
             .runes-column {
                 min-height: 78vh;
-                gap: 8px;
+                gap: 5px;
                 padding-top: 140px !important;
             }
             .runes-column.left {
@@ -863,7 +853,7 @@
             }
             .runes-column {
                 min-height: 72vh;
-                gap: 6px;
+                gap: 5px;
                 padding-top: 160px !important;
             }
             .runes-column.left {
@@ -990,7 +980,8 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            padding-top: 10px;
             z-index: 99999;
             pointer-events: auto;
             transition: opacity 0.5s ease;
@@ -2108,7 +2099,7 @@
             }
             .runes-column {
                 min-height: 80vh;
-                gap: 10px;
+                gap: 6px;
                 padding: 30px 0;
                 padding-top: 140px !important;
                 background: transparent !important;
@@ -2266,7 +2257,7 @@
     <div id="frost-particles" aria-hidden="true"></div>
     <div id="arcana-connect-gate">
         <p class="gate-message">Le Sanctuaire attend.<br>Connectez votre wallet pour entrer.</p>
-        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center; margin-top:20px;">
+        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center; margin-top:10px; position:absolute; top:10px; left:50%; transform:translateX(-50%);">
             <div class="wallet-button-wrap" style="position:relative; z-index:99999 !important; pointer-events:auto !important;">
                 <w3m-button></w3m-button>
             </div>
