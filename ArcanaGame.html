@@ -312,6 +312,13 @@
             transform: scale(0.8);
             transform-origin: center;
         }
+        #gate-connect-wrap {
+            position: fixed !important;
+            top: 10px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 100000 !important;
+        }
         /* Responsive Header */
         @media (max-width: 1024px) {
             header {
@@ -579,9 +586,9 @@
             justify-content: center;
             z-index: 10;
             
-            /* Transparence totale avec bordure dorée fine */
+            /* Transparence totale avec bordure dorée ultra-fine (lueur) */
             background: transparent !important;
-            border: 1px solid rgba(212, 175, 55, 0.35);
+            border: 1px solid rgba(212, 175, 55, 0.3);
             border-radius: 50%;
             
             /* Symbole doré */
@@ -733,7 +740,7 @@
         #level-3-sanctuary.sac-ouvert {
             opacity: 0.6;
         }
-        /* Colonnes de runes - Parallaxe (ombre portée) */
+        /* Colonnes de runes - Contour ultra-fin, transparence/blur léger */
         .runes-column {
             display: flex !important;
             flex-direction: column !important;
@@ -742,23 +749,25 @@
             gap: 6px;
             min-height: 85vh;
             background: transparent !important;
-            border: none !important;
+            border: 1px solid rgba(212, 175, 55, 0.3) !important;
             box-shadow: none !important;
             filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             z-index: 10;
             position: relative;
             padding: 40px 0;
             padding-top: 130px !important;
         }
         .runes-column.left {
+            grid-column: 1;
             justify-self: start;
             align-items: flex-start !important;
             padding-left: 35px;
             padding-top: 130px !important;
         }
         .runes-column.right {
+            grid-column: 3;
             justify-self: end;
             align-items: flex-end !important;
             padding-right: 35px;
@@ -772,34 +781,6 @@
         }
         .runes-column .rune-btn {
             background: transparent !important;
-        }
-        /* Temple-center : aucun fond visible */
-        .temple-center,
-        .temple-center * {
-            background-color: transparent !important;
-        }
-        /* Zone centrale - Invisible mais garde l'espace pour la grille */
-        .temple-center {
-            visibility: hidden !important;
-            padding: 0 !important;
-            min-width: 0 !important;
-            background: transparent !important;
-        }
-        /* Pseudo-éléments désactivés pour vue dégagée */
-        .temple-center::before,
-        .temple-center::after {
-            display: none;
-        }
-        /* Éléments de décor - Cachés pour vue dégagée sur le fond étoilé */
-        .temple-center-pillars,
-        .temple-center-floor,
-        .temple-center-mist {
-            display: none;
-        }
-        /* Contenu au-dessus du décor */
-        .temple-center > * {
-            position: relative;
-            z-index: 2;
         }
         /* Quand le sac est ouvert - runes restent visibles mais légèrement atténuées */
         #level-3-sanctuary.sac-ouvert .rune-btn {
@@ -836,9 +817,6 @@
                 width: 58px;
                 height: 58px;
             }
-            .temple-center {
-                padding: 50px 20px;
-            }
             #btn-sacoche {
                 bottom: 20px;
                 width: 54px;
@@ -873,9 +851,6 @@
                 font-size: 1.2em;
                 width: 50px;
                 height: 50px;
-            }
-            .temple-center {
-                padding: 40px 15px;
             }
             #btn-sacoche {
                 bottom: 18px;
@@ -980,14 +955,15 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding-top: 10px;
+            justify-content: center;
             z-index: 99999;
             pointer-events: auto;
             transition: opacity 0.5s ease;
+            overflow: hidden;
         }
         #arcana-connect-gate.hidden { display: none; }
         #arcana-connect-gate:not(.hidden) { display: flex !important; }
+        body:has(#arcana-connect-gate:not(.hidden)) { overflow: hidden; height: 100vh; }
         #arcana-connect-gate .gate-message {
             font-family: 'Cinzel', serif;
             color: var(--gold);
@@ -995,13 +971,12 @@
             background: transparent !important;
             letter-spacing: 0.15em;
             text-align: center;
-            margin-bottom: 25px;
+            margin: 0;
+            padding: 0;
             opacity: 1;
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-            background: rgba(20, 15, 10, 0.85);
-            padding: 20px 30px;
-            border-radius: 15px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            border: none !important;
+            box-shadow: none !important;
         }
         /* Ancien bouton retour - Désormais intégré dans le header */
         .btn-back-accueil {
@@ -1094,6 +1069,9 @@
         #arcana-connect-gate.fade-out .gate-connect-wrap { opacity: 0; transform: scale(0.95); }
         #arcana-connect-gate .gate-message,
         #arcana-connect-gate .gate-connect-wrap { transition: opacity 0.6s ease, transform 0.6s ease; }
+        @media (max-width: 480px) {
+            #arcana-connect-gate .gate-message { font-size: 0.95em; }
+        }
         #game-container.fade-in, #arcana-game-content.fade-in { animation: sanctuary-fade-in 1s ease forwards; }
         @keyframes sanctuary-fade-in {
             0% { opacity: 0; }
@@ -2119,10 +2097,6 @@
                 background: transparent !important;
                 border-width: 1px;
             }
-            .temple-center {
-                padding: 40px 10px;
-                background: transparent !important;
-            }
             /* Sac à dos */
             #sac-inventaire {
                 max-height: 80vh;
@@ -2214,11 +2188,6 @@
             <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6" title="🚪 Rune 6 : Le Verrou">⌬</button>
         </div>
 
-        <!-- ═══ ZONE CENTRALE - TEMPLE (TOTALEMENT VIDE) ═══ -->
-        <div class="temple-center" role="main" aria-label="Zone centrale du temple">
-            <!-- Espace libre pour papyrus, animations et vue sur le décor étoilé -->
-        </div>
-
         <!-- ═══ COLONNE DROITE - RUNES 7-12 ═══ -->
         <div class="runes-column right" role="region" aria-label="Runes droites">
             <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)" aria-label="Rune 7" title="🚪 Rune 7 : Le Verrou">⏍</button>
@@ -2257,7 +2226,7 @@
     <div id="frost-particles" aria-hidden="true"></div>
     <div id="arcana-connect-gate">
         <p class="gate-message">Le Sanctuaire attend.<br>Connectez votre wallet pour entrer.</p>
-        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center; margin-top:10px; position:absolute; top:10px; left:50%; transform:translateX(-50%);">
+        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center;">
             <div class="wallet-button-wrap" style="position:relative; z-index:99999 !important; pointer-events:auto !important;">
                 <w3m-button></w3m-button>
             </div>
