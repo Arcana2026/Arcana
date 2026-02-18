@@ -173,7 +173,7 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 5000;
+            z-index: 100;
             background: linear-gradient(180deg, rgba(18, 14, 10, 0.94) 0%, rgba(14, 11, 8, 0.65) 80%, transparent 100%);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -567,6 +567,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10;
             
             /* Transparence totale avec bordure dorée fine */
             background: transparent !important;
@@ -637,6 +638,11 @@
                 0 0 30px rgba(255, 68, 68, 0.7);
             box-shadow: 0 0 25px rgba(255, 68, 68, 0.5);
             animation: rune-feedback-bad 0.4s ease;
+        }
+        /* Effet doré au clic */
+        .rune-btn.click-gold {
+            filter: drop-shadow(0 0 15px #d4af37) !important;
+            transition: filter 0.2s ease;
         }
         @keyframes rune-feedback-good {
             0%, 100% {
@@ -731,16 +737,19 @@
             z-index: 10;
             position: relative;
             padding: 40px 0;
+            padding-top: 130px !important;
         }
         .runes-column.left {
             justify-self: start;
             align-items: flex-start !important;
             padding-left: 35px;
+            padding-top: 130px !important;
         }
         .runes-column.right {
             justify-self: end;
             align-items: flex-end !important;
             padding-right: 35px;
+            padding-top: 130px !important;
         }
         /* Forcer la transparence absolue sur tous les enfants des colonnes */
         .runes-column,
@@ -803,12 +812,15 @@
             }
             .runes-column {
                 min-height: 78vh;
+                padding-top: 140px !important;
             }
             .runes-column.left {
                 padding-left: 15px;
+                padding-top: 140px !important;
             }
             .runes-column.right {
                 padding-right: 15px;
+                padding-top: 140px !important;
             }
             .runes-column .rune-btn {
                 width: 58px;
@@ -836,12 +848,15 @@
             }
             .runes-column {
                 min-height: 72vh;
+                padding-top: 160px !important;
             }
             .runes-column.left {
                 padding-left: 12px;
+                padding-top: 160px !important;
             }
             .runes-column.right {
                 padding-right: 12px;
+                padding-top: 160px !important;
             }
             .runes-column .rune-btn {
                 width: 50px;
@@ -2059,13 +2074,16 @@
             .runes-column {
                 min-height: 80vh;
                 padding: 30px 0;
+                padding-top: 140px !important;
                 background: transparent !important;
             }
             .runes-column.left {
                 padding-left: 20px;
+                padding-top: 140px !important;
             }
             .runes-column.right {
                 padding-right: 20px;
+                padding-top: 140px !important;
             }
             .rune-btn {
                 width: 55px;
@@ -3945,6 +3963,7 @@
     // -- Suite du code originel inchangé pour le Sanctuaire & autres panneaux --
     // -------- Sanctuaire du Destin (Level 3) FINAL -----------
     const SANCTUARY_SEQUENCE = [2, 7, 5, 9, 0, 10];
+    const runeSound = new Audio('https://www.soundjay.com/buttons/button-16.mp3');
     let sanctuaryProgress = 0;
     let sanctuaryLocked = false;
     let sanctuaryTimerInterval = null;
@@ -4122,11 +4141,20 @@
     };
 
     function onRuneClick(runeId){
+        runeSound.currentTime = 0;
+        runeSound.volume = 0.5;
+        runeSound.play().catch(function(){});
+        
         if (sanctuaryLocked) return;
         
         const runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
         const btn = runes[runeId];
+        if (!btn) return;
         btn.blur();
+        
+        /* Effet visuel doré au clic */
+        btn.classList.add('click-gold');
+        setTimeout(function(){ btn.classList.remove('click-gold'); }, 350);
         
         // Dispatcher selon le numéro de rune
         if (runeId >= 0 && runeId <= 3) {
