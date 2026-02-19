@@ -1,30 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
-<!--
-═══════════════════════════════════════════════════════════════
-    ARCANA GAME - Le Sanctuaire du Destin
-    Écosystème Décentralisé sur Polygon | Optimisé Mobile
-    Structure: index.html ⇄ ArcanaGame.html (connexion bidirectionnelle)
-    
-    📡 ORACLE MÉTÉO :
-    - Condition : Température <= -2°C à Montréal-Est (Gel requis)
-    - Mode Admin : Définir ARCANA_TEST_WALLET avec votre adresse
-    - Bypass automatique pour le wallet admin (fonctionne même à +20°C)
-    
-    🔑 MODE ADMIN :
-    Ligne ~1368 : var ARCANA_TEST_WALLET = 'VOTRE_ADRESSE_0x...';
-═══════════════════════════════════════════════════════════════
--->
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="theme-color" content="#1b2735">
-    <meta name="description" content="Arcana Game - Écosystème Décentralisé sur Polygon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arcana Game - Écosystème Décentralisé</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" defer></script>
-    <link rel="preconnect" href="https://polygon-rpc.com">
-    <link rel="preconnect" href="https://cdn.pixabay.com">
-    <link rel="dns-prefetch" href="https://esm.sh">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         :root {
             --gold: #d4af37;
@@ -33,116 +13,49 @@
             --rune-glow-blue: #49cafa;
             --frost-muted: #adb5bd;
         }
-        * {
-            font-family: 'Cinzel', serif;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Cinzel', serif;
-            font-weight: 400;
-            letter-spacing: 0.15em;
-        }
         body {
-            perspective: 1000px;
-            /* Couloir de pierre en perspective - arrière-plan principal */
-            background: 
-                /* Murs latéraux sombres */
-                linear-gradient(90deg, 
-                    rgba(20, 15, 10, 1) 0%, 
-                    rgba(30, 25, 20, 0.9) 10%,
-                    transparent 25%,
-                    transparent 75%,
-                    rgba(30, 25, 20, 0.9) 90%,
-                    rgba(20, 15, 10, 1) 100%),
-                /* Sol en dalles */
-                linear-gradient(180deg,
-                    transparent 0%,
-                    transparent 50%,
-                    rgba(25, 20, 15, 0.8) 70%,
-                    rgba(20, 15, 10, 1) 100%),
-                /* Fond de pierre sombre */
-                radial-gradient(ellipse at 50% 50%, 
-                    rgba(40, 35, 30, 1) 0%, 
-                    rgba(25, 20, 15, 1) 50%,
-                    rgba(15, 10, 5, 1) 100%);
-            background-size: 100% 100%;
-            background-attachment: fixed;
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
             color: white;
-            font-family: 'Cinzel', serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            touch-action: manipulation;
-        }
-        /* Texture de pierre sur le body */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: 
-                /* Joints de dalles au sol */
-                repeating-linear-gradient(90deg,
-                    transparent 0,
-                    transparent 150px,
-                    rgba(0, 0, 0, 0.3) 150px,
-                    rgba(0, 0, 0, 0.3) 152px),
-                repeating-linear-gradient(0deg,
-                    transparent 0,
-                    transparent 100px,
-                    rgba(0, 0, 0, 0.25) 100px,
-                    rgba(0, 0, 0, 0.25) 102px),
-                /* Texture granuleuse */
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
-            opacity: 0.6;
-            pointer-events: none;
-            z-index: 0;
         }
         #star-container {
-            display: none; /* Étoiles désactivées pour correspondre à l'interface finale */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
         }
         .star {
-            display: none;
+            position: absolute;
+            background: white;
+            border-radius: 50%;
         }
         @keyframes twinkle {
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.1); }
         }
-        /* Glass panels normaux - Fond léger semi-transparent pour les menus */
         .glass-panel {
-            font-family: 'Cinzel', serif;
-            background: rgba(15, 12, 8, 0.88);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 2px solid rgba(212, 175, 55, 0.5);
-            border-radius: 18px;
-            box-shadow: 
-                0 0 60px rgba(0, 0, 0, 0.9),
-                0 0 100px rgba(212, 175, 55, 0.15),
-                inset 0 0 40px rgba(0, 0, 0, 0.3);
-            padding: 28px;
-            margin: 20px;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            margin: 15px;
             width: 90%;
-            max-width: 520px;
+            max-width: 500px;
             position: relative;
             z-index: 1;
-            transition: all 0.3s ease;
-        }
-        /* EXCEPTION CRITIQUE: Sanctuaire totalement transparent */
-        #level-3-sanctuary.glass-panel,
-        #level-3-sanctuary {
-            background: transparent !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            border: none !important;
-            box-shadow: none !important;
-            margin: 0 !important;
-            padding: 20px !important;
-            width: 100vw !important;
-            max-width: none !important;
+            transition: border 0.19s, box-shadow 0.16s;
         }
         .glass-panel.glitch {
             /* Glitch border red effect */
@@ -165,280 +78,28 @@
         }
         header {
             width: 100%;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding: 16px 30px;
+            padding: 10px 20px;
             box-sizing: border-box;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: linear-gradient(180deg, rgba(18, 14, 10, 0.94) 0%, rgba(14, 11, 8, 0.65) 80%, transparent 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            pointer-events: auto;
-            gap: 25px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 1;
         }
-        /* Logo Arcana - Discret et élégant à gauche */
-        .logo-arcana {
+        .logo-area {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.75em;
-            color: rgba(212, 175, 55, 0.8);
-            letter-spacing: 0.12em;
-            font-weight: 300;
-            text-transform: uppercase;
-            opacity: 0.85;
-            justify-self: start;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .logo-arcana:hover {
-            opacity: 1;
-            color: var(--gold);
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-        }
-        .logo-arcana img {
-            height: 45px;
-            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
-            transition: filter 0.3s ease;
-        }
-        .logo-arcana:hover img {
-            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8));
-        }
-        .logo-arcana-title {
-            font-family: 'Cinzel', serif !important;
-            font-size: 0.75em;
-            color: #d4af37 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.12em;
-            font-weight: 300;
-        }
-        /* Titre central avec plaque décorative */
-        .header-title-plate {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 32px;
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(212, 175, 55, 0.5);
-            border-radius: 18px;
-            box-shadow: 
-                0 0 35px rgba(0, 0, 0, 0.8),
-                inset 0 0 25px rgba(212, 175, 55, 0.06);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            justify-self: center;
-        }
-        .header-title-main {
-            font-family: 'Cinzel', serif;
-            font-size: 1em;
-            color: var(--gold);
-            letter-spacing: 0.2em;
-            font-weight: 400;
-            text-transform: uppercase;
-            margin: 0;
-            padding: 0;
-            line-height: 1.3;
-            text-shadow: 0 0 18px rgba(212, 175, 55, 0.5);
-        }
-        .header-title-separator {
-            width: 80%;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(212, 175, 55, 0.2) 20%, 
-                rgba(212, 175, 55, 0.6) 50%, 
-                rgba(212, 175, 55, 0.2) 80%, 
-                transparent 100%);
-            margin: 6px auto 5px;
-        }
-        .header-title-level {
-            font-family: 'Cinzel', serif;
-            font-size: 0.65em;
-            color: rgba(212, 175, 55, 0.7);
-            letter-spacing: 0.3em;
-            font-weight: 300;
-            text-transform: uppercase;
-        }
-        /* Boutons navigation - Forme pilule transparente */
-        .header-nav-buttons {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            justify-self: end;
-        }
-        .header-btn-pill {
-            font-family: 'Cinzel', serif;
-            background: transparent;
-            color: rgba(212, 175, 55, 0.85);
-            border: 1px solid rgba(212, 175, 55, 0.5);
-            padding: 7px 18px;
-            border-radius: 50px;
-            font-size: 0.7em;
-            font-weight: 400;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            white-space: nowrap;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        .header-btn-pill:hover {
-            background: rgba(212, 175, 55, 0.12);
-            border-color: rgba(212, 175, 55, 0.9);
-            color: rgba(255, 215, 0, 1);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
-            transform: translateY(-1px);
-        }
-        /* FORCE: Masquer boîte message centrale */
-        .w3m-container, .wallet-message-box, #arcana-connect-gate .gate-message { display: none !important; }
-        /* FORCE: Détruire toute boîte au centre */
-        #arcana-connect-gate, #arcana-connect-gate *, #gate-connect-wrap, .gate-connect-wrap,
-        .wallet-button-wrap, .w3m-container, .wallet-message-box {
-            border: 0 !important;
-            background: transparent !important;
-            box-shadow: none !important;
-        }
-        /* Masquer les boutons w3m sauf dans la gate et le wrapper */
-        w3m-button {
-            display: none !important;
-        }
-        #gate-connect-wrap w3m-button,
-        .wallet-button-wrap w3m-button {
-            display: block !important;
-        }
-        .wallet-button-wrap {
-            transform-origin: center;
-        }
-        /* FORCE: Wallet en haut à droite */
-        #gate-connect-wrap {
-            position: fixed !important;
-            top: 15px !important;
-            right: 15px !important;
-            left: auto !important;
-            transform: none !important;
-            z-index: 100000 !important;
-            margin: 0 !important;
-            justify-content: flex-end !important;
-        }
-        .wallet-button-wrap {
-            transform: scale(0.8) !important;
-        }
-        /* Responsive Header */
-        @media (max-width: 1024px) {
-            header {
-                padding: 15px 20px;
-                gap: 15px;
-            }
-            .header-title-plate {
-                padding: 10px 25px;
-            }
-            .header-title-main {
-                font-size: 0.95em;
-            }
-            .header-btn-pill {
-                padding: 7px 16px;
-                font-size: 0.7em;
-            }
-        }
-        @media (max-width: 768px) {
-            header {
-                grid-template-columns: auto 1fr auto;
-                padding: 12px 15px;
-                gap: 10px;
-            }
-            .logo-arcana {
-                font-size: 0.7em;
-            }
-            .logo-arcana img {
-                height: 40px;
-            }
-            .header-title-plate {
-                padding: 8px 18px;
-                border-radius: 14px;
-            }
-            .header-title-main {
-                font-size: 0.7em;
-                letter-spacing: 0.15em;
-            }
-            .header-title-separator {
-                margin: 4px auto 3px;
-                width: 75%;
-            }
-            .header-title-level {
-                font-size: 0.55em;
-            }
-            .header-nav-buttons {
-                gap: 6px;
-            }
-            .header-btn-pill {
-                padding: 6px 12px;
-                font-size: 0.6em;
-            }
-        }
-        @media (max-width: 480px) {
-            header {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto;
-                padding: 10px;
-                gap: 8px;
-            }
-            .logo-arcana {
-                justify-self: center;
-                order: 3;
-                font-size: 0.65em;
-            }
-            .header-title-plate {
-                order: 1;
-                justify-self: center;
-                padding: 7px 16px;
-            }
-            .header-title-main {
-                font-size: 0.65em;
-                letter-spacing: 0.12em;
-            }
-            .header-title-separator {
-                margin: 3px auto 2px;
-                width: 70%;
-            }
-            .header-title-level {
-                font-size: 0.5em;
-            }
-            .header-nav-buttons {
-                order: 2;
-                justify-self: center;
-                width: 100%;
-                justify-content: center;
-                gap: 8px;
-            }
-            .header-btn-pill {
-                flex: 1;
-                text-align: center;
-                padding: 7px 10px;
-                font-size: 0.55em;
-            }
+            gap: 10px;
         }
         .btn-connect {
-            font-family: 'Cinzel', serif;
             background: linear-gradient(45deg, #d4af37, #f2d06b);
             color: black;
             border: none;
             padding: 10px 20px;
             border-radius: 25px;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            letter-spacing: 0.05em;
         }
         .btn-connect:hover:not([disabled]):not(.disabled) {
             transform: scale(1.05);
@@ -452,7 +113,10 @@
             opacity: 0.68;
         }
         .title-vault {
-            display: none; /* Caché pour interface épurée selon image */
+            text-align: center;
+            font-size: 1.8em;
+            letter-spacing: 3px;
+            margin: 30px 0;
         }
         /* Section Oracle (Niveau 2) */
         .oracle-mirror {
@@ -466,92 +130,54 @@
             align-items: center;
             background: radial-gradient(circle, rgba(212, 175, 55, 0.2), transparent);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-            position: relative;
-            transition: all 0.5s ease;
-        }
-        .oracle-mirror.loading {
-            border-color: rgba(173, 181, 189, 0.5);
-            animation: oracle-pulse 2s ease-in-out infinite;
-        }
-        @keyframes oracle-pulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(173, 181, 189, 0.3); }
-            50% { box-shadow: 0 0 25px rgba(173, 181, 189, 0.6); }
         }
         .oracle-mirror.frozen {
             border: 3px solid #b9e9ff !important;
             background: radial-gradient(circle, rgba(135, 206, 235, 0.4), transparent) !important;
             box-shadow: 0 0 30px #49cafa, 0 0 10px #ffffff inset !important;
         }
-        .oracle-mirror #temp {
-            font-size: 2.2em;
-            font-weight: 600;
-            font-family: 'Cinzel', serif;
-            letter-spacing: 0.08em;
-        }
-        /* Salle 2 (Niveau 2) : transparent pour voir le couloir */
+        /* Salle 2 (Niveau 2) : matière moins transparente pour immersion */
         #level-2-panel {
-            background: transparent !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
+            background: rgba(0, 0, 0, 0.52);
         }
         #level-2-panel:has(.oracle-mirror.frozen) {
-            background: transparent !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            border: 1px solid rgba(185, 233, 255, 0.3);
-            box-shadow: none;
-            opacity: 1;
+            background: radial-gradient(ellipse at center, rgba(135, 206, 235, 0.2) 0%, rgba(100, 149, 237, 0.15) 40%, rgba(0, 0, 0, 0.55) 100%);
+            backdrop-filter: blur(12px) contrast(1.2) brightness(1.2);
+            -webkit-backdrop-filter: blur(12px) contrast(1.2) brightness(1.2);
+            border: 2px solid rgba(185, 233, 255, 0.5);
+            box-shadow: 0 0 25px rgba(135, 206, 235, 0.25), inset -10px -10px 30px rgba(135, 206, 235, 0.08), inset 10px 10px 20px rgba(255, 255, 255, 0.06);
+            opacity: 0.98;
         }
         .oracle-temp-warning {
-            font-family: 'Cinzel', serif;
             color: var(--frost-muted);
-            font-weight: 400;
-            font-size: 0.85em;
+            font-weight: 600;
+            font-size: 1.02em;
             text-align: center;
             margin-top: 1em;
-            padding: 12px;
-            background: rgba(173, 181, 189, 0.08);
-            border-radius: 8px;
-            border: 1px solid rgba(173, 181, 189, 0.2);
-            line-height: 1.6;
-            transition: all 0.3s ease;
-            letter-spacing: 0.05em;
-        }
-        .oracle-temp-warning:empty {
-            display: none !important;
         }
         #chat-temple {
-            display: none; /* Caché par défaut - s'affiche via la Taverne */
             position: fixed;
             bottom: 20px;
             right: 20px;
             width: 300px;
             max-height: 200px;
             font-size: 0.9em;
-            font-family: 'Cinzel', serif;
         }
         .input-arcana {
-            font-family: 'Cinzel', serif;
             width: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(212, 175, 55, 0.5);
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
             color: var(--gold);
             padding: 12px;
             border-radius: 10px;
             margin-top: 10px;
             box-sizing: border-box;
-            font-weight: 400;
-            letter-spacing: 0.05em;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
         }
         .label-gold {
-            font-family: 'Cinzel', serif;
             color: var(--gold);
             text-transform: uppercase;
-            font-size: 0.75em;
-            letter-spacing: 0.15em;
-            font-weight: 400;
+            font-size: 0.7em;
+            letter-spacing: 1px;
         }
         .class-card {
             cursor: pointer;
@@ -571,9 +197,21 @@
             font-size: 2em;
             margin-bottom: 5px;
         }
-        /* Digital Countdown - Caché par défaut */
+        /* Digital Countdown style */
         .digital-timer {
-            display: none;
+            font-family: 'Orbitron', 'VT323', monospace;
+            font-size: 2.2em;
+            color: var(--gold);
+            text-align: center;
+            letter-spacing: 0.08em;
+            background: rgba(64,43,3,0.12);
+            text-shadow: 0 0 5px #d4af37, 0 0 18px rgba(212,175,55,0.25);
+            padding: 8px 0;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            font-variant-numeric: tabular-nums;
+            border: 1px solid rgba(212, 175, 55, 0.11);
+            transition: color 0.3s, background 0.3s;
         }
         .digital-timer.danger {
             color: #fff0f0;
@@ -582,300 +220,135 @@
             border-color: #ff2424aa;
             animation: glitch-border 0.15s steps(1) infinite alternate;
         }
-        /* Runes - Cercles dorés (réduits 20%) */
-        .runes-column .rune-btn {
-            width: 70px;
-            height: 70px;
-            margin: 0;
-            transform: scale(0.8);
+        /* Runes grid */
+        #runes-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin: 35px 0 15px 0;
         }
         .rune-btn {
-            /* Structure */
-            font-family: 'Cinzel', serif;
-            font-size: 2em;
-            padding: 0;
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            
-            /* Transparence totale avec bordure dorée ultra-fine */
-            background: transparent !important;
-            border: 0.5px solid rgba(212, 175, 55, 0.3);
-            border-radius: 50%;
-            
-            /* Symbole doré */
-            color: rgba(212, 175, 55, 1);
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
-            
-            /* Interactions */
+            font-size: 2.2em;
+            padding: 22px 0 14px 0;
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.08) 60%, rgba(212, 175, 55, 0.13));
+            color: var(--gold);
+            box-shadow: 0 0 10px rgba(212,175,55,0.13);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.12s, transform 0.2s, box-shadow 0.2s, border-color 0.17s, color 0.15s;
             outline: none;
             user-select: none;
         }
-        
-        /* Effet de surbrillance doré au survol - reste transparent */
         .rune-btn:hover:not(:disabled) {
-            background: transparent !important;
-            border-color: rgba(212, 175, 55, 0.9);
-            color: rgba(255, 215, 0, 1);
-            text-shadow: 
-                0 0 25px rgba(255, 215, 0, 1),
-                0 0 35px rgba(212, 175, 55, 0.9),
-                0 0 45px rgba(212, 175, 55, 0.6);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
-            transform: scale(0.9);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--gold);
+            cursor: pointer;
         }
-        
-        /* Animation quête active - Pulse doré */
-        .rune-btn.quete-active {
-            animation: rune-quete-pulse 2.5s ease-in-out infinite;
+        .rune-btn.selected {
+            background: linear-gradient(120deg, #d4af37 45%, #f2d06b 85%);
+            color: #181312;
+            border-color: #d4af37;
+            box-shadow: 0 0 18px #f5df99, 0 0 6.5px #fffba8;
+            transform: translateY(-2px) scale(1.09);
         }
-        @keyframes rune-quete-pulse {
-            0%, 100% {
-                border-color: rgba(212, 175, 55, 0.25);
-                color: rgba(212, 175, 55, 0.9);
-                text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
-                box-shadow: none;
-            }
-            50% {
-                border-color: rgba(255, 215, 0, 0.8);
-                color: rgba(255, 215, 0, 1);
-                text-shadow: 
-                    0 0 20px rgba(255, 215, 0, 1),
-                    0 0 30px rgba(212, 175, 55, 0.8);
-                box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
-                transform: scale(0.84);
-            }
-        }
-        /* Feedback visuel pour les runes avec cercle doré */
-        .rune-btn.selected,
         .rune-btn.good {
-            border-color: rgba(73, 202, 250, 0.9);
-            color: rgba(73, 202, 250, 1);
-            text-shadow: 
-                0 0 20px rgba(73, 202, 250, 1),
-                0 0 30px rgba(73, 202, 250, 0.7);
-            box-shadow: 0 0 25px rgba(73, 202, 250, 0.5);
-            animation: rune-feedback-good 0.6s ease;
+            /* Bonne rune s'illumine bleu/or */
+            background: linear-gradient(120deg, var(--rune-glow-blue) 10%, #d4af37 70%);
+            color: #fff;
+            border-color: var(--rune-glow-blue);
+            box-shadow: 0 0 23px var(--rune-glow-blue), 0 0 12px #d4af37;
+            animation: glow-highlight 0.8s 1;
         }
         .rune-btn.bad {
-            border-color: rgba(255, 68, 68, 0.9);
-            color: rgba(255, 68, 68, 1);
-            text-shadow: 
-                0 0 20px rgba(255, 68, 68, 1),
-                0 0 30px rgba(255, 68, 68, 0.7);
-            box-shadow: 0 0 25px rgba(255, 68, 68, 0.5);
-            animation: rune-feedback-bad 0.4s ease;
+            /* Rune cliquée erreurr : effet rouge */
+            background: linear-gradient(120deg,#ed1c24 30%,#d4af37 99%);
+            color: #fff;
+            border-color: #fb5599;
+            box-shadow: 0 0 22px #ed1c24, 0 0 6px #fff7;
+            animation: wrongBtn 0.36s;
         }
-        /* Effet doré au clic */
-        .rune-btn.click-gold {
-            filter: drop-shadow(0 0 15px #d4af37) !important;
-            transition: filter 0.2s ease;
+        @keyframes glow-highlight {
+            0%{ box-shadow: 0 0 0 #fff0, 0 0 0 #fff0;}
+            8%{ box-shadow: 0 0 8px 4px var(--rune-glow-blue), 0 0 1px 1px #eaffff;}
+            80%{ box-shadow: 0 0 23px var(--rune-glow-blue), 0 0 12px #d4af37;}
+            100%{ }
         }
-        @keyframes rune-feedback-good {
-            0%, 100% {
-                transform: scale(0.8);
-            }
-            50% {
-                transform: scale(0.92);
-            }
+        @keyframes wrongBtn {
+            0%{filter:none;}
+            25%{filter:brightness(2) saturate(2.4);}
+            50%{filter:contrast(4);}
+            100%{filter:none;}
         }
-        @keyframes rune-feedback-bad {
-            0%, 100% {
-                transform: translateX(0);
-            }
-            25% {
-                transform: translateX(-6px);
-            }
-            75% {
-                transform: translateX(6px);
-            }
+        /* Progress bar */
+        .alignement-container {
+            width: 100%;
+            margin: 18px 0 8px 0;
         }
-        /* Progress bar - Cachée (épuration) */
-        .alignement-container,
-        .alignement-label,
-        .alignement-bar-bg,
-        .alignement-bar-fill,
+        .alignement-label {
+            font-size: 1em;
+            color: var(--gold);
+            opacity: 0.92;
+            text-align: left;
+            margin-bottom: 4px;
+            line-height: 1.2;
+            letter-spacing: 0.04em;
+        }
+        .alignement-bar-bg {
+            background: rgba(255,255,255,0.09);
+            border-radius: 9px;
+            width: 100%;
+            height: 18px;
+            overflow: hidden;
+            border: 1px solid var(--gold);
+            margin-bottom: 2px;
+        }
+        .alignement-bar-fill {
+            background: linear-gradient(90deg, #d4af37 30%, #f5df99 100%);
+            height: 100%;
+            width: 0%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px 0 rgba(212,175,55,0.32);
+            transition: width 0.5s cubic-bezier(.62,1.41,.84,.74);
+        }
         .alignement-percentage {
-            display: none;
+            font-size: 0.96em;
+            color: var(--gold);
+            text-align: right;
+            margin-right: 5px;
+            margin-top: -15px;
+            margin-bottom: 0;
+            opacity: 0.84;
+            letter-spacing: 0.03em;
         }
         /* Salle 3 (Sanctuaire) : pierre ancienne, bordure dorée pulsante */
         @keyframes golden-border-pulse {
             0%, 100% { box-shadow: 0 0 12px rgba(212, 175, 55, 0.5); border-color: rgba(212, 175, 55, 0.9); }
             50% { box-shadow: 0 0 22px rgba(212, 175, 55, 0.7); border-color: #d4af37; }
         }
-        /* Animation d'entrée douce pour le sanctuaire */
-        @keyframes sanctuaire-shift-up {
-            0% {
-                transform: translate(-50%, -50%);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -50%) translateY(-20%) scale(0.85);
-                opacity: 0.95;
-            }
-        }
-        @keyframes sanctuaire-shift-down {
-            0% {
-                transform: translate(-50%, -50%) translateY(-20%) scale(0.85);
-                opacity: 0.95;
-            }
-            100% {
-                transform: translate(-50%, -50%);
-                opacity: 1;
-            }
-        }
         #level-3-sanctuary {
-            /* Nettoyage complet - Vue dégagée sur le décor */
-            display: grid;
-            grid-template-columns: 120px 1fr 120px;
-            gap: 0;
+            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 100;
-            width: 100vw;
-            height: 100vh;
-            background: transparent !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
+            top: 50%;
+            left: 50%;
+            z-index: 1111;
+            transform: translate(-50%, -50%);
+            max-width: 480px;
+            width: 94vw;
+            background-color: #1c1a18;
+            background-image: repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px), repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px), linear-gradient(145deg, #252220 0%, #1a1816 18%, #2a2622 38%, #1e1c1a 55%, #252220 72%, #181614 88%, #0f0e0c 100%);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 3px solid #b8860b;
+            border-radius: 20px;
+            box-shadow: 0 0 18px rgba(184, 134, 11, 0.35), inset 0 1px 0 rgba(212, 175, 55, 0.15), 0 0 0 1px rgba(212, 175, 55, 0.2);
+            animation: golden-border-pulse 2.5s ease-in-out infinite;
             box-sizing: border-box;
-            transition: opacity 0.5s ease;
-            pointer-events: auto;
-            padding: 100px 20px 20px 20px;
-            overflow: hidden;
-            box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
         }
-        #level-3-sanctuary.sac-ouvert {
-            opacity: 0.6;
-        }
-        /* Colonnes de runes - Contour ultra-fin, transparence totale */
-        .runes-column {
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-evenly !important;
-            align-items: center !important;
-            gap: 6px;
-            min-height: 85vh;
-            background: transparent !important;
-            border: 0.5px solid rgba(212, 175, 55, 0.2) !important;
-            box-shadow: none !important;
-            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            z-index: 10;
-            position: relative;
-            padding: 40px 0;
-            padding-top: 130px !important;
-        }
-        .runes-column.left {
-            grid-column: 1;
-            justify-self: start;
-            align-items: flex-start !important;
-            padding-left: 35px;
-            padding-top: 130px !important;
-        }
-        .runes-column.right {
-            grid-column: 3;
-            justify-self: end;
-            align-items: flex-end !important;
-            padding-right: 35px;
-            padding-top: 130px !important;
-        }
-        /* Forcer la transparence absolue sur tous les enfants des colonnes */
-        .runes-column,
-        .runes-column * {
-            background-color: transparent !important;
-            background-image: none !important;
-        }
-        .runes-column .rune-btn {
-            background: transparent !important;
-        }
-        /* Quand le sac est ouvert - runes restent visibles mais légèrement atténuées */
-        #level-3-sanctuary.sac-ouvert .rune-btn {
-            opacity: 0.7;
-        }
-        #level-3-sanctuary.sac-ouvert .rune-btn:hover:not(:disabled) {
-            opacity: 1;
-        }
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             #level-3-sanctuary {
-                grid-template-columns: 95px 1fr 95px;
-                padding: 15px 5px;
-            }
-            .runes-column {
-                min-height: 78vh;
-                gap: 5px;
-                padding-top: 140px !important;
-            }
-            .runes-column.left {
-                padding-left: 15px;
-                padding-top: 140px !important;
-            }
-            .runes-column.right {
-                padding-right: 15px;
-                padding-top: 140px !important;
-            }
-            .runes-column .rune-btn {
-                width: 58px;
-                height: 58px;
-                transform: scale(0.8);
-            }
-            .rune-btn {
-                font-size: 1.4em;
-                width: 58px;
-                height: 58px;
-            }
-            #btn-sacoche {
-                bottom: 20px;
-                width: 54px;
-                height: 54px;
-                font-size: 1.6em;
-            }
-        }
-        @media (max-width: 480px) {
-            #level-3-sanctuary {
-                grid-template-columns: 75px 1fr 75px;
-                padding: 12px 3px;
-            }
-            .runes-column {
-                min-height: 72vh;
-                gap: 5px;
-                padding-top: 160px !important;
-            }
-            .runes-column.left {
-                padding-left: 12px;
-                padding-top: 160px !important;
-            }
-            .runes-column.right {
-                padding-right: 12px;
-                padding-top: 160px !important;
-            }
-            .runes-column .rune-btn {
-                width: 50px;
-                height: 50px;
-                transform: scale(0.8);
-            }
-            .rune-btn {
-                font-size: 1.2em;
-                width: 50px;
-                height: 50px;
-            }
-            #btn-sacoche {
-                bottom: 18px;
-                width: 50px;
-                height: 50px;
-                font-size: 1.5em;
-            }
-            .btn-back-accueil {
-                font-size: 0.65rem;
-                padding: 6px 12px;
+                padding: 5px;
+                max-width: 97vw;
             }
         }
         /* JACKPOT VICTORY style */
@@ -940,14 +413,45 @@
             color: #FADB1C;
         }
 
-        /* Brume atmosphérique - Désactivée pour vue dégagée */
+        /* Brume atmosphérique en bas d'écran */
         #arcana-fog {
-            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35vh;
+            pointer-events: none;
+            z-index: 100;
+            background: linear-gradient(to top, rgba(180, 200, 220, 0.25) 0%, rgba(140, 160, 180, 0.12) 30%, transparent 70%);
+            filter: blur(25px);
+            -webkit-filter: blur(25px);
+            opacity: 0.7;
+            animation: fog-drift 12s ease-in-out infinite;
+            transition: opacity 1.2s ease, height 1.2s ease, background 1.2s ease;
         }
-        #arcana-fog::before,
-        #arcana-fog.sanctuary-active,
+        #arcana-fog::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            background: linear-gradient(95deg, transparent 0%, rgba(200, 215, 230, 0.15) 25%, rgba(180, 200, 220, 0.18) 50%, rgba(200, 215, 230, 0.12) 75%, transparent 100%);
+            animation: fog-sweep 15s ease-in-out infinite;
+        }
+        #arcana-fog.sanctuary-active {
+            height: 55vh;
+            opacity: 0.92;
+            background: linear-gradient(to top, rgba(220, 230, 245, 0.55) 0%, rgba(200, 215, 235, 0.35) 25%, rgba(180, 200, 220, 0.15) 55%, transparent 85%);
+            filter: blur(35px);
+            -webkit-filter: blur(35px);
+        }
         #arcana-fog.jackpot-golden {
-            display: none;
+            background: linear-gradient(to top, rgba(212, 175, 55, 0.45) 0%, rgba(212, 175, 55, 0.25) 30%, rgba(184, 134, 11, 0.12) 60%, transparent 90%) !important;
+            filter: blur(40px);
+            -webkit-filter: blur(40px);
+            opacity: 0.95;
+            transition: background 10s ease, opacity 10s ease;
         }
         @keyframes fog-drift {
             0%, 100% { transform: translateX(0) scaleX(1); }
@@ -958,143 +462,85 @@
             50% { transform: translateX(5%); opacity: 1; }
         }
 
-        /* Mentions légales - Cachées pour épuration */
+        /* Mentions légales / discrètes en bas de page */
         .arcana-mention {
-            display: none;
+            width: 100%;
+            text-align: center;
+            color: #b0a77b;
+            opacity: 0.44;
+            font-size: 0.98em;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            letter-spacing: 0.05em;
+            position: fixed;
+            left: 0;
+            bottom: 5px;
+            z-index: 3;
+            pointer-events: none;
+            user-select: none;
         }
-        /* Écran d'attente : complètement transparent, pas de boîte */
+        /* Écran d'attente : jeu caché tant que non connecté */
         #arcana-connect-gate {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            outline: none !important;
-            display: none;
+            background: rgba(5, 10, 20, 0.92);
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 99999;
-            pointer-events: auto;
+            z-index: 500;
             transition: opacity 0.5s ease;
-            overflow: hidden;
         }
-        #arcana-connect-gate.hidden { display: none; pointer-events: none !important; }
-        #arcana-connect-gate:not(.hidden) { display: flex !important; }
-        body:has(#arcana-connect-gate:not(.hidden)) { overflow: hidden; height: 100vh; }
+        #arcana-connect-gate.hidden { display: none; }
         #arcana-connect-gate .gate-message {
-            font-family: 'Cinzel', serif;
             color: var(--gold);
             font-size: 1.1em;
-            background: transparent !important;
             letter-spacing: 0.15em;
             text-align: center;
-            margin: 0;
-            padding: 0;
-            opacity: 1;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-            border: none !important;
-            box-shadow: none !important;
+            margin-bottom: 25px;
+            opacity: 0.9;
         }
-        #arcana-connect-gate .gate-connect-wrap {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        /* Ancien bouton retour - Désormais intégré dans le header */
+        /* Lien retour page principale — haut gauche, toujours visible au-dessus de la brume et du gate */
         .btn-back-accueil {
-            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 700;
+            font-size: 0.78rem;
+            color: rgba(212, 175, 55, 0.9);
+            text-decoration: none;
+            letter-spacing: 0.08em;
+            transition: color 0.25s, text-shadow 0.25s;
+            pointer-events: auto;
         }
-        /* Contenu jeu : effet de salle (tunnel/temple) */
-        #game-container, #arcana-game-content { 
-            display: none; 
-            opacity: 0;
-            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
-            background-size: cover !important;
+        .btn-back-accueil:hover {
+            color: #ffd700;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.6), 0 0 4px rgba(255, 215, 0, 0.4);
         }
-        #game-container.visible, #arcana-game-content.visible { 
-            display: block;
-            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
-            background-size: cover !important;
-        }
-        /* Masquer tous les panels sauf le sanctuaire par défaut */
-        #class-selection,
-        #level-2-panel,
-        #arcane-level-panel,
-        #arcane-altar-panel {
-            display: none !important;
-        }
+        /* Contenu jeu : caché par défaut */
+        #game-container, #arcana-game-content { display: none; opacity: 0; }
+        #game-container.visible, #arcana-game-content.visible { display: block; }
         /* Identification wallet : coin de l'écran */
         .wallet-address-badge {
             position: fixed; top: 12px; right: 12px; z-index: 600;
-            font-size: 0.7rem; font-family: 'Cinzel', serif; color: var(--gold);
-            background: rgba(0,0,0,0.6); padding: 7px 14px; border-radius: 8px;
-            border: 1px solid rgba(212, 175, 55, 0.4); letter-spacing: 0.08em;
-            font-weight: 400;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            font-size: 0.75rem; font-family: monospace; color: var(--gold);
+            background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.4); letter-spacing: 0.05em;
         }
-        /* Badge Mode Test */
-        .test-mode-badge {
-            display: none;
-        }
-        /* Admin trigger - Discret */
-        .admin-trigger {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            font-size: 0.7rem;
-            color: rgba(212, 175, 55, 0.3);
-            cursor: pointer;
-            z-index: 500;
-            transition: color 0.3s;
-            font-family: 'Cinzel', serif;
-            letter-spacing: 0.1em;
-        }
-        .admin-trigger:hover {
-            color: rgba(212, 175, 55, 0.7);
-        }
-        .admin-stat {
-            font-family: 'Cinzel', serif;
-            font-size: 0.85em;
-            margin: 8px 0;
-        }
-        .admin-close {
-            font-family: 'Cinzel', serif;
-        }
-        @keyframes test-badge-pulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; box-shadow: 0 0 12px rgba(0, 255, 136, 0.4); }
-        }
-        /* Alerte Oracle stylisée */
+        /* Alerte Oracle stylisée (réseau non Polygon) */
         .oracle-network-alert {
-            font-family: 'Cinzel', serif;
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 9999; 
-            background: rgba(20, 15, 10, 0.95);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 2px solid rgba(212, 175, 55, 0.6);
-            border-radius: 16px; padding: 28px; max-width: 380px; text-align: center;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 80px rgba(212, 175, 55, 0.2);
+            z-index: 9999; background: rgba(10, 15, 25, 0.98); border: 2px solid #49cafa;
+            border-radius: 16px; padding: 24px; max-width: 320px; text-align: center;
+            box-shadow: 0 0 40px rgba(73, 202, 250, 0.3);
         }
-        .oracle-network-alert p { 
-            font-family: 'Cinzel', serif;
-            color: var(--gold); 
-            margin: 0 0 18px 0; 
-            line-height: 1.7;
-            letter-spacing: 0.05em;
-        }
-        .oracle-network-alert .btn-connect { margin-top: 12px; }
+        .oracle-network-alert p { color: #b9e9ff; margin: 0 0 16px 0; line-height: 1.5; }
+        .oracle-network-alert .btn-connect { margin-top: 8px; }
         /* Transition connexion : fade-out message / fade-in Sanctuaire */
         #arcana-connect-gate.fade-out { opacity: 0; pointer-events: none; }
         #arcana-connect-gate.fade-out .gate-message,
         #arcana-connect-gate.fade-out .gate-connect-wrap { opacity: 0; transform: scale(0.95); }
         #arcana-connect-gate .gate-message,
         #arcana-connect-gate .gate-connect-wrap { transition: opacity 0.6s ease, transform 0.6s ease; }
-        @media (max-width: 480px) {
-            #arcana-connect-gate .gate-message { font-size: 0.95em; }
-        }
         #game-container.fade-in, #arcana-game-content.fade-in { animation: sanctuary-fade-in 1s ease forwards; }
         @keyframes sanctuary-fade-in {
             0% { opacity: 0; }
@@ -1129,11 +575,20 @@
         #arcane-darkness-overlay.room-lit-1 { --room1-mask: transparent; }
         #arcane-darkness-overlay.room-lit-2 { --room2-mask: transparent; }
         .arcane-light-object {
-            display: none; /* Caché pour épuration */
+            position: absolute; width: 48px; height: 48px; cursor: pointer; z-index: 460;
+            display: flex; align-items: center; justify-content: center; font-size: 1.8em;
+            background: radial-gradient(circle, rgba(255,200,100,0.4), transparent);
+            border-radius: 50%; border: 2px solid rgba(255,220,100,0.6);
+            box-shadow: 0 0 20px rgba(255,200,80,0.6); pointer-events: auto;
+            transition: transform 0.3s, opacity 0.5s; animation: light-flicker 2s ease-in-out infinite;
         }
-        /* Inventaire clés - Caché (tout passe par la sacoche) */
-        #arcane-inventory {
-            display: none;
+        .arcane-light-object:hover { transform: scale(1.15); box-shadow: 0 0 30px rgba(255,220,100,0.9); }
+        .arcane-light-object.collected { opacity: 0; pointer-events: none; }
+        @keyframes light-flicker { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.2); } }
+        /* Inventaire clés */
+        #arcane-inventory { position: fixed; top: 70px; left: 12px; z-index: 520;
+            background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 10px 16px; display: flex; align-items: center; gap: 10px;
         }
         #arcane-inventory .keys-count { color: var(--gold); font-weight: bold; font-size: 1.2em; }
         #arcane-inventory .keys-label { color: rgba(255,255,255,0.8); font-size: 0.75em; }
@@ -1153,21 +608,18 @@
         /* === Système 100 niveaux === */
         #arcane-level-counter {
             position: fixed; top: 12px; right: 80px; z-index: 610;
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem; font-weight: 400;
+            font-family: 'Orbitron', 'VT323', monospace;
+            font-size: 1.8rem; font-weight: 700;
             color: var(--gold);
-            text-shadow: 0 0 15px rgba(212,175,55,0.5);
-            letter-spacing: 0.2em;
+            text-shadow: 0 0 20px rgba(212,175,55,0.6);
+            letter-spacing: 0.15em;
         }
         .arcane-level-door {
-            font-family: 'Cinzel', serif;
             min-width: 100px; padding: 16px 24px; margin: 8px;
-            font-size: 0.9em; cursor: pointer; border-radius: 12px;
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            background: rgba(0,0,0,0.6); color: var(--gold);
+            font-size: 1em; cursor: pointer; border-radius: 12px;
+            border: 2px solid var(--glass-border);
+            background: rgba(0,0,0,0.5); color: var(--gold);
             transition: all 0.3s;
-            font-weight: 400;
-            letter-spacing: 0.05em;
         }
         .arcane-level-door:hover { border-color: var(--gold); box-shadow: 0 0 15px var(--gold); }
         .arcane-level-door.wrong { border-color: #ff4444; background: rgba(255,68,68,0.2); animation: door-shake 0.4s; }
@@ -1187,8 +639,9 @@
         }
         .arcane-corner-clue:hover { opacity: 1; }
         .arcane-corner-clue.used { opacity: 0.2; pointer-events: none; }
-        #arcane-pyramid-map {
-            display: none; /* Caché pour épuration */
+        #arcane-pyramid-map { position: fixed; bottom: 100px; left: 20px; z-index: 515;
+            width: 120px; height: 140px; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 8px; display: none;
         }
         .pyramid-row { display: flex; justify-content: center; gap: 2px; margin: 1px 0; font-size: 8px; }
         .pyramid-cell { width: 10px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 2px; color: #666; }
@@ -1199,7 +652,13 @@
         }
         /* L'Écho du Sanctuaire — Bandeau défilant style parchemin */
         #arcane-echo-journal {
-            display: none; /* Caché pour épuration */
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+            height: 52px; overflow: hidden; padding: 0 16px;
+            background: linear-gradient(180deg, rgba(40,25,15,0.4) 0%, rgba(25,15,8,0.98) 100%);
+            border-top: 3px solid rgba(212,175,55,0.5);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.6), inset 0 0 60px rgba(80,60,30,0.15);
+            font-family: 'Cinzel', Georgia, serif; font-size: 0.8rem;
+            color: rgba(220,200,160,0.95); display: flex; align-items: center;
         }
         #arcane-echo-journal .echo-title { color: var(--gold); font-weight: 700; flex-shrink: 0; margin-right: 16px; letter-spacing: 0.12em; }
         #arcane-echo-ticker { flex: 1; overflow: hidden; white-space: nowrap; }
@@ -1210,11 +669,7 @@
         @keyframes pyramid-loot-blink { 0%,100% { background: rgba(212,175,55,0.4); box-shadow: 0 0 4px var(--gold); } 50% { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); } }
         /* === Grimoire d'Arcana === */
         #grimoire-btn {
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            z-index: 2000;
-            display: none; /* Caché par défaut pour épuration */
+            position: fixed; bottom: 70px; right: 20px; z-index: 505;
             width: 56px; height: 56px; border-radius: 12px;
             background: linear-gradient(145deg, #2a2520, #1a1612);
             border: 2px solid rgba(212,175,55,0.6);
@@ -1274,988 +729,30 @@
             background: rgba(220,200,160,0.4); color: #5c4a2a; border-radius: 6px; cursor: pointer; font-size: 1.3em; z-index: 2;
         }
         .grimoire-close:hover { background: rgba(184,134,11,0.3); }
-        
-        /* === PAPYRUS ANCIEN - Modal Centrée avec fond transparent === */
-        #papyrus-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        #papyrus-modal.active {
-            display: flex;
-            opacity: 1;
-        }
-        .papyrus-scroll {
-            position: relative;
-            width: 85vw;
-            max-width: 650px;
-            height: 75vh;
-            max-height: 850px;
-            /* Fond de parchemin beige/doré comme dans l'image */
-            background: linear-gradient(180deg, #e8d5b5 0%, #d9c8a8 30%, #c9b898 70%, #b9a888 100%);
-            background-image: 
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='paper-noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper-noise)' opacity='0.2'/%3E%3C/svg%3E"),
-                linear-gradient(180deg, #e8d5b5 0%, #d9c8a8 30%, #c9b898 70%, #b9a888 100%);
-            border-left: 35px solid #6b5745;
-            border-right: 35px solid #6b5745;
-            border-top: 20px solid transparent;
-            border-bottom: 20px solid transparent;
-            border-radius: 8px;
-            box-shadow: 
-                0 0 80px rgba(0, 0, 0, 0.9),
-                0 0 120px rgba(0, 0, 0, 0.7),
-                inset 0 0 80px rgba(139, 115, 85, 0.25),
-                inset 15px 0 40px rgba(0, 0, 0, 0.3),
-                inset -15px 0 40px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            transform: scaleY(0);
-            transform-origin: top center;
-            animation: papyrus-unroll 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            z-index: 10;
-        }
-        @keyframes papyrus-unroll {
-            0% {
-                transform: scaleY(0) rotateX(90deg);
-                opacity: 0;
-            }
-            30% {
-                opacity: 0.5;
-            }
-            60% {
-                transform: scaleY(1) rotateX(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: scaleY(1) rotateX(0deg);
-                opacity: 1;
-            }
-        }
-        @keyframes papyrus-roll-up {
-            0% {
-                transform: scaleY(1) rotateX(0deg);
-                opacity: 1;
-            }
-            40% {
-                transform: scaleY(0.7) rotateX(-15deg);
-                opacity: 0.8;
-            }
-            100% {
-                transform: scaleY(0) rotateX(-90deg);
-                opacity: 0;
-            }
-        }
-        .papyrus-scroll::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -35px;
-            width: 35px;
-            height: 100%;
-            background: linear-gradient(90deg, #5a4735 0%, #6b5745 50%, #5a4735 100%);
-            box-shadow: 
-                inset -8px 0 15px rgba(0, 0, 0, 0.5),
-                inset 0 0 5px rgba(0, 0, 0, 0.3);
-            border-radius: 8px 0 0 8px;
-        }
-        .papyrus-scroll::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: -35px;
-            width: 35px;
-            height: 100%;
-            background: linear-gradient(90deg, #6b5745 0%, #5a4735 50%, #6b5745 100%);
-            box-shadow: 
-                inset 8px 0 15px rgba(0, 0, 0, 0.5),
-                inset 0 0 5px rgba(0, 0, 0, 0.3);
-            border-radius: 0 8px 8px 0;
-        }
-        .papyrus-content {
-            padding: 70px 50px;
-            height: 100%;
-            overflow-y: auto;
-            font-family: 'Cinzel', 'Times New Roman', serif;
-            color: #2d1f15;
-            position: relative;
-            opacity: 0;
-            animation: papyrus-text-fade 0.8s ease 0.8s forwards;
-        }
-        @keyframes papyrus-text-fade {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .papyrus-title {
-            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
-            font-weight: 400;
-            text-align: center;
-            margin-bottom: 35px;
-            color: #4a3520;
-            text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
-            letter-spacing: 0.12em;
-            border-bottom: 1px solid rgba(92, 61, 42, 0.25);
-            padding-bottom: 20px;
-            text-transform: uppercase;
-        }
-        .papyrus-text {
-            font-size: clamp(0.95rem, 2.8vw, 1.1rem);
-            line-height: 1.9;
-            text-align: left;
-            margin-bottom: 20px;
-            text-indent: 0;
-            font-style: normal;
-            /* Effet encre ancienne */
-            color: #3d2a1a;
-            text-shadow: 
-                0.5px 0.5px 1px rgba(92, 61, 42, 0.15);
-            filter: contrast(1.05);
-            font-weight: 400;
-            letter-spacing: 0.02em;
-        }
-        .papyrus-text-russe {
-            font-family: 'Libre Baskerville', 'Times New Roman', serif;
-            font-size: clamp(1.3rem, 4vw, 1.8rem);
-            text-align: center;
-            font-style: italic;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            color: #4a3520;
-            text-shadow: 
-                2px 2px 3px rgba(92, 61, 42, 0.4),
-                0 0 3px rgba(61, 42, 26, 0.3),
-                1px 1px 0 rgba(201, 185, 147, 0.2);
-            filter: contrast(1.25) brightness(0.88) sepia(0.2);
-            margin: 30px 0;
-            padding: 25px 20px;
-            background: 
-                linear-gradient(135deg, rgba(92, 61, 42, 0.08) 0%, rgba(92, 61, 42, 0.04) 100%),
-                repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(92, 61, 42, 0.02) 2px, rgba(92, 61, 42, 0.02) 4px);
-            border: 2px solid rgba(92, 61, 42, 0.2);
-            border-radius: 10px;
-            box-shadow: 
-                inset 0 2px 5px rgba(92, 61, 42, 0.15),
-                0 2px 8px rgba(0, 0, 0, 0.1);
-            text-indent: 0;
-            position: relative;
-        }
-        .papyrus-text-russe::before {
-            content: '❄️';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.5em;
-            opacity: 0.6;
-        }
-        .papyrus-text-russe::after {
-            content: '❄️';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.5em;
-            opacity: 0.6;
-        }
-        .papyrus-hieroglyph {
-            text-align: center;
-            font-size: 1.8em;
-            margin: 25px 0;
-            opacity: 0.7;
-            color: #5a4535;
-            letter-spacing: 0.3em;
-        }
-        .papyrus-close-btn {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 14px 35px;
-            background: linear-gradient(180deg, #6b5745, #5a4735);
-            color: #e8d5b5;
-            border: 2px solid #4a3520;
-            border-radius: 10px;
-            font-family: 'Cinzel', serif;
-            font-size: 0.85rem;
-            font-weight: 400;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
-        .papyrus-close-btn:hover {
-            background: linear-gradient(180deg, #7b6755, #6b5745);
-            transform: translateX(-50%) translateY(-2px);
-            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.7);
-            border-color: #5a4735;
-        }
-        .papyrus-scroll-bar::-webkit-scrollbar {
-            width: 10px;
-        }
-        .papyrus-scroll-bar::-webkit-scrollbar-track {
-            background: rgba(92, 61, 42, 0.2);
-        }
-        .papyrus-scroll-bar::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #8b7355, #6b5745);
-            border-radius: 5px;
-            border: 2px solid rgba(244, 233, 208, 0.3);
-        }
-        /* Responsive Papyrus */
-        @media (max-width: 768px) {
-            .papyrus-scroll {
-                width: 95vw;
-                height: 80vh;
-                border-left-width: 20px;
-                border-right-width: 20px;
-            }
-            .papyrus-content {
-                padding: 40px 30px;
-            }
-            .papyrus-title {
-                font-size: 1.3rem;
-                margin-bottom: 20px;
-            }
-            .papyrus-text {
-                font-size: 0.95rem;
-                line-height: 1.7;
-            }
-            .papyrus-hieroglyph {
-                font-size: 1.5em;
-                margin: 20px 0;
-            }
-        }
-        @media (max-width: 480px) {
-            .papyrus-scroll {
-                border-left-width: 15px;
-                border-right-width: 15px;
-            }
-            .papyrus-content {
-                padding: 30px 20px;
-            }
-            .papyrus-title {
-                font-size: 1.1rem;
-            }
-            .papyrus-text {
-                font-size: 0.85rem;
-                text-indent: 25px;
-            }
-            .papyrus-close-btn {
-                font-size: 0.8rem;
-                padding: 10px 25px;
-            }
-        }
-        
-        /* === BOUTON SACOCHE - Centre bas, animation de rebond === */
-        @keyframes bounceIn {
-            0% { transform: translateX(-50%) rotateX(2deg) scale(0); opacity: 0; }
-            60% { transform: translateX(-50%) rotateX(2deg) scale(1.1); opacity: 1; }
-            80% { transform: translateX(-50%) rotateX(2deg) scale(0.95); }
-            100% { transform: translateX(-50%) rotateX(2deg) scale(1); }
-        }
-        #btn-sacoche {
-            position: fixed !important;
-            bottom: 20px !important;
-            left: 50% !important;
-            transform: translateX(-50%) rotateX(2deg);
-            z-index: 100001 !important;
-            pointer-events: auto !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            background: 
-                linear-gradient(135deg, 
-                    rgba(92, 74, 53, 0.98) 0%, 
-                    rgba(74, 61, 47, 1) 50%, 
-                    rgba(61, 47, 35, 1) 100%),
-                repeating-linear-gradient(90deg, 
-                    transparent 0, 
-                    transparent 1px, 
-                    rgba(0, 0, 0, 0.08) 1px, 
-                    rgba(0, 0, 0, 0.08) 2px);
-            border: 0.5px solid rgba(212, 175, 55, 0.4);
-            box-shadow: 
-                0 8px 35px rgba(0, 0, 0, 0.85),
-                inset 0 2px 0 rgba(212, 175, 55, 0.2),
-                inset 0 -3px 10px rgba(0, 0, 0, 0.5),
-                0 0 25px rgba(139, 115, 85, 0.35);
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            transition: all 0.3s ease;
-        }
-        #btn-sacoche::before {
-            content: '';
-            position: absolute;
-            inset: 6px;
-            border: 1px solid rgba(139, 115, 85, 0.3);
-            border-radius: 4px;
-            pointer-events: none;
-        }
-        #btn-sacoche::after {
-            display: none;
-        }
-        #btn-sacoche:hover {
-            border-color: rgba(212, 175, 55, 1);
-            box-shadow: 
-                0 10px 35px rgba(0, 0, 0, 0.9),
-                0 0 25px rgba(212, 175, 55, 0.5),
-                inset 0 2px 0 rgba(212, 175, 55, 0.3);
-            transform: translateX(-50%) rotateX(2deg) scale(1.06);
-        }
-        #btn-sacoche.resonance {
-            animation: sac-resonance-pulse 1.5s ease-in-out infinite;
-        }
-        @keyframes sac-resonance-pulse {
-            0%, 100% {
-                transform: translateX(-50%) rotateX(2deg) scale(1);
-                box-shadow: 0 6px 25px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(212, 175, 55, 0.15);
-            }
-            25% {
-                transform: translateX(-50%) rotateX(2deg) scale(1.08);
-                box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), 0 0 18px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.4);
-            }
-            50% {
-                transform: translateX(-50%) rotateX(2deg) scale(1.12);
-                box-shadow: 0 0 45px rgba(212, 175, 55, 1), 0 0 25px rgba(255, 215, 0, 0.8), inset 0 0 18px rgba(212, 175, 55, 0.6);
-            }
-            75% {
-                transform: translateX(-50%) rotateX(2deg) scale(1.08);
-                box-shadow: 0 0 35px rgba(212, 175, 55, 0.8), 0 0 18px rgba(255, 215, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.4);
-            }
-        }
-        #btn-sacoche.resonance::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
-            animation: sac-resonance-ring 1.5s ease-in-out infinite;
-            pointer-events: none;
-        }
-        @keyframes sac-resonance-ring {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.5);
-                opacity: 1;
-            }
-        }
-        #btn-sacoche-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #d4af37, #b8860b);
-            border-radius: 50%;
-            border: 2px solid #000;
-            font-size: 0.45em;
-            font-family: 'Cinzel', serif;
-            font-weight: 600;
-            color: #000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.8);
-            letter-spacing: 0;
-        }
-        
-        /* === OVERLAY DRAWER - Très subtil pour voir le couloir === */
-        #sac-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            z-index: 2400;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
-        }
-        #sac-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        
-        /* === BRUME ANIMÉE === */
-        .mist-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 200%;
-            height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png');
-            opacity: 0.2;
-            filter: blur(8px);
-            z-index: 1;
-            pointer-events: none;
-            animation: drift 60s linear infinite;
-        }
-        @keyframes drift {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-        
-        /* === DRAWER INVENTAIRE - Glassmorphism (fini glace transparente) === */
-        #sac-inventaire {
-            font-family: 'Cinzel', serif;
-            position: fixed !important;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 10000;
-            max-height: 70vh;
-            background: rgba(10, 10, 15, 0.4) !important;
-            backdrop-filter: blur(25px) brightness(0.8) contrast(1.2) !important;
-            -webkit-backdrop-filter: blur(25px) brightness(0.8) contrast(1.2) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(212, 175, 55, 0.2) !important;
-            padding: 24px 20px 25px;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            color: rgba(255, 255, 255, 0.95);
-        }
-        #sac-inventaire.open {
-            transform: translateY(0);
-        }
-        /* Scrollbar stylisée pour l'inventaire */
-        #sac-inventaire::-webkit-scrollbar {
-            width: 8px;
-        }
-        #sac-inventaire::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-        }
-        #sac-inventaire::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(212, 175, 55, 0.6), rgba(184, 134, 11, 0.6));
-            border-radius: 10px;
-            border: 2px solid rgba(0, 0, 0, 0.3);
-        }
-        #sac-inventaire::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, rgba(212, 175, 55, 0.8), rgba(184, 134, 11, 0.8));
-        }
-        /* Firefox scrollbar */
-        #sac-inventaire {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(212, 175, 55, 0.6) rgba(0, 0, 0, 0.3);
-        }
-        #sac-inventaire-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-        }
-        #sac-inventaire-titre {
-            font-family: 'Cinzel', serif;
-            color: var(--gold);
-            font-size: 1.1em;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            font-weight: 600;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-        }
-        #sac-btn-fermer {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            background: rgba(139, 0, 0, 0.3);
-            border: 1px solid rgba(255, 68, 68, 0.4);
-            color: #ff6b6b;
-            font-size: 1.4em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.25s ease;
-        }
-        #sac-btn-fermer:hover {
-            background: rgba(139, 0, 0, 0.5);
-            border-color: #ff4444;
-            transform: scale(1.08);
-        }
-        .sac-section {
-            margin-bottom: 24px;
-        }
-        .sac-section-titre {
-            font-family: 'Cinzel', serif;
-            color: rgba(212, 175, 55, 0.9);
-            font-size: 0.85em;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .sac-section-titre::before {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.3));
-        }
-        .sac-section-titre::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.3));
-        }
-        #sac-slots-container {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-        }
-        .sac-slot {
-            aspect-ratio: 1;
-            min-height: 60px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid rgba(212, 175, 55, 0.4);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Orbitron', monospace;
-            font-size: 0.9em;
-            color: var(--gold);
-            font-weight: bold;
-            transition: all 0.25s ease;
-            position: relative;
-            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-        }
-        .sac-slot:hover {
-            border-color: rgba(212, 175, 55, 0.7);
-            background: rgba(212, 175, 55, 0.08);
-            transform: translateY(-2px);
-        }
-        .sac-slot:empty::after {
-            content: '—';
-            color: rgba(212, 175, 55, 0.2);
-            font-size: 1.2em;
-        }
-        .sac-slot.filled {
-            background: rgba(212, 175, 55, 0.15);
-            border-color: var(--gold);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        .sac-slot.filled::before {
-            content: '🗝️';
-            font-size: 1.5em;
-            margin-bottom: 4px;
-        }
-        .sac-slot.objet-actif {
-            border-color: rgba(212, 175, 55, 1);
-            background: rgba(212, 175, 55, 0.2);
-            animation: objet-resonance-glow 2s ease-in-out infinite;
-        }
-        .sac-slot.objet-actif::after {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 8px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%);
-            animation: objet-resonance-aura 2s ease-in-out infinite;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        /* === OBJETS DE QUÊTE === */
-        #sac-objets-quete {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 12px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            min-height: 100px;
-        }
-        .objet-quete {
-            aspect-ratio: 1;
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(73, 202, 250, 0.4);
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
-        }
-        /* Style spécial pour les papyrus anciens - Rouleau égyptien */
-        .objet-quete.papyrus-ancien {
-            background: linear-gradient(135deg, 
-                rgba(233, 221, 196, 0.25) 0%, 
-                rgba(217, 201, 163, 0.35) 50%, 
-                rgba(201, 185, 147, 0.4) 100%);
-            border-color: rgba(139, 115, 85, 0.7);
-            border-radius: 8px;
-            box-shadow: 
-                inset 0 2px 8px rgba(139, 115, 85, 0.4),
-                0 4px 15px rgba(139, 115, 85, 0.3),
-                inset 0 0 40px rgba(244, 233, 208, 0.1);
-            position: relative;
-            overflow: visible;
-        }
-        /* Bâtons du rouleau (gauche et droite) */
-        .objet-quete.papyrus-ancien::before {
-            content: '';
-            position: absolute;
-            top: 5px;
-            bottom: 5px;
-            left: 8px;
-            width: 4px;
-            background: linear-gradient(180deg, #6b5745, #4a3d2f, #6b5745);
-            border-radius: 2px;
-            box-shadow: 
-                1px 0 2px rgba(0, 0, 0, 0.3),
-                inset 0 0 3px rgba(107, 87, 69, 0.5);
-            pointer-events: none;
-        }
-        .objet-quete.papyrus-ancien::after {
-            content: '';
-            position: absolute;
-            top: 5px;
-            bottom: 5px;
-            right: 8px;
-            width: 4px;
-            background: linear-gradient(180deg, #6b5745, #4a3d2f, #6b5745);
-            border-radius: 2px;
-            box-shadow: 
-                -1px 0 2px rgba(0, 0, 0, 0.3),
-                inset 0 0 3px rgba(107, 87, 69, 0.5);
-            pointer-events: none;
-        }
-        .objet-quete.papyrus-ancien:hover {
-            border-color: rgba(139, 115, 85, 1);
-            background: linear-gradient(135deg, 
-                rgba(233, 221, 196, 0.4) 0%, 
-                rgba(217, 201, 163, 0.5) 50%, 
-                rgba(201, 185, 147, 0.55) 100%);
-            box-shadow: 
-                inset 0 2px 8px rgba(139, 115, 85, 0.5),
-                0 0 30px rgba(139, 115, 85, 0.6),
-                0 6px 20px rgba(139, 115, 85, 0.4);
-            transform: translateY(-4px) scale(1.05) rotateZ(-2deg);
-        }
-        .objet-quete.papyrus-ancien .objet-quete-nom {
-            color: rgba(212, 175, 55, 0.95);
-            font-weight: 600;
-        }
-        .objet-quete:hover {
-            border-color: rgba(73, 202, 250, 0.8);
-            background: rgba(73, 202, 250, 0.1);
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 0 20px rgba(73, 202, 250, 0.3);
-        }
-        .objet-quete.objet-actif {
-            border-color: rgba(212, 175, 55, 1);
-            background: rgba(212, 175, 55, 0.2);
-            animation: objet-resonance-glow 2s ease-in-out infinite;
-            position: relative;
-        }
-        .objet-quete.objet-actif::before {
-            content: '✨';
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            font-size: 1.2em;
-            animation: objet-resonance-sparkle 1.5s ease-in-out infinite;
-            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.8));
-        }
-        .objet-quete.objet-actif::after {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 10px;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%);
-            animation: objet-resonance-aura 2s ease-in-out infinite;
-            pointer-events: none;
-            z-index: -1;
-        }
-        @keyframes objet-resonance-glow {
-            0%, 100% {
-                box-shadow: 0 0 15px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.2);
-                transform: scale(1);
-            }
-            50% {
-                box-shadow: 0 0 35px rgba(212, 175, 55, 0.9), 0 0 20px rgba(255, 215, 0, 0.6), inset 0 0 20px rgba(212, 175, 55, 0.4);
-                transform: scale(1.05);
-            }
-        }
-        @keyframes objet-resonance-sparkle {
-            0%, 100% {
-                opacity: 0.6;
-                transform: rotate(0deg) scale(1);
-            }
-            50% {
-                opacity: 1;
-                transform: rotate(180deg) scale(1.2);
-            }
-        }
-        @keyframes objet-resonance-aura {
-            0%, 100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: scale(1.3);
-            }
-        }
-        .objet-quete-nom {
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.35em;
-            font-family: 'Cinzel', serif;
-            color: rgba(255, 255, 255, 0.9);
-            text-align: center;
-            white-space: nowrap;
-            max-width: 90%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        #sac-objets-quete-vide {
-            grid-column: 1 / -1;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            font-family: 'Cinzel', serif;
-            font-size: 0.85em;
-            font-style: italic;
-            padding: 20px;
-        }
-        #sac-alerte-surcharge {
-            position: absolute;
-            top: -32px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(139, 0, 0, 0.95);
-            color: #fff;
-            padding: 6px 16px;
-            border-radius: 8px;
-            border: 2px solid #ff4444;
-            font-family: 'Orbitron', monospace;
-            font-size: 0.75em;
-            font-weight: bold;
-            letter-spacing: 0.05em;
-            box-shadow: 0 0 15px rgba(255, 68, 68, 0.5), 0 4px 12px rgba(0, 0, 0, 0.6);
-            animation: sac-alerte-pulse 0.8s ease-in-out infinite;
-            display: none;
-            white-space: nowrap;
-            text-align: center;
-        }
-        #sac-alerte-surcharge.active {
-            display: block;
-        }
-        @keyframes sac-alerte-pulse {
-            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-            50% { opacity: 0.85; transform: translateX(-50%) scale(1.03); }
-        }
-        
-        /* Responsive Tablette et Mobile */
-        @media (max-width: 768px) {
-            /* Sanctuaire - Layout adaptatif */
-            #level-3-sanctuary {
-                grid-template-columns: 90px 1fr 90px;
-                padding: 15px;
-                background: transparent !important;
-            }
-            .runes-column {
-                min-height: 80vh;
-                gap: 6px;
-                padding: 30px 0;
-                padding-top: 140px !important;
-                background: transparent !important;
-            }
-            .runes-column.left {
-                padding-left: 20px;
-                padding-top: 140px !important;
-            }
-            .runes-column.right {
-                padding-right: 20px;
-                padding-top: 140px !important;
-            }
-            .rune-btn {
-                width: 55px;
-                height: 55px;
-                font-size: 1.6em;
-                background: transparent !important;
-                border-width: 1px;
-            }
-            /* Sac à dos */
-            #sac-inventaire {
-                max-height: 80vh;
-                padding: 20px 16px 16px;
-            }
-            #sac-inventaire-titre {
-                font-size: 1em;
-            }
-            #sac-slots-container {
-                grid-template-columns: repeat(5, 1fr);
-                gap: 8px;
-            }
-            .sac-slot {
-                min-height: 55px;
-                font-size: 0.8em;
-            }
-            #level-3-sanctuary.sac-ouvert {
-                opacity: 0.5;
-            }
-            /* Sacoche */
-            #btn-sacoche {
-                width: 52px;
-                height: 52px;
-                font-size: 1.6em;
-                bottom: 15px;
-            }
-        }
-        @media (max-width: 480px) {
-            #btn-sacoche {
-                width: 48px;
-                height: 48px;
-                font-size: 1.5em;
-                bottom: 12px;
-            }
-            #sac-inventaire {
-                padding: 16px 12px 12px;
-            }
-            #sac-inventaire-titre {
-                font-size: 0.95em;
-            }
-            #sac-slots-container {
-                grid-template-columns: repeat(5, 1fr);
-                gap: 6px;
-                padding: 8px;
-            }
-            .sac-slot {
-                min-height: 48px;
-                font-size: 0.75em;
-                border-width: 1.5px;
-            }
-            #sac-objets-quete {
-                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-                gap: 8px;
-            }
-            .sac-section-titre {
-                font-size: 0.75em;
-            }
-        }
-        /* --- SANCTUAIRE TRANSPARENT ET DORÉ --- */
-        #level-3-sanctuary {
-            background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), 
-                        url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
-            background-size: cover !important;
-            display: flex !important;
-            justify-content: space-between !important;
-        }
-
-        .glass-panel, .rune-column, .rune-container {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
     </style>
     <!-- Google Fonts for digital effect -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
-    <!-- ║   GRILLE DES 12 RUNES - AFFICHAGE PRIORITAIRE (CHARGEMENT IMMÉDIAT) ║ -->
-    <!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
-    <div id="level-3-sanctuary" class="glass-panel" data-room="2">
-        <!-- ═══ COLONNE GAUCHE - RUNES 1-6 ═══ -->
-        <div class="runes-column left" role="region" aria-label="Runes gauches">
-            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)" aria-label="Rune 1" title="🔍 Rune 1 : Le Chercheur">⏀</button>
-            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)" aria-label="Rune 2" title="🔍 Rune 2 : Le Chercheur">⏃</button>
-            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)" aria-label="Rune 3" title="🔍 Rune 3 : Le Chercheur">⏇</button>
-            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)" aria-label="Rune 4" title="🔍 Rune 4 : Le Chercheur">⎈</button>
-            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)" aria-label="Rune 5" title="🚪 Rune 5 : Le Verrou">⎔</button>
-            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)" aria-label="Rune 6" title="🚪 Rune 6 : Le Verrou">⌬</button>
-        </div>
-
-        <!-- ═══ COLONNE DROITE - RUNES 7-12 ═══ -->
-        <div class="runes-column right" role="region" aria-label="Runes droites">
-            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)" aria-label="Rune 7" title="🚪 Rune 7 : Le Verrou">⏍</button>
-            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)" aria-label="Rune 8" title="🚪 Rune 8 : Le Verrou">⏦</button>
-            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)" aria-label="Rune 9" title="📜 Rune 9 : L'Atelier">⧖</button>
-            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)" aria-label="Rune 10" title="📜 Rune 10 : L'Atelier">⧉</button>
-            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)" aria-label="Rune 11" title="🍺 Rune 11 : La Taverne">⨇</button>
-            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)" aria-label="Rune 12" title="👁️ Rune 12 : L'Oracle">⩓</button>
-        </div>
-    </div>
-    <!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
-    
     <div id="star-container"></div>
     <div id="arcana-fog" aria-hidden="true"></div>
+    <a href="index.html" class="btn-back-accueil" style="color: #ff007f; text-decoration: none; font-weight: bold;">← Retour à Arcana Rose</a>
     <header>
-        <!-- Logo Arcana à gauche -->
-        <div class="logo-arcana">
-            <img src="logo.png" alt="Arcana" style="height: 45px; margin-right: 10px;">
-            <span class="logo-arcana-title">ARCANA</span>
+        <div class="logo-area">
+            <div style="width:40px; height:40px; background:var(--gold); border-radius:16%; box-shadow:0 0 12px #ffeaa5;"><span style="font-size:1.6em; display:block; line-height:40px; text-align:center;">🎲</span></div>
+            <div><strong>ARCANA GAME</strong><br><span style="font-size:0.68em; color:var(--gold); font-weight:500;">ÉCOSYSTÈME</span></div>
         </div>
-        
-        <!-- Titre central avec plaque décorative -->
-        <div class="header-title-plate">
-            <h1 class="header-title-main">LE SANCTUAIRE DU DESTIN</h1>
-            <div class="header-title-separator"></div>
-            <div class="header-title-level">LEVEL <span id="header-level-num">1</span></div>
-        </div>
-        
-        <!-- Boutons de navigation à droite -->
-        <div class="header-nav-buttons">
-            <a href="./index.html" class="header-btn-pill">RETOUR AU COFFRE</a>
-            <button class="header-btn-pill" id="header-connect-wallet-btn">CONNECT WALLET</button>
-        </div>
+        <div id="web3modal-connect-wrap"><w3m-button></w3m-button></div>
     </header>
 
     <div id="frost-particles" aria-hidden="true"></div>
     <div id="arcana-connect-gate">
         <p class="gate-message">Le Sanctuaire attend.<br>Connectez votre wallet pour entrer.</p>
-        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:flex-end; margin:0;">
-            <div class="wallet-button-wrap" style="position:relative; z-index:99999 !important; pointer-events:auto !important;">
-                <w3m-button></w3m-button>
-            </div>
+        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center; margin-top:20px;">
+            <w3m-button></w3m-button>
         </div>
     </div>
+
     <div id="arcane-dark-fog" style="opacity:0; pointer-events:none;"></div>
     <div id="arcane-darkness-overlay" style="opacity:0;"></div>
     <div id="arcane-inventory" style="display:none;">
@@ -2267,11 +764,9 @@
         <span id="arcane-protection-count" class="keys-count">0</span>
     </div>
     <div id="arcane-level-counter" style="display:none;">NIVEAU <span id="arcane-level-num">1</span> / 100</div>
-    
-    <!-- ═══ CONTENEUR PRINCIPAL DU JEU ═══ -->
     <div id="game-container" class="arcana-game-content">
-        <div class="title-vault">THE ARCANA VAULT</div>
-        <div id="class-selection" class="glass-panel" style="display:none; text-align:center;">
+    <div class="title-vault">THE ARCANA VAULT</div>
+    <div id="class-selection" class="glass-panel" style="display:none; text-align:center;">
         <div class="label-gold">Rite d'Engagement / Étape 1</div>
         <h2 style="letter-spacing: 2px;">CHOISISSEZ VOTRE DESTIN</h2>
         <div style="display: flex; justify-content: space-around; margin-top: 20px;">
@@ -2288,9 +783,9 @@
                 <p>GARDIEN</p>
             </div>
         </div>
-        </div>
+    </div>
 
-        <div id="level-2-panel" class="glass-panel" data-room="1">
+    <div id="level-2-panel" class="glass-panel" data-room="1">
         <div class="arcane-light-object" id="light-1" onclick="collectLight(1)" style="top:15px;right:20px;" title="Allumer la lumière">🕯️</div>
         <div class="label-gold">Guide Poche / Niveau 2</div>
         <div class="oracle-mirror">
@@ -2345,6 +840,40 @@
         </div>
         <div class="label-gold" style="margin-top:15px;">Log en temps réel</div>
         <div id="admin-log"></div>
+    </div>
+    
+    <!-- ==== Sanctuaire du Destin (Niveau 3) ==== -->
+    <div id="level-3-sanctuary" class="glass-panel" data-room="2" style="display:none;">
+        <div class="arcane-light-object" id="light-2" onclick="collectLight(2)" style="top:15px;right:20px;" title="Allumer la lumière">🔮</div>
+        <div class="digital-timer" id="sanctuary-timer">15:00</div>
+        <h2 style="color:var(--gold); letter-spacing:2px; text-align:center; margin-bottom:0.3em;">
+            LE SANCTUAIRE DU DESTIN
+        </h2>
+        <div class="alignement-container">
+            <div class="alignement-label">Alignement du Sceau</div>
+            <div class="alignement-bar-bg">
+                <div id="alignement-fill" class="alignement-bar-fill"></div>
+            </div>
+            <div id="alignement-percent" class="alignement-percentage">0%</div>
+        </div>
+        <div id="runes-grid">
+            <!-- Les 12 symboles mystiques -->
+            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)">⏀</button>
+            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)">⏃</button>
+            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)">⏇</button>
+            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)">⎈</button>
+            <button class="rune-btn" data-index="4" data-symbol="⎔" onclick="onRuneClick(4)">⎔</button>
+            <button class="rune-btn" data-index="5" data-symbol="⌬" onclick="onRuneClick(5)">⌬</button>
+            <button class="rune-btn" data-index="6" data-symbol="⏍" onclick="onRuneClick(6)">⏍</button>
+            <button class="rune-btn" data-index="7" data-symbol="⏦" onclick="onRuneClick(7)">⏦</button>
+            <button class="rune-btn" data-index="8" data-symbol="⧖" onclick="onRuneClick(8)">⧖</button>
+            <button class="rune-btn" data-index="9" data-symbol="⧉" onclick="onRuneClick(9)">⧉</button>
+            <button class="rune-btn" data-index="10" data-symbol="⨇" onclick="onRuneClick(10)">⨇</button>
+            <button class="rune-btn" data-index="11" data-symbol="⩓" onclick="onRuneClick(11)">⩓</button>
+        </div>
+        <div id="sanctuary-success" style="display:none; margin-top: 1em; text-align:center; color:var(--gold); font-weight: bold; font-size:1.1em;">
+            Sceau aligné ! Le Destin est révélé...
+        </div>
     </div>
     <!-- Panel 100 niveaux : portes aléatoires -->
     <div id="arcane-level-panel" class="glass-panel" style="display:none; position:relative;">
@@ -2413,88 +942,19 @@
         </div>
         <p id="arcane-altar-result" style="color:var(--gold); font-weight:bold; min-height:24px;"></p>
         <button class="btn-connect" onclick="closeAltar()" style="margin-top:12px;">Fermer</button>
-        </div>
-        
-        <!-- ═══ VICTOIRE JACKPOT : Pluie d'or ═══ -->
-        <div id="victory-jackpot">
-            <div class="victory-text">✨ JACKPOT DÉVERROUILLÉ<br><span style="font-size:0.62em;color:#fff;letter-spacing:0.09em;">Le Destin, scellé dans l'or éternel</span></div>
-            <div class="gold-rain"></div>
-        </div>
     </div>
-    <!-- ═══ FIN CONTENEUR PRINCIPAL (#game-container) ═══ -->
-    <!-- ═══ EFFETS SONORES - Chargement optimisé ═══ -->
-    <audio id="heartbeat-audio" preload="metadata" src="https://cdn.pixabay.com/audio/2022/08/20/audio_12c959d8f4.mp3"></audio>
-    <audio id="triumph-audio" preload="metadata" src="https://cdn.pixabay.com/audio/2022/01/18/audio_8f0bc6dc2b.mp3"></audio>
-    <audio id="ice-crackle-audio" preload="metadata" src="https://assets.mixkit.co/active_storage/sfx/2571-ice-break-2571.mp3"></audio>
+    <!-- Victoire JACKPOT : pluie d'or -->
+    <div id="victory-jackpot">
+        <div class="victory-text">✨ JACKPOT DÉVERROUILLÉ<br><span style="font-size:0.62em;color:#fff;letter-spacing:0.09em;">Le Destin, scellé dans l'or éternel</span></div>
+        <div class="gold-rain"></div>
+    </div>
+    </div><!-- /game-container -->
+    <!-- Heartbeat audio (muted/loop, started in JS) -->
+    <audio id="heartbeat-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/08/20/audio_12c959d8f4.mp3"></audio>
+    <audio id="triumph-audio" preload="auto" src="https://cdn.pixabay.com/audio/2022/01/18/audio_8f0bc6dc2b.mp3"></audio>
+    <audio id="ice-crackle-audio" preload="auto" src="https://assets.mixkit.co/active_storage/sfx/2571-ice-break-2571.mp3"></audio>
 
     <div class="arcana-mention">Arcana Game - Écosystème Décentralisé</div>
-
-    <!-- ═══ MODAL PAPYRUS ANCIEN ═══ -->
-    <div id="papyrus-modal" onclick="fermerPapyrusOverlay(event)">
-        <div class="papyrus-scroll" onclick="event.stopPropagation()">
-            <div class="papyrus-content papyrus-scroll-bar">
-                <div class="papyrus-title" id="papyrus-titre">Papyrus Ancien</div>
-                <div class="papyrus-hieroglyph">𓂀 𓆣 𓃭 𓅓</div>
-                <div class="papyrus-text" id="papyrus-texte">
-                    Sous la pierre froide, là où le givre se dépose en silence,
-                    un secret millénaire attend celui qui sait regarder au-delà des apparences.
-                    Les anciens Gardiens ont scellé ici un fragment de la Grande Connaissance,
-                    écrit dans une langue que seul le cœur pur peut déchiffrer.
-                </div>
-                <div class="papyrus-hieroglyph">⚱ ⚡ ⚖</div>
-                <div class="papyrus-text" id="papyrus-indice" style="text-align: center; font-weight: bold; font-size: 1.1em; text-indent: 0; color: #8b4513;">
-                    « Le trésor se cache là où le givre rencontre l'or »
-                </div>
-            </div>
-            <button class="papyrus-close-btn" onclick="fermerPapyrus()">✕ ROULER LE PAPYRUS</button>
-        </div>
-    </div>
-
-    <!-- ═══ BRUME ANIMÉE - Derrière l'inventaire ═══ -->
-    <div class="mist-layer" aria-hidden="true"></div>
-    <!-- ═══ BOUTON SACOCHE - Flotte au-dessus du sanctuaire ═══ -->
-    <button id="btn-sacoche" onclick="toggleSacInventaire()" title="Ouvrir l'inventaire" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) rotateX(2deg);z-index:100001;pointer-events:auto;display:block!important;">
-        <span style="filter: sepia(0.3) contrast(1.1);">💼</span>
-        <span id="btn-sacoche-badge">0</span>
-    </button>
-
-    <!-- ═══ OVERLAY DRAWER ═══ -->
-    <div id="sac-overlay" onclick="fermerSacInventaire()"></div>
-
-    <!-- ═══ DRAWER INVENTAIRE ═══ -->
-    <div id="sac-inventaire">
-        <div id="sac-alerte-surcharge">⚠️ SAC TROP LOURD - RISQUE DE PERTE</div>
-        
-        <div id="sac-inventaire-header">
-            <div id="sac-inventaire-titre">📦 Inventaire</div>
-            <button id="sac-btn-fermer" onclick="fermerSacInventaire()" title="Fermer">×</button>
-        </div>
-
-        <!-- Section Clés -->
-        <div class="sac-section">
-            <div class="sac-section-titre">🗝️ Clés du Destin</div>
-            <div id="sac-slots-container">
-                <div class="sac-slot" data-slot="0"></div>
-                <div class="sac-slot" data-slot="1"></div>
-                <div class="sac-slot" data-slot="2"></div>
-                <div class="sac-slot" data-slot="3"></div>
-                <div class="sac-slot" data-slot="4"></div>
-                <div class="sac-slot" data-slot="5"></div>
-                <div class="sac-slot" data-slot="6"></div>
-                <div class="sac-slot" data-slot="7"></div>
-                <div class="sac-slot" data-slot="8"></div>
-                <div class="sac-slot" data-slot="9"></div>
-            </div>
-        </div>
-
-        <!-- Section Objets de Quête -->
-        <div class="sac-section">
-            <div class="sac-section-titre">✨ Objets de Quête</div>
-            <div id="sac-objets-quete">
-                <div id="sac-objets-quete-vide">Aucun objet de quête</div>
-            </div>
-        </div>
-    </div>
 
     <script type="module">
       (async function() {
@@ -2503,7 +963,7 @@
           const { createWeb3Modal, defaultWagmiConfig } = await import('https://esm.sh/@web3modal/wagmi@5.1.11')
           const { mainnet, polygon } = await import('https://esm.sh/viem/chains')
           const { watchAccount, getWalletClient } = await import('https://esm.sh/@wagmi/core@2.13.4')
-          const projectId = '7004f981f33f063167f1395567798132'
+          const projectId = 'A26c2cef0fcf1c593197f7465d71c07e'
           const metadata = {
             name: 'Arcana',
             description: 'Arcana Game - Écosystème Décentralisé sur Polygon',
@@ -2551,7 +1011,7 @@
               url: 'https://arcana-ezl.pages.dev',
               icons: ['https://arcana-ezl.pages.dev/favicon.ico']
             },
-            projectId: '7004f981f33f063167f1395567798132',
+            projectId: 'A26c2cef0fcf1c593197f7465d71c07e',
             features: {
               analytics: false,
               onramp: false,
@@ -2609,18 +1069,12 @@
 </style>
 <script>
     // --- CONFIGURATION OFFICIELLE ARCANA GAME ---
-    const ARCANA_PROJECT_ID = "7004f981f33f063167f1395567798132";
+    const ARCANA_PROJECT_ID = "A26c2cef0fcf1c593197f7465d71c07e";
     const ARCANA_GAME_CONTRACT = "0xFABF1FcFB7dA0Aa861A61747E1e5a2F2F8E9E337";
     const ADMIN_ADDRESS = ""; // À REMPLIR : adresse 0x... du wallet autorisé pour Force Ouverture
     const ARCANA_TOKEN_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
     const USDT_TOKEN_ADDRESS   = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
     const USDC_TOKEN_ADDRESS   = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
-    
-    // ═══════════════════════════════════════════════════════
-    // 🔓 VARIABLE DE TEST : Bypass Oracle Météo
-    // ═══════════════════════════════════════════════════════
-    let bypassOracle = true; // Mettez à true pour forcer l'accès en développement
-    // ═══════════════════════════════════════════════════════
     // Pour MATIC natif, pas besoin d'adresse.
     // Ajouter l'adresse du contrat d'Arcana Game pour la température si c'est un autre contrat
     const ARCANA_GAME_ORACLE_ABI = [
@@ -2780,14 +1234,7 @@
         updateArcaneInventory();
         updateArcaneFog();
         updateArcaneDoors();
-        
-        // Ajouter une clé numérotée correspondante dans le sac
-        var cleNum = roomId; // Clé 1 pour room 1, clé 2 pour room 2, etc.
-        ajouterCleDansSac(cleNum);
-        
-        addOracleChatMessage('🔮 Lumière collectée ! Clé ' + cleNum + ' ajoutée à votre inventaire.');
-        
-        console.log('%c🔮 Lumière ' + roomId + ' collectée → Clé ' + cleNum + ' obtenue', 'color:#d4af37;');
+        addOracleChatMessage('Une lumière éclaire la pièce. +1 Clé.');
     }
     function openAltar() {
         if (arcaneKeys < 1) { addOracleChatMessage('Vous n\'avez pas assez de clés.'); return; }
@@ -2814,21 +1261,13 @@
         document.getElementById('arcane-altar-panel').style.display = 'none';
     }
 
-    // === VIP Bernard : 0x1...876d + Mode Test Oracle ===
+    // === VIP Bernard : 0x1...876d ===
     var ARCANA_VIP_WALLET = ''; // Mettez l'adresse complète ou laissez vide
-    var ARCANA_TEST_WALLET = ''; // Wallet de test qui bypass l'Oracle (votre adresse complète ici)
     var GRIMOIRE_SELLER_WALLET = ''; // Adresse complète du vendeur (0x1...876d) pour recevoir les ventes de livrets
-    
     function isVipWallet(addr) {
         if (!addr) return false;
         var a = (addr + '').toLowerCase();
         return (a.startsWith('0x1') && a.endsWith('876d') && a.length === 42) || (ARCANA_VIP_WALLET && a === ARCANA_VIP_WALLET.toLowerCase());
-    }
-    
-    function isTestWallet(addr) {
-        if (!addr) return false;
-        var a = (addr + '').toLowerCase();
-        return (ARCANA_TEST_WALLET && a === ARCANA_TEST_WALLET.toLowerCase());
     }
     // === Système 100 niveaux : progression, portes, difficulté, Web3 ===
     const ARCANA_MAX_LEVEL = 100;
@@ -2912,10 +1351,8 @@
     function updateLevelDisplay() {
         var num = document.getElementById('arcane-level-num');
         var panelNum = document.getElementById('arcane-panel-level-num');
-        var headerNum = document.getElementById('header-level-num');
         if (num) num.textContent = arcaneCurrentLevel;
         if (panelNum) panelNum.textContent = arcaneCurrentLevel;
-        if (headerNum) headerNum.textContent = arcaneCurrentLevel;
         applyLevelDarkness();
     }
     function applyLevelDarkness() {
@@ -3185,27 +1622,13 @@
     function updateWalletAddressDisplay(addr) {
         var existing = document.getElementById('wallet-address-badge');
         if (existing) existing.remove();
-        var existingTest = document.getElementById('test-mode-badge');
-        if (existingTest) existingTest.remove();
-        
         if (!addr || addr.length < 10) return;
-        
         var short = addr.slice(0, 6) + '…' + addr.slice(-4);
         var badge = document.createElement('div');
         badge.id = 'wallet-address-badge';
         badge.className = 'wallet-address-badge';
         badge.textContent = short;
         document.body.appendChild(badge);
-        
-        // Ajouter badge de mode test si applicable
-        if (isTestWallet(addr)) {
-            var testBadge = document.createElement('div');
-            testBadge.id = 'test-mode-badge';
-            testBadge.className = 'test-mode-badge';
-            testBadge.innerHTML = '🧪 MODE TEST';
-            testBadge.title = 'Oracle Bypass Activé : Toutes les fonctions sont débloquées';
-            document.body.appendChild(testBadge);
-        }
     }
 
     function hideGameContent() {
@@ -3314,15 +1737,7 @@
             document.body.classList.remove('frost-transition');
             var frost = document.getElementById('frost-particles');
             if (frost) frost.classList.remove('active');
-            
-            // Rafraîchir l'Oracle avec le contexte du wallet connecté
             fetchAndDisplayTemperature();
-            
-            // Log pour wallet de test
-            if (isTestWallet(addr)) {
-                console.log('%c🧪 Mode Test Détecté : Wallet ' + addr.slice(0,6) + '...' + addr.slice(-4), 'color:#00ff88; font-weight:bold; font-size:1.1em;');
-                console.log('%cℹ️ Oracle Bypass : Toutes les fonctions sont débloquées indépendamment de la température', 'color:#00ff88;');
-            }
         }, 2500);
     }
 
@@ -3339,10 +1754,6 @@
     // Remplace ici si le contrat de température est un autre ! (Sinon garde ARCANA_GAME_CONTRACT)
     const ARCANA_GAME_ORACLE_CONTRACT = ARCANA_GAME_CONTRACT; 
 
-    // === État de l'Oracle (chargement asynchrone) ===
-    var oracleTemperature = null;
-    var oracleLoading = true;
-    
     async function fetchAndDisplayTemperature() {
         try {
             // Utilise provider public ou connecte au wallet au besoin
@@ -3353,215 +1764,81 @@
 
             let tempRaw = await oracle.currentTemp();
             let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
-            oracleTemperature = tempC;
-            oracleLoading = false;
 
             const tempDisplay = document.getElementById('temp');
             const depositBtn = document.getElementById('btnDeposit');
             const warningMsg = document.getElementById('oracle-warning-message');
             const oracleMirror = document.querySelector(".oracle-mirror");
-            
-            // Mode Test : Bypass pour wallet de test
-            var isTestMode = account && isTestWallet(account);
 
-            // Console Log : État de l'Oracle
-            console.log('%c📡 Oracle Météo - État', 'color:#d4af37; font-weight:bold;');
-            console.log('   Température actuelle:', tempC + '°C');
-            console.log('   Bypass activé:', bypassOracle);
-            console.log('   Wallet de test:', isTestMode);
-            console.log('   Accès autorisé:', (tempC <= -2 || bypassOracle === true || isTestMode));
-
-            // Vérifier si l'accès est autorisé (temp <= -2°C OU bypass OU test mode)
-            var accessGranted = (tempC <= -2 || bypassOracle === true || isTestMode);
-
-            if (accessGranted) {
-                // Affiche la température avec indicateur d'accès autorisé
-                tempDisplay.textContent = `${tempC}°C 🔓`;
-                
-                // ═══ ACCÈS AUTORISÉ : Toutes les fonctions sont débloquées ═══
-                if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Accès Autorisé</strong> : Gel confirmé (≤ -2°C)</span>';
-                    warningMsg.style.display = "block";
-                }
+            // Affiche la température
+            if (tempC <= -10) {
+                tempDisplay.textContent = `${tempC}°C`;
+                if (warningMsg) warningMsg.style.display = "none";
                 if (depositBtn) {
                     depositBtn.disabled = false;
                     depositBtn.classList.remove("disabled");
-                    depositBtn.title = "Dépôt autorisé - Gel actif";
+                    depositBtn.title = "";
                 }
                 // Ajoute le style frozen à l'oracle miroir
                 if (oracleMirror) {
                     oracleMirror.classList.add("frozen");
                 }
-                
-                // Console log de confirmation
-                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès autorisé (≤ -2°C)', 'color:#00ff88; font-weight:bold;');
             } else {
-                // Accès refusé
-                tempDisplay.textContent = `${tempC}°C 🔒`;
-                
+                tempDisplay.textContent = `${tempC}°C`;
+                // Affiche le message seulement si température > -10°C
                 if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#ff6b6b;">🔒 <strong>Sanctuaire en Attente</strong> : Le gel n\'est pas assez profond (> -2°C)</span>';
-                    warningMsg.style.display = "block";
+                  warningMsg.textContent = "Le givre ne s'est pas encore formé. Revenez quand Montréal gèlera.";
+                  warningMsg.style.display = "block";
                 }
                 if (depositBtn) {
-                    depositBtn.disabled = true;
-                    depositBtn.classList.add("disabled");
-                    depositBtn.title = "Gel insuffisant - Attendez le froid";
+                  depositBtn.disabled = true;
+                  depositBtn.classList.add("disabled");
+                  depositBtn.title = "Les dépôts sont désactivés tant que Montréal n'est pas gelé.";
                 }
+                // Retire le style frozen de l'oracle miroir
                 if (oracleMirror) {
                     oracleMirror.classList.remove("frozen");
                 }
-                
-                console.log('%c🔒 Température actuelle: ' + tempC + '°C | Accès refusé (> -2°C)', 'color:#ff6b6b; font-weight:bold;');
             }
         } catch(e) {
-            oracleLoading = false;
-            console.warn('Oracle fetch error:', e);
-            
-            // En cas d'erreur ET bypass activé, autoriser quand même l'accès
-            if (bypassOracle === true) {
-                console.log('%c🔓 Erreur Oracle détectée | Accès forcé par bypass', 'color:#00ff88; font-weight:bold;');
-                const depositBtn = document.getElementById('btnDeposit');
-                const oracleMirror = document.querySelector(".oracle-mirror");
-                const warningMsg = document.getElementById('oracle-warning-message');
-                
-                if (depositBtn) {
-                    depositBtn.disabled = false;
-                    depositBtn.classList.remove("disabled");
-                    depositBtn.title = "Bypass Oracle Activé";
-                }
-                if (oracleMirror) {
-                    oracleMirror.classList.add("frozen");
-                }
-                if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Bypass Oracle Activé</strong> : Accès forcé</span>';
-                    warningMsg.style.display = "block";
-                }
-            } else {
-                const tempDisplay = document.getElementById('temp');
-                if (tempDisplay) tempDisplay.textContent = "??°C";
-                const warningMsg = document.getElementById('oracle-warning-message');
-                if (warningMsg) {
-                    warningMsg.innerHTML = '⚠️ <strong>Oracle temporairement indisponible</strong><br><small style="font-size:0.85em;opacity:0.75;">Les fonctions seront actives dès que l\'Oracle répond.</small>';
-                    warningMsg.style.display = "block";
-                }
-                const depositBtn = document.getElementById('btnDeposit');
-                if (depositBtn) {
-                    depositBtn.disabled = true;
-                    depositBtn.classList.add("disabled");
-                    depositBtn.title = "Oracle : Connexion en cours...";
-                }
-                const oracleMirror = document.querySelector(".oracle-mirror");
-                if (oracleMirror) {
-                    oracleMirror.classList.remove("frozen");
-                }
+            const tempDisplay = document.getElementById('temp');
+            if (tempDisplay) tempDisplay.textContent = "??°C";
+            const warningMsg = document.getElementById('oracle-warning-message');
+            if (warningMsg) {
+                warningMsg.textContent = "Impossible de récupérer la température de l'oracle.";
+                warningMsg.style.display = "block";
+            }
+            const depositBtn = document.getElementById('btnDeposit');
+            if (depositBtn) {
+                depositBtn.disabled = true;
+                depositBtn.classList.add("disabled");
+                depositBtn.title = "Erreur sur l'oracle météo.";
+            }
+            const oracleMirror = document.querySelector(".oracle-mirror");
+            if (oracleMirror) {
+                oracleMirror.classList.remove("frozen");
             }
         }
     }
 
-    // === FONCTION DE SÉCURITÉ : Lance les vérifications APRÈS l'affichage ===
-    function checkSecurity() {
-        console.log('%c🔒 Vérifications de sécurité lancées en arrière-plan', 'color:#d4af37; font-weight:bold;');
-        
-        // Afficher immédiatement l'interface avec un placeholder
-        var tempDisplay = document.getElementById('temp');
-        if (tempDisplay) tempDisplay.textContent = '⏳';
-        
-        var oracleMirror = document.querySelector('.oracle-mirror');
-        if (oracleMirror) oracleMirror.classList.add('loading');
-        
-        var warningMsg = document.getElementById('oracle-warning-message');
-        if (warningMsg) {
-            warningMsg.innerHTML = '<small style="opacity:0.6;">📡 Oracle en cours de connexion...</small>';
-            warningMsg.style.display = "block";
-        }
-        
-        // Lancer l'Oracle en arrière-plan (non-bloquant)
-        setTimeout(function() {
-            fetchAndDisplayTemperature().then(function() {
-                var mirror = document.querySelector('.oracle-mirror');
-                if (mirror) mirror.classList.remove('loading');
-            });
-        }, 500);
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchAndDisplayTemperature();
 
-        // Rafraîchissement automatique toutes les 3 minutes
-        setInterval(function() {
-            fetchAndDisplayTemperature();
-        }, 180*1000);
-    }
-    
-    // ═══════════════════════════════════════════════════════
-    // INITIALISATION DE LA PREMIÈRE QUÊTE (RUNE N°1)
-    // ═══════════════════════════════════════════════════════
-    
-    function initialiserQueteRune1() {
-        // Si la quête n'a pas encore été complétée, faire clignoter la Rune n°1
-        if (!runesDecouvertes.rune1PremierClic) {
-            var runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
-            if (runes[0]) {
-                runes[0].classList.add('quete-active');
-                
-                // Message console stylisé
-                console.log('%c╔═══════════════════════════════════════════════════╗', 'color:#d4af37; font-weight:bold;');
-                console.log('%c║      🌟 QUÊTE ACTIVE : LE PREMIER FRAGMENT       ║', 'color:#d4af37; font-weight:bold; font-size:1.1em;');
-                console.log('%c╚═══════════════════════════════════════════════════╝', 'color:#d4af37; font-weight:bold;');
-                console.log('%c\n✨ La Rune n°1 (⏀) clignote doucement en doré...', 'color:#d4af37; font-weight:bold;');
-                console.log('%c💡 Cliquez sur cette rune pour découvrir le premier secret !', 'color:#49cafa; font-size:1.05em;');
-                console.log('%c\n🔍 Indices :', 'color:#888; font-weight:bold;');
-                console.log('%c   → La rune se trouve dans la colonne de gauche', 'color:#888;');
-                console.log('%c   → Symbole : ⏀ (première rune en haut)', 'color:#888;');
-                console.log('%c   → Un papyrus ancien vous attend...', 'color:#888;');
-                console.log('%c\n🎁 Récompense : Papyrus Ancien avec texte russe mystique', 'color:#00ff88;');
-                console.log(' ');
-                
-                // Message dans le chat Oracle
-                setTimeout(function() {
-                    addOracleChatMessage('🌟 Une quête vous attend... Observez la première rune qui clignote doucement.');
-                }, 2000);
-            }
-        }
-    }
-    
-    // === CHARGEMENT APRÈS L'AFFICHAGE COMPLET ===
-    window.addEventListener('load', function() {
-        checkSecurity();
-        
-        // Initialiser la première quête après un court délai
-        setTimeout(function() {
-            initialiserQueteRune1();
-        }, 1000);
-        
-        // Gestionnaire pour le bouton "CONNECT WALLET" du header
-        const headerConnectBtn = document.getElementById('header-connect-wallet-btn');
-        if (headerConnectBtn) {
-            headerConnectBtn.addEventListener('click', function() {
-                // Chercher le bouton w3m natif et simuler un clic
-                const w3mButton = document.querySelector('w3m-button');
-                if (w3mButton && w3mButton.shadowRoot) {
-                    const innerBtn = w3mButton.shadowRoot.querySelector('button');
-                    if (innerBtn) {
-                        innerBtn.click();
-                    }
-                }
-            });
-        }
+        // Optionnel : rafraîchit auto toutes les 3 minutes (si tu veux)
+        setInterval(fetchAndDisplayTemperature, 180*1000);
     });
 
     // Codes valides pour ouvrir le Sanctuaire (Niveau 3)
     const VALID_SEAL_CODES = ['ARCANA2026'];
 
     function showStyledAlert(message) {
-        // Supprimer toute alerte existante
-        var existingOverlay = document.getElementById('arcana-alert-overlay');
-        if (existingOverlay) existingOverlay.remove();
-        
         const overlay = document.createElement('div');
         overlay.id = 'arcana-alert-overlay';
-        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;';
         const box = document.createElement('div');
         box.className = 'glass-panel';
-        box.style.cssText = 'font-family:"Cinzel",serif;max-width:450px;text-align:center;position:relative;padding:35px;background:rgba(20,15,10,0.95)!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important;border:2px solid rgba(212,175,55,0.7)!important;border-radius:15px;box-shadow:0 0 60px rgba(0,0,0,0.9),0 0 100px rgba(212,175,55,0.3)!important;';
-        box.innerHTML = '<div style="font-family:inherit;color:var(--gold);margin:0 0 24px 0;font-size:1.05em;line-height:1.8;font-weight:400;letter-spacing:0.05em;">' + message + '</div><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;width:100%;margin-top:12px;">FERMER</button>';
+        box.style.cssText = 'max-width:360px;text-align:center;position:relative;';
+        box.innerHTML = '<p style="color:var(--gold);margin:0 0 20px 0;font-size:1em;line-height:1.4;">' + message + '</p><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;">OK</button>';
         overlay.appendChild(box);
         overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
         document.body.appendChild(overlay);
@@ -3575,9 +1852,6 @@
 
         btnSeal.disabled = true;
         try {
-            // Mode Test : Bypass pour wallet de test
-            var isTestMode = account && isTestWallet(account);
-            
             if (!provider) {
                 provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
             }
@@ -3585,23 +1859,9 @@
             const tempRaw = await oracle.currentTemp();
             const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
 
-            // Console Log : État complet
-            console.log('%c🔐 Vérification Oracle pour le Sceau du Sanctuaire', 'color:#d4af37; font-weight:bold;');
-            console.log('   Température actuelle:', tempC + '°C');
-            console.log('   Seuil requis: ≤ -2°C');
-            console.log('   Bypass Oracle:', bypassOracle);
-            console.log('   Wallet de test:', isTestMode);
-
-            // ═══ CONDITION DE FORCE : Temp <= -2 OU bypassOracle OU wallet de test ═══
-            // Seuil réaliste : Accès autorisé uniquement si température ≤ -2°C
-            if (tempC > -2 && bypassOracle !== true && !isTestMode) {
-                showStyledAlert('❄️ <strong>Oracle Météo</strong><br><br>Le Sanctuaire attend le gel profond.<br><br>Température actuelle : ' + tempC + '°C<br>Seuil requis : ≤ -2°C');
+            if (tempC > -10) {
+                showStyledAlert('Le givre n\'est pas encore assez profond pour ouvrir les portes du Sanctuaire.');
                 return;
-            }
-            
-            // Message de confirmation si bypass ou mode test
-            if ((bypassOracle || isTestMode) && tempC > -2) {
-                console.log('%c🔓 Température actuelle: ' + tempC + '°C | Accès forcé par bypass/admin', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
             }
 
             const code = (codeInput.value || '').trim();
@@ -3625,37 +1885,9 @@
                 startFinalLevel();
             }, 500);
         } catch (e) {
-            // En cas d'erreur Oracle, si bypass est activé, continuer quand même
-            if (bypassOracle === true) {
-                console.log('%c🔓 Erreur Oracle détectée | Accès forcé par bypass', 'color:#00ff88; font-weight:bold;');
-                
-                const code = (codeInput.value || '').trim();
-                const isValidCode = VALID_SEAL_CODES.some(c => code.toUpperCase() === c.toUpperCase());
-                
-                if (!isValidCode) {
-                    vibratePanel(level2Panel);
-                    const origBorder = codeInput.style.border;
-                    codeInput.style.border = '2px solid #ff2424';
-                    codeInput.style.transition = 'border 0.2s';
-                    setTimeout(function() {
-                        codeInput.style.border = origBorder || '';
-                    }, 1000);
-                    btnSeal.disabled = false;
-                    return;
-                }
-                
-                level2Panel.style.transition = 'opacity 0.5s ease';
-                level2Panel.style.opacity = '0';
-                setTimeout(function() {
-                    level2Panel.style.display = 'none';
-                    startFinalLevel();
-                }, 500);
-            } else {
-                showStyledAlert('⚠️ <strong>Erreur Oracle</strong><br><br>Impossible de contacter l\'Oracle météo.<br><br>' + (e.message || e));
-                btnSeal.disabled = false;
-            }
+            showStyledAlert('Erreur : impossible de contacter l\'Oracle. ' + (e.message || e));
         } finally {
-            if (!bypassOracle) btnSeal.disabled = false;
+            btnSeal.disabled = false;
         }
     }
 
@@ -3754,8 +1986,11 @@
     });
 
     // ===== Wallet connect & Polygon switch
+    const METAMASK_DAPP_LINK = 'https://metamask.app.link/dapp/arcana-ezl.pages.dev';
     async function connectWallet() {
         if (!window.ethereum) {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+            if (isMobile) window.location.href = METAMASK_DAPP_LINK;
             return;
         }
         provider = new ethers.providers.Web3Provider(window.ethereum, "any");
@@ -3988,7 +2223,6 @@
     // -- Suite du code originel inchangé pour le Sanctuaire & autres panneaux --
     // -------- Sanctuaire du Destin (Level 3) FINAL -----------
     const SANCTUARY_SEQUENCE = [2, 7, 5, 9, 0, 10];
-    const runeSound = new Audio('https://www.soundjay.com/buttons/button-16.mp3');
     let sanctuaryProgress = 0;
     let sanctuaryLocked = false;
     let sanctuaryTimerInterval = null;
@@ -4056,7 +2290,7 @@
     function showSanctuarySuccess() {
         document.getElementById('sanctuary-success').style.display = 'block';
         document.getElementById('sanctuary-success').innerText = "JACKPOT DÉVERROUILLÉ ! Le Destin est révélé...";
-        Array.from(document.querySelectorAll('.runes-column .rune-btn')).forEach(b=>b.disabled=true);
+        Array.from(document.querySelectorAll('#runes-grid .rune-btn')).forEach(b=>b.disabled=true);
         sanctuaryLocked = true;
         stopHeartbeat();
         broadcastVictory(account);
@@ -4106,7 +2340,7 @@
             sanctuaryLocked = true;
             stopHeartbeat();
             enableGlitchPanel();
-            Array.from(document.querySelectorAll('.runes-column .rune-btn')).forEach(b=>b.disabled=true);
+            Array.from(document.querySelectorAll('#runes-grid .rune-btn')).forEach(b=>b.disabled=true);
             document.getElementById('sanctuary-success').style.display = 'block';
             document.getElementById('sanctuary-success').innerText = "Temps écoulé. Le sceau s'efface...";
             return;
@@ -4145,327 +2379,31 @@
         stopHeartbeat();
         document.getElementById('victory-jackpot').style.display = "none";
     }
-    // ═══════════════════════════════════════════════════════
-    // SYSTÈME DE RUNES - Configuration des 12 Runes
-    // ═══════════════════════════════════════════════════════
-    // 
-    // Runes 1-4 : Les Chercheurs (fouillerZone)
-    // Runes 5-8 : Les Verrous (ouvrirPorte)
-    // Runes 9-10 : L'Atelier (assemblage papyrus)
-    // Rune 11 : La Taverne (chat social)
-    // Rune 12 : L'Œil de l'Oracle (météo + jackpot)
-    // 
-    // ═══════════════════════════════════════════════════════
-
-    // État des énigmes et découvertes
-    var runesDecouvertes = {
-        rune1PremierClic: false,
-        indicesTrouves: [],
-        papyrusCollectes: [],
-        portesOuvertes: []
-    };
-
     function onRuneClick(runeId){
-        runeSound.currentTime = 0;
-        runeSound.volume = 0.5;
-        runeSound.play().catch(function(){});
-        
         if (sanctuaryLocked) return;
-        
-        const runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
+        const runes = Array.from(document.querySelectorAll('#runes-grid .rune-btn'));
         const btn = runes[runeId];
-        if (!btn) return;
         btn.blur();
-        
-        /* Effet visuel doré au clic */
-        btn.classList.add('click-gold');
-        setTimeout(function(){ btn.classList.remove('click-gold'); }, 350);
-        
-        // Dispatcher selon le numéro de rune
-        if (runeId >= 0 && runeId <= 3) {
-            // Runes 1-4 : Les Chercheurs
-            fouillerZone(runeId);
-        } else if (runeId >= 4 && runeId <= 7) {
-            // Runes 5-8 : Les Verrous
-            ouvrirPorte(runeId);
-        } else if (runeId === 8 || runeId === 9) {
-            // Runes 9-10 : L'Atelier
-            ouvrirAtelierPapyrus();
-        } else if (runeId === 10) {
-            // Rune 11 : La Taverne
-            ouvrirTaverne();
-        } else if (runeId === 11) {
-            // Rune 12 : L'Œil de l'Oracle
-            afficherOeilOracle();
-        }
-        
-        // Animation de feedback
-        btn.classList.add('good');
-        setTimeout(function() {
-            btn.classList.remove('good');
-        }, 450);
-    }
-
-    // ═══════════════════════════════════════════════════════
-    // RUNES 1-4 : LES CHERCHEURS
-    // ═══════════════════════════════════════════════════════
-    
-    function fouillerZone(runeId) {
-        console.log('%c🔍 Fouille de la zone - Rune ' + (runeId + 1), 'color:#d4af37; font-weight:bold;');
-        
-        // ÉNIGME #1 - Rune 1 (index 0)
-        if (runeId === 0 && !runesDecouvertes.rune1PremierClic) {
-            runesDecouvertes.rune1PremierClic = true;
-            
-            // Vibration mobile de 200ms pour la découverte
-            if (navigator.vibrate) {
-                navigator.vibrate(200);
-            }
-            
-            // Retirer l'animation de clignotement de la rune
-            var runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
-            if (runes[0]) {
-                runes[0].classList.remove('quete-active');
-            }
-            
-            // Ajouter le premier papyrus ancien (rouleau égyptien) au sac
-            ajouterObjetQuete('📜', 'Papyrus Ancien I', 'papyrus_ancien_1');
-            runesDecouvertes.papyrusCollectes.push('papyrus_ancien_1');
-            
-            // Message chat
-            addOracleChatMessage('🗿 La Rune des Chercheurs révèle son premier secret...');
-            
-            // Ouvrir directement le papyrus avec animation de déroulement
-            setTimeout(function() {
-                ouvrirPapyrus('papyrus_ancien_1', 'Papyrus Ancien I');
-            }, 500);
-            
-            console.log('%c✨ Énigme #1 résolue : Premier papyrus découvert !', 'color:#00ff88; font-weight:bold;');
-            console.log('%c📜 Le papyrus se déroule automatiquement...', 'color:#d4af37;');
-            
-            return;
-        }
-        
-        // Vérifier si le joueur n'a pas encore trouvé le premier indice
-        if (!runesDecouvertes.rune1PremierClic && runeId === 0) {
-            vibrerSac(1);
-            addOracleChatMessage('💡 Cette rune semble cacher quelque chose d\'important...');
-            return;
-        }
-        
-        // Comportement pour les autres runes chercheurs
-        var indices = [
-            { id: 'indice_1', texte: 'Une trace de givre mène vers le nord...', icone: '❄️', papyrus: null },
-            { id: 'indice_2', texte: 'Des empreintes mystérieuses près du miroir...', icone: '👣', papyrus: 'papyrus_ancien_2' },
-            { id: 'indice_3', texte: 'Un écho lointain résonne dans les profondeurs...', icone: '🔊', papyrus: 'papyrus_ancien_3' },
-            { id: 'indice_4', texte: 'Une lueur dorée perce l\'obscurité...', icone: '✨', papyrus: null }
-        ];
-        
-        var indice = indices[runeId];
-        if (indice && runesDecouvertes.indicesTrouves.indexOf(indice.id) === -1) {
-            runesDecouvertes.indicesTrouves.push(indice.id);
-            addOracleChatMessage(indice.icone + ' Indice découvert : ' + indice.texte);
-            
-            // Papyrus spécifique pour cette rune
-            if (indice.papyrus) {
-                var papyrusNum = indice.papyrus.split('_')[2]; // Extraire le numéro
-                ajouterObjetQuete('📜', 'Papyrus Ancien ' + ['I', 'II', 'III'][parseInt(papyrusNum) - 1], indice.papyrus);
-                runesDecouvertes.papyrusCollectes.push(indice.papyrus);
-                vibrerSac(2);
-                addOracleChatMessage('📜 Un nouveau papyrus ancien a été découvert !');
-                
-                setTimeout(function() {
-                    addOracleChatMessage('💡 Cliquez sur le papyrus dans l\'inventaire pour le dérouler.');
-                }, 1500);
-                
-                console.log('%c📜 Papyrus ' + papyrusNum + ' découvert !', 'color:#8b7355; font-weight:bold;');
-            } else {
-                // Chance de trouver un objet (30%)
-                if (Math.random() < 0.3) {
-                    var objets = [
-                        { icone: '🗝️', nom: 'Clé Ancienne', id: 'cle_ancienne_' + Date.now() },
-                        { icone: '💎', nom: 'Fragment de Cristal', id: 'cristal_' + Date.now() },
-                        { icone: '🔮', nom: 'Orbe Mineur', id: 'orbe_mineur_' + Date.now() }
-                    ];
-                    var objet = objets[Math.floor(Math.random() * objets.length)];
-                    ajouterObjetQuete(objet.icone, objet.nom, objet.id);
-                    vibrerSac(1);
-                }
+        if(runeId === SANCTUARY_SEQUENCE[sanctuaryProgress]){
+            btn.classList.add('good');
+            btn.disabled = true;
+            setTimeout(()=>btn.classList.remove('good'), 450);
+            btn.classList.add('selected');
+            setSanctuaryProgress(sanctuaryProgress+1);
+            if (sanctuaryProgress === SANCTUARY_SEQUENCE.length) {
+                showSanctuarySuccess();
             }
         } else {
-            addOracleChatMessage('🔍 Rien de nouveau à découvrir ici pour le moment...');
+            btn.classList.add('bad');
+            vibratePanel(document.getElementById('level-3-sanctuary'));
+            setTimeout(()=>{
+                btn.classList.remove('bad');
+                runes.forEach(x=>x.classList.remove('selected','good','bad'));
+                runes.forEach(x=>x.disabled=false);
+                setSanctuaryProgress(0);
+            },310);
         }
     }
-
-    // ═══════════════════════════════════════════════════════
-    // RUNES 5-8 : LES VERROUS
-    // ═══════════════════════════════════════════════════════
-    
-    function ouvrirPorte(runeId) {
-        var porteNum = runeId - 3; // Porte 1-4 pour runes 5-8
-        console.log('%c🚪 Tentative d\'ouverture - Porte ' + porteNum, 'color:#49cafa; font-weight:bold;');
-        
-        // Vérifier si la porte est déjà ouverte
-        if (runesDecouvertes.portesOuvertes.indexOf(porteNum) !== -1) {
-            addOracleChatMessage('🚪 Cette porte est déjà ouverte.');
-            return;
-        }
-        
-        // Demander une clé spécifique (la clé doit correspondre au numéro de porte)
-        var cleRequise = porteNum;
-        
-        if (sacInventaire.indexOf(cleRequise) !== -1) {
-            // Clé trouvée !
-            runesDecouvertes.portesOuvertes.push(porteNum);
-            
-            showStyledAlert('🔓 <strong>Porte ' + porteNum + ' Déverrouillée</strong><br><br>La clé ' + cleRequise + ' ouvre le passage !<br><br><em style="color:#00ff88;">Un nouveau chemin s\'ouvre devant vous...</em>');
-            
-            // Retirer la clé du sac
-            var index = sacInventaire.indexOf(cleRequise);
-            retirerCleDuSac(index);
-            
-            // Récompense
-            arcaneKeys += 2;
-            updateArcaneInventory();
-            addOracleChatMessage('🎁 Récompense : +2 Clés du Destin');
-            
-            // Vibration de succès
-            vibrerSac(3);
-            
-            console.log('%c🔓 Porte ' + porteNum + ' ouverte avec succès !', 'color:#00ff88; font-weight:bold;');
-        } else {
-            // Clé manquante
-            showStyledAlert('🔒 <strong>Porte Verrouillée</strong><br><br>Cette porte nécessite la <strong>Clé ' + cleRequise + '</strong><br><br><em style="color:#ff6b6b;">Explorez les Runes des Chercheurs pour trouver des clés...</em>');
-            
-            addOracleChatMessage('🔒 Porte ' + porteNum + ' : Clé ' + cleRequise + ' requise.');
-            
-            // Vibration de refus
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 100, 100]);
-            }
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    // RUNES 9-10 : L'ATELIER DES PAPYRUS
-    // ═══════════════════════════════════════════════════════
-    
-    function ouvrirAtelierPapyrus() {
-        console.log('%c📜 Ouverture de l\'Atelier des Papyrus Anciens', 'color:#d4af37; font-weight:bold;');
-        
-        // Compter les papyrus collectés
-        var nbPapyrus = runesDecouvertes.papyrusCollectes.length;
-        
-        if (nbPapyrus === 0) {
-            showStyledAlert('📜 <strong>L\'Atelier des Papyrus</strong><br><br>Cet atelier permet d\'assembler les fragments de papyrus anciens découverts dans le Sanctuaire.<br><br><em style="color:#49cafa;">Vous n\'avez encore trouvé aucun fragment...</em><br><br><small style="color:#888;">💡 Explorez les Runes des Chercheurs pour découvrir les papyrus cachés.</small>');
-            addOracleChatMessage('📜 Atelier : Aucun papyrus à assembler.');
-            return;
-        }
-        
-        // Afficher l'interface d'assemblage
-        var message = '📜 <strong>Atelier d\'Assemblage Égyptien</strong><br><br>';
-        message += '<div style="font-size:1.5em; margin: 15px 0;">𓂀 𓆣 𓃭</div>';
-        message += 'Papyrus anciens collectés : <strong>' + nbPapyrus + '</strong>/3<br><br>';
-        
-        if (nbPapyrus >= 3) {
-            message += '<em style="color:#00ff88;">✨ Les trois fragments s\'assemblent dans une lumière dorée !</em><br><br>';
-            message += '<div style="font-size:1.3em; margin: 15px 0; color:#d4af37;">⚱ ⚡ ⚖</div>';
-            message += '🎁 <strong>Message Révélé :</strong><br><span style="font-size:1.1em; color:#8b4513; font-weight:bold;">"Le trésor se cache là où le givre rencontre l\'or éternel"</span>';
-            
-            // Récompense pour assemblage (éviter les doublons)
-            if (!sacObjetsQuete.find(function(obj) { return obj.id === 'livre_secrets'; })) {
-                ajouterObjetQuete('📖', 'Livre des Secrets', 'livre_secrets');
-                vibrerSac(3);
-                addOracleChatMessage('📖 Assemblage réussi : Livre des Secrets obtenu !');
-            }
-        } else {
-            message += '<em style="color:#ff6b6b;">Il vous faut les 3 fragments pour reconstituer le message complet...</em><br><br>';
-            message += '<div style="margin: 10px 0;">⏳ Fragments manquants : <strong>' + (3 - nbPapyrus) + '</strong></div>';
-            message += '<small style="color:#888;">💡 Continuez à explorer avec les Runes des Chercheurs.</small>';
-        }
-        
-        showStyledAlert(message);
-        
-        addOracleChatMessage('📜 Atelier ouvert : ' + nbPapyrus + '/3 papyrus disponibles.');
-    }
-
-    // ═══════════════════════════════════════════════════════
-    // RUNE 11 : LA TAVERNE (Chat Social)
-    // ═══════════════════════════════════════════════════════
-    
-    function ouvrirTaverne() {
-        console.log('%c🍺 Ouverture de la Taverne', 'color:#d4af37; font-weight:bold;');
-        
-        var chatPanel = document.getElementById('chat-temple');
-        if (chatPanel) {
-            chatPanel.style.display = 'block';
-            chatPanel.style.position = 'fixed';
-            chatPanel.style.top = '50%';
-            chatPanel.style.left = '50%';
-            chatPanel.style.transform = 'translate(-50%, -50%)';
-            chatPanel.style.zIndex = '2000';
-            chatPanel.style.maxWidth = '500px';
-            chatPanel.style.width = '90vw';
-            
-            addOracleChatMessage('🍺 Bienvenue à la Taverne ! Partagez vos découvertes avec les autres Initiés...');
-            
-            // Ajouter un bouton de fermeture
-            if (!document.getElementById('btn-fermer-taverne')) {
-                var btnFermer = document.createElement('button');
-                btnFermer.id = 'btn-fermer-taverne';
-                btnFermer.className = 'btn-connect';
-                btnFermer.textContent = '✕ Fermer';
-                btnFermer.style.marginTop = '10px';
-                btnFermer.style.width = '100%';
-                btnFermer.onclick = function() {
-                    chatPanel.style.display = 'none';
-                    chatPanel.style.position = '';
-                    chatPanel.style.transform = '';
-                    chatPanel.style.zIndex = '';
-                };
-                chatPanel.appendChild(btnFermer);
-            }
-        } else {
-            showStyledAlert('🍺 <strong>La Taverne</strong><br><br>Un lieu de rencontre pour les Initiés.<br><br><em>Le chat sera bientôt disponible...</em>');
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    // RUNE 12 : L'ŒIL DE L'ORACLE
-    // ═══════════════════════════════════════════════════════
-    
-    function afficherOeilOracle() {
-        console.log('%c👁️ L\'Œil de l\'Oracle s\'ouvre', 'color:#d4af37; font-weight:bold;');
-        
-        // Récupérer la température actuelle
-        var tempActuelle = oracleTemperature !== null ? oracleTemperature + '°C' : 'En chargement...';
-        
-        var message = '👁️ <strong>L\'Œil de l\'Oracle</strong><br><br>';
-        message += '🌡️ <strong>Température à Montréal :</strong> ' + tempActuelle + '<br>';
-        message += '❄️ <strong>Seuil d\'activation :</strong> ≤ -2°C<br><br>';
-        
-        // Calculer le jackpot potentiel (exemple)
-        var jackpotBase = 1000;
-        var portesOuvertes = runesDecouvertes.portesOuvertes.length;
-        var papyrusCollectes = runesDecouvertes.papyrusCollectes.length;
-        var jackpot = jackpotBase + (portesOuvertes * 250) + (papyrusCollectes * 100);
-        
-        message += '💰 <strong>Jackpot Actuel :</strong><br>';
-        message += '<span style="font-size:1.5em; color:#d4af37;">' + jackpot + ' ARCANA</span><br><br>';
-        
-        message += '📊 <strong>Progression :</strong><br>';
-        message += '🚪 Portes ouvertes : ' + portesOuvertes + '/4<br>';
-        message += '📜 Papyrus collectés : ' + papyrusCollectes + '<br>';
-        message += '🔍 Indices trouvés : ' + runesDecouvertes.indicesTrouves.length + '<br>';
-        
-        showStyledAlert(message);
-        
-        addOracleChatMessage('👁️ L\'Oracle révèle l\'état du Sanctuaire...');
-        
-        // Vibration mystique
-        vibrerSac(2);
-    }
-
     function vibratePanel(panel){
         panel.style.animation = 'border-shake 0.22s linear 2';
         panel.style.boxShadow = "0 0 28px #ff2424,0 0 9px #ffe7e5 inset";
@@ -4532,1035 +2470,6 @@
             console.error("Erreur Oracle:", error);
             alert("Erreur de synchronisation : " + error.message);
         }
-    }
-
-    // === SCRIPT DE SÉCURITÉ : DÉSACTIVÉ - Les runes s'affichent immédiatement ===
-    // Tout le code de vérification Web3 est maintenant dans checkSecurity() qui se lance après le chargement
-    console.log('%c✅ Mode Affichage Immédiat : Les runes sont visibles sans vérification préalable', 'color:#00ff88; font-weight:bold;');
-
-    // ═══════════════════════════════════════════════════════
-    // SAC À DOS INVENTAIRE - Gestion des Clés et Objets
-    // ═══════════════════════════════════════════════════════
-    var sacInventaire = [];
-    var sacObjetsQuete = [];
-    var sacAlerteTimeout = null;
-    var sacIsOpen = false;
-
-    // ═══════════════════════════════════════════════════════
-    // INTERACTION INVENTAIRE ↔ SANCTUAIRE
-    // ═══════════════════════════════════════════════════════
-    // 
-    // Quand l'inventaire s'ouvre :
-    // 1. Le drawer monte depuis le bas de l'écran (transition 0.5s)
-    // 2. Le sanctuaire se déplace vers le haut (-20%) et se réduit (85%)
-    // 3. L'overlay s'affiche avec transparence (40%) pour voir le sanctuaire
-    // 4. Les runes restent CLIQUABLES grâce au z-index élevé
-    // 5. Le fond du drawer est semi-transparent (85-95%) avec blur
-    // 
-    // Quand l'inventaire se ferme :
-    // 1. Le drawer redescend (transition fluide)
-    // 2. Le sanctuaire reprend sa position centrale (transition 0.6s)
-    // 3. L'overlay disparaît en fondu
-    // 4. Toutes les animations sont coordonnées pour un effet harmonieux
-    // 
-    // ═══════════════════════════════════════════════════════
-    
-    function toggleSacInventaire() {
-        if (sacIsOpen) {
-            fermerSacInventaire();
-        } else {
-            ouvrirSacInventaire();
-        }
-    }
-
-    function ouvrirSacInventaire() {
-        var drawer = document.getElementById('sac-inventaire');
-        var overlay = document.getElementById('sac-overlay');
-        var sanctuaire = document.getElementById('level-3-sanctuary');
-        
-        drawer.classList.add('open');
-        overlay.classList.add('active');
-        sacIsOpen = true;
-        
-        // Déplacer le sanctuaire vers le haut avec animation fluide
-        if (sanctuaire) {
-            sanctuaire.classList.add('sac-ouvert');
-            
-            // Petit effet de pulse pour indiquer que c'est toujours interactif
-            sanctuaire.style.animation = 'none';
-            setTimeout(function() {
-                sanctuaire.style.animation = '';
-            }, 50);
-            
-            // Message subtil la première fois (localStorage)
-            if (!localStorage.getItem('arcana_sac_hint_shown')) {
-                setTimeout(function() {
-                    addOracleChatMessage('💡 Les runes du Sanctuaire restent cliquables même quand l\'inventaire est ouvert.');
-                    localStorage.setItem('arcana_sac_hint_shown', 'true');
-                }, 800);
-            }
-        }
-        
-        // Empêcher le scroll du body
-        document.body.style.overflow = 'hidden';
-        
-        console.log('%c📦 Inventaire ouvert - Sanctuaire repositionné (reste cliquable)', 'color:#d4af37; font-weight:bold;');
-    }
-
-    function fermerSacInventaire() {
-        var drawer = document.getElementById('sac-inventaire');
-        var overlay = document.getElementById('sac-overlay');
-        var sanctuaire = document.getElementById('level-3-sanctuary');
-        
-        drawer.classList.remove('open');
-        overlay.classList.remove('active');
-        sacIsOpen = false;
-        
-        // Restaurer la position du sanctuaire
-        if (sanctuaire) {
-            sanctuaire.classList.remove('sac-ouvert');
-        }
-        
-        // Réactiver le scroll du body
-        document.body.style.overflow = 'auto';
-        
-        console.log('%c📦 Inventaire fermé - Sanctuaire restauré', 'color:#888;');
-    }
-
-    function updateSacBadge() {
-        var badge = document.getElementById('btn-sacoche-badge');
-        var total = sacInventaire.length;
-        if (badge) {
-            badge.textContent = total;
-            badge.style.display = total > 0 ? 'flex' : 'none';
-        }
-    }
-
-    function ajouterCleDansSac(numero) {
-        var slots = document.querySelectorAll('.sac-slot');
-        var alerte = document.getElementById('sac-alerte-surcharge');
-        
-        // Vérifier si le sac est plein (10 clés maximum)
-        if (sacInventaire.length >= 10) {
-            // Afficher l'alerte de surcharge
-            alerte.classList.add('active');
-            
-            // Faire vibrer le sac
-            var sacContainer = document.getElementById('sac-inventaire');
-            sacContainer.style.animation = 'border-shake 0.3s linear 2';
-            
-            // Log pour debug
-            console.log('%c⚠️ SAC PLEIN : Impossible d\'ajouter la clé ' + numero, 'color:#ff4444; font-weight:bold;');
-            
-            // Masquer l'alerte après 3 secondes
-            if (sacAlerteTimeout) clearTimeout(sacAlerteTimeout);
-            sacAlerteTimeout = setTimeout(function() {
-                alerte.classList.remove('active');
-                sacContainer.style.animation = '';
-            }, 3000);
-            
-            return false;
-        }
-        
-        // Ajouter la clé dans le premier slot vide
-        sacInventaire.push(numero);
-        var slotIndex = sacInventaire.length - 1;
-        var slot = slots[slotIndex];
-        
-        if (slot) {
-            slot.textContent = numero;
-            slot.classList.add('filled');
-            
-            // Animation d'ajout
-            slot.style.transform = 'scale(1.2)';
-            slot.style.boxShadow = '0 0 20px rgba(212, 175, 55, 0.8)';
-            setTimeout(function() {
-                slot.style.transform = '';
-                slot.style.boxShadow = '';
-            }, 300);
-            
-            // Log de confirmation
-            console.log('%c🗝️ Clé ' + numero + ' ajoutée au sac (slot ' + (slotIndex + 1) + '/10)', 'color:#d4af37; font-weight:bold;');
-            
-            // Message dans le chat Oracle
-            addOracleChatMessage('Clé ' + numero + ' rangée dans le sac (' + sacInventaire.length + '/10)');
-            
-            // Mettre à jour le badge
-            updateSacBadge();
-        }
-        
-        return true;
-    }
-
-    function retirerCleDuSac(slotIndex) {
-        var slots = document.querySelectorAll('.sac-slot');
-        
-        if (slotIndex < 0 || slotIndex >= sacInventaire.length) {
-            console.warn('Slot invalide:', slotIndex);
-            return null;
-        }
-        
-        var cleRetiree = sacInventaire[slotIndex];
-        sacInventaire.splice(slotIndex, 1);
-        
-        // Réorganiser l'affichage
-        slots.forEach(function(slot, idx) {
-            if (idx < sacInventaire.length) {
-                slot.textContent = sacInventaire[idx];
-                slot.classList.add('filled');
-            } else {
-                slot.textContent = '';
-                slot.classList.remove('filled');
-            }
-        });
-        
-        console.log('%c🗝️ Clé ' + cleRetiree + ' retirée du sac', 'color:#888; font-weight:bold;');
-        addOracleChatMessage('Clé ' + cleRetiree + ' utilisée (' + sacInventaire.length + '/10 restantes)');
-        
-        // Mettre à jour le badge
-        updateSacBadge();
-        
-        return cleRetiree;
-    }
-
-    function viderSac() {
-        sacInventaire = [];
-        var slots = document.querySelectorAll('.sac-slot');
-        slots.forEach(function(slot) {
-            slot.textContent = '';
-            slot.classList.remove('filled');
-        });
-        updateSacBadge();
-        console.log('%c🗝️ Sac vidé', 'color:#888;');
-    }
-
-    function obtenirNombreClesDansSac() {
-        return sacInventaire.length;
-    }
-
-    // ═══════════════════════════════════════════════════════
-    // OBJETS DE QUÊTE - Gestion
-    // ═══════════════════════════════════════════════════════
-    
-    function ajouterObjetQuete(icone, nom, id) {
-        // Vérifier si l'objet existe déjà
-        if (sacObjetsQuete.find(function(obj) { return obj.id === id; })) {
-            console.warn('Objet de quête déjà présent:', nom);
-            return false;
-        }
-        
-        var objet = {
-            id: id || 'objet_' + Date.now(),
-            icone: icone,
-            nom: nom
-        };
-        
-        sacObjetsQuete.push(objet);
-        afficherObjetsQuete();
-        updateSacBadge();
-        
-        console.log('%c✨ Objet de quête ajouté:', 'color:#49cafa; font-weight:bold;', nom);
-        addOracleChatMessage('Objet de quête obtenu : ' + nom);
-        
-        return true;
-    }
-
-    function retirerObjetQuete(id) {
-        var index = sacObjetsQuete.findIndex(function(obj) { return obj.id === id; });
-        if (index === -1) return null;
-        
-        var objet = sacObjetsQuete[index];
-        sacObjetsQuete.splice(index, 1);
-        afficherObjetsQuete();
-        updateSacBadge();
-        
-        console.log('%c✨ Objet de quête retiré:', 'color:#888;', objet.nom);
-        addOracleChatMessage('Objet de quête utilisé : ' + objet.nom);
-        
-        return objet;
-    }
-
-    function afficherObjetsQuete() {
-        var container = document.getElementById('sac-objets-quete');
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        if (sacObjetsQuete.length === 0) {
-            var vide = document.createElement('div');
-            vide.id = 'sac-objets-quete-vide';
-            vide.textContent = 'Aucun objet de quête';
-            container.appendChild(vide);
-            return;
-        }
-        
-        sacObjetsQuete.forEach(function(objet) {
-            var div = document.createElement('div');
-            div.className = 'objet-quete';
-            div.dataset.id = objet.id;
-            
-            // Ajouter classe spéciale pour les papyrus anciens
-            if (objet.id && objet.id.startsWith('papyrus_ancien_')) {
-                div.classList.add('papyrus-ancien');
-            }
-            
-            div.innerHTML = objet.icone + '<span class="objet-quete-nom">' + objet.nom + '</span>';
-            
-            // Action au clic selon le type d'objet
-            div.onclick = function() {
-                console.log('Objet de quête cliqué:', objet.nom);
-                
-                // Si c'est un papyrus ancien, afficher la modal de déroulement
-                if (objet.id && objet.id.startsWith('papyrus_ancien_')) {
-                    ouvrirPapyrus(objet.id, objet.nom);
-                } else {
-                    // Pour les autres objets, afficher une info simple
-                    showStyledAlert('✨ <strong>' + objet.nom + '</strong><br><br>Un objet mystérieux de votre quête.<br><br><em style="color:#49cafa;">Gardez-le précieusement...</em>');
-                }
-            };
-            
-            container.appendChild(div);
-        });
-    }
-
-    function viderObjetsQuete() {
-        sacObjetsQuete = [];
-        afficherObjetsQuete();
-        updateSacBadge();
-    }
-
-    // ═══════════════════════════════════════════════════════
-    // RÉSONANCE MAGIQUE - Effets Visuels et Haptiques
-    // ═══════════════════════════════════════════════════════
-    // 
-    // GUIDE D'UTILISATION RAPIDE :
-    // 
-    // 1. Vibrer le bouton sacoche uniquement :
-    //    vibrerSac(intensite);  // intensite: 1=doux, 2=moyen, 3=fort
-    // 
-    // 2. Activer la résonance d'un objet dans l'inventaire :
-    //    activerResonanceObjet(objetId, 'quete');  // ou 'cle' pour une clé
-    // 
-    // 3. Déclencher une résonance complète (bouton + objet + vibration) :
-    //    declencherResonanceMagique(objetId, 'quete', intensite);
-    // 
-    // 4. Vérifier si le joueur a l'objet requis et déclencher la résonance :
-    //    verifierResonanceZone('nom_zone', 'id_objet_requis');
-    // 
-    // 5. Arrêter toute résonance :
-    //    arreterResonanceMagique();
-    // 
-    // EXEMPLE D'INTÉGRATION AVEC UNE PORTE :
-    // 
-    //    function onRuneClick(runeId) {
-    //        // Vérifier si le joueur s'approche de la bonne rune
-    //        if (runeId === SANCTUARY_SEQUENCE[sanctuaryProgress]) {
-    //            // Déclencher une résonance si une clé spéciale est dans l'inventaire
-    //            if (sacInventaire.indexOf(7) !== -1) {
-    //                declencherResonanceMagique(7, 'cle', 2);
-    //            }
-    //        }
-    //    }
-    // 
-    // ═══════════════════════════════════════════════════════
-    var sacResonanceActive = false;
-    var sacResonanceObjetActif = null;
-
-    function vibrerSac(intensite) {
-        intensite = intensite || 1; // Intensité par défaut : 1
-        var btnSacoche = document.getElementById('btn-sacoche');
-        
-        // Ajouter la classe de résonance
-        btnSacoche.classList.add('resonance');
-        
-        // Vibration haptique si supportée
-        if (navigator.vibrate) {
-            // Pattern de vibration selon l'intensité
-            var pattern;
-            switch(Math.floor(intensite)) {
-                case 1:
-                    pattern = [100, 50, 100]; // Doux
-                    break;
-                case 2:
-                    pattern = [150, 50, 150, 50, 150]; // Moyen
-                    break;
-                case 3:
-                    pattern = [200, 50, 200, 50, 200, 50, 200]; // Fort
-                    break;
-                default:
-                    pattern = [100, 50, 100];
-            }
-            navigator.vibrate(pattern);
-            console.log('%c📳 Vibration haptique déclenchée (intensité: ' + intensite + ')', 'color:#d4af37;');
-        } else {
-            console.log('%c📳 Vibration haptique non supportée sur cet appareil', 'color:#888;');
-        }
-        
-        sacResonanceActive = true;
-        
-        console.log('%c✨ Résonance magique activée (intensité: ' + intensite + ')', 'color:#d4af37; font-weight:bold;');
-    }
-
-    function arreterVibrationSac() {
-        var btnSacoche = document.getElementById('btn-sacoche');
-        btnSacoche.classList.remove('resonance');
-        
-        // Arrêter la vibration haptique
-        if (navigator.vibrate) {
-            navigator.vibrate(0);
-        }
-        
-        sacResonanceActive = false;
-        
-        console.log('%c✨ Résonance magique désactivée', 'color:#888;');
-    }
-
-    function activerResonanceObjet(objetId, typeObjet) {
-        // typeObjet: 'cle' ou 'quete'
-        typeObjet = typeObjet || 'quete';
-        
-        // Retirer l'ancienne résonance
-        if (sacResonanceObjetActif) {
-            desactiverResonanceObjet();
-        }
-        
-        var element;
-        if (typeObjet === 'cle') {
-            // Trouver le slot de clé
-            var slots = document.querySelectorAll('.sac-slot');
-            var index = sacInventaire.indexOf(objetId);
-            if (index !== -1 && slots[index]) {
-                element = slots[index];
-            }
-        } else {
-            // Trouver l'objet de quête
-            element = document.querySelector('.objet-quete[data-id="' + objetId + '"]');
-        }
-        
-        if (element) {
-            element.classList.add('objet-actif');
-            sacResonanceObjetActif = { id: objetId, type: typeObjet, element: element };
-            
-            console.log('%c✨ Objet en résonance:', 'color:#d4af37; font-weight:bold;', objetId);
-            return true;
-        }
-        
-        return false;
-    }
-
-    function desactiverResonanceObjet() {
-        if (sacResonanceObjetActif && sacResonanceObjetActif.element) {
-            sacResonanceObjetActif.element.classList.remove('objet-actif');
-            console.log('%c✨ Résonance d\'objet désactivée:', 'color:#888;', sacResonanceObjetActif.id);
-            sacResonanceObjetActif = null;
-        }
-    }
-
-    function declencherResonanceMagique(objetId, typeObjet, intensite) {
-        // Fonction principale pour activer la résonance complète
-        intensite = intensite || 1;
-        
-        // Vibrer le bouton sacoche
-        vibrerSac(intensite);
-        
-        // Activer la résonance de l'objet dans l'inventaire
-        var objetTrouve = activerResonanceObjet(objetId, typeObjet);
-        
-        if (objetTrouve) {
-            // Message dans le chat Oracle
-            addOracleChatMessage('✨ Résonance magique détectée ! Un objet de votre inventaire réagit à la zone...');
-            
-            // Auto-désactiver après 5 secondes
-            setTimeout(function() {
-                arreterResonanceMagique();
-            }, 5000);
-            
-            return true;
-        }
-        
-        return false;
-    }
-
-    function arreterResonanceMagique() {
-        arreterVibrationSac();
-        desactiverResonanceObjet();
-    }
-
-    function verifierResonanceZone(zoneId, objetRequis) {
-        // Vérifier si le joueur possède l'objet requis
-        var objetPresent = false;
-        var typeObjet = 'quete';
-        
-        // Vérifier dans les objets de quête
-        var objet = sacObjetsQuete.find(function(obj) { return obj.id === objetRequis; });
-        if (objet) {
-            objetPresent = true;
-            typeObjet = 'quete';
-        } else {
-            // Vérifier dans les clés
-            var index = sacInventaire.indexOf(objetRequis);
-            if (index !== -1) {
-                objetPresent = true;
-                typeObjet = 'cle';
-            }
-        }
-        
-        if (objetPresent) {
-            console.log('%c🌟 Zone ' + zoneId + ' : Objet requis détecté (' + objetRequis + ')', 'color:#d4af37; font-weight:bold;');
-            declencherResonanceMagique(objetRequis, typeObjet, 2);
-            return true;
-        } else {
-            console.log('%c🔒 Zone ' + zoneId + ' : Objet requis manquant (' + objetRequis + ')', 'color:#888;');
-            return false;
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    // PAPYRUS ANCIEN - Système de Déroulement
-    // ═══════════════════════════════════════════════════════
-    
-    var papyrusTextes = {
-        'papyrus_ancien_1': {
-            titre: 'Papyrus Ancien I - Le Fragment du Givre',
-            hieroglyphes: '𓂀 𓆣 𓃭 𓅓',
-            texte: 'Sous la pierre froide, là où le givre se dépose en silence, repose le premier secret des Gardiens de l\'Ancien Temps. Celui qui lit ces mots a franchi le premier seuil.',
-            indice: '« Первый шаг замерз в снегу »',
-            messageRusse: 'Первый шаг замерз в снегу'
-        },
-        'papyrus_ancien_2': {
-            titre: 'Papyrus Ancien II - Le Fragment des Ombres',
-            hieroglyphes: '𓊖 𓋴 𓌪 𓍯',
-            texte: 'Dans les profondeurs où l\'obscurité règne et où les miroirs reflètent plus que la lumière, le deuxième fragment attend. Les étoiles du Sanctuaire tracent un chemin invisible aux yeux des mortels ordinaires. Seuls ceux qui ont allumé les flammes sacrées pourront déchiffrer ce message écrit dans l\'encre du temps.',
-            indice: '« Fragment II : ...SE CACHE... »'
-        },
-        'papyrus_ancien_3': {
-            titre: 'Papyrus Ancien III - Le Fragment de l\'Aurore',
-            hieroglyphes: '𓎡 𓏏 𓐍',
-            texte: 'Le dernier fragment repose à la croisée des mondes, là où le givre éternel rencontre l\'or qui ne ternit jamais. Trois fragments réunis forment la Clé Suprême. Le trésor n\'est pas un objet matériel, mais la Connaissance Pure des Anciens. Celui qui dévoile ce secret devient Gardien à son tour, protecteur du Sanctuaire pour les générations futures.',
-            indice: '« Fragment III : ...LÀ OÙ LE GIVRE RENCONTRE L\'OR ÉTERNEL »'
-        }
-    };
-
-    function ouvrirPapyrus(papyrusId, papyrusNom) {
-        var modal = document.getElementById('papyrus-modal');
-        var titre = document.getElementById('papyrus-titre');
-        var texte = document.getElementById('papyrus-texte');
-        var indice = document.getElementById('papyrus-indice');
-        var hieroglyphes = document.querySelectorAll('.papyrus-hieroglyph');
-        
-        // Récupérer les données du papyrus
-        var data = papyrusTextes[papyrusId] || {
-            titre: papyrusNom || 'Papyrus Ancien',
-            hieroglyphes: '𓂀 𓆣 𓃭',
-            texte: 'Un texte ancien écrit dans une langue oubliée...',
-            indice: '« Les secrets se révèlent aux patients »'
-        };
-        
-        // Remplir le contenu
-        if (titre) titre.textContent = data.titre;
-        if (texte) texte.textContent = data.texte;
-        
-        // Si un message russe est présent, l'afficher avec un style spécial
-        if (data.messageRusse && indice) {
-            indice.innerHTML = '<div class="papyrus-text-russe">' + data.messageRusse + '</div>';
-            indice.style.textAlign = 'center';
-        } else if (indice) {
-            indice.textContent = data.indice;
-        }
-        
-        if (hieroglyphes[0]) hieroglyphes[0].textContent = data.hieroglyphes;
-        
-        // Afficher la modal avec animation
-        modal.classList.add('active');
-        
-        // Son de déroulement (optionnel)
-        if (navigator.vibrate) {
-            navigator.vibrate([50, 30, 50, 30, 100]);
-        }
-        
-        // Réinitialiser l'animation
-        var scroll = modal.querySelector('.papyrus-scroll');
-        if (scroll) {
-            scroll.style.animation = 'none';
-            scroll.offsetHeight; // Force reflow
-            scroll.style.animation = 'papyrus-unroll 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
-        }
-        
-        console.log('%c📜 Papyrus déroulé:', 'color:#8b7355; font-weight:bold;', data.titre);
-        addOracleChatMessage('📜 Vous lisez le ' + data.titre + '...');
-    }
-
-    function fermerPapyrus() {
-        var modal = document.getElementById('papyrus-modal');
-        var scroll = modal.querySelector('.papyrus-scroll');
-        
-        // Animation de fermeture (enroulement)
-        if (scroll) {
-            scroll.style.animation = 'papyrus-roll-up 0.6s cubic-bezier(0.6, -0.28, 0.74, 0.05) forwards';
-        }
-        
-        // Masquer la modal après l'animation
-        setTimeout(function() {
-            modal.classList.remove('active');
-        }, 600);
-        
-        console.log('%c📜 Papyrus enroulé', 'color:#888;');
-    }
-
-    function fermerPapyrusOverlay(event) {
-        // Fermer uniquement si on clique sur l'overlay, pas sur le papyrus
-        if (event.target.id === 'papyrus-modal') {
-            fermerPapyrus();
-        }
-    }
-
-    // ═══════════════════════════════════════════════════════
-    // CONTRÔLES CLAVIER - Fermer l'inventaire avec Échap
-    // ═══════════════════════════════════════════════════════
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (sacIsOpen) {
-                fermerSacInventaire();
-            }
-            // Fermer aussi le papyrus si ouvert
-            var papyrusModal = document.getElementById('papyrus-modal');
-            if (papyrusModal && papyrusModal.classList.contains('active')) {
-                fermerPapyrus();
-            }
-        }
-    });
-
-    // ═══════════════════════════════════════════════════════
-    // FONCTIONS DE TEST - Console
-    // ═══════════════════════════════════════════════════════
-    // 
-    // GUIDE DE TEST DANS LA CONSOLE :
-    // 
-    // testQueteRune1()             - Test de la première quête (Rune n°1) (NEW!)
-    // testSac()                    - Test complet du sac (clés + objets + alerte surcharge)
-    // testObjetsQuete()            - Test des objets de quête uniquement
-    // testPapyrus()                - Test papyrus anciens avec déroulement
-    // testResonance()              - Test des effets de résonance magique
-    // testZoneInteractive()        - Test de détection de zone avec objet requis
-    // testInteractionSanctuaire()  - Test interaction inventaire ↔ sanctuaire
-    // testRunesSysteme()           - Test système des 12 runes
-    // testScenarioComplet()        - Scénario complet de quête avec résonances
-    // 
-    // FONCTIONS RAPIDES :
-    // 
-    // resonner('cristal_1', 'quete', 2)  - Déclencher résonance rapide
-    // vibrerSac(3)                        - Vibrer le bouton (intensité 1-3)
-    // ouvrirSacInventaire()              - Ouvrir le drawer
-    // fermerSacInventaire()              - Fermer le drawer
-    // toggleSacInventaire()              - Ouvrir/fermer le drawer
-    // 
-    // FONCTIONS RUNES :
-    // 
-    // fouillerZone(0)                    - Fouiller avec rune 1 (énigme)
-    // ouvrirPorte(4)                     - Tenter d'ouvrir porte 1
-    // ouvrirAtelierPapyrus()             - Ouvrir l'atelier
-    // ouvrirTaverne()                    - Ouvrir le chat
-    // afficherOeilOracle()               - Afficher météo + jackpot
-    // 
-    // ═══════════════════════════════════════════════════════
-    window.testSac = function() {
-        console.log('%c=== TEST DU SAC À DOS ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
-        viderSac();
-        viderObjetsQuete();
-        ouvrirSacInventaire();
-        
-        // Test ajout de clés
-        for (var i = 1; i <= 12; i++) {
-            setTimeout(function(num) {
-                return function() {
-                    ajouterCleDansSac(num);
-                };
-            }(i), i * 400);
-        }
-        
-        // Test ajout d'objets de quête
-        setTimeout(function() {
-            ajouterObjetQuete('📜', 'Parchemin Ancien', 'parchemin_1');
-        }, 5000);
-        setTimeout(function() {
-            ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
-        }, 5500);
-        setTimeout(function() {
-            ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
-        }, 6000);
-    };
-
-    window.testObjetsQuete = function() {
-        console.log('%c=== TEST OBJETS DE QUÊTE ===', 'color:#49cafa; font-size:1.2em; font-weight:bold;');
-        ouvrirSacInventaire();
-        ajouterObjetQuete('📜', 'Papyrus Ancien I', 'papyrus_ancien_1');
-        ajouterObjetQuete('📜', 'Papyrus Ancien II', 'papyrus_ancien_2');
-        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
-        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
-        ajouterObjetQuete('⚗️', 'Fiole Magique', 'fiole_1');
-        ajouterObjetQuete('🗡️', 'Lame Enchantée', 'lame_1');
-    };
-
-    window.testPapyrus = function() {
-        console.log('%c=== TEST PAPYRUS ANCIEN ===', 'color:#8b7355; font-size:1.3em; font-weight:bold;');
-        
-        // Ajouter des papyrus de test
-        viderSac();
-        viderObjetsQuete();
-        ajouterObjetQuete('📜', 'Papyrus Ancien I', 'papyrus_ancien_1');
-        ajouterObjetQuete('📜', 'Papyrus Ancien II', 'papyrus_ancien_2');
-        ajouterObjetQuete('📜', 'Papyrus Ancien III', 'papyrus_ancien_3');
-        
-        // Ouvrir l'inventaire
-        ouvrirSacInventaire();
-        
-        console.log('%c📜 3 Papyrus ajoutés à l\'inventaire', 'color:#8b7355;');
-        console.log('%c💡 Cliquez sur un papyrus dans l\'inventaire pour le dérouler !', 'color:#d4af37; font-weight:bold;');
-        console.log('%c   → Animation de déroulement 3D fluide', 'color:#888;');
-        console.log('%c   → Texte en encre ancienne avec hiéroglyphes', 'color:#888;');
-        console.log('%c   → Vibration haptique au déroulement', 'color:#888;');
-        console.log('%c   → Fermer avec Échap ou le bouton "ROULER"', 'color:#888;');
-        
-        // Auto-ouvrir le premier papyrus après 2 secondes
-        setTimeout(function() {
-            console.log('%c\n📜 Ouverture automatique du Papyrus I...', 'color:#8b7355; font-weight:bold;');
-            ouvrirPapyrus('papyrus_ancien_1', 'Papyrus Ancien I');
-        }, 2000);
-    };
-
-    window.testQueteRune1 = function() {
-        console.log('%c=== TEST QUÊTE RUNE N°1 ===', 'color:#00ff88; font-size:1.3em; font-weight:bold;');
-        
-        // Réinitialiser l'état de la quête
-        runesDecouvertes.rune1PremierClic = false;
-        viderSac();
-        viderObjetsQuete();
-        
-        // Activer le clignotement de la Rune n°1
-        initialiserQueteRune1();
-        
-        console.log('%c✨ La Rune n°1 clignote doucement en doré', 'color:#d4af37;');
-        console.log('%c💡 Cliquez sur la première rune (⏀) pour découvrir le papyrus !', 'color:#49cafa; font-weight:bold;');
-        console.log('%c   → Vibration de 200ms sur mobile', 'color:#888;');
-        console.log('%c   → Animation de déroulement automatique', 'color:#888;');
-        console.log('%c   → Texte russe : "Первый шаг замерз в снегу"', 'color:#888;');
-        console.log('%c   → Papyrus ajouté dans le sac automatiquement', 'color:#888;');
-    };
-
-    window.testResonance = function() {
-        console.log('%c=== TEST RÉSONANCE MAGIQUE ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
-        
-        // Ajouter des objets de test
-        viderSac();
-        viderObjetsQuete();
-        ajouterCleDansSac(42);
-        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
-        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
-        ajouterObjetQuete('📜', 'Parchemin Ancien', 'parchemin_1');
-        
-        // Ouvrir l'inventaire
-        ouvrirSacInventaire();
-        
-        // Test 1 : Vibration simple du bouton
-        console.log('%cTest 1: Vibration simple du bouton', 'color:#49cafa;');
-        setTimeout(function() {
-            vibrerSac(1);
-        }, 1000);
-        
-        // Test 2 : Résonance d'un objet de quête
-        console.log('%cTest 2: Résonance objet de quête (Cristal)', 'color:#49cafa;');
-        setTimeout(function() {
-            arreterVibrationSac();
-            declencherResonanceMagique('cristal_1', 'quete', 2);
-        }, 3000);
-        
-        // Test 3 : Changement d'objet actif
-        console.log('%cTest 3: Changement vers Orbe Mystique', 'color:#49cafa;');
-        setTimeout(function() {
-            arreterResonanceMagique();
-            declencherResonanceMagique('orbe_1', 'quete', 1);
-        }, 8000);
-        
-        // Test 4 : Résonance d'une clé
-        console.log('%cTest 4: Résonance clé numéro 42', 'color:#49cafa;');
-        setTimeout(function() {
-            arreterResonanceMagique();
-            declencherResonanceMagique(42, 'cle', 3);
-        }, 13000);
-        
-        // Test 5 : Arrêt complet
-        setTimeout(function() {
-            arreterResonanceMagique();
-            console.log('%c✅ Test de résonance terminé', 'color:#00ff88; font-weight:bold;');
-        }, 18000);
-    };
-
-    window.testZoneInteractive = function() {
-        console.log('%c=== TEST ZONE INTERACTIVE ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
-        
-        // Préparer l'inventaire
-        viderSac();
-        viderObjetsQuete();
-        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_mystique');
-        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_givre');
-        ajouterCleDansSac(7);
-        
-        ouvrirSacInventaire();
-        
-        // Simuler l'approche d'une zone qui requiert l'Orbe
-        console.log('%c🚪 Approche de la Porte du Mystère...', 'color:#49cafa;');
-        setTimeout(function() {
-            var result = verifierResonanceZone('porte_mystere', 'orbe_mystique');
-            if (result) {
-                console.log('%c✅ La porte reconnaît votre objet !', 'color:#00ff88;');
-            }
-        }, 1500);
-        
-        // Arrêt après 6 secondes
-        setTimeout(function() {
-            arreterResonanceMagique();
-            console.log('%c✅ Test de zone terminé', 'color:#00ff88; font-weight:bold;');
-        }, 7500);
-    };
-
-    window.testRunesSysteme = function() {
-        console.log('%c=== TEST SYSTÈME DES 12 RUNES ===', 'color:#d4af37; font-size:1.3em; font-weight:bold; text-shadow: 0 0 10px rgba(212,175,55,0.5);');
-        
-        // Préparer le terrain
-        viderSac();
-        viderObjetsQuete();
-        runesDecouvertes = {
-            rune1PremierClic: false,
-            indicesTrouves: [],
-            papyrusCollectes: [],
-            portesOuvertes: []
-        };
-        
-        console.log('%c\n📖 GUIDE DES RUNES :', 'color:#49cafa; font-size:1.1em; font-weight:bold;');
-        console.log('%c  Runes 1-4  : Les Chercheurs (fouillerZone)', 'color:#888;');
-        console.log('%c  Runes 5-8  : Les Verrous (ouvrirPorte)', 'color:#888;');
-        console.log('%c  Runes 9-10 : L\'Atelier (papyrus russes)', 'color:#888;');
-        console.log('%c  Rune 11    : La Taverne (chat social)', 'color:#888;');
-        console.log('%c  Rune 12    : L\'Œil de l\'Oracle (météo + jackpot)', 'color:#888;');
-        
-        console.log('%c\n🎬 SCÉNARIO DE TEST :', 'color:#00ff88; font-weight:bold;');
-        
-        // Étape 1 : Cliquer sur la Rune 1 (Énigme #1)
-        setTimeout(function() {
-            console.log('%c\n1️⃣ Clic sur Rune 1 (Première fois) - Énigme #1', 'color:#d4af37; font-weight:bold;');
-            console.log('%c   → Devrait afficher le message mystique', 'color:#888;');
-            console.log('%c   → Devrait ajouter le premier papyrus', 'color:#888;');
-            console.log('%c   → Devrait vibrer le sac', 'color:#888;');
-        }, 500);
-        
-        // Étape 2 : Ajouter des clés pour tester les portes
-        setTimeout(function() {
-            console.log('%c\n2️⃣ Ajout de clés dans le sac', 'color:#d4af37; font-weight:bold;');
-            ajouterCleDansSac(1);
-            ajouterCleDansSac(2);
-            console.log('%c   → Clés 1 et 2 ajoutées', 'color:#00ff88;');
-        }, 1500);
-        
-        // Étape 3 : Tester une porte (Rune 5 = Porte 1)
-        setTimeout(function() {
-            console.log('%c\n3️⃣ Vous pouvez maintenant tester :', 'color:#d4af37; font-weight:bold;');
-            console.log('%c   • Rune 1 (0)  : Énigme + papyrus', 'color:#49cafa;');
-            console.log('%c   • Rune 2-4    : Fouiller zones', 'color:#49cafa;');
-            console.log('%c   • Rune 5 (4)  : Porte 1 (clé 1 requise)', 'color:#49cafa;');
-            console.log('%c   • Rune 6 (5)  : Porte 2 (clé 2 requise)', 'color:#49cafa;');
-            console.log('%c   • Rune 9-10   : Atelier papyrus', 'color:#49cafa;');
-            console.log('%c   • Rune 11 (10): Taverne', 'color:#49cafa;');
-            console.log('%c   • Rune 12 (11): Œil Oracle', 'color:#49cafa;');
-            console.log('%c\n💡 Cliquez sur les runes pour tester leurs fonctions !', 'color:#00ff88; font-size:1.1em; font-weight:bold;');
-        }, 2500);
-    };
-
-    window.testInteractionSanctuaire = function() {
-        console.log('%c=== TEST INTERACTION INVENTAIRE ↔ SANCTUAIRE ===', 'color:#d4af37; font-size:1.3em; font-weight:bold;');
-        
-        // Préparer l'inventaire avec quelques objets
-        viderSac();
-        viderObjetsQuete();
-        ajouterCleDansSac(1);
-        ajouterCleDansSac(5);
-        ajouterCleDansSac(7);
-        ajouterObjetQuete('💎', 'Cristal', 'cristal_1');
-        ajouterObjetQuete('🔮', 'Orbe', 'orbe_1');
-        
-        console.log('%c📦 Ouverture de l\'inventaire...', 'color:#49cafa;');
-        console.log('%c   → Le sanctuaire va se déplacer vers le haut et se réduire', 'color:#888;');
-        console.log('%c   → Les runes restent CLIQUABLES', 'color:#00ff88; font-weight:bold;');
-        ouvrirSacInventaire();
-        
-        setTimeout(function() {
-            console.log('%c✨ L\'inventaire est ouvert !', 'color:#d4af37;');
-            console.log('%c   → Essayez de cliquer sur les runes du sanctuaire', 'color:#49cafa;');
-            console.log('%c   → Vous pouvez voir le sanctuaire à travers le fond semi-transparent', 'color:#49cafa;');
-        }, 600);
-        
-        setTimeout(function() {
-            console.log('%c📦 Fermeture de l\'inventaire...', 'color:#888;');
-            console.log('%c   → Le sanctuaire reprend sa position centrale', 'color:#888;');
-            fermerSacInventaire();
-        }, 4000);
-        
-        setTimeout(function() {
-            console.log('%c✅ Test terminé - Interaction fluide confirmée !', 'color:#00ff88; font-size:1.1em; font-weight:bold;');
-            console.log('%c💡 Astuce : Appuyez sur Échap pour fermer l\'inventaire rapidement', 'color:#d4af37;');
-        }, 4700);
-    };
-
-    window.testScenarioComplet = function() {
-        console.log('%c=== SCÉNARIO COMPLET : QUÊTE DU SANCTUAIRE ===', 'color:#d4af37; font-size:1.3em; font-weight:bold; text-shadow: 0 0 10px rgba(212,175,55,0.5);');
-        
-        // Préparer l'inventaire
-        viderSac();
-        viderObjetsQuete();
-        
-        // Étape 1 : Le joueur reçoit des objets
-        console.log('%c📦 Étape 1/5 : Collecte d\'objets...', 'color:#49cafa; font-weight:bold;');
-        ajouterCleDansSac(1);
-        ajouterCleDansSac(5);
-        ajouterObjetQuete('🗝️', 'Clé Antique', 'cle_antique');
-        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_givre');
-        ajouterObjetQuete('🔮', 'Orbe de Vision', 'orbe_vision');
-        
-        // Ouvrir l'inventaire
-        setTimeout(function() {
-            ouvrirSacInventaire();
-        }, 500);
-        
-        // Étape 2 : Approche d'une première porte (nécessite cristal)
-        setTimeout(function() {
-            console.log('%c❄️ Étape 2/5 : Approche de la Porte de Glace...', 'color:#49cafa; font-weight:bold;');
-            enregistrerZoneResonance('porte_glace', 'cristal_givre', function() {
-                console.log('%c🎉 La Porte de Glace s\'ouvre !', 'color:#00ff88;');
-                retirerObjetQuete('cristal_givre');
-            });
-            declencherZoneResonance('porte_glace');
-        }, 3000);
-        
-        // Étape 3 : Le cristal disparaît, résonance s'arrête
-        setTimeout(function() {
-            arreterResonanceMagique();
-            console.log('%c✨ Le Cristal de Givre se dissout dans un éclat de lumière...', 'color:#888; font-style:italic;');
-        }, 8000);
-        
-        // Étape 4 : Nouvelle zone nécessitant l'Orbe
-        setTimeout(function() {
-            console.log('%c🔮 Étape 3/5 : Salle des Miroirs...', 'color:#49cafa; font-weight:bold;');
-            enregistrerZoneResonance('salle_miroirs', 'orbe_vision', function() {
-                console.log('%c👁️ L\'Orbe révèle le chemin caché !', 'color:#00ff88;');
-            });
-            declencherZoneResonance('salle_miroirs');
-        }, 10000);
-        
-        // Étape 5 : Arrêt et nouvelle clé découverte
-        setTimeout(function() {
-            arreterResonanceMagique();
-            console.log('%c🗝️ Étape 4/5 : Une nouvelle clé apparaît !', 'color:#49cafa; font-weight:bold;');
-            ajouterCleDansSac(13);
-        }, 15000);
-        
-        // Étape 6 : Porte finale nécessitant clé 13
-        setTimeout(function() {
-            console.log('%c🚪 Étape 5/5 : Porte du Sanctuaire Final...', 'color:#d4af37; font-weight:bold;');
-            verifierResonanceRune(12); // Rune 12 nécessite clé 13
-            console.log('%c✨ La clé 13 vibre intensément !', 'color:#d4af37;');
-        }, 17000);
-        
-        // Fin du scénario
-        setTimeout(function() {
-            arreterResonanceMagique();
-            fermerSacInventaire();
-            console.log('%c🎊 QUÊTE TERMINÉE ! Le Sanctuaire s\'ouvre devant vous...', 'color:#00ff88; font-size:1.2em; font-weight:bold; text-shadow: 0 0 20px rgba(0,255,136,0.8);');
-        }, 22000);
-    };
-
-
-    // Fonction utilitaire : Déclencher résonance simple (pour intégration facile)
-    window.resonner = function(objetId, type, intensite) {
-        type = type || 'quete';
-        intensite = intensite || 1;
-        declencherResonanceMagique(objetId, type, intensite);
-    };
-
-    // ═══════════════════════════════════════════════════════
-    // INTÉGRATION ZONES INTERACTIVES - Détection de proximité
-    // ═══════════════════════════════════════════════════════
-    
-    // Exemple d'intégration avec les runes du Sanctuaire
-    function verifierResonanceRune(runeId) {
-        // Vérifier si une clé spéciale peut débloquer cette rune
-        var cleSpeciale = runeId + 1; // Exemple : rune 0 nécessite clé 1
-        
-        if (sacInventaire.indexOf(cleSpeciale) !== -1) {
-            console.log('%c🌟 Rune ' + runeId + ' : Clé spéciale détectée !', 'color:#d4af37;');
-            declencherResonanceMagique(cleSpeciale, 'cle', 1);
-            return true;
-        }
-        return false;
-    }
-
-    // Exemple d'intégration avec les portes des 100 niveaux
-    function verifierResonancePorte(doorIndex) {
-        // Vérifier si un objet de quête peut aider à identifier la bonne porte
-        var objetsUtiles = ['orbe_vision', 'cristal_clarte', 'parchemin_sagesse'];
-        
-        for (var i = 0; i < objetsUtiles.length; i++) {
-            var objet = sacObjetsQuete.find(function(obj) { return obj.id === objetsUtiles[i]; });
-            if (objet) {
-                console.log('%c🔮 Porte ' + doorIndex + ' : Objet de guidance détecté !', 'color:#49cafa;');
-                declencherResonanceMagique(objet.id, 'quete', 2);
-                
-                // Révéler la destination de la porte
-                if (typeof revealDoorWithScroll === 'function') {
-                    revealDoorWithScroll(doorIndex);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Hook global : Surveiller les événements de proximité
-    var resonanceZonesActives = {};
-    
-    function enregistrerZoneResonance(zoneId, objetRequis, callback) {
-        resonanceZonesActives[zoneId] = {
-            objetRequis: objetRequis,
-            callback: callback || function() {}
-        };
-        console.log('%c📍 Zone de résonance enregistrée:', 'color:#d4af37;', zoneId);
-    }
-
-    function declencherZoneResonance(zoneId) {
-        var zone = resonanceZonesActives[zoneId];
-        if (!zone) {
-            console.warn('Zone de résonance inconnue:', zoneId);
-            return false;
-        }
-        
-        var result = verifierResonanceZone(zoneId, zone.objetRequis);
-        if (result && zone.callback) {
-            zone.callback();
-        }
-        return result;
-    }
-
-    // Exemple d'utilisation avec les runes :
-    // Ajoutez ceci dans onRuneClick pour activer la résonance au survol
-    /*
-    function onRuneClick(runeId) {
-        // Code existant...
-        
-        // Ajouter détection de résonance
-        if (verifierResonanceRune(runeId)) {
-            addOracleChatMessage('✨ Votre clé vibre en présence de cette rune !');
-        }
-        
-        // Reste du code...
-    }
-    */
+    }// Vous pouvez appeler startFinalLevel() pour faire apparaître la salle.
 </script>
 </html>
