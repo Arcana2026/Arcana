@@ -2484,748 +2484,777 @@
         </div>
     </div>
 </body>
-
-
-    <script type="module">
-      (async function() {
-        let wagmiConfig = null
-        try {
-          const { createWeb3Modal, defaultWagmiConfig } = await import('https://esm.sh/@web3modal/wagmi@5.1.11')
-          const { mainnet, polygon } = await import('https://esm.sh/viem/chains')
-          const { watchAccount, getWalletClient } = await import('https://esm.sh/@wagmi/core@2.13.4')
-          const projectId = '7004f981f33f063167f1395567798132'
-          const metadata = {
+<script type="module">
+    (async function() {
+      let wagmiConfig = null
+      try {
+        const { createWeb3Modal, defaultWagmiConfig } = await import('https://esm.sh/@web3modal/wagmi@5.1.11')
+        const { mainnet, polygon } = await import('https://esm.sh/viem/chains')
+        const { watchAccount, getWalletClient } = await import('https://esm.sh/@wagmi/core@2.13.4')
+        const projectId = '7004f981f33f063167f1395567798132'
+        const metadata = {
+          name: 'Arcana',
+          description: 'Arcana Game - Écosystème Décentralisé sur Polygon',
+          url: 'https://arcana-ezl.pages.dev',
+          icons: ['https://arcana-ezl.pages.dev/favicon.ico']
+        }
+        const chains = [mainnet, polygon]
+        wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
+        createWeb3Modal({
+          wagmiConfig,
+          projectId,
+          chains,
+          defaultChain: polygon,
+          enableAnalytics: false,
+          enableOnramp: false,
+          featuredWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96']
+        })
+        watchAccount(wagmiConfig, {
+          onChange: async (account) => {
+            if (account.address && window.arcanaOnW3mConnect) {
+              try {
+                const client = await getWalletClient(wagmiConfig)
+                if (!client) return
+                const eip1193 = (typeof client.request === 'function') ? client : (client.transport?.value ?? client.transport ?? client)
+                const prov = new ethers.providers.Web3Provider(eip1193, 'any')
+                const sgn = prov.getSigner()
+                const acc = await sgn.getAddress()
+                window.arcanaOnW3mConnect(prov, sgn, acc)
+              } catch (err) { console.warn('wagmi provider:', err) }
+            }
+          }
+        })
+      } catch (e) {
+        console.warn('Web3Modal wagmi init:', e);
+        const { createAppKit } = await import('https://esm.sh/@reown/appkit@1.8.18');
+        const { polygon } = await import('https://esm.sh/@reown/appkit@1.8.18/networks');
+        const { Ethers5Adapter } = await import('https://esm.sh/@reown/appkit-adapter-ethers5@0.2.6');
+        const modal = createAppKit({
+          adapters: [new Ethers5Adapter()],
+          networks: [polygon],
+          defaultNetwork: polygon,
+          metadata: {
             name: 'Arcana',
-            description: 'Arcana Game - ├ëcosyst├¿me D├®centralis├® sur Polygon',
+            description: 'Arcana Game - Écosystème Décentralisé sur Polygon',
             url: 'https://arcana-ezl.pages.dev',
             icons: ['https://arcana-ezl.pages.dev/favicon.ico']
+          },
+          projectId: '7004f981f33f063167f1395567798132',
+          features: {
+            analytics: false,
+            onramp: false,
+            email: false,
+            socials: [],
+            connectMethodsOrder: ['wallet']
+          },
+          featuredWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
+          themeMode: 'dark',
+          themeVariables: { '--w3m-accent': '#d4af37' }
+        });
+        modal.subscribeProvider(async (state) => {
+          if (state.isConnected && state.provider && window.arcanaOnW3mConnect) {
+            const prov = new ethers.providers.Web3Provider(state.provider, 'any');
+            const sgn = prov.getSigner();
+            const acc = await sgn.getAddress();
+            window.arcanaOnW3mConnect(prov, sgn, acc);
+          } else if (!state.isConnected && window.arcanaOnW3mDisconnect) window.arcanaOnW3mDisconnect();
+        });
+      }
+      if (window.ethereum) {
+        window.ethereum.on('accountsChanged', async (accounts) => {
+          if (accounts?.[0] && window.arcanaOnW3mConnect) {
+            const prov = new ethers.providers.Web3Provider(window.ethereum, 'any');
+            const sgn = prov.getSigner();
+            const acc = await sgn.getAddress();
+            window.arcanaOnW3mConnect(prov, sgn, acc);
           }
-          const chains = [mainnet, polygon]
-          wagmiConfig = defaultWagmiConfig({ chains, projectId, metadata })
-          createWeb3Modal({
-            wagmiConfig,
-            projectId,
-            chains,
-            defaultChain: polygon,
-            enableAnalytics: false,
-            enableOnramp: false,
-            featuredWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96']
-          })
-          watchAccount(wagmiConfig, {
-            onChange: async (account) => {
-              if (account.address && window.arcanaOnW3mConnect) {
-                try {
-                  const client = await getWalletClient(wagmiConfig)
-                  if (!client) return
-                  const eip1193 = (typeof client.request === 'function') ? client : (client.transport?.value ?? client.transport ?? client)
-                  const prov = new ethers.providers.Web3Provider(eip1193, 'any')
-                  const sgn = prov.getSigner()
-                  const acc = await sgn.getAddress()
-                  window.arcanaOnW3mConnect(prov, sgn, acc)
-                } catch (err) { console.warn('wagmi provider:', err) }
-              }
-            }
-          })
-        } catch (e) {
-          console.warn('Web3Modal wagmi init:', e);
-          const { createAppKit } = await import('https://esm.sh/@reown/appkit@1.8.18');
-          const { polygon } = await import('https://esm.sh/@reown/appkit@1.8.18/networks');
-          const { Ethers5Adapter } = await import('https://esm.sh/@reown/appkit-adapter-ethers5@0.2.6');
-          const modal = createAppKit({
-            adapters: [new Ethers5Adapter()],
-            networks: [polygon],
-            defaultNetwork: polygon,
-            metadata: {
-              name: 'Arcana',
-              description: 'Arcana Game - ├ëcosyst├¿me D├®centralis├® sur Polygon',
-              url: 'https://arcana-ezl.pages.dev',
-              icons: ['https://arcana-ezl.pages.dev/favicon.ico']
-            },
-            projectId: '7004f981f33f063167f1395567798132',
-            features: {
-              analytics: false,
-              onramp: false,
-              email: false,
-              socials: [],
-              connectMethodsOrder: ['wallet']
-            },
-            featuredWalletIds: ['c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96'],
-            themeMode: 'dark',
-            themeVariables: { '--w3m-accent': '#d4af37' }
-          });
-          modal.subscribeProvider(async (state) => {
-            if (state.isConnected && state.provider && window.arcanaOnW3mConnect) {
-              const prov = new ethers.providers.Web3Provider(state.provider, 'any');
-              const sgn = prov.getSigner();
-              const acc = await sgn.getAddress();
-              window.arcanaOnW3mConnect(prov, sgn, acc);
-            } else if (!state.isConnected && window.arcanaOnW3mDisconnect) window.arcanaOnW3mDisconnect();
-          });
-        }
-        if (window.ethereum) {
-          window.ethereum.on('accountsChanged', async (accounts) => {
-            if (accounts?.[0] && window.arcanaOnW3mConnect) {
-              const prov = new ethers.providers.Web3Provider(window.ethereum, 'any');
-              const sgn = prov.getSigner();
-              const acc = await sgn.getAddress();
-              window.arcanaOnW3mConnect(prov, sgn, acc);
-            }
-          });
-          window.ethereum.on('chainChanged', () => location.reload());
-        }
-      })();
-    </script>
+        });
+        window.ethereum.on('chainChanged', () => location.reload());
+      }
+    })();
+  </script>
 
 <!-- Lien stylisé d'ajout de token ARCANA à MetaMask juste après le bouton de dépôt -->
 <style>
 .arcana-add-metamask-link {
-    display: inline-block;
-    margin-top: 6px;
-    color: #ffd700;
-    font-size: 0.92em;
-    font-family: inherit;
-    cursor: pointer;
-    text-decoration: underline dotted;
-    transition: color 0.18s;
-    background: transparent;
-    border: none;
-    padding: 0;
+  display: inline-block;
+  margin-top: 6px;
+  color: #ffd700;
+  font-size: 0.92em;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  transition: color 0.18s;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 .arcana-add-metamask-link:hover {
-    color: #fff2b8;
-    text-decoration: underline;
+  color: #fff2b8;
+  text-decoration: underline;
 }
 </style>
 <script>
-    // --- CONFIGURATION OFFICIELLE ARCANA GAME ---
-    const ARCANA_PROJECT_ID = "7004f981f33f063167f1395567798132";
-    const ARCANA_GAME_CONTRACT = "0xFABF1FcFB7dA0Aa861A61747E1e5a2F2F8E9E337";
-    const ADMIN_ADDRESS = ""; // ├Ç REMPLIR : adresse 0x... du wallet autoris├® pour Force Ouverture
-    const ARCANA_TOKEN_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
-    const USDT_TOKEN_ADDRESS   = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-    const USDC_TOKEN_ADDRESS   = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
-    
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // ­ƒöô VARIABLE DE TEST : Bypass Oracle M├®t├®o
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    let bypassOracle = true; // Mettez ├á true pour forcer l'acc├¿s en d├®veloppement
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // Pour MATIC natif, pas besoin d'adresse.
-    // Ajouter l'adresse du contrat d'Arcana Game pour la temp├®rature si c'est un autre contrat
-    const ARCANA_GAME_ORACLE_ABI = [
-        "function currentTemp() view returns (int256)",
-        "function updateOracle(int256 _temp) external"
-    ];
-    // Contrat de sauvegarde progression (mapping address => level). Sauvegarde persistante sur Polygon.
-    const ARCANA_PROGRESSION_CONTRACT = ARCANA_GAME_CONTRACT; // ou "0x1...876d" pour reprendre o├╣ l'on s'est arr├¬t├®
-    const ARCANA_PROGRESSION_ABI = [
-        "function playerLevel(address) view returns (uint256)",
-        "function setLevel(uint256 _level) external"
-    ];
+  // --- CONFIGURATION OFFICIELLE ARCANA GAME ---
+  const ARCANA_PROJECT_ID = "7004f981f33f063167f1395567798132";
+  const ARCANA_GAME_CONTRACT = "0xFABF1FcFB7dA0Aa861A61747E1e5a2F2F8E9E337";
+  const ADMIN_ADDRESS = ""; // À REMPLIR : adresse 0x... du wallet autorisé pour Force Ouverture
+  const ARCANA_TOKEN_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
+  const USDT_TOKEN_ADDRESS   = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+  const USDC_TOKEN_ADDRESS   = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+  
+  // ═════════════════════════════════════════════════════════════════════
+  // 🔧 VARIABLE DE TEST : Bypass Oracle Météo
+  // ═════════════════════════════════════════════════════════════════════
+  let bypassOracle = true; // Mettez à true pour forcer l'accès en développement
+  // ═════════════════════════════════════════════════════════════════════
+  // Pour MATIC natif, pas besoin d'adresse.
+  // Ajouter l'adresse du contrat d'Arcana Game pour la température si c'est un autre contrat
+  const ARCANA_GAME_ORACLE_ABI = [
+      "function currentTemp() view returns (int256)",
+      "function updateOracle(int256 _temp) external"
+  ];
+  // Contrat de sauvegarde progression (mapping address => level). Sauvegarde persistante sur Polygon.
+  const ARCANA_PROGRESSION_CONTRACT = ARCANA_GAME_CONTRACT; // ou "0x1...876d" pour reprendre où l'on s'est arrêté
+  const ARCANA_PROGRESSION_ABI = [
+      "function playerLevel(address) view returns (uint256)",
+      "function setLevel(uint256 _level) external"
+  ];
 
-    // ERC20 ABI minimum pour approve/allowance/transferFrom/balanceOf (lecture+Transfert)
-    const ERC20_ABI = [
-        "function approve(address,uint256) public returns (bool)",
-        "function allowance(address,address) public view returns (uint256)",
-        "function balanceOf(address) public view returns (uint256)",
-        "function decimals() public view returns (uint8)",
-        "function transfer(address,uint256) public returns (bool)"
-    ];
+  // ERC20 ABI minimum pour approve/allowance/transferFrom/balanceOf (lecture+Transfert)
+  const ERC20_ABI = [
+      "function approve(address,uint256) public returns (bool)",
+      "function allowance(address,address) public view returns (uint256)",
+      "function balanceOf(address) public view returns (uint256)",
+      "function decimals() public view returns (uint8)",
+      "function transfer(address,uint256) public returns (bool)"
+  ];
 
-    // Polygon chainId
-    const POLYGON_CHAIN_ID = "0x89"; // 137
+  // Polygon chainId
+  const POLYGON_CHAIN_ID = "0x89"; // 137
 
-    var provider, signer, account;
+  var provider, signer, account;
 
-    var gameContainer = function() { return document.getElementById('game-container') || document.getElementById('arcana-game-content'); };
+  var gameContainer = function() { return document.getElementById('game-container') || document.getElementById('arcana-game-content'); };
 
-    // === Syst├¿me d'obscurit├®, Lumi├¿re, Cl├®s, Autel ===
-    var arcaneKeys = 0;
-    var arcaneLitRooms = {}; // roomId -> true
-    var arcaneAltarWinIndex = -1;
+  // === Système d'obscurité, Lumière, Clés, Autel ===
+  var arcaneKeys = 0;
+  var arcaneLitRooms = {}; // roomId -> true
+  var arcaneAltarWinIndex = -1;
 
-    function updateArcaneInventory() {
-        var el = document.getElementById('arcane-keys-count');
-        if (el) el.textContent = arcaneKeys;
-        var nav = document.getElementById('arcane-navkeys-count');
-        if (nav) nav.textContent = arcaneNavKeys;
-        var prot = document.getElementById('arcane-protection-count');
-        if (prot) prot.textContent = arcaneProtectionKeys;
-        var inv = document.getElementById('arcane-inventory');
-        if (inv && gameContainer() && gameContainer().classList.contains('visible')) inv.style.display = 'flex';
-        updateGrimoireInventory();
-    }
-    function updateGrimoireInventory() {
-        var el = function(id, val) { var e = document.getElementById(id); if (e) e.textContent = (val !== undefined ? val : 0); };
-        el('grimoire-propulsion', arcaneNavKeys);
-        el('grimoire-rappel', arcaneNavKeys);
-        el('grimoire-butins', arcaneButinsRecuperes + arcaneLootNFTs);
-    }
-    function toggleGrimoire() {
-        var panel = document.getElementById('grimoire-panel');
-        if (panel.style.display === 'block') { closeGrimoire(); return; }
-        panel.style.display = 'block';
-        updateGrimoireInventory();
-        requestAnimationFrame(function() { panel.classList.add('grimoire-open'); });
-    }
-    function closeGrimoire() {
-        var panel = document.getElementById('grimoire-panel');
-        panel.classList.remove('grimoire-open');
-        setTimeout(function() { panel.style.display = 'none'; }, 350);
-    }
-    async function unlockSavoir2POL() {
-        var seller = GRIMOIRE_SELLER_WALLET || (isVipWallet(account) ? account : '');
-        if (!seller || seller.length < 40) { addOracleChatMessage('D├®finissez GRIMOIRE_SELLER_WALLET (0x1...876d) pour recevoir les 2 POL.'); return; }
-        if (!signer || !account) { addOracleChatMessage('Connectez votre wallet pour d├®bloquer le savoir.'); return; }
-        try {
-            var wei = ethers.utils.parseEther('2');
-            var tx = await signer.sendTransaction({ to: seller, value: wei, gasLimit: 21000 });
-            await tx.wait();
-            addOracleChatMessage('Le savoir est d├®bloqu├®. 2 POL transmis.');
-            echoAddMessage('Un Initi├® a d├®bloqu├® le Tome I.');
-        } catch (e) { addOracleChatMessage('Transaction ├®chou├®e : ' + (e.message || e)); }
-    }
-    function grimoireUsePropulsion() {
-        closeGrimoire();
-        if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Cl├® de Propulsion.'); return; }
-        navKeyPropulsion();
-    }
-    function grimoireUseRappel() {
-        closeGrimoire();
-        if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Cl├® de Rappel.'); return; }
-        navKeyRappel();
-    }
-    function grimoireLightRoom(roomId) {
-        if (arcaneKeys < 1) { addOracleChatMessage('Pas assez de cl├®s pour ├®clairer.'); return; }
-        if (arcaneLitRooms[roomId]) { addOracleChatMessage('Cette salle est d├®j├á ├®clair├®e.'); return; }
-        arcaneKeys--;
-        arcaneLitRooms[roomId] = true;
-        updateArcaneDoors();
-        updateGrimoireInventory();
-        updateArcaneInventory();
-        applyLevelDarkness();
-        addOracleChatMessage('La Salle ' + roomId + ' est d├®sormais ├®clair├®e.');
-        echoAddMessage('Un Initi├® a ├®clair├® la Salle ' + roomId + '.');
-    }
-    async function buyBooklet(level) {
-        var seller = GRIMOIRE_SELLER_WALLET || (isVipWallet(account) ? account : '');
-        if (!seller || seller.length < 40) { addOracleChatMessage('March├® indisponible. D├®finissez GRIMOIRE_SELLER_WALLET avec l\'adresse du vendeur (0x1...876d).'); return; }
-        if (!signer || !account) { addOracleChatMessage('Connectez votre wallet pour acheter.'); return; }
-        var prices = { 5: 0.01, 15: 0.02, 25: 0.03, 50: 0.05, 100: 0.1 };
-        var price = prices[level] || 0.01;
-        var wei = ethers.utils.parseEther(price.toString());
-        try {
-            var tx = await signer.sendTransaction({ to: seller, value: wei, gasLimit: 21000 });
-            await tx.wait();
-            arcaneLootNFTs++;
-            updateGrimoireInventory();
-            addOracleChatMessage('Livret du Niveau ' + level + ' achet├® ! +1 NFT de Butin.');
-            echoAddMessage('Un Initi├® a acquis le Livret du Niveau ' + level + '.');
-            closeGrimoire();
-        } catch (e) { addOracleChatMessage('Achat ├®chou├® : ' + (e.message || e)); }
-    }
-    function updateArcaneFog() {
-        var lit = Object.keys(arcaneLitRooms).length;
-        var fog = document.getElementById('arcane-dark-fog');
-        if (fog) fog.style.setProperty('--fog-opacity', Math.max(0, 0.85 - lit * 0.35).toString());
-    }
-    function updateArcaneDoors() {
-        var btnSeal = document.getElementById('btnSeal');
-        if (btnSeal) {
-            if (arcaneLitRooms[1]) btnSeal.classList.remove('locked'); else btnSeal.classList.add('locked');
-        }
-    }
-    document.addEventListener('mousemove', function(e) {
+  function updateArcaneInventory() {
+      var el = document.getElementById('arcane-keys-count');
+      if (el) el.textContent = arcaneKeys;
+      var nav = document.getElementById('arcane-navkeys-count');
+      if (nav) nav.textContent = arcaneNavKeys;
+      var prot = document.getElementById('arcane-protection-count');
+      if (prot) prot.textContent = arcaneProtectionKeys;
+      var inv = document.getElementById('arcane-inventory');
+      if (inv && gameContainer() && gameContainer().classList.contains('visible')) inv.style.display = 'flex';
+      updateGrimoireInventory();
+  }
+  function updateGrimoireInventory() {
+      var el = function(id, val) { var e = document.getElementById(id); if (e) e.textContent = (val !== undefined ? val : 0); };
+      el('grimoire-propulsion', arcaneNavKeys);
+      el('grimoire-rappel', arcaneNavKeys);
+      el('grimoire-butins', arcaneButinsRecuperes + arcaneLootNFTs);
+  }
+  function toggleGrimoire() {
+      var panel = document.getElementById('grimoire-panel');
+      if (panel.style.display === 'block') { closeGrimoire(); return; }
+      panel.style.display = 'block';
+      updateGrimoireInventory();
+      requestAnimationFrame(function() { panel.classList.add('grimoire-open'); });
+  }
+  function closeGrimoire() {
+      var panel = document.getElementById('grimoire-panel');
+      panel.classList.remove('grimoire-open');
+      setTimeout(function() { panel.style.display = 'none'; }, 350);
+  }
+  async function unlockSavoir2POL() {
+      var seller = GRIMOIRE_SELLER_WALLET || (isVipWallet(account) ? account : '');
+      if (!seller || seller.length < 40) { addOracleChatMessage('Définissez GRIMOIRE_SELLER_WALLET (0x1...876d) pour recevoir les 2 POL.'); return; }
+      if (!signer || !account) { addOracleChatMessage('Connectez votre wallet pour débloquer le savoir.'); return; }
+      try {
+          var wei = ethers.utils.parseEther('2');
+          var tx = await signer.sendTransaction({ to: seller, value: wei, gasLimit: 21000 });
+          await tx.wait();
+          addOracleChatMessage('Le savoir est débloqué. 2 POL transmis.');
+          echoAddMessage('Un Initié a débloqué le Tome I.');
+      } catch (e) { addOracleChatMessage('Transaction échouée : ' + (e.message || e)); }
+  }
+  function grimoireUsePropulsion() {
+      closeGrimoire();
+      if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Clé de Propulsion.'); return; }
+      navKeyPropulsion();
+  }
+  function grimoireUseRappel() {
+      closeGrimoire();
+      if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Clé de Rappel.'); return; }
+      navKeyRappel();
+  }
+  function grimoireLightRoom(roomId) {
+      if (arcaneKeys < 1) { addOracleChatMessage('Pas assez de clés pour éclairer.'); return; }
+      if (arcaneLitRooms[roomId]) { addOracleChatMessage('Cette salle est déjà éclairée.'); return; }
+      arcaneKeys--;
+      arcaneLitRooms[roomId] = true;
+      updateArcaneDoors();
+      updateGrimoireInventory();
+      updateArcaneInventory();
+      applyLevelDarkness();
+      addOracleChatMessage('La Salle ' + roomId + ' est désormais éclairée.');
+      echoAddMessage('Un Initié a éclairé la Salle ' + roomId + '.');
+  }
+  async function buyBooklet(level) {
+      var seller = GRIMOIRE_SELLER_WALLET || (isVipWallet(account) ? account : '');
+      if (!seller || seller.length < 40) { addOracleChatMessage('Marché indisponible. Définissez GRIMOIRE_SELLER_WALLET avec l\'adresse du vendeur (0x1...876d).'); return; }
+      if (!signer || !account) { addOracleChatMessage('Connectez votre wallet pour acheter.'); return; }
+      var prices = { 5: 0.01, 15: 0.02, 25: 0.03, 50: 0.05, 100: 0.1 };
+      var price = prices[level] || 0.01;
+      var wei = ethers.utils.parseEther(price.toString());
+      try {
+          var tx = await signer.sendTransaction({ to: seller, value: wei, gasLimit: 21000 });
+          await tx.wait();
+          arcaneLootNFTs++;
+          updateGrimoireInventory();
+          addOracleChatMessage('Livret du Niveau ' + level + ' acheté ! +1 NFT de Butin.');
+          echoAddMessage('Un Initié a acquis le Livret du Niveau ' + level + '.');
+          closeGrimoire();
+      } catch (e) { addOracleChatMessage('Achat échoué : ' + (e.message || e)); }
+  }
+  function updateArcaneFog() {
+      var lit = Object.keys(arcaneLitRooms).length;
+      var fog = document.getElementById('arcane-dark-fog');
+      if (fog) fog.style.setProperty('--fog-opacity', Math.max(0, 0.85 - lit * 0.35).toString());
+  }
+  function updateArcaneDoors() {
+      var btnSeal = document.getElementById('btnSeal');
+      if (btnSeal) {
+          if (arcaneLitRooms[1]) btnSeal.classList.remove('locked'); else btnSeal.classList.add('locked');
+      }
+  }
+</script>
+
+}
+document.addEventListener('mousemove', function(e) {
+    var overlay = document.getElementById('arcane-darkness-overlay');
+    if (!overlay) return;
+    var x = (e.clientX / window.innerWidth * 100).toFixed(2);
+    var y = (e.clientY / window.innerHeight * 100).toFixed(2);
+    overlay.style.setProperty('--cursor-x', x + '%');
+    overlay.style.setProperty('--cursor-y', y + '%');
+    var r = 120 + (arcaneLitRooms[1] ? 80 : 0) + (arcaneLitRooms[2] ? 80 : 0);
+    var shrink = Math.max(0.08, 0.35 * Math.pow(0.95, arcaneCurrentLevel - 1));
+    overlay.style.background = 'radial-gradient(circle ' + r + 'px at ' + x + '% ' + y + '%, transparent 0%, transparent ' + (shrink * 100) + '%, rgba(0,0,0,0.97) 100%)';
+});
+document.addEventListener('touchmove', function(e) {
+    if (e.touches && e.touches[0]) {
+        var t = e.touches[0];
         var overlay = document.getElementById('arcane-darkness-overlay');
         if (!overlay) return;
-        var x = (e.clientX / window.innerWidth * 100).toFixed(2);
-        var y = (e.clientY / window.innerHeight * 100).toFixed(2);
+        var x = (t.clientX / window.innerWidth * 100).toFixed(2);
+        var y = (t.clientY / window.innerHeight * 100).toFixed(2);
         overlay.style.setProperty('--cursor-x', x + '%');
         overlay.style.setProperty('--cursor-y', y + '%');
         var r = 120 + (arcaneLitRooms[1] ? 80 : 0) + (arcaneLitRooms[2] ? 80 : 0);
         var shrink = Math.max(0.08, 0.35 * Math.pow(0.95, arcaneCurrentLevel - 1));
         overlay.style.background = 'radial-gradient(circle ' + r + 'px at ' + x + '% ' + y + '%, transparent 0%, transparent ' + (shrink * 100) + '%, rgba(0,0,0,0.97) 100%)';
-    });
-    document.addEventListener('touchmove', function(e) {
-        if (e.touches && e.touches[0]) {
-            var t = e.touches[0];
-            var overlay = document.getElementById('arcane-darkness-overlay');
-            if (!overlay) return;
-            var x = (t.clientX / window.innerWidth * 100).toFixed(2);
-            var y = (t.clientY / window.innerHeight * 100).toFixed(2);
-            overlay.style.setProperty('--cursor-x', x + '%');
-            overlay.style.setProperty('--cursor-y', y + '%');
-            var r = 120 + (arcaneLitRooms[1] ? 80 : 0) + (arcaneLitRooms[2] ? 80 : 0);
-            var shrink = Math.max(0.08, 0.35 * Math.pow(0.95, arcaneCurrentLevel - 1));
-            overlay.style.background = 'radial-gradient(circle ' + r + 'px at ' + x + '% ' + y + '%, transparent 0%, transparent ' + (shrink * 100) + '%, rgba(0,0,0,0.97) 100%)';
-        }
-    }, { passive: true });
-    function collectLight(roomId) {
-        if (arcaneLitRooms[roomId]) return;
-        var lightEl = document.getElementById('light-' + roomId);
-        if (lightEl) { lightEl.classList.add('collected'); }
-        arcaneLitRooms[roomId] = true;
-        arcaneKeys++;
-        updateArcaneInventory();
-        updateArcaneFog();
-        updateArcaneDoors();
-        
-        // Ajouter une cl├® num├®rot├®e correspondante dans le sac
-        var cleNum = roomId; // Cl├® 1 pour room 1, cl├® 2 pour room 2, etc.
-        ajouterCleDansSac(cleNum);
-        
-        addOracleChatMessage('­ƒö« Lumi├¿re collect├®e ! Cl├® ' + cleNum + ' ajout├®e ├á votre inventaire.');
-        
-        console.log('%c­ƒö« Lumi├¿re ' + roomId + ' collect├®e ÔåÆ Cl├® ' + cleNum + ' obtenue', 'color:#d4af37;');
     }
-    function openAltar() {
-        if (arcaneKeys < 1) { addOracleChatMessage('Vous n\'avez pas assez de cl├®s.'); return; }
-        arcaneAltarWinIndex = Math.floor(Math.random() * 3);
-        document.getElementById('arcane-altar-panel').style.display = 'block';
-        document.getElementById('arcane-altar-result').textContent = '';
-        var cards = document.querySelectorAll('#arcane-altar-cards button');
-        cards.forEach(function(b,i){ b.textContent = 'ÔØô'; b.disabled = false; });
-    }
-    function pickAltarCard(idx) {
-        var cards = document.querySelectorAll('#arcane-altar-cards button');
-        cards.forEach(function(b){ b.disabled = true; });
-        var win = (idx === arcaneAltarWinIndex);
-        cards[0].textContent = arcaneAltarWinIndex === 0 ? '­ƒùØ´©Å' : 'Ô£ù';
-        cards[1].textContent = arcaneAltarWinIndex === 1 ? '­ƒùØ´©Å' : 'Ô£ù';
-        cards[2].textContent = arcaneAltarWinIndex === 2 ? '­ƒùØ´©Å' : 'Ô£ù';
-        arcaneKeys--;
-        if (win) { arcaneKeys += 3; addOracleChatMessage('Victoire ! +3 Cl├®s.'); }
-        else { addOracleChatMessage('Le destin n\'a pas souri.'); }
-        updateArcaneInventory();
-        document.getElementById('arcane-altar-result').textContent = win ? 'Ô£¿ +3 Cl├®s !' : 'La cl├® est perdue.';
-    }
-    function closeAltar() {
-        document.getElementById('arcane-altar-panel').style.display = 'none';
-    }
+}, { passive: true });
 
-    // === VIP Bernard : 0x1...876d + Mode Test Oracle ===
-    var ARCANA_VIP_WALLET = ''; // Mettez l'adresse compl├¿te ou laissez vide
-    var ARCANA_TEST_WALLET = ''; // Wallet de test qui bypass l'Oracle (votre adresse compl├¿te ici)
-    var GRIMOIRE_SELLER_WALLET = ''; // Adresse compl├¿te du vendeur (0x1...876d) pour recevoir les ventes de livrets
+function collectLight(roomId) {
+    if (arcaneLitRooms[roomId]) return;
+    var lightEl = document.getElementById('light-' + roomId);
+    if (lightEl) { lightEl.classList.add('collected'); }
+    arcaneLitRooms[roomId] = true;
+    arcaneKeys++;
+    updateArcaneInventory();
+    updateArcaneFog();
+    updateArcaneDoors();
     
-    function isVipWallet(addr) {
-        if (!addr) return false;
-        var a = (addr + '').toLowerCase();
-        return (a.startsWith('0x1') && a.endsWith('876d') && a.length === 42) || (ARCANA_VIP_WALLET && a === ARCANA_VIP_WALLET.toLowerCase());
-    }
+    // Ajouter une clé numérotée correspondante dans le sac
+    var cleNum = roomId; // Clé 1 pour room 1, clé 2 pour room 2, etc.
+    ajouterCleDansSac(cleNum);
     
-    function isTestWallet(addr) {
-        if (!addr) return false;
-        var a = (addr + '').toLowerCase();
-        return (ARCANA_TEST_WALLET && a === ARCANA_TEST_WALLET.toLowerCase());
-    }
-    // === Syst├¿me 100 niveaux : progression, portes, difficult├®, Web3 ===
-    const ARCANA_MAX_LEVEL = 100;
-    var arcaneCurrentLevel = 1;
-    var arcaneDoorDeltas = [];
-    var arcaneDoorRevealed = [];
-    var arcaneInLevelMode = false;
-    var arcaneNavKeys = 0;
-    var arcaneProtectionKeys = 0;
-    var arcaneLootLevels = [];
-    var arcaneTotalLootSpawned = 0;
-    var arcaneLootNFTs = 0;
-    var arcaneButinsRecuperes = 0;
+    addOracleChatMessage('🔑 Lumière collectée ! Clé ' + cleNum + ' ajoutée à votre inventaire.');
+    
+    console.log('%c🔑 Lumière ' + roomId + ' collectée → Clé ' + cleNum + ' obtenue', 'color:#d4af37;');
+}
 
-    function getDoorDestination(type) {
-        if (type === 'trap') return -(1 + Math.floor(Math.random() * 5));
-        if (type === 'propeller') return 2 + Math.floor(Math.random() * 7);
-        return 1;
+function openAltar() {
+    if (arcaneKeys < 1) { addOracleChatMessage('Vous n\'avez pas assez de clés.'); return; }
+    arcaneAltarWinIndex = Math.floor(Math.random() * 3);
+    document.getElementById('arcane-altar-panel').style.display = 'block';
+    document.getElementById('arcane-altar-result').textContent = '';
+    var cards = document.querySelectorAll('#arcane-altar-cards button');
+    cards.forEach(function(b,i){ b.textContent = '❓'; b.disabled = false; });
+}
+
+function pickAltarCard(idx) {
+    var cards = document.querySelectorAll('#arcane-altar-cards button');
+    cards.forEach(function(b){ b.disabled = true; });
+    var win = (idx === arcaneAltarWinIndex);
+    cards[0].textContent = arcaneAltarWinIndex === 0 ? '🏆' : '💀';
+    cards[1].textContent = arcaneAltarWinIndex === 1 ? '🏆' : '💀';
+    cards[2].textContent = arcaneAltarWinIndex === 2 ? '🏆' : '💀';
+    arcaneKeys--;
+    if (win) { arcaneKeys += 3; addOracleChatMessage('Victoire ! +3 Clés.'); }
+    else { addOracleChatMessage('Le destin n\'a pas souri.'); }
+    updateArcaneInventory();
+    document.getElementById('arcane-altar-result').textContent = win ? '✨ +3 Clés !' : 'La clé est perdue.';
+}
+
+function closeAltar() {
+    document.getElementById('arcane-altar-panel').style.display = 'none';
+}
+
+// === VIP Bernard : 0x1...876d + Mode Test Oracle ===
+var ARCANA_VIP_WALLET = ''; // Mettez l'adresse complète ou laissez vide
+var ARCANA_TEST_WALLET = ''; // Wallet de test qui bypass l'Oracle (votre adresse complète ici)
+var GRIMOIRE_SELLER_WALLET = ''; // Adresse complète du vendeur (0x1...876d) pour recevoir les ventes de livrets
+
+function isVipWallet(addr) {
+    if (!addr) return false;
+    var a = (addr + '').toLowerCase();
+    return (a.startsWith('0x1') && a.endsWith('876d') && a.length === 42) || (ARCANA_VIP_WALLET && a === ARCANA_VIP_WALLET.toLowerCase());
+}
+
+function isTestWallet(addr) {
+    if (!addr) return false;
+    var a = (addr + '').toLowerCase();
+    return (ARCANA_TEST_WALLET && a === ARCANA_TEST_WALLET.toLowerCase());
+}
+
+// === Système 100 niveaux : progression, portes, difficulté, Web3 ===
+const ARCANA_MAX_LEVEL = 100;
+var arcaneCurrentLevel = 1;
+var arcaneDoorDeltas = [];
+var arcaneDoorRevealed = [];
+var arcaneInLevelMode = false;
+var arcaneNavKeys = 0;
+var arcaneProtectionKeys = 0;
+var arcaneLootLevels = [];
+var arcaneTotalLootSpawned = 0;
+var arcaneLootNFTs = 0;
+var arcaneButinsRecuperes = 0;
+
+function getDoorDestination(type) {
+    if (type === 'trap') return -(1 + Math.floor(Math.random() * 5));
+    if (type === 'propeller') return 2 + Math.floor(Math.random() * 7);
+    return 1;
+}
+
+var arcaneEchoQueue = [];
+
+function echoAddMessage(msg) {
+    arcaneEchoQueue.push(msg);
+    if (arcaneEchoQueue.length > 20) arcaneEchoQueue.shift();
+    var scroll = document.getElementById('arcane-echo-scroll');
+    if (scroll) {
+        var txt = arcaneEchoQueue.join('  ◆  ');
+        scroll.textContent = txt + (txt ? '  ◆  ' : '');
+        scroll.style.animation = 'none';
+        scroll.offsetHeight;
+        scroll.style.animation = 'echo-scroll 40s linear infinite';
     }
-    var arcaneEchoQueue = [];
-    function echoAddMessage(msg) {
-        arcaneEchoQueue.push(msg);
-        if (arcaneEchoQueue.length > 20) arcaneEchoQueue.shift();
-        var scroll = document.getElementById('arcane-echo-scroll');
-        if (scroll) {
-            var txt = arcaneEchoQueue.join('  Ôùå  ');
-            scroll.textContent = txt + (txt ? '  Ôùå  ' : '');
-            scroll.style.animation = 'none';
-            scroll.offsetHeight;
-            scroll.style.animation = 'echo-scroll 40s linear infinite';
+}
+
+function ouvrirPorte(idx) {
+    var delta = arcaneDoorDeltas[idx] !== undefined ? arcaneDoorDeltas[idx] : 1;
+    var newLevel = Math.max(1, Math.min(ARCANA_MAX_LEVEL, arcaneCurrentLevel + delta));
+    var doors = document.querySelectorAll('.arcane-level-door');
+    doors.forEach(function(d){ d.disabled = true; });
+    if (delta < 0) {
+        var lostLevel = arcaneCurrentLevel;
+        if (arcaneLootLevels.indexOf(lostLevel) === -1) {
+            arcaneLootLevels.push(lostLevel);
+            arcaneTotalLootSpawned++;
+            echoAddMessage('Un trésor est apparu au Niveau ' + lostLevel + ' !');
         }
+        addOracleChatMessage('Piège ! Retour au niveau ' + newLevel + '.');
+    } else {
+        if (delta > 1) echoAddMessage('Un Initié a sauté ' + delta + ' niveaux !');
+        if (delta > 1) addOracleChatMessage('Propulseur ! Saut au niveau ' + newLevel + ' !');
+        else addOracleChatMessage('Niveau ' + newLevel + ' atteint.');
     }
-    function ouvrirPorte(idx) {
-        var delta = arcaneDoorDeltas[idx] !== undefined ? arcaneDoorDeltas[idx] : 1;
-        var newLevel = Math.max(1, Math.min(ARCANA_MAX_LEVEL, arcaneCurrentLevel + delta));
-        var doors = document.querySelectorAll('.arcane-level-door');
-        doors.forEach(function(d){ d.disabled = true; });
-        if (delta < 0) {
-            var lostLevel = arcaneCurrentLevel;
-            if (arcaneLootLevels.indexOf(lostLevel) === -1) {
-                arcaneLootLevels.push(lostLevel);
-                arcaneTotalLootSpawned++;
-                echoAddMessage('Un tr├®sor est apparu au Niveau ' + lostLevel + ' !');
-            }
-            addOracleChatMessage('Pi├¿ge ! Retour au niveau ' + newLevel + '.');
-        } else {
-            if (delta > 1) echoAddMessage('Un Initi├® a saut├® ' + delta + ' niveaux !');
-            if (delta > 1) addOracleChatMessage('Propulseur ! Saut au niveau ' + newLevel + ' !');
-            else addOracleChatMessage('Niveau ' + newLevel + ' atteint.');
+    goToLevel(newLevel);
+}
+
+function goToLevel(level, fromRappel) {
+    var targetLevel = Math.max(1, Math.min(ARCANA_MAX_LEVEL, level));
+    var lootLevel = targetLevel;
+    if (fromRappel && arcaneLootLevels.indexOf(lootLevel) !== -1) {
+        var isMirage = Math.random() < 0.10;
+        if (isMirage && arcaneProtectionKeys < 1) {
+            targetLevel = Math.max(1, lootLevel - 5);
+            echoAddMessage('Le Mirage ! Un piège vous renvoie 5 niveaux en arrière.');
+            addOracleChatMessage('Mirage : piège ! -5 niveaux.');
+        } else if (isMirage && arcaneProtectionKeys >= 1) {
+            arcaneProtectionKeys--;
+            updateArcaneInventory();
+            echoAddMessage('Clé de Protection : le Mirage est neutralisé.');
         }
-        goToLevel(newLevel);
+        arcaneLootLevels = arcaneLootLevels.filter(function(l){ return l !== lootLevel; });
+        if (!isMirage) { arcaneProtectionKeys++; arcaneButinsRecuperes++; updateArcaneInventory(); }
     }
-    function goToLevel(level, fromRappel) {
-        var targetLevel = Math.max(1, Math.min(ARCANA_MAX_LEVEL, level));
-        var lootLevel = targetLevel;
-        if (fromRappel && arcaneLootLevels.indexOf(lootLevel) !== -1) {
-            var isMirage = Math.random() < 0.10;
-            if (isMirage && arcaneProtectionKeys < 1) {
-                targetLevel = Math.max(1, lootLevel - 5);
-                echoAddMessage('Le Mirage ! Un pi├¿ge vous renvoie 5 niveaux en arri├¿re.');
-                addOracleChatMessage('Mirage : pi├¿ge ! -5 niveaux.');
-            } else if (isMirage && arcaneProtectionKeys >= 1) {
-                arcaneProtectionKeys--;
-                updateArcaneInventory();
-                echoAddMessage('Cl├® de Protection : le Mirage est neutralis├®.');
-            }
-            arcaneLootLevels = arcaneLootLevels.filter(function(l){ return l !== lootLevel; });
-            if (!isMirage) { arcaneProtectionKeys++; arcaneButinsRecuperes++; updateArcaneInventory(); }
-        }
-        arcaneCurrentLevel = targetLevel;
-        updateLevelDisplay();
-        updatePyramidMap();
-        generateLevelDoors();
-        if (isVipWallet(account)) {
-            console.log('%c[Omniscience] Butin pyramide ÔÇö Total accumul├®: ' + arcaneTotalLootSpawned + ' | Non ramass├®s: ' + arcaneLootLevels.length + ' | Niveaux: ' + (arcaneLootLevels.slice(0).sort(function(a,b){return a-b;}).join(', ') || 'ÔÇö') + ' | Niveau actuel: ' + arcaneCurrentLevel, 'color:#d4af37; font-weight:bold;');
-        }
-        spawnScrolls();
-        spawnCornerClues();
-        saveLevelWeb3(arcaneCurrentLevel);
+    arcaneCurrentLevel = targetLevel;
+    updateLevelDisplay();
+    updatePyramidMap();
+    generateLevelDoors();
+    if (isVipWallet(account)) {
+        console.log('%c[Omniscience] Butin pyramide — Total accumulé: ' + arcaneTotalLootSpawned + ' | Non ramassés: ' + arcaneLootLevels.length + ' | Niveaux: ' + (arcaneLootLevels.slice(0).sort(function(a,b){return a-b;}).join(', ') || '—') + ' | Niveau actuel: ' + arcaneCurrentLevel, 'color:#d4af37; font-weight:bold;');
     }
-    function updateLevelDisplay() {
-        var num = document.getElementById('arcane-level-num');
-        var panelNum = document.getElementById('arcane-panel-level-num');
-        var headerNum = document.getElementById('header-level-num');
-        if (num) num.textContent = arcaneCurrentLevel;
-        if (panelNum) panelNum.textContent = arcaneCurrentLevel;
-        if (headerNum) headerNum.textContent = arcaneCurrentLevel;
-        applyLevelDarkness();
+    spawnScrolls();
+    spawnCornerClues();
+    saveLevelWeb3(arcaneCurrentLevel);
+}
+
+function updateLevelDisplay() {
+    var num = document.getElementById('arcane-level-num');
+    var panelNum = document.getElementById('arcane-panel-level-num');
+    var headerNum = document.getElementById('header-level-num');
+    if (num) num.textContent = arcaneCurrentLevel;
+    if (panelNum) panelNum.textContent = arcaneCurrentLevel;
+    if (headerNum) headerNum.textContent = arcaneCurrentLevel;
+    applyLevelDarkness();
+}
+
+function applyLevelDarkness() {
+    var overlay = document.getElementById('arcane-darkness-overlay');
+    if (overlay) {
+        var r = 120 + (arcaneLitRooms[1] ? 80 : 0) + (arcaneLitRooms[2] ? 80 : 0);
+        var shrink = Math.max(0.08, 0.35 * Math.pow(0.95, arcaneCurrentLevel - 1));
+        overlay.style.background = 'radial-gradient(circle ' + r + 'px at var(--cursor-x, 50%) var(--cursor-y, 50%), transparent 0%, transparent ' + (shrink * 100) + '%, rgba(0,0,0,0.97) 100%)';
     }
-    function applyLevelDarkness() {
-        var overlay = document.getElementById('arcane-darkness-overlay');
-        if (overlay) {
-            var r = 120 + (arcaneLitRooms[1] ? 80 : 0) + (arcaneLitRooms[2] ? 80 : 0);
-            var shrink = Math.max(0.08, 0.35 * Math.pow(0.95, arcaneCurrentLevel - 1));
-            overlay.style.background = 'radial-gradient(circle ' + r + 'px at var(--cursor-x, 50%) var(--cursor-y, 50%), transparent 0%, transparent ' + (shrink * 100) + '%, rgba(0,0,0,0.97) 100%)';
-        }
+}
+
+function generateLevelDoors() {
+    var count = 2 + Math.floor(Math.random() * 3);
+    arcaneDoorDeltas = [];
+    arcaneDoorRevealed = [];
+    var types = ['normal','normal','trap','propeller'];
+    var container = document.getElementById('arcane-doors-container');
+    if (!container) return;
+    container.innerHTML = '';
+    for (var i = 0; i < count; i++) {
+        var type = types[Math.floor(Math.random() * types.length)];
+        var delta = getDoorDestination(type);
+        arcaneDoorDeltas.push(delta);
+        arcaneDoorRevealed.push(false);
+        var btn = document.createElement('button');
+        btn.className = 'arcane-level-door btn-connect' + (isVipWallet(account) ? (delta < 0 ? ' vip-trap' : ' vip-shortcut') : '');
+        btn.textContent = '🚪 Porte ' + (i + 1);
+        btn.dataset.index = i;
+        btn.dataset.delta = delta;
+        btn.onclick = function() { ouvrirPorte(parseInt(this.dataset.index, 10)); };
+        container.appendChild(btn);
     }
-    function generateLevelDoors() {
-        var count = 2 + Math.floor(Math.random() * 3);
-        arcaneDoorDeltas = [];
-        arcaneDoorRevealed = [];
-        var types = ['normal','normal','trap','propeller'];
-        var container = document.getElementById('arcane-doors-container');
-        if (!container) return;
-        container.innerHTML = '';
-        for (var i = 0; i < count; i++) {
-            var type = types[Math.floor(Math.random() * types.length)];
-            var delta = getDoorDestination(type);
-            arcaneDoorDeltas.push(delta);
-            arcaneDoorRevealed.push(false);
-            var btn = document.createElement('button');
-            btn.className = 'arcane-level-door btn-connect' + (isVipWallet(account) ? (delta < 0 ? ' vip-trap' : ' vip-shortcut') : '');
-            btn.textContent = '­ƒÜ¬ Porte ' + (i + 1);
-            btn.dataset.index = i;
-            btn.dataset.delta = delta;
-            btn.onclick = function() { ouvrirPorte(parseInt(this.dataset.index, 10)); };
-            container.appendChild(btn);
-        }
+}
+
+function revealDoorWithScroll(doorIdx) {
+    if (doorIdx < 0 || doorIdx >= arcaneDoorRevealed.length) return;
+    arcaneDoorRevealed[doorIdx] = true;
+    var doors = document.querySelectorAll('.arcane-level-door');
+    var delta = arcaneDoorDeltas[doorIdx];
+    var dest = arcaneCurrentLevel + delta;
+    var lbl = delta < 0 ? '⬇ Niv.' + dest : (delta > 1 ? '⬆ Niv.' + dest : '→ +1');
+    if (doors[doorIdx]) {
+        doors[doorIdx].textContent = '🚪 ' + lbl;
+        doors[doorIdx].title = 'Destination : niveau ' + dest;
     }
-    function revealDoorWithScroll(doorIdx) {
-        if (doorIdx < 0 || doorIdx >= arcaneDoorRevealed.length) return;
-        arcaneDoorRevealed[doorIdx] = true;
-        var doors = document.querySelectorAll('.arcane-level-door');
-        var delta = arcaneDoorDeltas[doorIdx];
-        var dest = arcaneCurrentLevel + delta;
-        var lbl = delta < 0 ? 'Ôû╝ Niv.' + dest : (delta > 1 ? 'Ôû▓ Niv.' + dest : 'ÔåÆ +1');
-        if (doors[doorIdx]) {
-            doors[doorIdx].textContent = '­ƒÜ¬ ' + lbl;
-            doors[doorIdx].title = 'Destination : niveau ' + dest;
-        }
+}
+
+function spawnCornerClues() {
+    var container = document.getElementById('arcane-corner-clues-container');
+    if (!container || !arcaneDoorDeltas.length) return;
+    container.innerHTML = '';
+    var corners = [
+        { pos: 'top:8px;left:8px;', label: '🔍' },
+        { pos: 'top:8px;right:8px;left:auto;', label: '🔍' },
+        { pos: 'bottom:8px;left:8px;', label: '🔍' },
+        { pos: 'bottom:8px;right:8px;left:auto;', label: '🔍' }
+    ];
+    var n = 1 + Math.floor(Math.random() * 2);
+    var used = [];
+    for (var c = 0; c < n; c++) {
+        var idx = Math.floor(Math.random() * corners.length);
+        while (used.indexOf(idx) !== -1) idx = (idx + 1) % corners.length;
+        used.push(idx);
+        var el = document.createElement('div');
+        el.className = 'arcane-corner-clue';
+        el.style.cssText = corners[idx].pos + 'position:absolute;';
+        el.textContent = corners[idx].label;
+        el.title = 'Indice caché...';
+        el.onclick = (function(clueEl) {
+            return function() {
+                if (clueEl.classList.contains('used')) return;
+                var unrevealed = [];
+                for (var i = 0; i < arcaneDoorRevealed.length; i++) { if (!arcaneDoorRevealed[i]) unrevealed.push(i); }
+                if (unrevealed.length === 0) return;
+                var doorIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+                var delta = arcaneDoorDeltas[doorIdx];
+                var typ = delta < 0 ? 'Piège' : 'Raccourci';
+                var doors = document.querySelectorAll('.arcane-level-door');
+                if (doors[doorIdx]) {
+                    var lbl = typ + (delta < 0 ? ' ⬇' + (arcaneCurrentLevel + delta) : ' ⬆');
+                    doors[doorIdx].textContent = '🚪 ' + lbl;
+                    doors[doorIdx].title = typ + (delta < 0 ? ' -' + Math.abs(delta) + ' niveaux' : ' vers l\'avant');
+                }
+                arcaneDoorRevealed[doorIdx] = true;
+                clueEl.classList.add('used');
+                echoAddMessage('Indice : La Porte ' + (doorIdx + 1) + ' est un ' + typ + '.');
+                addOracleChatMessage('Indice révélé : Porte ' + (doorIdx + 1) + ' = ' + typ + '.');
+            };
+        })(el);
+        container.appendChild(el);
     }
-    function spawnCornerClues() {
-        var container = document.getElementById('arcane-corner-clues-container');
-        if (!container || !arcaneDoorDeltas.length) return;
-        container.innerHTML = '';
-        var corners = [
-            { pos: 'top:8px;left:8px;', label: '­ƒö«' },
-            { pos: 'top:8px;right:8px;left:auto;', label: '­ƒö«' },
-            { pos: 'bottom:8px;left:8px;', label: '­ƒö«' },
-            { pos: 'bottom:8px;right:8px;left:auto;', label: '­ƒö«' }
-        ];
-        var n = 1 + Math.floor(Math.random() * 2);
-        var used = [];
-        for (var c = 0; c < n; c++) {
-            var idx = Math.floor(Math.random() * corners.length);
-            while (used.indexOf(idx) !== -1) idx = (idx + 1) % corners.length;
-            used.push(idx);
-            var el = document.createElement('div');
-            el.className = 'arcane-corner-clue';
-            el.style.cssText = corners[idx].pos + 'position:absolute;';
-            el.textContent = corners[idx].label;
-            el.title = 'Indice cach├®...';
-            el.onclick = (function(clueEl) {
-                return function() {
-                    if (clueEl.classList.contains('used')) return;
-                    var unrevealed = [];
-                    for (var i = 0; i < arcaneDoorRevealed.length; i++) { if (!arcaneDoorRevealed[i]) unrevealed.push(i); }
-                    if (unrevealed.length === 0) return;
-                    var doorIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
-                    var delta = arcaneDoorDeltas[doorIdx];
-                    var typ = delta < 0 ? 'Pi├¿ge' : 'Raccourci';
+}
+
+function spawnScrolls() {
+    var container = document.getElementById('arcane-scrolls-container');
+    if (!container) return;
+    container.innerHTML = '';
+    var n = 1 + Math.floor(Math.random() * 2);
+    for (var i = 0; i < n; i++) {
+        var s = document.createElement('div');
+        s.className = 'arcane-scroll-object';
+        s.textContent = '📜';
+        s.style.left = (15 + Math.random() * 70) + '%';
+        s.style.top = (5 + Math.random() * 20) + 'px';
+        s.onclick = (function() { return function() {
+            if (this.classList.contains('revealed')) return;
+            if (arcaneDoorDeltas.length) {
+                var doorIdx = Math.floor(Math.random() * arcaneDoorDeltas.length);
+                var useProbability = Math.random() < 0.5;
+                if (useProbability) {
+                    var pct = [20, 30, 40, 50, 60][Math.floor(Math.random() * 5)];
+                    var targetLvl = Math.min(ARCANA_MAX_LEVEL, arcaneCurrentLevel + 5 + Math.floor(Math.random() * 45));
+                    var msg = 'Parchemin : La Porte ' + (doorIdx+1) + ' a ' + pct + '% de chance d\'être un raccourci vers le Niveau ' + targetLvl + '.';
+                    addOracleChatMessage(msg);
+                    echoAddMessage(msg);
                     var doors = document.querySelectorAll('.arcane-level-door');
-                    if (doors[doorIdx]) {
-                        var lbl = typ + (delta < 0 ? ' Ôû╝' + (arcaneCurrentLevel + delta) : ' Ôû▓');
-                        doors[doorIdx].textContent = '­ƒÜ¬ ' + lbl;
-                        doors[doorIdx].title = typ + (delta < 0 ? ' -' + Math.abs(delta) + ' niveaux' : ' vers l\'avant');
-                    }
-                    arcaneDoorRevealed[doorIdx] = true;
-                    clueEl.classList.add('used');
-                    echoAddMessage('Indice : La Porte ' + (doorIdx + 1) + ' est un ' + typ + '.');
-                    addOracleChatMessage('Indice r├®v├®l├® : Porte ' + (doorIdx + 1) + ' = ' + typ + '.');
-                };
-            })(el);
-            container.appendChild(el);
-        }
-    }
-    function spawnScrolls() {
-        var container = document.getElementById('arcane-scrolls-container');
-        if (!container) return;
-        container.innerHTML = '';
-        var n = 1 + Math.floor(Math.random() * 2);
-        for (var i = 0; i < n; i++) {
-            var s = document.createElement('div');
-            s.className = 'arcane-scroll-object';
-            s.textContent = '­ƒô£';
-            s.style.left = (15 + Math.random() * 70) + '%';
-            s.style.top = (5 + Math.random() * 20) + 'px';
-            s.onclick = (function() { return function() {
-                if (this.classList.contains('revealed')) return;
-                if (arcaneDoorDeltas.length) {
-                    var doorIdx = Math.floor(Math.random() * arcaneDoorDeltas.length);
-                    var useProbability = Math.random() < 0.5;
-                    if (useProbability) {
-                        var pct = [20, 30, 40, 50, 60][Math.floor(Math.random() * 5)];
-                        var targetLvl = Math.min(ARCANA_MAX_LEVEL, arcaneCurrentLevel + 5 + Math.floor(Math.random() * 45));
-                        var msg = 'Parchemin : La Porte ' + (doorIdx+1) + ' a ' + pct + '% de chance d\'├¬tre un raccourci vers le Niveau ' + targetLvl + '.';
-                        addOracleChatMessage(msg);
-                        echoAddMessage(msg);
-                        var doors = document.querySelectorAll('.arcane-level-door');
-                        if (doors[doorIdx]) doors[doorIdx].title = pct + '% raccourci vers Niv.' + targetLvl;
-                    } else {
-                        revealDoorWithScroll(doorIdx);
-                        addOracleChatMessage('Parchemin : la Porte ' + (doorIdx+1) + ' m├¿ne au niveau ' + (arcaneCurrentLevel + arcaneDoorDeltas[doorIdx]) + '. +1 Cl├® Nav.');
-                    }
-                    this.classList.add('revealed');
-                    arcaneNavKeys++;
-                    updateArcaneInventory();
+                    if (doors[doorIdx]) doors[doorIdx].title = pct + '% raccourci vers Niv.' + targetLvl;
+                } else {
+                    revealDoorWithScroll(doorIdx);
+                    addOracleChatMessage('Parchemin : la Porte ' + (doorIdx+1) + ' mène au niveau ' + (arcaneCurrentLevel + arcaneDoorDeltas[doorIdx]) + '. +1 Clé Nav.');
                 }
-            }; })();
-            container.appendChild(s);
-        }
-    }
-    function useNavKey() {
-        if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Cl├® de Navigation.'); return; }
-        document.getElementById('arcane-nav-key-panel').style.display = 'block';
-    }
-    function navKeyPropulsion() {
-        if (arcaneNavKeys < 1) return;
-        arcaneNavKeys--;
-        updateArcaneInventory();
-        closeNavKeyPanel();
-        var jump = 1 + Math.floor(Math.random() * 10);
-        goToLevel(arcaneCurrentLevel + jump);
-        echoAddMessage('Propulsion activ├®e : saut de ' + jump + ' niveaux !');
-        addOracleChatMessage('Propulsion : +' + jump + ' niveaux.');
-    }
-    function navKeyRappel() {
-        if (arcaneNavKeys < 1) return;
-        arcaneNavKeys--;
-        updateArcaneInventory();
-        closeNavKeyPanel();
-        var target = 0;
-        if (arcaneLootLevels.length > 0) {
-            target = arcaneLootLevels[Math.floor(Math.random() * arcaneLootLevels.length)];
-        } else {
-            target = Math.max(1, arcaneCurrentLevel - (5 + Math.floor(Math.random() * 10)));
-        }
-        goToLevel(target, true);
-        echoAddMessage('Rappel : retour au Niveau ' + target + ' pour ramasser un butin.');
-        addOracleChatMessage('Rappel vers le niveau ' + target + '.');
-    }
-    function closeNavKeyPanel() {
-        document.getElementById('arcane-nav-key-panel').style.display = 'none';
-    }
-    function updatePyramidMap() {
-        var grid = document.getElementById('pyramid-grid');
-        var map = document.getElementById('arcane-pyramid-map');
-        if (!grid || !map) return;
-        grid.innerHTML = '';
-        var rows = 10;
-        var perRow = ARCANA_MAX_LEVEL / rows;
-        for (var r = 0; r < rows; r++) {
-            var rowDiv = document.createElement('div');
-            rowDiv.className = 'pyramid-row';
-            var start = Math.floor(r * perRow) + 1;
-            var end = Math.min(ARCANA_MAX_LEVEL, Math.floor((r + 1) * perRow));
-            for (var l = start; l <= end; l++) {
-                var cell = document.createElement('div');
-                var isPlayer = l === arcaneCurrentLevel;
-                var hasLoot = arcaneLootLevels.indexOf(l) !== -1;
-                cell.className = 'pyramid-cell' + (isPlayer ? ' player' : '') + (hasLoot ? ' loot' : '');
-                cell.textContent = l;
-                rowDiv.appendChild(cell);
+                this.classList.add('revealed');
+                arcaneNavKeys++;
+                updateArcaneInventory();
             }
-            grid.appendChild(rowDiv);
-        }
-        map.style.display = arcaneInLevelMode ? 'block' : 'none';
+        }; })();
+        container.appendChild(s);
     }
-    async function loadLevelWeb3() {
-        if (!provider || !account) return;
-        try {
-            var c = new ethers.Contract(ARCANA_PROGRESSION_CONTRACT, ARCANA_PROGRESSION_ABI, provider);
-            var lvl = await c.playerLevel(account);
-            var n = lvl ? (typeof lvl === 'number' ? lvl : parseInt(lvl.toString(), 10)) : 0;
-            if (n > 0 && n <= ARCANA_MAX_LEVEL) arcaneCurrentLevel = n;
-        } catch (e) { console.warn('Load level:', e); }
-    }
-    async function saveLevelWeb3(level) {
-        if (!signer || !account) return;
-        try {
-            var c = new ethers.Contract(ARCANA_PROGRESSION_CONTRACT, ARCANA_PROGRESSION_ABI, signer);
-            var tx = await c.setLevel(level);
-            await tx.wait();
-        } catch (e) { console.warn('Save level:', e); }
-    }
-    function enterLevelMode() {
-        arcaneInLevelMode = true;
-        arcaneNavKeys = (arcaneNavKeys || 0) + 1;
-        updateArcaneInventory();
-        document.getElementById('arcane-level-counter').style.display = 'block';
-        document.getElementById('arcane-level-panel').style.display = 'block';
-        document.getElementById('arcane-pyramid-map').style.display = 'block';
-        var journal = document.getElementById('arcane-echo-journal');
-        if (journal) { journal.style.display = 'block'; echoAddMessage('Le Sanctuaire s\'├®veille. Les 100 niveaux vous attendent.'); }
-        updateLevelDisplay();
-        generateLevelDoors();
-        spawnScrolls();
-        spawnCornerClues();
-        updatePyramidMap();
-        if (isVipWallet(account)) {
-            console.log('%c[Omniscience] Entr├®e aux 100 niveaux ÔÇö Butin total accumul├®: ' + arcaneTotalLootSpawned + ' | Tr├®sors en attente: ' + arcaneLootLevels.length, 'color:#d4af37; font-weight:bold;');
-        }
-        if (Math.random() < 0.3) {
-            var rumourLvl = 1 + Math.floor(Math.random() * ARCANA_MAX_LEVEL);
-            echoAddMessage('Rumeur : un butin a ├®t├® signal├® au Niveau ' + rumourLvl + '.');
-        }
-    }
+}
 
-    function showGameContent() {
-        var gate = document.getElementById('arcana-connect-gate');
-        var content = gameContainer();
-        if (gate) gate.classList.add('hidden');
-        if (content) content.classList.add('visible');
-    }
+function useNavKey() {
+    if (arcaneNavKeys < 1) { addOracleChatMessage('Pas de Clé de Navigation.'); return; }
+    document.getElementById('arcane-nav-key-panel').style.display = 'block';
+}
 
-    function showOracleNetworkAlert() {
-        if (document.getElementById('oracle-network-overlay')) return;
-        var overlay = document.createElement('div');
-        overlay.id = 'oracle-network-overlay';
-        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9998;';
-        var box = document.createElement('div');
-        box.className = 'oracle-network-alert';
-        box.innerHTML = '<p>L\'Oracle ne reconna├«t que le r├®seau Polygon.</p><button class="btn-connect" onclick="switchToPolygon()">Passer sur Polygon</button><br><button class="btn-connect" style="margin-top:8px;background:transparent;border:1px solid #888;color:#888;" onclick="document.getElementById(\'oracle-network-overlay\').remove()">Fermer</button>';
-        overlay.appendChild(box);
-        document.body.appendChild(overlay);
-    }
+function navKeyPropulsion() {
+    if (arcaneNavKeys < 1) return;
+    arcaneNavKeys--;
+    updateArcaneInventory();
+    closeNavKeyPanel();
+    var jump = 1 + Math.floor(Math.random() * 10);
+    goToLevel(arcaneCurrentLevel + jump);
+    echoAddMessage('Propulsion activée : saut de ' + jump + ' niveaux !');
+    addOracleChatMessage('Propulsion : +' + jump + ' niveaux.');
+}
 
-    async function switchToPolygon() {
-        try {
-            if (window.ethereum && provider) {
-                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
-                var overlay = document.getElementById('oracle-network-overlay');
-                if (overlay) overlay.remove();
-                if (provider && account) {
-                    window._arcanaTransitionDone = false;
-                    var sgn = provider.getSigner ? provider.getSigner() : null;
-                    if (sgn) triggerTransitionToSanctuary(provider, sgn, account);
-                }
+function navKeyRappel() {
+    if (arcaneNavKeys < 1) return;
+    arcaneNavKeys--;
+    updateArcaneInventory();
+    closeNavKeyPanel();
+    var target = 0;
+    if (arcaneLootLevels.length > 0) {
+        target = arcaneLootLevels[Math.floor(Math.random() * arcaneLootLevels.length)];
+    } else {
+        target = Math.max(1, arcaneCurrentLevel - (5 + Math.floor(Math.random() * 10)));
+    }
+    goToLevel(target, true);
+    echoAddMessage('Rappel : retour au Niveau ' + target + ' pour ramasser un butin.');
+    addOracleChatMessage('Rappel vers le niveau ' + target + '.');
+}
+
+function closeNavKeyPanel() {
+    document.getElementById('arcane-nav-key-panel').style.display = 'none';
+}
+
+function updatePyramidMap() {
+    var grid = document.getElementById('pyramid-grid');
+    var map = document.getElementById('arcane-pyramid-map');
+    if (!grid || !map) return;
+    grid.innerHTML = '';
+    var rows = 10;
+    var perRow = ARCANA_MAX_LEVEL / rows;
+    for (var r = 0; r < rows; r++) {
+        var rowDiv = document.createElement('div');
+        rowDiv.className = 'pyramid-row';
+        var start = Math.floor(r * perRow) + 1;
+        var end = Math.min(ARCANA_MAX_LEVEL, Math.floor((r + 1) * perRow));
+        for (var l = start; l <= end; l++) {
+            var cell = document.createElement('div');
+            var isPlayer = l === arcaneCurrentLevel;
+            var hasLoot = arcaneLootLevels.indexOf(l) !== -1;
+            cell.className = 'pyramid-cell' + (isPlayer ? ' player' : '') + (hasLoot ? ' loot' : '');
+            cell.textContent = l;
+            rowDiv.appendChild(cell);
+        }
+        grid.appendChild(rowDiv);
+    }
+    map.style.display = arcaneInLevelMode ? 'block' : 'none';
+}
+
+async function loadLevelWeb3() {
+    if (!provider || !account) return;
+    try {
+        var c = new ethers.Contract(ARCANA_PROGRESSION_CONTRACT, ARCANA_PROGRESSION_ABI, provider);
+        var lvl = await c.playerLevel(account);
+        var n = lvl ? (typeof lvl === 'number' ? lvl : parseInt(lvl.toString(), 10)) : 0;
+        if (n > 0 && n <= ARCANA_MAX_LEVEL) arcaneCurrentLevel = n;
+    } catch (e) { console.warn('Load level:', e); }
+}
+
+async function saveLevelWeb3(level) {
+    if (!signer || !account) return;
+    try {
+        var c = new ethers.Contract(ARCANA_PROGRESSION_CONTRACT, ARCANA_PROGRESSION_ABI, signer);
+        var tx = await c.setLevel(level);
+        await tx.wait();
+    } catch (e) { console.warn('Save level:', e); }
+}
+
+function enterLevelMode() {
+    arcaneInLevelMode = true;
+    arcaneNavKeys = (arcaneNavKeys || 0) + 1;
+    updateArcaneInventory();
+    document.getElementById('arcane-level-counter').style.display = 'block';
+    document.getElementById('arcane-level-panel').style.display = 'block';
+    document.getElementById('arcane-pyramid-map').style.display = 'block';
+    var journal = document.getElementById('arcane-echo-journal');
+    if (journal) { journal.style.display = 'block'; echoAddMessage('Le Sanctuaire s\'éveille. Les 100 niveaux vous attendent.'); }
+    updateLevelDisplay();
+    generateLevelDoors();
+    spawnScrolls();
+    spawnCornerClues();
+    updatePyramidMap();
+    if (isVipWallet(account)) {
+        console.log('%c[Omniscience] Entrée aux 100 niveaux — Butin total accumulé: ' + arcaneTotalLootSpawned + ' | Trésors en attente: ' + arcaneLootLevels.length, 'color:#d4af37; font-weight:bold;');
+    }
+    if (Math.random() < 0.3) {
+        var rumourLvl = 1 + Math.floor(Math.random() * ARCANA_MAX_LEVEL);
+        echoAddMessage('Rumeur : un butin a été signalé au Niveau ' + rumourLvl + '.');
+    }
+}
+
+function showGameContent() {
+    var gate = document.getElementById('arcana-connect-gate');
+    var content = gameContainer();
+    if (gate) gate.classList.add('hidden');
+    if (content) content.classList.add('visible');
+}
+
+function showOracleNetworkAlert() {
+    if (document.getElementById('oracle-network-overlay')) return;
+    var overlay = document.createElement('div');
+    overlay.id = 'oracle-network-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9998;';
+    var box = document.createElement('div');
+    box.className = 'oracle-network-alert';
+    box.innerHTML = '<p>L\'Oracle ne reconnaît que le réseau Polygon.</p><button class="btn-connect" onclick="switchToPolygon()">Passer sur Polygon</button><br><button class="btn-connect" style="margin-top:8px;background:transparent;border:1px solid #888;color:#888;" onclick="document.getElementById(\'oracle-network-overlay\').remove()">Fermer</button>';
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+}
+
+async function switchToPolygon() {
+    try {
+        if (window.ethereum && provider) {
+            await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
+            var overlay = document.getElementById('oracle-network-overlay');
+            if (overlay) overlay.remove();
+            if (provider && account) {
+                window._arcanaTransitionDone = false;
+                var sgn = provider.getSigner ? provider.getSigner() : null;
+                if (sgn) triggerTransitionToSanctuary(provider, sgn, account);
             }
-        } catch (e) {
-            if (e.code === 4902) {
-                await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x89', chainName: 'Polygon Mainnet', rpcUrls: ['https://polygon-rpc.com'], nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 }, blockExplorerUrls: ['https://polygonscan.com'] }] });
-                var ov = document.getElementById('oracle-network-overlay');
-                if (ov) ov.remove();
-                if (provider && account) {
-                    window._arcanaTransitionDone = false;
-                    var s = provider.getSigner ? provider.getSigner() : null;
-                    if (s) triggerTransitionToSanctuary(provider, s, account);
-                }
+        }
+    } catch (e) {
+        if (e.code === 4902) {
+            await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x89', chainName: 'Polygon Mainnet', rpcUrls: ['https://polygon-rpc.com'], nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 }, blockExplorerUrls: ['https://polygonscan.com'] }] });
+            var ov = document.getElementById('oracle-network-overlay');
+            if (ov) ov.remove();
+            if (provider && account) {
+                window._arcanaTransitionDone = false;
+                var s = provider.getSigner ? provider.getSigner() : null;
+                if (s) triggerTransitionToSanctuary(provider, s, account);
             }
         }
     }
+}
 
-    function updateWalletAddressDisplay(addr) {
-        var existing = document.getElementById('wallet-address-badge');
-        if (existing) existing.remove();
-        var existingTest = document.getElementById('test-mode-badge');
-        if (existingTest) existingTest.remove();
-        
-        if (!addr || addr.length < 10) return;
-        
-        var short = addr.slice(0, 6) + 'ÔÇª' + addr.slice(-4);
-        var badge = document.createElement('div');
-        badge.id = 'wallet-address-badge';
-        badge.className = 'wallet-address-badge';
-        badge.textContent = short;
-        document.body.appendChild(badge);
-        
-        // Ajouter badge de mode test si applicable
-        if (isTestWallet(addr)) {
-            var testBadge = document.createElement('div');
-            testBadge.id = 'test-mode-badge';
-            testBadge.className = 'test-mode-badge';
-            testBadge.innerHTML = '­ƒº¬ MODE TEST';
-            testBadge.title = 'Oracle Bypass Activ├® : Toutes les fonctions sont d├®bloqu├®es';
-            document.body.appendChild(testBadge);
-        }
+function updateWalletAddressDisplay(addr) {
+    var existing = document.getElementById('wallet-address-badge');
+    if (existing) existing.remove();
+    var existingTest = document.getElementById('test-mode-badge');
+    if (existingTest) existingTest.remove();
+    
+    if (!addr || addr.length < 10) return;
+    
+    var short = addr.slice(0, 6) + '…' + addr.slice(-4);
+    var badge = document.createElement('div');
+    badge.id = 'wallet-address-badge';
+    badge.className = 'wallet-address-badge';
+    badge.textContent = short;
+    document.body.appendChild(badge);
+    
+    // Ajouter badge de mode test si applicable
+    if (isTestWallet(addr)) {
+        var testBadge = document.createElement('div');
+        testBadge.id = 'test-mode-badge';
+        testBadge.className = 'test-mode-badge';
+        testBadge.innerHTML = '🧪 MODE TEST';
+        testBadge.title = 'Oracle Bypass Activé : Toutes les fonctions sont débloquées';
+        document.body.appendChild(testBadge);
     }
+}
 
-    function hideGameContent() {
-        provider = null; signer = null; account = null;
-        window._arcanaTransitionDone = false;
-        var gate = document.getElementById('arcana-connect-gate');
-        var content = gameContainer();
-        if (gate) { gate.classList.remove('hidden', 'fade-out'); }
-        if (content) { content.classList.remove('visible', 'fade-in'); }
-        var frost = document.getElementById('frost-particles');
-        if (frost) { frost.classList.remove('active'); frost.innerHTML = ''; }
-        document.body.classList.remove('frost-transition');
-        var inv = document.getElementById('arcane-inventory');
-        if (inv) inv.style.display = 'none';
-        var gb = document.getElementById('grimoire-btn');
-        if (gb) gb.style.display = 'none';
-        var df = document.getElementById('arcane-dark-fog');
-        var dl = document.getElementById('arcane-darkness-overlay');
-        if (df) df.style.opacity = '0';
-        if (dl) dl.style.opacity = '0';
-        var ej = document.getElementById('arcane-echo-journal');
-        if (ej) ej.style.display = 'none';
-        var pm = document.getElementById('arcane-pyramid-map');
-        if (pm) pm.style.display = 'none';
-        var fog = document.getElementById('arcana-fog');
-        if (fog) fog.classList.remove('sanctuary-active');
-        var badge = document.getElementById('wallet-address-badge');
-        if (badge) badge.remove();
-        var overlay = document.getElementById('oracle-network-overlay');
-        if (overlay) overlay.remove();
-    }
+function hideGameContent() {
+    provider = null; signer = null; account = null;
+    window._arcanaTransitionDone = false;
+    var gate = document.getElementById('arcana-connect-gate');
+    var content = gameContainer();
+    if (gate) { gate.classList.remove('hidden', 'fade-out'); }
+    if (content) { content.classList.remove('visible', 'fade-in'); }
+    var frost = document.getElementById('frost-particles');
+    if (frost) { frost.classList.remove('active'); frost.innerHTML = ''; }
+    document.body.classList.remove('frost-transition');
+    var inv = document.getElementById('arcane-inventory');
+    if (inv) inv.style.display = 'none';
+    var gb = document.getElementById('grimoire-btn');
+    if (gb) gb.style.display = 'none';
+    var df = document.getElementById('arcane-dark-fog');
+    var dl = document.getElementById('arcane-darkness-overlay');
+    if (df) df.style.opacity = '0';
+    if (dl) dl.style.opacity = '0';
+    var ej = document.getElementById('arcane-echo-journal');
+    if (ej) ej.style.display = 'none';
+    var pm = document.getElementById('arcane-pyramid-map');
+    if (pm) pm.style.display = 'none';
+    var fog = document.getElementById('arcana-fog');
+    if (fog) fog.classList.remove('sanctuary-active');
+    var badge = document.getElementById('wallet-address-badge');
+    if (badge) badge.remove();
+    var overlay = document.getElementById('oracle-network-overlay');
+    if (overlay) overlay.remove();
+}
+
+</script>
+</body>
+</html>
+
 
     function addOracleChatMessage(msg) {
         var chatContainer = document.querySelector('#chat-temple div[style*="overflow-y"]') || document.querySelector('#chat-temple > div:nth-child(2)');
