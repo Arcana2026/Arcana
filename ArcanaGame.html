@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
 <!--
-ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+═══════════════════════════════════════════════════════════════
     ARCANA GAME - Le Sanctuaire du Destin
-    ├ëcosyst├¿me D├®centralis├® sur Polygon | Optimis├® Mobile
-    Structure: index.html Ôçä ArcanaGame.html (connexion bidirectionnelle)
+    Écosystème Décentralisé sur Polygon | Optimisé Mobile
+    Structure: index.html → ArcanaGame.html (connexion bidirectionnelle)
     
-    ­ƒôí ORACLE M├ëT├ëO :
-    - Condition : Temp├®rature <= -2┬░C ├á Montr├®al-Est (Gel requis)
-    - Mode Admin : D├®finir ARCANA_TEST_WALLET avec votre adresse
-    - Bypass automatique pour le wallet admin (fonctionne m├¬me ├á +20┬░C)
+    🌡 ORACLE MÉTÉO :
+    - Condition : Température <= -2°C à Montréal-Est (Gel requis)
+    - Mode Admin : Définir ARCANA_TEST_WALLET avec votre adresse
+    - Bypass automatique pour le wallet admin (fonctionne même à +20°C)
     
-    ­ƒöæ MODE ADMIN :
+    🔧 MODE ADMIN :
     Ligne ~1368 : var ARCANA_TEST_WALLET = 'VOTRE_ADRESSE_0x...';
-ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+═══════════════════════════════════════════════════════════════
 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#1b2735">
-    <meta name="description" content="Arcana Game - ├ëcosyst├¿me D├®centralis├® sur Polygon">
-    <title>Arcana Game - ├ëcosyst├¿me D├®centralis├®</title>
+    <meta name="description" content="Arcana Game - Écosystème Décentralisé sur Polygon">
+    <title>Arcana Game - Écosystème Décentralisé</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" defer></script>
     <link rel="preconnect" href="https://polygon-rpc.com">
     <link rel="preconnect" href="https://cdn.pixabay.com">
@@ -43,9 +43,9 @@
         }
         body {
             perspective: 1000px;
-            /* Couloir de pierre en perspective - arri├¿re-plan principal */
+            /* Couloir de pierre en perspective - arrière-plan principal */
             background: 
-                /* Murs lat├®raux sombres */
+                /* Murs latéraux sombres */
                 linear-gradient(90deg, 
                     rgba(20, 15, 10, 1) 0%, 
                     rgba(30, 25, 20, 0.9) 10%,
@@ -102,7 +102,7 @@
             z-index: 0;
         }
         #star-container {
-            display: none; /* ├ëtoiles d├®sactiv├®es pour correspondre ├á l'interface finale */
+            display: none; /* Étoiles désactivées pour correspondre à l'interface finale */
         }
         .star {
             display: none;
@@ -111,7 +111,7 @@
             0%, 100% { opacity: 0.3; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.1); }
         }
-        /* Glass panels normaux - Fond l├®ger semi-transparent pour les menus */
+        /* Glass panels normaux - Fond léger semi-transparent pour les menus */
         .glass-panel {
             font-family: 'Cinzel', serif;
             background: rgba(15, 12, 8, 0.88);
@@ -182,7 +182,7 @@
             gap: 25px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
         }
-        /* Logo Arcana - Discret et ├®l├®gant ├á gauche */
+        /* Logo Arcana - Discret et élégant à gauche */
         .logo-arcana {
             display: flex;
             align-items: center;
@@ -219,7 +219,7 @@
             letter-spacing: 0.12em;
             font-weight: 300;
         }
-        /* Titre central avec plaque d├®corative */
+        /* Titre central avec plaque décorative */
         .header-title-plate {
             display: flex;
             flex-direction: column;
@@ -430,7 +430,7 @@
             opacity: 0.68;
         }
         .title-vault {
-            display: none; /* Cach├® pour interface ├®pur├®e selon image */
+            display: none; /* Caché pour interface épurée selon image */
         }
         /* Section Oracle (Niveau 2) */
         .oracle-mirror {
@@ -499,7 +499,7 @@
             display: none !important;
         }
         #chat-temple {
-            display: none; /* Cach├® par d├®faut - s'affiche via la Taverne */
+            display: none; /* Caché par défaut - s'affiche via la Taverne */
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -549,7 +549,7 @@
             font-size: 2em;
             margin-bottom: 5px;
         }
-        /* Digital Countdown - Cach├® par d├®faut */
+        /* Digital Countdown - Caché par défaut */
         .digital-timer {
             display: none;
         }
@@ -560,7 +560,7 @@
             border-color: #ff2424aa;
             animation: glitch-border 0.15s steps(1) infinite alternate;
         }
-        /* Runes - Cercles dor├®s (r├®duits 20%) */
+        /* Runes - Cercles dorés (réduits 20%) */
         .runes-column .rune-btn {
             width: 70px;
             height: 70px;
@@ -579,12 +579,12 @@
             justify-content: center;
             z-index: 10;
             
-            /* Transparence totale avec bordure dor├®e ultra-fine */
+            /* Transparence totale avec bordure dorée ultra-fine */
             background: transparent !important;
             border: 0.5px solid rgba(212, 175, 55, 0.2);
             border-radius: 50%;
             
-            /* Symbole dor├® */
+            /* Symbole doré */
             color: rgba(212, 175, 55, 1);
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
             
@@ -595,7 +595,7 @@
             user-select: none;
         }
         
-        /* Effet de surbrillance dor├® au survol - reste transparent */
+        /* Effet de surbrillance doré au survol - reste transparent */
         .rune-btn:hover:not(:disabled) {
             background: transparent !important;
             border-color: rgba(212, 175, 55, 0.9);
@@ -608,7 +608,7 @@
             transform: scale(0.9);
         }
         
-        /* Animation qu├¬te active - Pulse dor├® */
+        /* Animation quête active - Pulse doré */
         .rune-btn.quete-active {
             animation: rune-quete-pulse 2.5s ease-in-out infinite;
         }
@@ -629,7 +629,7 @@
                 transform: scale(0.84);
             }
         }
-        /* Feedback visuel pour les runes avec cercle dor├® */
+        /* Feedback visuel pour les runes avec cercle doré */
         .rune-btn.selected,
         .rune-btn.good {
             border-color: rgba(73, 202, 250, 0.9);
@@ -649,7 +649,7 @@
             box-shadow: 0 0 25px rgba(255, 68, 68, 0.5);
             animation: rune-feedback-bad 0.4s ease;
         }
-        /* Effet dor├® au clic */
+        /* Effet doré au clic */
         .rune-btn.click-gold {
             filter: drop-shadow(0 0 15px #d4af37) !important;
             transition: filter 0.2s ease;
@@ -673,7 +673,7 @@
                 transform: translateX(6px);
             }
         }
-        /* Progress bar - Cach├®e (├®puration) */
+        /* Progress bar - Cachée (épuration) */
         .alignement-container,
         .alignement-label,
         .alignement-bar-bg,
@@ -681,12 +681,12 @@
         .alignement-percentage {
             display: none;
         }
-        /* Salle 3 (Sanctuaire) : pierre ancienne, bordure dor├®e pulsante */
+        /* Salle 3 (Sanctuaire) : pierre ancienne, bordure dorée pulsante */
         @keyframes golden-border-pulse {
             0%, 100% { box-shadow: 0 0 12px rgba(212, 175, 55, 0.5); border-color: rgba(212, 175, 55, 0.9); }
             50% { box-shadow: 0 0 22px rgba(212, 175, 55, 0.7); border-color: #d4af37; }
         }
-        /* Animation d'entr├®e douce pour le sanctuaire */
+        /* Animation d'entrée douce pour le sanctuaire */
         @keyframes sanctuaire-shift-up {
             0% {
                 transform: translate(-50%, -50%);
@@ -708,7 +708,7 @@
             }
         }
         #level-3-sanctuary {
-            /* Nettoyage complet - Vue d├®gag├®e sur le d├®cor */
+            /* Nettoyage complet - Vue dégagée sur le décor */
             display: grid;
             grid-template-columns: 120px 1fr 120px;
             gap: 0;
@@ -775,7 +775,7 @@
         .runes-column .rune-btn {
             background: transparent !important;
         }
-        /* Quand le sac est ouvert - runes restent visibles mais l├®g├¿rement att├®nu├®es */
+        /* Quand le sac est ouvert - runes restent visibles mais légèrement atténuées */
         #level-3-sanctuary.sac-ouvert .rune-btn {
             opacity: 0.7;
         }
@@ -907,7 +907,7 @@
             90% { opacity: 0.98;}
             100% { transform: translateY(110vh) scaleY(1.1) rotate(7deg); opacity: 0;}
         }
-        /* Nouveaux styles pour le s├®lecteur de token */
+        /* Nouveaux styles pour le sélecteur de token */
         .token-select-group {
             display: flex;
             align-items: center;
@@ -918,7 +918,7 @@
             color: #FADB1C;
         }
 
-        /* Brume atmosph├®rique - D├®sactiv├®e pour vue d├®gag├®e */
+        /* Brume atmosphérique - Désactivée pour vue dégagée */
         #arcana-fog {
             display: none;
         }
@@ -936,11 +936,11 @@
             50% { transform: translateX(5%); opacity: 1; }
         }
 
-        /* Mentions l├®gales - Cach├®es pour ├®puration */
+        /* Mentions légales - Cachées pour épuration */
         .arcana-mention {
             display: none;
         }
-        /* ├ëcran d'attente : transparent, ne couvre pas le header (CONNECT WALLET reste cliquable) */
+        /* Écran d'attente : transparent, ne couvre pas le header (CONNECT WALLET reste cliquable) */
         #arcana-connect-gate {
             position: fixed;
             top: 72px; left: 0; right: 0; bottom: 0;
@@ -974,7 +974,7 @@
             border: none !important;
             box-shadow: none !important;
         }
-        /* Ancien bouton retour - D├®sormais int├®gr├® dans le header */
+        /* Ancien bouton retour - Désormais intégré dans le header */
         .btn-back-accueil {
             display: none;
         }
@@ -990,14 +990,14 @@
             background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
             background-size: cover !important;
         }
-        /* Masquer tous les panels sauf le sanctuaire par d├®faut */
+        /* Masquer tous les panels sauf le sanctuaire par défaut */
         #class-selection,
         #level-2-panel,
         #arcane-level-panel,
         #arcane-altar-panel {
             display: none !important;
         }
-        /* Identification wallet : coin de l'├®cran */
+        /* Identification wallet : coin de l'écran */
         .wallet-address-badge {
             position: fixed; top: 12px; right: 12px; z-index: 600;
             font-size: 0.7rem; font-family: 'Cinzel', serif; color: var(--gold);
@@ -1039,7 +1039,7 @@
             0%, 100% { opacity: 0.8; }
             50% { opacity: 1; box-shadow: 0 0 12px rgba(0, 255, 136, 0.4); }
         }
-        /* Alerte Oracle stylis├®e */
+        /* Alerte Oracle stylisée */
         .oracle-network-alert {
             font-family: 'Cinzel', serif;
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -1071,7 +1071,7 @@
             0% { opacity: 0; }
             100% { opacity: 1; }
         }
-        /* Filtre bleu givre ├á la connexion */
+        /* Filtre bleu givre à la connexion */
         body.frost-transition #arcana-fog { opacity: 0.95; filter: blur(35px); }
         body.frost-transition #arcana-fog,
         body.frost-transition #star-container { filter: blur(2px) hue-rotate(-5deg) saturate(0.9); }
@@ -1090,7 +1090,7 @@
             0% { transform: translateY(-10px) scale(1); opacity: 0.8; }
             100% { transform: translateY(100vh) scale(0.5); opacity: 0; }
         }
-        /* === Syst├¿me d'obscurit├® et Lumi├¿re === */
+        /* === Système d'obscurité et Lumière === */
         #arcane-darkness-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             pointer-events: none; z-index: 450;
@@ -1100,15 +1100,15 @@
         #arcane-darkness-overlay.room-lit-1 { --room1-mask: transparent; }
         #arcane-darkness-overlay.room-lit-2 { --room2-mask: transparent; }
         .arcane-light-object {
-            display: none; /* Cach├® pour ├®puration */
+            display: none; /* Caché pour épuration */
         }
-        /* Inventaire cl├®s - Cach├® (tout passe par la sacoche) */
+        /* Inventaire clés - Caché (tout passe par la sacoche) */
         #arcane-inventory {
             display: none;
         }
         #arcane-inventory .keys-count { color: var(--gold); font-weight: bold; font-size: 1.2em; }
         #arcane-inventory .keys-label { color: rgba(255,255,255,0.8); font-size: 0.75em; }
-        /* Autel des Cl├®s */
+        /* Autel des Clés */
         #arcane-altar-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
             z-index: 510; background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 20px;
             padding: 24px; max-width: 340px; text-align: center;
@@ -1121,7 +1121,7 @@
             background: radial-gradient(ellipse 150% 150% at 50% 50%, transparent 30%, rgba(10,5,20,0.7) 80%, rgba(5,2,15,0.9) 100%);
             opacity: var(--fog-opacity, 0.85); transition: opacity 1.5s ease;
         }
-        /* === Syst├¿me 100 niveaux === */
+        /* === Système 100 niveaux === */
         #arcane-level-counter {
             position: fixed; top: 12px; right: 80px; z-index: 610;
             font-family: 'Cinzel', serif;
@@ -1159,7 +1159,7 @@
         .arcane-corner-clue:hover { opacity: 1; }
         .arcane-corner-clue.used { opacity: 0.2; pointer-events: none; }
         #arcane-pyramid-map {
-            display: none; /* Cach├® pour ├®puration */
+            display: none; /* Caché pour épuration */
         }
         .pyramid-row { display: flex; justify-content: center; gap: 2px; margin: 1px 0; font-size: 8px; }
         .pyramid-cell { width: 10px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 2px; color: #666; }
@@ -1168,9 +1168,9 @@
             z-index: 512; background: rgba(0,0,0,0.92); border: 2px solid var(--gold); border-radius: 16px;
             padding: 20px; text-align: center;
         }
-        /* L'├ëcho du Sanctuaire ÔÇö Bandeau d├®filant style parchemin */
+        /* L'Écho du Sanctuaire — Bandeau défilant style parchemin */
         #arcane-echo-journal {
-            display: none; /* Cach├® pour ├®puration */
+            display: none; /* Caché pour épuration */
         }
         #arcane-echo-journal .echo-title { color: var(--gold); font-weight: 700; flex-shrink: 0; margin-right: 16px; letter-spacing: 0.12em; }
         #arcane-echo-ticker { flex: 1; overflow: hidden; white-space: nowrap; }
@@ -1185,7 +1185,7 @@
             bottom: 20px; 
             right: 20px; 
             z-index: 2000;
-            display: none; /* Cach├® par d├®faut pour ├®puration */
+            display: none; /* Caché par défaut pour épuration */
             width: 56px; height: 56px; border-radius: 12px;
             background: linear-gradient(145deg, #2a2520, #1a1612);
             border: 0.5px solid rgba(212,175,55,0.6);
@@ -1246,7 +1246,7 @@
         }
         .grimoire-close:hover { background: rgba(184,134,11,0.3); }
         
-        /* === PAPYRUS ANCIEN - Modal Centr├®e avec fond transparent === */
+        /* === PAPYRUS ANCIEN - Modal Centrée avec fond transparent === */
         #papyrus-modal {
             display: none;
             position: fixed;
@@ -1273,7 +1273,7 @@
             max-width: 650px;
             height: 75vh;
             max-height: 850px;
-            /* Fond de parchemin beige/dor├® comme dans l'image */
+            /* Fond de parchemin beige/doré comme dans l'image */
             background: linear-gradient(180deg, #e8d5b5 0%, #d9c8a8 30%, #c9b898 70%, #b9a888 100%);
             background-image: 
                 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='paper-noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paper-noise)' opacity='0.2'/%3E%3C/svg%3E"),
@@ -1426,7 +1426,7 @@
             position: relative;
         }
         .papyrus-text-russe::before {
-            content: 'ÔØä´©Å';
+            content: '✦';
             position: absolute;
             top: -15px;
             left: 50%;
@@ -1435,7 +1435,7 @@
             opacity: 0.6;
         }
         .papyrus-text-russe::after {
-            content: 'ÔØä´©Å';
+            content: '✦';
             position: absolute;
             bottom: -15px;
             left: 50%;
@@ -1653,7 +1653,7 @@
             letter-spacing: 0;
         }
         
-        /* === OVERLAY DRAWER - Tr├¿s subtil pour voir le couloir === */
+        /* === OVERLAY DRAWER - Très subtil pour voir le couloir === */
         #sac-overlay {
             position: fixed;
             top: 0;
@@ -1673,7 +1673,7 @@
             pointer-events: auto;
         }
         
-        /* === BRUME ANIM├ëE === */
+        /* === BRUME ANIMÉE === */
         .mist-layer {
             position: fixed;
             top: 0;
@@ -1716,7 +1716,7 @@
         #sac-inventaire.open {
             transform: translateY(0);
         }
-        /* Scrollbar stylis├®e pour l'inventaire */
+        /* Scrollbar stylisée pour l'inventaire */
         #sac-inventaire::-webkit-scrollbar {
             width: 8px;
         }
@@ -1833,7 +1833,7 @@
             transform: translateY(-2px);
         }
         .sac-slot:empty::after {
-            content: 'ÔÇö';
+            content: '—';
             color: rgba(212, 175, 55, 0.2);
             font-size: 1.2em;
         }
@@ -1843,7 +1843,7 @@
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         .sac-slot.filled::before {
-            content: '­ƒùØ´©Å';
+            content: '🔑';
             font-size: 1.5em;
             margin-bottom: 4px;
         }
@@ -1863,7 +1863,7 @@
             z-index: -1;
         }
         
-        /* === OBJETS DE QU├èTE === */
+        /* === OBJETS DE QUÊTE === */
         #sac-objets-quete {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -1889,7 +1889,7 @@
             position: relative;
             box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
         }
-        /* Style sp├®cial pour les papyrus anciens - Rouleau ├®gyptien */
+        /* Style spécial pour les papyrus anciens - Rouleau égyptien */
         .objet-quete.papyrus-ancien {
             background: linear-gradient(135deg, 
                 rgba(233, 221, 196, 0.25) 0%, 
@@ -1904,7 +1904,7 @@
             position: relative;
             overflow: visible;
         }
-        /* B├ótons du rouleau (gauche et droite) */
+        /* Bâtons du rouleau (gauche et droite) */
         .objet-quete.papyrus-ancien::before {
             content: '';
             position: absolute;
@@ -1962,7 +1962,7 @@
             position: relative;
         }
         .objet-quete.objet-actif::before {
-            content: 'Ô£¿';
+            content: '✨';
             position: absolute;
             top: -8px;
             right: -8px;
@@ -2091,7 +2091,7 @@
                 background: transparent !important;
                 border-width: 1px;
             }
-            /* Sac ├á dos */
+            /* Sac à dos */
             #sac-inventaire {
                 max-height: 80vh;
                 padding: 20px 16px 16px;
@@ -2149,7 +2149,7 @@
                 font-size: 0.75em;
             }
         }
-        /* --- SANCTUAIRE TRANSPARENT ET DOR├ë --- */
+        /* --- SANCTUAIRE TRANSPARENT ET DORÉ --- */
         #level-3-sanctuary {
             background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), 
                         url('https://images.unsplash.com/photo-1605806616949-1e87b487fc2f?q=80&w=2070&auto=format&fit=crop') !important;
@@ -3421,33 +3421,33 @@ function hideGameContent() {
                 }
             }
 
-            // Affichage du compte connect├® + r├®v├®ler le jeu (fallback si Web3Modal ├®choue)
+            // Affichage du compte connecté + révéler le jeu (fallback si Web3Modal échoue)
             var btn = document.querySelector(".btn-connect, #web3modal-connect-wrap .btn-connect");
-            if (btn) btn.innerText = "Connect├®";
+            if (btn) btn.innerText = "Connecté";
             if (window.arcanaOnW3mConnect) window.arcanaOnW3mConnect(provider, signer, account);
 
         } catch (err) {
             if (err.code === 4001 || (err?.message && err.message.toLowerCase().includes('reject'))) {
-                alert("Connexion annul├®e. Veuillez d├®verrouiller MetaMask si n├®cessaire et r├®essayer.");
+                alert("Connexion annulée. Veuillez déverrouiller MetaMask si nécessaire et réessayer.");
             } else {
                 alert("Impossible de se connecter au wallet : " + (err.message || err));
             }
         }
     }
 
-    // ============ FONCTION DE D├ëP├öT MULTI-TOKEN POLYGON ==============
+    // ============ FONCTION DE DÉPÔT MULTI-TOKEN POLYGON ==============
     async function payStake() {
         if (!window.ethereum) {
-            showStyledAlert("Connectez votre wallet via le bouton de connexion pour effectuer un d├®p├┤t.");
+            showStyledAlert("Connectez votre wallet via le bouton de connexion pour effectuer un dépôt.");
             return;
         }
         if (!signer || !account) await connectWallet();
         if (!signer) {
-            showStyledAlert("Connectez votre wallet pour effectuer un d├®p├┤t.");
+            showStyledAlert("Connectez votre wallet pour effectuer un dépôt.");
             return;
         }
 
-        // R├®cup├®rer valeur/jeton s├®lectionn├®
+        // Récupérer valeur/jeton sélectionné
         const rawAmount = document.getElementById('amountInput').value;
         const tokenSelected = document.getElementById('tokenSelect').value;
         let amount = Number(rawAmount);
@@ -3461,7 +3461,7 @@ function hideGameContent() {
             let tokenAddress = null;
             let isNative = false, decimals = 18;
 
-            // D├®tails par token
+            // Détails par token
             if (tokenSelected === "USDT") {
                 tokenAddress = USDT_TOKEN_ADDRESS;
             } else if (tokenSelected === "USDC") {
@@ -3471,7 +3471,7 @@ function hideGameContent() {
             } else if (tokenSelected === "MATIC") {
                 isNative = true;
             } else {
-                throw new Error("Jeton non g├®r├®");
+                throw new Error("Jeton non géré");
             }
 
             // Prepare amount in token's decimals
@@ -3485,37 +3485,37 @@ function hideGameContent() {
             }
 
             if (isNative) {
-                // ===== D├®p├┤t en MATIC =====
+                // ===== Dépôt en MATIC =====
                 const tx = await signer.sendTransaction({
                     to: ARCANA_GAME_CONTRACT,
                     value: parsedAmount
                 });
                 await tx.wait();
-                alert("D├®p├┤t de " + amount + " MATIC envoy├®!");
+                alert("Dépôt de " + amount + " MATIC envoyé!");
             } else {
-                // ===== D├®p├┤t ERC20 =====
-                // V├®rifier allowance
+                // ===== Dépôt ERC20 =====
+                // Vérifier allowance
                 const token = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
                 const allowance = await token.allowance(account, ARCANA_GAME_CONTRACT);
 
                 if (allowance.lt(parsedAmount)) {
-                    // Approval n├®cessaire
+                    // Approval nécessaire
                     const tx1 = await token.approve(ARCANA_GAME_CONTRACT, parsedAmount);
                     await tx1.wait();
                 }
 
-                // Transf├®rer le montant au contrat
+                // Transférer le montant au contrat
                 // (Le smart contract doit supporter receive/transferFrom)
                 const tx2 = await token.transfer(ARCANA_GAME_CONTRACT, parsedAmount);
                 await tx2.wait();
-                alert(`D├®p├┤t de ${amount} ${tokenSelected} envoy├® !`);
+                alert(`Dépôt de ${amount} ${tokenSelected} envoyé !`);
             }
         } catch (error) {
-            alert("Erreur lors du d├®p├┤t : " + (error.message || error));
+            alert("Erreur lors du dépôt : " + (error.message || error));
         }
     }
 
-    // Ajout ARCANA ├á MetaMask
+    // Ajout ARCANA à MetaMask
     async function addArcanaToMetaMask() {
         if (!window.ethereum) {
             return;
@@ -3534,24 +3534,24 @@ function hideGameContent() {
                 }
             });
             if (wasAdded) {
-                // Le token ARCANA a ├®t├® ajout├® avec succ├¿s
+                // Le token ARCANA a été ajouté avec succès
             }
         } catch (error) {
             alert("Erreur lors de l'ajout du token : " + (error.message || error));
         }
     }
 
-    // Ajoute dynamiquement le lien sous le bouton de d├®p├┤t au chargement DOM
+    // Ajoute dynamiquement le lien sous le bouton de dépôt au chargement DOM
     document.addEventListener('DOMContentLoaded', function() {
-        // On cherche le bouton de d├®p├┤t (btn-stake ou btn-depot selon ton HTML)
-        // Adaptation┬á: on cherche le parent autour du bouton stake ou le select jeton
+        // On cherche le bouton de dépôt (btn-stake ou btn-depot selon ton HTML)
+        // Adaptation : on cherche le parent autour du bouton stake ou le select jeton
         let stakeBtn = document.querySelector('.btn-stake, .btn-depot, #stake-btn');
         let tokenSelect = document.getElementById('tokenSelect');
         let referenceNode = null;
         if (stakeBtn) {
             referenceNode = stakeBtn;
         } else if(tokenSelect) {
-            // Fallback : on ins├¿re pr├¿s du select
+            // Fallback : on insère près du select
             referenceNode = tokenSelect;
         }
         if (referenceNode && !document.getElementById('arcana-metamask-link')) {
@@ -3560,12 +3560,12 @@ function hideGameContent() {
             link.className = "arcana-add-metamask-link";
             link.id = "arcana-metamask-link";
             link.tabIndex = 0;
-            link.innerHTML = '+ Ajouter le jeton ARCANA ├á MetaMask';
+            link.innerHTML = '+ Ajouter le jeton ARCANA à MetaMask';
             link.onclick = addArcanaToMetaMask;
-            // On l'ins├¿re juste apr├¿s le bouton de stake
+            // On l'insère juste après le bouton de stake
             referenceNode.insertAdjacentElement('afterend', link);
         }
-        // Ins├®rer le style uniquement si non d├®j├á pr├®sent
+        // Insérer le style uniquement si non déjà présent
         if (!document.getElementById('arcana-metamask-link-style')) {
           var styleEl = document.createElement('style');
           styleEl.id = 'arcana-metamask-link-style';
@@ -3592,7 +3592,7 @@ function hideGameContent() {
         }
     });
 
-    // Fond ├®toil├® dynamique : 200 ├®toiles avec animation de scintillement
+    // Fond étoilé dynamique : 200 étoiles avec animation de scintillement
     (function() {
         const container = document.getElementById('star-container');
         const starCount = 200;
@@ -3614,7 +3614,7 @@ function hideGameContent() {
         }
     })();
 
-    // -- Suite du code originel inchang├® pour le Sanctuaire & autres panneaux --
+    // -- Suite du code originel inchangé pour le Sanctuaire & autres panneaux --
     // -------- Sanctuaire du Destin (Level 3) FINAL -----------
     const SANCTUARY_SEQUENCE = [2, 7, 5, 9, 0, 10];
     const runeSound = new Audio('https://www.soundjay.com/buttons/button-16.mp3');
@@ -3652,9 +3652,9 @@ function hideGameContent() {
         document.getElementById('alignement-percent').textContent = percent + "%";
     }
     function broadcastVictory(walletAddress) {
-        const addr = (walletAddress || account || 'Un Initi├®').toString();
-        const shortAddr = addr.length > 14 ? addr.slice(0, 6) + 'ÔÇª' + addr.slice(-4) : addr;
-        const msg = 'Ô£¿ L\'├ëLU ' + shortAddr + ' vient de sceller le Destin ! La pluie d\'or tombe sur le Sanctuaire !';
+        const addr = (walletAddress || account || 'Un Initié').toString();
+        const shortAddr = addr.length > 14 ? addr.slice(0, 6) + '…' + addr.slice(-4) : addr;
+        const msg = '✨ L\'ÉLU ' + shortAddr + ' vient de sceller le Destin ! La pluie d\'or tombe sur le Sanctuaire !';
         const chatContainer = document.querySelector('#chat-temple div[style*="overflow-y"]') || document.querySelector('#chat-temple').children[1];
         if (chatContainer) {
             const p = document.createElement('p');
@@ -3684,7 +3684,7 @@ function hideGameContent() {
     }
     function showSanctuarySuccess() {
         document.getElementById('sanctuary-success').style.display = 'block';
-        document.getElementById('sanctuary-success').innerText = "JACKPOT D├ëVERROUILL├ëÔÇë! Le Destin est r├®v├®l├®...";
+        document.getElementById('sanctuary-success').innerText = "JACKPOT DÉVERROUILLÉ ! Le Destin est révélé...";
         Array.from(document.querySelectorAll('.runes-column .rune-btn')).forEach(b=>b.disabled=true);
         sanctuaryLocked = true;
         stopHeartbeat();
@@ -3731,13 +3731,13 @@ function hideGameContent() {
         if (--sanctuaryTimeLeft<0) {
             clearInterval(sanctuaryTimerInterval);
             sanctuaryTimerInterval = null;
-            document.getElementById('sanctuary-timer').textContent = "├ëCHEC";
+            document.getElementById('sanctuary-timer').textContent = "ÉCHEC";
             sanctuaryLocked = true;
             stopHeartbeat();
             enableGlitchPanel();
             Array.from(document.querySelectorAll('.runes-column .rune-btn')).forEach(b=>b.disabled=true);
             document.getElementById('sanctuary-success').style.display = 'block';
-            document.getElementById('sanctuary-success').innerText = "Temps ├®coul├®. Le sceau s'efface...";
+            document.getElementById('sanctuary-success').innerText = "Temps écoulé. Le sceau s'efface...";
             return;
         }
         updateSanctuaryTimerDisplay();
@@ -3925,38 +3925,38 @@ function hideGameContent() {
         }
         
         // Afficher l'interface d'assemblage
-        var message = '­ƒô£ <strong>Atelier d\'Assemblage ├ëgyptien</strong><br><br>';
-        message += '<div style="font-size:1.5em; margin: 15px 0;">­ôéÇ ­ôåú ­ôâ¡</div>';
-        message += 'Papyrus anciens collect├®s : <strong>' + nbPapyrus + '</strong>/3<br><br>';
+        var message = '📜 <strong>Atelier d\'Assemblage Égyptien</strong><br><br>';
+        message += '<div style="font-size:1.5em; margin: 15px 0;">⏀ ⏃ ⏇</div>';
+        message += 'Papyrus anciens collectés : <strong>' + nbPapyrus + '</strong>/3<br><br>';
         
         if (nbPapyrus >= 3) {
-            message += '<em style="color:#00ff88;">Ô£¿ Les trois fragments s\'assemblent dans une lumi├¿re dor├®e !</em><br><br>';
-            message += '<div style="font-size:1.3em; margin: 15px 0; color:#d4af37;">ÔÜ▒ ÔÜí ÔÜû</div>';
-            message += '­ƒÄü <strong>Message R├®v├®l├® :</strong><br><span style="font-size:1.1em; color:#8b4513; font-weight:bold;">"Le tr├®sor se cache l├á o├╣ le givre rencontre l\'or ├®ternel"</span>';
+            message += '<em style="color:#00ff88;">✨ Les trois fragments s\'assemblent dans une lumière dorée !</em><br><br>';
+            message += '<div style="font-size:1.3em; margin: 15px 0; color:#d4af37;">❶ ❷ ❸</div>';
+            message += '🎯 <strong>Message Révélé :</strong><br><span style="font-size:1.1em; color:#8b4513; font-weight:bold;">"Le trésor se cache là où le givre rencontre l\'or éternel"</span>';
             
-            // R├®compense pour assemblage (├®viter les doublons)
+            // Récompense pour assemblage (éviter les doublons)
             if (!sacObjetsQuete.find(function(obj) { return obj.id === 'livre_secrets'; })) {
-                ajouterObjetQuete('­ƒôû', 'Livre des Secrets', 'livre_secrets');
+                ajouterObjetQuete('📖', 'Livre des Secrets', 'livre_secrets');
                 vibrerSac(3);
-                addOracleChatMessage('­ƒôû Assemblage r├®ussi : Livre des Secrets obtenu !');
+                addOracleChatMessage('📖 Assemblage réussi : Livre des Secrets obtenu !');
             }
         } else {
             message += '<em style="color:#ff6b6b;">Il vous faut les 3 fragments pour reconstituer le message complet...</em><br><br>';
-            message += '<div style="margin: 10px 0;">ÔÅ│ Fragments manquants : <strong>' + (3 - nbPapyrus) + '</strong></div>';
-            message += '<small style="color:#888;">­ƒÆí Continuez ├á explorer avec les Runes des Chercheurs.</small>';
+            message += '<div style="margin: 10px 0;">│ Fragments manquants : <strong>' + (3 - nbPapyrus) + '</strong></div>';
+            message += '<small style="color:#888;">💡 Continuez à explorer avec les Runes des Chercheurs.</small>';
         }
         
         showStyledAlert(message);
         
-        addOracleChatMessage('­ƒô£ Atelier ouvert : ' + nbPapyrus + '/3 papyrus disponibles.');
+        addOracleChatMessage('📜 Atelier ouvert : ' + nbPapyrus + '/3 papyrus disponibles.');
     }
 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // ═══════════════════════════════════════════════════════
     // RUNE 11 : LA TAVERNE (Chat Social)
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // ═══════════════════════════════════════════════════════
     
     function ouvrirTaverne() {
-        console.log('%c­ƒì║ Ouverture de la Taverne', 'color:#d4af37; font-weight:bold;');
+        console.log('%c🍺 Ouverture de la Taverne', 'color:#d4af37; font-weight:bold;');
         
         var chatPanel = document.getElementById('chat-temple');
         if (chatPanel) {
@@ -3969,14 +3969,14 @@ function hideGameContent() {
             chatPanel.style.maxWidth = '500px';
             chatPanel.style.width = '90vw';
             
-            addOracleChatMessage('­ƒì║ Bienvenue ├á la Taverne ! Partagez vos d├®couvertes avec les autres Initi├®s...');
+            addOracleChatMessage('🍺 Bienvenue à la Taverne ! Partagez vos découvertes avec les autres Initiés...');
             
             // Ajouter un bouton de fermeture
             if (!document.getElementById('btn-fermer-taverne')) {
                 var btnFermer = document.createElement('button');
                 btnFermer.id = 'btn-fermer-taverne';
                 btnFermer.className = 'btn-connect';
-                btnFermer.textContent = 'Ô£ò Fermer';
+                btnFermer.textContent = '✓ Fermer';
                 btnFermer.style.marginTop = '10px';
                 btnFermer.style.width = '100%';
                 btnFermer.onclick = function() {
@@ -3988,7 +3988,7 @@ function hideGameContent() {
                 chatPanel.appendChild(btnFermer);
             }
         } else {
-            showStyledAlert('­ƒì║ <strong>La Taverne</strong><br><br>Un lieu de rencontre pour les Initi├®s.<br><br><em>Le chat sera bient├┤t disponible...</em>');
+            showStyledAlert('🍺 <strong>La Taverne</strong><br><br>Un lieu de rencontre pour les Initiés.<br><br><em>Le chat sera bientôt disponible...</em>');
         }
     }// =========================================================================
     // RUNE 12 : L'ŒIL DE L'ORACLE (STATISTIQUES & JACKPOT)
@@ -4131,35 +4131,35 @@ function hideGameContent() {
         var btnSacoche = document.getElementById('btn-sacoche');
         btnSacoche.classList.remove('resonance');
         
-        // Arr├¬ter la vibration haptique
+        // Arrêter la vibration haptique
         if (navigator.vibrate) {
             navigator.vibrate(0);
         }
         
         sacResonanceActive = false;
         
-        console.log('%cÔ£¿ R├®sonance magique d├®sactiv├®e', 'color:#888;');
+        console.log('%c✨ Résonance magique désactivée', 'color:#888;');
     }
 
     function activerResonanceObjet(objetId, typeObjet) {
         // typeObjet: 'cle' ou 'quete'
         typeObjet = typeObjet || 'quete';
         
-        // Retirer l'ancienne r├®sonance
+        // Retirer l'ancienne résonance
         if (sacResonanceObjetActif) {
             desactiverResonanceObjet();
         }
         
         var element;
         if (typeObjet === 'cle') {
-            // Trouver le slot de cl├®
+            // Trouver le slot de clé
             var slots = document.querySelectorAll('.sac-slot');
             var index = sacInventaire.indexOf(objetId);
             if (index !== -1 && slots[index]) {
                 element = slots[index];
             }
         } else {
-            // Trouver l'objet de qu├¬te
+            // Trouver l'objet de quête
             element = document.querySelector('.objet-quete[data-id="' + objetId + '"]');
         }
         
@@ -4167,7 +4167,7 @@ function hideGameContent() {
             element.classList.add('objet-actif');
             sacResonanceObjetActif = { id: objetId, type: typeObjet, element: element };
             
-            console.log('%cÔ£¿ Objet en r├®sonance:', 'color:#d4af37; font-weight:bold;', objetId);
+            console.log('%c✨ Objet en résonance:', 'color:#d4af37; font-weight:bold;', objetId);
             return true;
         }
         
@@ -4177,26 +4177,26 @@ function hideGameContent() {
     function desactiverResonanceObjet() {
         if (sacResonanceObjetActif && sacResonanceObjetActif.element) {
             sacResonanceObjetActif.element.classList.remove('objet-actif');
-            console.log('%cÔ£¿ R├®sonance d\'objet d├®sactiv├®e:', 'color:#888;', sacResonanceObjetActif.id);
+            console.log('%c✨ Résonance d\'objet désactivée:', 'color:#888;', sacResonanceObjetActif.id);
             sacResonanceObjetActif = null;
         }
     }
 
     function declencherResonanceMagique(objetId, typeObjet, intensite) {
-        // Fonction principale pour activer la r├®sonance compl├¿te
+        // Fonction principale pour activer la résonance complète
         intensite = intensite || 1;
         
         // Vibrer le bouton sacoche
         vibrerSac(intensite);
         
-        // Activer la r├®sonance de l'objet dans l'inventaire
+        // Activer la résonance de l'objet dans l'inventaire
         var objetTrouve = activerResonanceObjet(objetId, typeObjet);
         
         if (objetTrouve) {
             // Message dans le chat Oracle
-            addOracleChatMessage('Ô£¿ R├®sonance magique d├®tect├®e ! Un objet de votre inventaire r├®agit ├á la zone...');
+            addOracleChatMessage('✨ Résonance magique détectée ! Un objet de votre inventaire réagit à la zone...');
             
-            // Auto-d├®sactiver apr├¿s 5 secondes
+            // Auto-désactiver après 5 secondes
             setTimeout(function() {
                 arreterResonanceMagique();
             }, 5000);
@@ -4213,17 +4213,17 @@ function hideGameContent() {
     }
 
     function verifierResonanceZone(zoneId, objetRequis) {
-        // V├®rifier si le joueur poss├¿de l'objet requis
+        // Vérifier si le joueur possède l'objet requis
         var objetPresent = false;
         var typeObjet = 'quete';
         
-        // V├®rifier dans les objets de qu├¬te
+        // Vérifier dans les objets de quête
         var objet = sacObjetsQuete.find(function(obj) { return obj.id === objetRequis; });
         if (objet) {
             objetPresent = true;
             typeObjet = 'quete';
         } else {
-            // V├®rifier dans les cl├®s
+            // Vérifier dans les clés
             var index = sacInventaire.indexOf(objetRequis);
             if (index !== -1) {
                 objetPresent = true;
@@ -4232,38 +4232,38 @@ function hideGameContent() {
         }
         
         if (objetPresent) {
-            console.log('%c­ƒîƒ Zone ' + zoneId + ' : Objet requis d├®tect├® (' + objetRequis + ')', 'color:#d4af37; font-weight:bold;');
+            console.log('%c🔑 Zone ' + zoneId + ' : Objet requis détecté (' + objetRequis + ')', 'color:#d4af37; font-weight:bold;');
             declencherResonanceMagique(objetRequis, typeObjet, 2);
             return true;
         } else {
-            console.log('%c­ƒöÆ Zone ' + zoneId + ' : Objet requis manquant (' + objetRequis + ')', 'color:#888;');
+            console.log('%c🔒 Zone ' + zoneId + ' : Objet requis manquant (' + objetRequis + ')', 'color:#888;');
             return false;
         }
     }
 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // PAPYRUS ANCIEN - Syst├¿me de D├®roulement
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // ═══════════════════════════════════════════════════════
+    // PAPYRUS ANCIEN - Système de Déroulement
+    // ═══════════════════════════════════════════════════════
     
     var papyrusTextes = {
         'papyrus_ancien_1': {
             titre: 'Papyrus Ancien I - Le Fragment du Givre',
-            hieroglyphes: '­ôéÇ ­ôåú ­ôâ¡ ­ôàô',
-            texte: 'Sous la pierre froide, l├á o├╣ le givre se d├®pose en silence, repose le premier secret des Gardiens de l\'Ancien Temps. Celui qui lit ces mots a franchi le premier seuil.',
-            indice: '┬½ ðƒðÁÐÇð▓Ðïð╣ Ðêð░ð│ ðÀð░ð╝ðÁÐÇðÀ ð▓ Ðüð¢ðÁð│Ðâ ┬╗',
-            messageRusse: 'ðƒðÁÐÇð▓Ðïð╣ Ðêð░ð│ ðÀð░ð╝ðÁÐÇðÀ ð▓ Ðüð¢ðÁð│Ðâ'
+            hieroglyphes: '⏀ ⏃ ⏇ ⎈',
+            texte: 'Sous la pierre froide, là où le givre se dépose en silence, repose le premier secret des Gardiens de l\'Ancien Temps. Celui qui lit ces mots a franchi le premier seuil.',
+            indice: '« Premier fragment gelé dans la neige »',
+            messageRusse: 'Первый шаг замерз в снегу'
         },
         'papyrus_ancien_2': {
             titre: 'Papyrus Ancien II - Le Fragment des Ombres',
-            hieroglyphes: '­ôèû ­ôï┤ ­ôî¬ ­ôì»',
-            texte: 'Dans les profondeurs o├╣ l\'obscurit├® r├¿gne et o├╣ les miroirs refl├¿tent plus que la lumi├¿re, le deuxi├¿me fragment attend. Les ├®toiles du Sanctuaire tracent un chemin invisible aux yeux des mortels ordinaires. Seuls ceux qui ont allum├® les flammes sacr├®es pourront d├®chiffrer ce message ├®crit dans l\'encre du temps.',
-            indice: '┬½ Fragment II : ...SE CACHE... ┬╗'
+            hieroglyphes: '⏍ ⏎ ⏏ ⏐',
+            texte: 'Dans les profondeurs où l\'obscurité règne et où les miroirs reflètent plus que la lumière, le deuxième fragment attend. Les étoiles du Sanctuaire tracent un chemin invisible aux yeux des mortels ordinaires. Seuls ceux qui ont allumé les flammes sacrées pourront déchiffrer ce message écrit dans l\'encre du temps.',
+            indice: '« Fragment II : ...SE CACHE... »'
         },
         'papyrus_ancien_3': {
             titre: 'Papyrus Ancien III - Le Fragment de l\'Aurore',
-            hieroglyphes: '­ôÄí ­ôÅÅ ­ôÉì',
-            texte: 'Le dernier fragment repose ├á la crois├®e des mondes, l├á o├╣ le givre ├®ternel rencontre l\'or qui ne ternit jamais. Trois fragments r├®unis forment la Cl├® Supr├¬me. Le tr├®sor n\'est pas un objet mat├®riel, mais la Connaissance Pure des Anciens. Celui qui d├®voile ce secret devient Gardien ├á son tour, protecteur du Sanctuaire pour les g├®n├®rations futures.',
-            indice: '┬½ Fragment III : ...L├Ç O├Ö LE GIVRE RENCONTRE L\'OR ├ëTERNEL ┬╗'
+            hieroglyphes: '⏑ ⏒ ⏓ ⏔',
+            texte: 'Le dernier fragment repose à la croisée des mondes, là où le givre éternel rencontre l\'or qui ne ternit jamais. Trois fragments réunis forment la Clé Suprême. Le trésor n\'est pas un objet matériel, mais la Connaissance Pure des Anciens. Celui qui dévoile ce secret devient Gardien à son tour, protecteur du Sanctuaire pour les générations futures.',
+            indice: '« Fragment III : ...LÀ OÙ LE GIVRE RENCONTRE L\'OR ÉTERNEL »'
         }
     };
 
@@ -4274,19 +4274,19 @@ function hideGameContent() {
         var indice = document.getElementById('papyrus-indice');
         var hieroglyphes = document.querySelectorAll('.papyrus-hieroglyph');
         
-        // R├®cup├®rer les donn├®es du papyrus
+        // Récupérer les données du papyrus
         var data = papyrusTextes[papyrusId] || {
             titre: papyrusNom || 'Papyrus Ancien',
-            hieroglyphes: '­ôéÇ ­ôåú ­ôâ¡',
-            texte: 'Un texte ancien ├®crit dans une langue oubli├®e...',
-            indice: '┬½ Les secrets se r├®v├¿lent aux patients ┬╗'
+            hieroglyphes: '⏀ ⏃ ⏇',
+            texte: 'Un texte ancien écrit dans une langue oubliée...',
+            indice: '« Les secrets se révèlent aux patients »'
         };
         
         // Remplir le contenu
         if (titre) titre.textContent = data.titre;
         if (texte) texte.textContent = data.texte;
         
-        // Si un message russe est pr├®sent, l'afficher avec un style sp├®cial
+        // Si un message russe est présent, l'afficher avec un style spécial
         if (data.messageRusse && indice) {
             indice.innerHTML = '<div class="papyrus-text-russe">' + data.messageRusse + '</div>';
             indice.style.textAlign = 'center';
@@ -4299,12 +4299,12 @@ function hideGameContent() {
         // Afficher la modal avec animation
         modal.classList.add('active');
         
-        // Son de d├®roulement (optionnel)
+        // Son de déroulement (optionnel)
         if (navigator.vibrate) {
             navigator.vibrate([50, 30, 50, 30, 100]);
         }
         
-        // R├®initialiser l'animation
+        // Réinitialiser l'animation
         var scroll = modal.querySelector('.papyrus-scroll');
         if (scroll) {
             scroll.style.animation = 'none';
@@ -4312,8 +4312,8 @@ function hideGameContent() {
             scroll.style.animation = 'papyrus-unroll 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
         }
         
-        console.log('%c­ƒô£ Papyrus d├®roul├®:', 'color:#8b7355; font-weight:bold;', data.titre);
-        addOracleChatMessage('­ƒô£ Vous lisez le ' + data.titre + '...');
+        console.log('%c📜 Papyrus déroulé:', 'color:#8b7355; font-weight:bold;', data.titre);
+        addOracleChatMessage('📜 Vous lisez le ' + data.titre + '...');
     }
 
     function fermerPapyrus() {
@@ -4325,12 +4325,12 @@ function hideGameContent() {
             scroll.style.animation = 'papyrus-roll-up 0.6s cubic-bezier(0.6, -0.28, 0.74, 0.05) forwards';
         }
         
-        // Masquer la modal apr├¿s l'animation
+        // Masquer la modal après l'animation
         setTimeout(function() {
             modal.classList.remove('active');
         }, 600);
         
-        console.log('%c­ƒô£ Papyrus enroul├®', 'color:#888;');
+        console.log('%c📜 Papyrus enroulé', 'color:#888;');
     }
 
     function fermerPapyrusOverlay(event) {
@@ -4340,9 +4340,9 @@ function hideGameContent() {
         }
     }
 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // CONTR├öLES CLAVIER - Fermer l'inventaire avec ├ëchap
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // ═══════════════════════════════════════════════════════
+    // CONTRÔLES CLAVIER - Fermer l'inventaire avec Échap
+    // ═══════════════════════════════════════════════════════
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             if (sacIsOpen) {
@@ -4356,46 +4356,46 @@ function hideGameContent() {
         }
     });
 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // ═══════════════════════════════════════════════════════
     // FONCTIONS DE TEST - Console
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // ═══════════════════════════════════════════════════════
     // 
     // GUIDE DE TEST DANS LA CONSOLE :
     // 
-    // testQueteRune1()             - Test de la premi├¿re qu├¬te (Rune n┬░1) (NEW!)
-    // testSac()                    - Test complet du sac (cl├®s + objets + alerte surcharge)
-    // testObjetsQuete()            - Test des objets de qu├¬te uniquement
-    // testPapyrus()                - Test papyrus anciens avec d├®roulement
-    // testResonance()              - Test des effets de r├®sonance magique
-    // testZoneInteractive()        - Test de d├®tection de zone avec objet requis
-    // testInteractionSanctuaire()  - Test interaction inventaire Ôåö sanctuaire
-    // testRunesSysteme()           - Test syst├¿me des 12 runes
-    // testScenarioComplet()        - Sc├®nario complet de qu├¬te avec r├®sonances
+    // testQueteRune1()             - Test de la première quête (Rune n°1) (NEW!)
+    // testSac()                    - Test complet du sac (clés + objets + alerte surcharge)
+    // testObjetsQuete()            - Test des objets de quête uniquement
+    // testPapyrus()                - Test papyrus anciens avec déroulement
+    // testResonance()              - Test des effets de résonance magique
+    // testZoneInteractive()        - Test de détection de zone avec objet requis
+    // testInteractionSanctuaire()  - Test interaction inventaire ↔ sanctuaire
+    // testRunesSysteme()           - Test système des 12 runes
+    // testScenarioComplet()        - Scénario complet de quête avec résonances
     // 
     // FONCTIONS RAPIDES :
     // 
-    // resonner('cristal_1', 'quete', 2)  - D├®clencher r├®sonance rapide
-    // vibrerSac(3)                        - Vibrer le bouton (intensit├® 1-3)
+    // resonner('cristal_1', 'quete', 2)  - Déclencher résonance rapide
+    // vibrerSac(3)                        - Vibrer le bouton (intensité 1-3)
     // ouvrirSacInventaire()              - Ouvrir le drawer
     // fermerSacInventaire()              - Fermer le drawer
     // toggleSacInventaire()              - Ouvrir/fermer le drawer
     // 
     // FONCTIONS RUNES :
     // 
-    // fouillerZone(0)                    - Fouiller avec rune 1 (├®nigme)
+    // fouillerZone(0)                    - Fouiller avec rune 1 (énigme)
     // ouvrirPorte(4)                     - Tenter d'ouvrir porte 1
     // ouvrirAtelierPapyrus()             - Ouvrir l'atelier
     // ouvrirTaverne()                    - Ouvrir le chat
-    // afficherOeilOracle()               - Afficher m├®t├®o + jackpot
+    // afficherOeilOracle()               - Afficher météo + jackpot
     // 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // ═══════════════════════════════════════════════════════
     window.testSac = function() {
-        console.log('%c=== TEST DU SAC ├Ç DOS ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
+        console.log('%c=== TEST DU SAC À DOS ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
         viderSac();
         viderObjetsQuete();
         ouvrirSacInventaire();
         
-        // Test ajout de cl├®s
+        // Test ajout de clés
         for (var i = 1; i <= 12; i++) {
             setTimeout(function(num) {
                 return function() {
@@ -4404,27 +4404,27 @@ function hideGameContent() {
             }(i), i * 400);
         }
         
-        // Test ajout d'objets de qu├¬te
+        // Test ajout d'objets de quête
         setTimeout(function() {
-            ajouterObjetQuete('­ƒô£', 'Parchemin Ancien', 'parchemin_1');
+            ajouterObjetQuete('📜', 'Parchemin Ancien', 'parchemin_1');
         }, 5000);
         setTimeout(function() {
-            ajouterObjetQuete('­ƒÆÄ', 'Cristal de Givre', 'cristal_1');
+            ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
         }, 5500);
         setTimeout(function() {
-            ajouterObjetQuete('­ƒö«', 'Orbe Mystique', 'orbe_1');
+            ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
         }, 6000);
     };
 
     window.testObjetsQuete = function() {
-        console.log('%c=== TEST OBJETS DE QU├èTE ===', 'color:#49cafa; font-size:1.2em; font-weight:bold;');
+        console.log('%c=== TEST OBJETS DE QUÊTE ===', 'color:#49cafa; font-size:1.2em; font-weight:bold;');
         ouvrirSacInventaire();
-        ajouterObjetQuete('­ƒô£', 'Papyrus Ancien I', 'papyrus_ancien_1');
-        ajouterObjetQuete('­ƒô£', 'Papyrus Ancien II', 'papyrus_ancien_2');
-        ajouterObjetQuete('­ƒÆÄ', 'Cristal de Givre', 'cristal_1');
-        ajouterObjetQuete('­ƒö«', 'Orbe Mystique', 'orbe_1');
-        ajouterObjetQuete('ÔÜù´©Å', 'Fiole Magique', 'fiole_1');
-        ajouterObjetQuete('­ƒùí´©Å', 'Lame Enchant├®e', 'lame_1');
+        ajouterObjetQuete('📜', 'Papyrus Ancien I', 'papyrus_ancien_1');
+        ajouterObjetQuete('📜', 'Papyrus Ancien II', 'papyrus_ancien_2');
+        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
+        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
+        ajouterObjetQuete('🧪', 'Fiole Magique', 'fiole_1');
+        ajouterObjetQuete('⚔', 'Lame Enchantée', 'lame_1');
     };
 
     window.testPapyrus = function() {
@@ -4433,56 +4433,56 @@ function hideGameContent() {
         // Ajouter des papyrus de test
         viderSac();
         viderObjetsQuete();
-        ajouterObjetQuete('­ƒô£', 'Papyrus Ancien I', 'papyrus_ancien_1');
-        ajouterObjetQuete('­ƒô£', 'Papyrus Ancien II', 'papyrus_ancien_2');
-        ajouterObjetQuete('­ƒô£', 'Papyrus Ancien III', 'papyrus_ancien_3');
+        ajouterObjetQuete('📜', 'Papyrus Ancien I', 'papyrus_ancien_1');
+        ajouterObjetQuete('📜', 'Papyrus Ancien II', 'papyrus_ancien_2');
+        ajouterObjetQuete('📜', 'Papyrus Ancien III', 'papyrus_ancien_3');
         
         // Ouvrir l'inventaire
         ouvrirSacInventaire();
         
-        console.log('%c­ƒô£ 3 Papyrus ajout├®s ├á l\'inventaire', 'color:#8b7355;');
-        console.log('%c­ƒÆí Cliquez sur un papyrus dans l\'inventaire pour le d├®rouler !', 'color:#d4af37; font-weight:bold;');
-        console.log('%c   ÔåÆ Animation de d├®roulement 3D fluide', 'color:#888;');
-        console.log('%c   ÔåÆ Texte en encre ancienne avec hi├®roglyphes', 'color:#888;');
-        console.log('%c   ÔåÆ Vibration haptique au d├®roulement', 'color:#888;');
-        console.log('%c   ÔåÆ Fermer avec ├ëchap ou le bouton "ROULER"', 'color:#888;');
+        console.log('%c📜 3 Papyrus ajoutés à l\'inventaire', 'color:#8b7355;');
+        console.log('%c💡 Cliquez sur un papyrus dans l\'inventaire pour le dérouler !', 'color:#d4af37; font-weight:bold;');
+        console.log('%c   → Animation de déroulement 3D fluide', 'color:#888;');
+        console.log('%c   → Texte en encre ancienne avec hiéroglyphes', 'color:#888;');
+        console.log('%c   → Vibration haptique au déroulement', 'color:#888;');
+        console.log('%c   → Fermer avec Échap ou le bouton "ROULER"', 'color:#888;');
         
-        // Auto-ouvrir le premier papyrus apr├¿s 2 secondes
+        // Auto-ouvrir le premier papyrus après 2 secondes
         setTimeout(function() {
-            console.log('%c\n­ƒô£ Ouverture automatique du Papyrus I...', 'color:#8b7355; font-weight:bold;');
+            console.log('%c\n📜 Ouverture automatique du Papyrus I...', 'color:#8b7355; font-weight:bold;');
             ouvrirPapyrus('papyrus_ancien_1', 'Papyrus Ancien I');
         }, 2000);
     };
 
     window.testQueteRune1 = function() {
-        console.log('%c=== TEST QU├èTE RUNE N┬░1 ===', 'color:#00ff88; font-size:1.3em; font-weight:bold;');
+        console.log('%c=== TEST QUÊTE RUNE N°1 ===', 'color:#00ff88; font-size:1.3em; font-weight:bold;');
         
-        // R├®initialiser l'├®tat de la qu├¬te
+        // Réinitialiser l'état de la quête
         runesDecouvertes.rune1PremierClic = false;
         viderSac();
         viderObjetsQuete();
         
-        // Activer le clignotement de la Rune n┬░1
+        // Activer le clignotement de la Rune n°1
         initialiserQueteRune1();
         
-        console.log('%cÔ£¿ La Rune n┬░1 clignote doucement en dor├®', 'color:#d4af37;');
-        console.log('%c­ƒÆí Cliquez sur la premi├¿re rune (⏀) pour d├®couvrir le papyrus !', 'color:#49cafa; font-weight:bold;');
-        console.log('%c   ÔåÆ Vibration de 200ms sur mobile', 'color:#888;');
-        console.log('%c   ÔåÆ Animation de d├®roulement automatique', 'color:#888;');
-        console.log('%c   ÔåÆ Texte russe : "ðƒðÁÐÇð▓Ðïð╣ Ðêð░ð│ ðÀð░ð╝ðÁÐÇðÀ ð▓ Ðüð¢ðÁð│Ðâ"', 'color:#888;');
-        console.log('%c   ÔåÆ Papyrus ajout├® dans le sac automatiquement', 'color:#888;');
+        console.log('%c✨ La Rune n°1 clignote doucement en doré', 'color:#d4af37;');
+        console.log('%c💡 Cliquez sur la première rune (⏀) pour découvrir le papyrus !', 'color:#49cafa; font-weight:bold;');
+        console.log('%c   → Vibration de 200ms sur mobile', 'color:#888;');
+        console.log('%c   → Animation de déroulement automatique', 'color:#888;');
+        console.log('%c   → Texte russe : "Первый шаг замерз в снегу"', 'color:#888;');
+        console.log('%c   → Papyrus ajouté dans le sac automatiquement', 'color:#888;');
     };
 
     window.testResonance = function() {
-        console.log('%c=== TEST R├ëSONANCE MAGIQUE ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
+        console.log('%c=== TEST RÉSONANCE MAGIQUE ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
         
         // Ajouter des objets de test
         viderSac();
         viderObjetsQuete();
         ajouterCleDansSac(42);
-        ajouterObjetQuete('­ƒÆÄ', 'Cristal de Givre', 'cristal_1');
-        ajouterObjetQuete('­ƒö«', 'Orbe Mystique', 'orbe_1');
-        ajouterObjetQuete('­ƒô£', 'Parchemin Ancien', 'parchemin_1');
+        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_1');
+        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_1');
+        ajouterObjetQuete('📜', 'Parchemin Ancien', 'parchemin_1');
         
         // Ouvrir l'inventaire
         ouvrirSacInventaire();
@@ -4493,8 +4493,8 @@ function hideGameContent() {
             vibrerSac(1);
         }, 1000);
         
-        // Test 2 : R├®sonance d'un objet de qu├¬te
-        console.log('%cTest 2: R├®sonance objet de qu├¬te (Cristal)', 'color:#49cafa;');
+        // Test 2 : Résonance d'un objet de quête
+        console.log('%cTest 2: Résonance objet de quête (Cristal)', 'color:#49cafa;');
         setTimeout(function() {
             arreterVibrationSac();
             declencherResonanceMagique('cristal_1', 'quete', 2);
@@ -4507,52 +4507,52 @@ function hideGameContent() {
             declencherResonanceMagique('orbe_1', 'quete', 1);
         }, 8000);
         
-        // Test 4 : R├®sonance d'une cl├®
-        console.log('%cTest 4: R├®sonance cl├® num├®ro 42', 'color:#49cafa;');
+        // Test 4 : Résonance d'une clé
+        console.log('%cTest 4: Résonance clé numéro 42', 'color:#49cafa;');
         setTimeout(function() {
             arreterResonanceMagique();
             declencherResonanceMagique(42, 'cle', 3);
         }, 13000);
         
-        // Test 5 : Arr├¬t complet
+        // Test 5 : Arrêt complet
         setTimeout(function() {
             arreterResonanceMagique();
-            console.log('%cÔ£à Test de r├®sonance termin├®', 'color:#00ff88; font-weight:bold;');
+            console.log('%c✔ Test de résonance terminé', 'color:#00ff88; font-weight:bold;');
         }, 18000);
     };
 
     window.testZoneInteractive = function() {
         console.log('%c=== TEST ZONE INTERACTIVE ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
         
-        // Pr├®parer l'inventaire
+        // Préparer l'inventaire
         viderSac();
         viderObjetsQuete();
-        ajouterObjetQuete('­ƒö«', 'Orbe Mystique', 'orbe_mystique');
-        ajouterObjetQuete('­ƒÆÄ', 'Cristal de Givre', 'cristal_givre');
+        ajouterObjetQuete('🔮', 'Orbe Mystique', 'orbe_mystique');
+        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_givre');
         ajouterCleDansSac(7);
         
         ouvrirSacInventaire();
         
         // Simuler l'approche d'une zone qui requiert l'Orbe
-        console.log('%c­ƒÜ¬ Approche de la Porte du Myst├¿re...', 'color:#49cafa;');
+        console.log('%c🚪 Approche de la Porte du Mystère...', 'color:#49cafa;');
         setTimeout(function() {
             var result = verifierResonanceZone('porte_mystere', 'orbe_mystique');
             if (result) {
-                console.log('%cÔ£à La porte reconna├«t votre objet !', 'color:#00ff88;');
+                console.log('%c✔ La porte reconnaît votre objet !', 'color:#00ff88;');
             }
         }, 1500);
         
-        // Arr├¬t apr├¿s 6 secondes
+        // Arrêt après 6 secondes
         setTimeout(function() {
             arreterResonanceMagique();
-            console.log('%cÔ£à Test de zone termin├®', 'color:#00ff88; font-weight:bold;');
+            console.log('%c✔ Test de zone terminé', 'color:#00ff88; font-weight:bold;');
         }, 7500);
     };
 
     window.testRunesSysteme = function() {
-        console.log('%c=== TEST SYST├êME DES 12 RUNES ===', 'color:#d4af37; font-size:1.3em; font-weight:bold; text-shadow: 0 0 10px rgba(212,175,55,0.5);');
+        console.log('%c=== TEST SYSTÈME DES 12 RUNES ===', 'color:#d4af37; font-size:1.3em; font-weight:bold; text-shadow: 0 0 10px rgba(212,175,55,0.5);');
         
-        // Pr├®parer le terrain
+        // Préparer le terrain
         viderSac();
         viderObjetsQuete();
         runesDecouvertes = {
@@ -4562,184 +4562,184 @@ function hideGameContent() {
             portesOuvertes: []
         };
         
-        console.log('%c\n­ƒôû GUIDE DES RUNES :', 'color:#49cafa; font-size:1.1em; font-weight:bold;');
+        console.log('%c\n📖 GUIDE DES RUNES :', 'color:#49cafa; font-size:1.1em; font-weight:bold;');
         console.log('%c  Runes 1-4  : Les Chercheurs (fouillerZone)', 'color:#888;');
         console.log('%c  Runes 5-8  : Les Verrous (ouvrirPorte)', 'color:#888;');
         console.log('%c  Runes 9-10 : L\'Atelier (papyrus russes)', 'color:#888;');
         console.log('%c  Rune 11    : La Taverne (chat social)', 'color:#888;');
-        console.log('%c  Rune 12    : L\'┼Æil de l\'Oracle (m├®t├®o + jackpot)', 'color:#888;');
+        console.log('%c  Rune 12    : L\'Œil de l\'Oracle (météo + jackpot)', 'color:#888;');
         
-        console.log('%c\n­ƒÄ¼ SC├ëNARIO DE TEST :', 'color:#00ff88; font-weight:bold;');
+        console.log('%c\n📋 SCÉNARIO DE TEST :', 'color:#00ff88; font-weight:bold;');
         
-        // ├ëtape 1 : Cliquer sur la Rune 1 (├ënigme #1)
+        // Étape 1 : Cliquer sur la Rune 1 (Énigme #1)
         setTimeout(function() {
-            console.log('%c\n1´©ÅÔâú Clic sur Rune 1 (Premi├¿re fois) - ├ënigme #1', 'color:#d4af37; font-weight:bold;');
-            console.log('%c   ÔåÆ Devrait afficher le message mystique', 'color:#888;');
-            console.log('%c   ÔåÆ Devrait ajouter le premier papyrus', 'color:#888;');
-            console.log('%c   ÔåÆ Devrait vibrer le sac', 'color:#888;');
+            console.log('%c\n1. Clic sur Rune 1 (Première fois) - Énigme #1', 'color:#d4af37; font-weight:bold;');
+            console.log('%c   → Devrait afficher le message mystique', 'color:#888;');
+            console.log('%c   → Devrait ajouter le premier papyrus', 'color:#888;');
+            console.log('%c   → Devrait vibrer le sac', 'color:#888;');
         }, 500);
         
-        // ├ëtape 2 : Ajouter des cl├®s pour tester les portes
+        // Étape 2 : Ajouter des clés pour tester les portes
         setTimeout(function() {
-            console.log('%c\n2´©ÅÔâú Ajout de cl├®s dans le sac', 'color:#d4af37; font-weight:bold;');
+            console.log('%c\n2. Ajout de clés dans le sac', 'color:#d4af37; font-weight:bold;');
             ajouterCleDansSac(1);
             ajouterCleDansSac(2);
-            console.log('%c   ÔåÆ Cl├®s 1 et 2 ajout├®es', 'color:#00ff88;');
+            console.log('%c   → Clés 1 et 2 ajoutées', 'color:#00ff88;');
         }, 1500);
         
-        // ├ëtape 3 : Tester une porte (Rune 5 = Porte 1)
+        // Étape 3 : Tester une porte (Rune 5 = Porte 1)
         setTimeout(function() {
-            console.log('%c\n3´©ÅÔâú Vous pouvez maintenant tester :', 'color:#d4af37; font-weight:bold;');
-            console.log('%c   ÔÇó Rune 1 (0)  : ├ënigme + papyrus', 'color:#49cafa;');
-            console.log('%c   ÔÇó Rune 2-4    : Fouiller zones', 'color:#49cafa;');
-            console.log('%c   ÔÇó Rune 5 (4)  : Porte 1 (cl├® 1 requise)', 'color:#49cafa;');
-            console.log('%c   ÔÇó Rune 6 (5)  : Porte 2 (cl├® 2 requise)', 'color:#49cafa;');
-            console.log('%c   ÔÇó Rune 9-10   : Atelier papyrus', 'color:#49cafa;');
-            console.log('%c   ÔÇó Rune 11 (10): Taverne', 'color:#49cafa;');
-            console.log('%c   ÔÇó Rune 12 (11): ┼Æil Oracle', 'color:#49cafa;');
-            console.log('%c\n­ƒÆí Cliquez sur les runes pour tester leurs fonctions !', 'color:#00ff88; font-size:1.1em; font-weight:bold;');
+            console.log('%c\n3. Vous pouvez maintenant tester :', 'color:#d4af37; font-weight:bold;');
+            console.log('%c   • Rune 1 (0)  : Énigme + papyrus', 'color:#49cafa;');
+            console.log('%c   • Rune 2-4    : Fouiller zones', 'color:#49cafa;');
+            console.log('%c   • Rune 5 (4)  : Porte 1 (clé 1 requise)', 'color:#49cafa;');
+            console.log('%c   • Rune 6 (5)  : Porte 2 (clé 2 requise)', 'color:#49cafa;');
+            console.log('%c   • Rune 9-10   : Atelier papyrus', 'color:#49cafa;');
+            console.log('%c   • Rune 11 (10): Taverne', 'color:#49cafa;');
+            console.log('%c   • Rune 12 (11): Œil Oracle', 'color:#49cafa;');
+            console.log('%c\n💡 Cliquez sur les runes pour tester leurs fonctions !', 'color:#00ff88; font-size:1.1em; font-weight:bold;');
         }, 2500);
     };
 
     window.testInteractionSanctuaire = function() {
-        console.log('%c=== TEST INTERACTION INVENTAIRE Ôåö SANCTUAIRE ===', 'color:#d4af37; font-size:1.3em; font-weight:bold;');
+        console.log('%c=== TEST INTERACTION INVENTAIRE ↔ SANCTUAIRE ===', 'color:#d4af37; font-size:1.3em; font-weight:bold;');
         
-        // Pr├®parer l'inventaire avec quelques objets
+        // Préparer l'inventaire avec quelques objets
         viderSac();
         viderObjetsQuete();
         ajouterCleDansSac(1);
         ajouterCleDansSac(5);
         ajouterCleDansSac(7);
-        ajouterObjetQuete('­ƒÆÄ', 'Cristal', 'cristal_1');
-        ajouterObjetQuete('­ƒö«', 'Orbe', 'orbe_1');
+        ajouterObjetQuete('💎', 'Cristal', 'cristal_1');
+        ajouterObjetQuete('🔮', 'Orbe', 'orbe_1');
         
-        console.log('%c­ƒôª Ouverture de l\'inventaire...', 'color:#49cafa;');
-        console.log('%c   ÔåÆ Le sanctuaire va se d├®placer vers le haut et se r├®duire', 'color:#888;');
-        console.log('%c   ÔåÆ Les runes restent CLIQUABLES', 'color:#00ff88; font-weight:bold;');
+        console.log('%c👜 Ouverture de l\'inventaire...', 'color:#49cafa;');
+        console.log('%c   → Le sanctuaire va se déplacer vers le haut et se réduire', 'color:#888;');
+        console.log('%c   → Les runes restent CLIQUABLES', 'color:#00ff88; font-weight:bold;');
         ouvrirSacInventaire();
         
         setTimeout(function() {
-            console.log('%cÔ£¿ L\'inventaire est ouvert !', 'color:#d4af37;');
-            console.log('%c   ÔåÆ Essayez de cliquer sur les runes du sanctuaire', 'color:#49cafa;');
-            console.log('%c   ÔåÆ Vous pouvez voir le sanctuaire ├á travers le fond semi-transparent', 'color:#49cafa;');
+            console.log('%c✨ L\'inventaire est ouvert !', 'color:#d4af37;');
+            console.log('%c   → Essayez de cliquer sur les runes du sanctuaire', 'color:#49cafa;');
+            console.log('%c   → Vous pouvez voir le sanctuaire à travers le fond semi-transparent', 'color:#49cafa;');
         }, 600);
         
         setTimeout(function() {
-            console.log('%c­ƒôª Fermeture de l\'inventaire...', 'color:#888;');
-            console.log('%c   ÔåÆ Le sanctuaire reprend sa position centrale', 'color:#888;');
+            console.log('%c👜 Fermeture de l\'inventaire...', 'color:#888;');
+            console.log('%c   → Le sanctuaire reprend sa position centrale', 'color:#888;');
             fermerSacInventaire();
         }, 4000);
         
         setTimeout(function() {
-            console.log('%cÔ£à Test termin├® - Interaction fluide confirm├®e !', 'color:#00ff88; font-size:1.1em; font-weight:bold;');
-            console.log('%c­ƒÆí Astuce : Appuyez sur ├ëchap pour fermer l\'inventaire rapidement', 'color:#d4af37;');
+            console.log('%c✔ Test terminé - Interaction fluide confirmée !', 'color:#00ff88; font-size:1.1em; font-weight:bold;');
+            console.log('%c💡 Astuce : Appuyez sur Échap pour fermer l\'inventaire rapidement', 'color:#d4af37;');
         }, 4700);
     };
 
     window.testScenarioComplet = function() {
-        console.log('%c=== SC├ëNARIO COMPLET : QU├èTE DU SANCTUAIRE ===', 'color:#d4af37; font-size:1.3em; font-weight:bold; text-shadow: 0 0 10px rgba(212,175,55,0.5);');
+        console.log('%c=== SCÉNARIO COMPLET : QUÊTE DU SANCTUAIRE ===', 'color:#d4af37; font-size:1.3em; font-weight:bold; text-shadow: 0 0 10px rgba(212,175,55,0.5);');
         
-        // Pr├®parer l'inventaire
+        // Préparer l'inventaire
         viderSac();
         viderObjetsQuete();
         
-        // ├ëtape 1 : Le joueur re├ºoit des objets
-        console.log('%c­ƒôª ├ëtape 1/5 : Collecte d\'objets...', 'color:#49cafa; font-weight:bold;');
+        // Étape 1 : Le joueur reçoit des objets
+        console.log('%c👜 Étape 1/5 : Collecte d\'objets...', 'color:#49cafa; font-weight:bold;');
         ajouterCleDansSac(1);
         ajouterCleDansSac(5);
-        ajouterObjetQuete('­ƒùØ´©Å', 'Cl├® Antique', 'cle_antique');
-        ajouterObjetQuete('­ƒÆÄ', 'Cristal de Givre', 'cristal_givre');
-        ajouterObjetQuete('­ƒö«', 'Orbe de Vision', 'orbe_vision');
+        ajouterObjetQuete('🔑', 'Clé Antique', 'cle_antique');
+        ajouterObjetQuete('💎', 'Cristal de Givre', 'cristal_givre');
+        ajouterObjetQuete('🔮', 'Orbe de Vision', 'orbe_vision');
         
         // Ouvrir l'inventaire
         setTimeout(function() {
             ouvrirSacInventaire();
         }, 500);
         
-        // ├ëtape 2 : Approche d'une premi├¿re porte (n├®cessite cristal)
+        // Étape 2 : Approche d'une première porte (nécessite cristal)
         setTimeout(function() {
-            console.log('%cÔØä´©Å ├ëtape 2/5 : Approche de la Porte de Glace...', 'color:#49cafa; font-weight:bold;');
+            console.log('%c✦ Étape 2/5 : Approche de la Porte de Glace...', 'color:#49cafa; font-weight:bold;');
             enregistrerZoneResonance('porte_glace', 'cristal_givre', function() {
-                console.log('%c­ƒÄë La Porte de Glace s\'ouvre !', 'color:#00ff88;');
+                console.log('%c🎉 La Porte de Glace s\'ouvre !', 'color:#00ff88;');
                 retirerObjetQuete('cristal_givre');
             });
             declencherZoneResonance('porte_glace');
         }, 3000);
         
-        // ├ëtape 3 : Le cristal dispara├«t, r├®sonance s'arr├¬te
+        // Étape 3 : Le cristal disparaît, résonance s'arrête
         setTimeout(function() {
             arreterResonanceMagique();
-            console.log('%cÔ£¿ Le Cristal de Givre se dissout dans un ├®clat de lumi├¿re...', 'color:#888; font-style:italic;');
+            console.log('%c✨ Le Cristal de Givre se dissout dans un éclat de lumière...', 'color:#888; font-style:italic;');
         }, 8000);
         
-        // ├ëtape 4 : Nouvelle zone n├®cessitant l'Orbe
+        // Étape 4 : Nouvelle zone nécessitant l'Orbe
         setTimeout(function() {
-            console.log('%c­ƒö« ├ëtape 3/5 : Salle des Miroirs...', 'color:#49cafa; font-weight:bold;');
+            console.log('%c🔮 Étape 3/5 : Salle des Miroirs...', 'color:#49cafa; font-weight:bold;');
             enregistrerZoneResonance('salle_miroirs', 'orbe_vision', function() {
-                console.log('%c­ƒæü´©Å L\'Orbe r├®v├¿le le chemin cach├® !', 'color:#00ff88;');
+                console.log('%c👁 L\'Orbe révèle le chemin caché !', 'color:#00ff88;');
             });
             declencherZoneResonance('salle_miroirs');
         }, 10000);
         
-        // ├ëtape 5 : Arr├¬t et nouvelle cl├® d├®couverte
+        // Étape 5 : Arrêt et nouvelle clé découverte
         setTimeout(function() {
             arreterResonanceMagique();
-            console.log('%c­ƒùØ´©Å ├ëtape 4/5 : Une nouvelle cl├® appara├«t !', 'color:#49cafa; font-weight:bold;');
+            console.log('%c🔑 Étape 4/5 : Une nouvelle clé apparaît !', 'color:#49cafa; font-weight:bold;');
             ajouterCleDansSac(13);
         }, 15000);
         
-        // ├ëtape 6 : Porte finale n├®cessitant cl├® 13
+        // Étape 6 : Porte finale nécessitant clé 13
         setTimeout(function() {
-            console.log('%c­ƒÜ¬ ├ëtape 5/5 : Porte du Sanctuaire Final...', 'color:#d4af37; font-weight:bold;');
-            verifierResonanceRune(12); // Rune 12 n├®cessite cl├® 13
-            console.log('%cÔ£¿ La cl├® 13 vibre intens├®ment !', 'color:#d4af37;');
+            console.log('%c🚪 Étape 5/5 : Porte du Sanctuaire Final...', 'color:#d4af37; font-weight:bold;');
+            verifierResonanceRune(12); // Rune 12 nécessite clé 13
+            console.log('%c✨ La clé 13 vibre intensément !', 'color:#d4af37;');
         }, 17000);
         
-        // Fin du sc├®nario
+        // Fin du scénario
         setTimeout(function() {
             arreterResonanceMagique();
             fermerSacInventaire();
-            console.log('%c­ƒÄè QU├èTE TERMIN├ëE ! Le Sanctuaire s\'ouvre devant vous...', 'color:#00ff88; font-size:1.2em; font-weight:bold; text-shadow: 0 0 20px rgba(0,255,136,0.8);');
+            console.log('%c🎊 QUÊTE TERMINÉE ! Le Sanctuaire s\'ouvre devant vous...', 'color:#00ff88; font-size:1.2em; font-weight:bold; text-shadow: 0 0 20px rgba(0,255,136,0.8);');
         }, 22000);
     };
 
 
-    // Fonction utilitaire : D├®clencher r├®sonance simple (pour int├®gration facile)
+    // Fonction utilitaire : Déclencher résonance simple (pour intégration facile)
     window.resonner = function(objetId, type, intensite) {
         type = type || 'quete';
         intensite = intensite || 1;
         declencherResonanceMagique(objetId, type, intensite);
     };
 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // INT├ëGRATION ZONES INTERACTIVES - D├®tection de proximit├®
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // ═══════════════════════════════════════════════════════
+    // INTÉGRATION ZONES INTERACTIVES - Détection de proximité
+    // ═══════════════════════════════════════════════════════
     
-    // Exemple d'int├®gration avec les runes du Sanctuaire
+    // Exemple d'intégration avec les runes du Sanctuaire
     function verifierResonanceRune(runeId) {
-        // V├®rifier si une cl├® sp├®ciale peut d├®bloquer cette rune
-        var cleSpeciale = runeId + 1; // Exemple : rune 0 n├®cessite cl├® 1
+        // Vérifier si une clé spéciale peut débloquer cette rune
+        var cleSpeciale = runeId + 1; // Exemple : rune 0 nécessite clé 1
         
         if (sacInventaire.indexOf(cleSpeciale) !== -1) {
-            console.log('%c­ƒîƒ Rune ' + runeId + ' : Cl├® sp├®ciale d├®tect├®e !', 'color:#d4af37;');
+            console.log('%c🔑 Rune ' + runeId + ' : Clé spéciale détectée !', 'color:#d4af37;');
             declencherResonanceMagique(cleSpeciale, 'cle', 1);
             return true;
         }
         return false;
     }
 
-    // Exemple d'int├®gration avec les portes des 100 niveaux
+    // Exemple d'intégration avec les portes des 100 niveaux
     function verifierResonancePorte(doorIndex) {
-        // V├®rifier si un objet de qu├¬te peut aider ├á identifier la bonne porte
+        // Vérifier si un objet de quête peut aider à identifier la bonne porte
         var objetsUtiles = ['orbe_vision', 'cristal_clarte', 'parchemin_sagesse'];
         
         for (var i = 0; i < objetsUtiles.length; i++) {
             var objet = sacObjetsQuete.find(function(obj) { return obj.id === objetsUtiles[i]; });
             if (objet) {
-                console.log('%c­ƒö« Porte ' + doorIndex + ' : Objet de guidance d├®tect├® !', 'color:#49cafa;');
+                console.log('%c🔮 Porte ' + doorIndex + ' : Objet de guidance détecté !', 'color:#49cafa;');
                 declencherResonanceMagique(objet.id, 'quete', 2);
                 
-                // R├®v├®ler la destination de la porte
+                // Révéler la destination de la porte
                 if (typeof revealDoorWithScroll === 'function') {
                     revealDoorWithScroll(doorIndex);
                 }
@@ -4749,7 +4749,7 @@ function hideGameContent() {
         return false;
     }
 
-    // Hook global : Surveiller les ├®v├®nements de proximit├®
+    // Hook global : Surveiller les événements de proximité
     var resonanceZonesActives = {};
     
     function enregistrerZoneResonance(zoneId, objetRequis, callback) {
@@ -4757,13 +4757,13 @@ function hideGameContent() {
             objetRequis: objetRequis,
             callback: callback || function() {}
         };
-        console.log('%c­ƒôì Zone de r├®sonance enregistr├®e:', 'color:#d4af37;', zoneId);
+        console.log('%c📍 Zone de résonance enregistrée:', 'color:#d4af37;', zoneId);
     }
 
     function declencherZoneResonance(zoneId) {
         var zone = resonanceZonesActives[zoneId];
         if (!zone) {
-            console.warn('Zone de r├®sonance inconnue:', zoneId);
+            console.warn('Zone de résonance inconnue:', zoneId);
             return false;
         }
         
@@ -4775,14 +4775,14 @@ function hideGameContent() {
     }
 
     // Exemple d'utilisation avec les runes :
-    // Ajoutez ceci dans onRuneClick pour activer la r├®sonance au survol
+    // Ajoutez ceci dans onRuneClick pour activer la résonance au survol
     /*
     function onRuneClick(runeId) {
         // Code existant...
         
-        // Ajouter d├®tection de r├®sonance
+        // Ajouter détection de résonance
         if (verifierResonanceRune(runeId)) {
-            addOracleChatMessage('Ô£¿ Votre cl├® vibre en pr├®sence de cette rune !');
+            addOracleChatMessage('✨ Votre clé vibre en présence de cette rune !');
         }
         
         // Reste du code...
