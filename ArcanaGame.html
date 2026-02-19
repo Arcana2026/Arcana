@@ -300,8 +300,8 @@
             text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
             transform: translateY(-1px);
         }
-        /* Masquer le bouton flottant bleu w3m - seul CONNECT WALLET du header reste */
-        w3m-button {
+        /* Masquer le bouton bleu flottant w3m au centre - seul le bouton doré du header reste */
+        w3m-button, #arcana-connect-gate button, #arcana-connect-gate w3m-button {
             display: none !important;
             visibility: hidden !important;
             pointer-events: none !important;
@@ -2157,6 +2157,11 @@
             border: none !important;
             box-shadow: none !important;
         }
+        /* Bordures unifiées 0.5px pour tous les panneaux */
+        .glass-panel:not(.glitch):not(#level-3-sanctuary), #class-selection, #level-2-panel, #arcane-level-panel, #arcane-altar-panel,
+        .oracle-network-alert, .papyrus-scroll, #grimoire-panel, .header-title-plate, .header-btn-pill {
+            border: 0.5px solid var(--glass-border) !important;
+        }
     </style>
     <!-- Google Fonts for digital effect -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -2400,14 +2405,14 @@
         <div class="papyrus-scroll" onclick="event.stopPropagation()">
             <div class="papyrus-content papyrus-scroll-bar">
                 <div class="papyrus-title" id="papyrus-titre">Papyrus Ancien</div>
-                <div class="papyrus-hieroglyph">𓁹 𓂀 𓀡 𓀀</div>
+                <div class="papyrus-hieroglyph">⏀ ⏃ ⏇ ⎈</div>
                 <div class="papyrus-text" id="papyrus-texte">
                     Sous la pierre froide, là où le givre se dépose en silence,
                     un secret millénaire attend celui qui sait regarder au-delà des apparences.
                     Les anciens Gardiens ont scellé ici un fragment de la Grande Connaissance,
                     écrit dans une langue que seul le cœur pur peut déchiffrer.
                 </div>
-                <div class="papyrus-hieroglyph">☥ ☽ ☆</div>
+                <div class="papyrus-hieroglyph">⏍ ⏎ ⏏</div>
                 <div class="papyrus-text" id="papyrus-indice" style="text-align: center; font-weight: bold; font-size: 1.1em; text-indent: 0; color: #8b4513;">
                     « Le trésor se cache là où le givre rencontre l'or »
                 </div>
