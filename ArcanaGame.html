@@ -227,7 +227,7 @@
             justify-content: center;
             padding: 10px 32px;
             background: rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(212, 175, 55, 0.5);
+            border: 0.5px solid rgba(212, 175, 55, 0.5);
             border-radius: 18px;
             box-shadow: 
                 0 0 35px rgba(0, 0, 0, 0.8),
@@ -278,7 +278,7 @@
             font-family: 'Cinzel', serif;
             background: transparent;
             color: rgba(212, 175, 55, 0.85);
-            border: 1px solid rgba(212, 175, 55, 0.5);
+            border: 0.5px solid rgba(212, 175, 55, 0.5);
             padding: 7px 18px;
             border-radius: 50px;
             font-size: 0.7em;
@@ -300,11 +300,10 @@
             text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
             transform: translateY(-1px);
         }
-        /* Masquer les boutons w3m sauf dans la gate et le wrapper */
+        /* Masquer les boutons w3m sauf dans le header - pas de chevauchement avec le titre */
         w3m-button {
             display: none !important;
         }
-        #gate-connect-wrap w3m-button,
         .wallet-button-wrap w3m-button {
             display: block !important;
         }
@@ -312,12 +311,9 @@
             transform: scale(0.8);
             transform-origin: center;
         }
+        /* Gate-connect-wrap masqué : seul le bouton CONNECT WALLET du header (droite) reste visible */
         #gate-connect-wrap {
-            position: fixed !important;
-            top: 10px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            z-index: 100000 !important;
+            display: none !important;
         }
         /* Responsive Header */
         @media (max-width: 1024px) {
@@ -947,10 +943,10 @@
         .arcana-mention {
             display: none;
         }
-        /* ├ëcran d'attente : compl├¿tement transparent, pas de bo├«te */
+        /* ├ëcran d'attente : transparent, ne couvre pas le header (CONNECT WALLET reste cliquable) */
         #arcana-connect-gate {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 72px; left: 0; right: 0; bottom: 0;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
@@ -959,12 +955,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 99999;
+            z-index: 99;
             pointer-events: auto;
             transition: opacity 0.5s ease;
             overflow: hidden;
         }
-        #arcana-connect-gate.hidden { display: none; }
+        #arcana-connect-gate.hidden { display: none !important; pointer-events: none !important; visibility: hidden !important; }
         #arcana-connect-gate:not(.hidden) { display: flex !important; }
         body:has(#arcana-connect-gate:not(.hidden)) { overflow: hidden; height: 100vh; }
         #arcana-connect-gate .gate-message {
@@ -2188,22 +2184,22 @@
     <div id="level-3-sanctuary" class="glass-panel" data-room="2">
         <!-- ÔòÉÔòÉÔòÉ COLONNE GAUCHE - RUNES 1-6 ÔòÉÔòÉÔòÉ -->
         <div class="runes-column left" role="region" aria-label="Runes gauches">
-            <button class="rune-btn" data-index="0" data-symbol="ÔÅÇ" onclick="onRuneClick(0)" aria-label="Rune 1" title="­ƒöì Rune 1 : Le Chercheur">ÔÅÇ</button>
-            <button class="rune-btn" data-index="1" data-symbol="ÔÅâ" onclick="onRuneClick(1)" aria-label="Rune 2" title="­ƒöì Rune 2 : Le Chercheur">ÔÅâ</button>
-            <button class="rune-btn" data-index="2" data-symbol="ÔÅç" onclick="onRuneClick(2)" aria-label="Rune 3" title="­ƒöì Rune 3 : Le Chercheur">ÔÅç</button>
-            <button class="rune-btn" data-index="3" data-symbol="ÔÄê" onclick="onRuneClick(3)" aria-label="Rune 4" title="­ƒöì Rune 4 : Le Chercheur">ÔÄê</button>
-            <button class="rune-btn" data-index="4" data-symbol="ÔÄö" onclick="onRuneClick(4)" aria-label="Rune 5" title="­ƒÜ¬ Rune 5 : Le Verrou">ÔÄö</button>
-            <button class="rune-btn" data-index="5" data-symbol="Ôî¼" onclick="onRuneClick(5)" aria-label="Rune 6" title="­ƒÜ¬ Rune 6 : Le Verrou">Ôî¼</button>
+            <button class="rune-btn" data-index="0" data-symbol="⏀" onclick="onRuneClick(0)" aria-label="Rune 1" title="­ƒöì Rune 1 : Le Chercheur">⏀</button>
+            <button class="rune-btn" data-index="1" data-symbol="⏃" onclick="onRuneClick(1)" aria-label="Rune 2" title="­ƒöì Rune 2 : Le Chercheur">⏃</button>
+            <button class="rune-btn" data-index="2" data-symbol="⏇" onclick="onRuneClick(2)" aria-label="Rune 3" title="­ƒöì Rune 3 : Le Chercheur">⏇</button>
+            <button class="rune-btn" data-index="3" data-symbol="⎈" onclick="onRuneClick(3)" aria-label="Rune 4" title="­ƒöì Rune 4 : Le Chercheur">⎈</button>
+            <button class="rune-btn" data-index="4" data-symbol="⏍" onclick="onRuneClick(4)" aria-label="Rune 5" title="­ƒÜ¬ Rune 5 : Le Verrou">⏍</button>
+            <button class="rune-btn" data-index="5" data-symbol="⏎" onclick="onRuneClick(5)" aria-label="Rune 6" title="­ƒÜ¬ Rune 6 : Le Verrou">⏎</button>
         </div>
 
         <!-- ÔòÉÔòÉÔòÉ COLONNE DROITE - RUNES 7-12 ÔòÉÔòÉÔòÉ -->
         <div class="runes-column right" role="region" aria-label="Runes droites">
-            <button class="rune-btn" data-index="6" data-symbol="ÔÅì" onclick="onRuneClick(6)" aria-label="Rune 7" title="­ƒÜ¬ Rune 7 : Le Verrou">ÔÅì</button>
-            <button class="rune-btn" data-index="7" data-symbol="ÔÅª" onclick="onRuneClick(7)" aria-label="Rune 8" title="­ƒÜ¬ Rune 8 : Le Verrou">ÔÅª</button>
-            <button class="rune-btn" data-index="8" data-symbol="Ôºû" onclick="onRuneClick(8)" aria-label="Rune 9" title="­ƒô£ Rune 9 : L'Atelier">Ôºû</button>
-            <button class="rune-btn" data-index="9" data-symbol="Ôºë" onclick="onRuneClick(9)" aria-label="Rune 10" title="­ƒô£ Rune 10 : L'Atelier">Ôºë</button>
-            <button class="rune-btn" data-index="10" data-symbol="Ô¿ç" onclick="onRuneClick(10)" aria-label="Rune 11" title="­ƒì║ Rune 11 : La Taverne">Ô¿ç</button>
-            <button class="rune-btn" data-index="11" data-symbol="Ô®ô" onclick="onRuneClick(11)" aria-label="Rune 12" title="­ƒæü´©Å Rune 12 : L'Oracle">Ô®ô</button>
+            <button class="rune-btn" data-index="6" data-symbol="⏏" onclick="onRuneClick(6)" aria-label="Rune 7" title="­ƒÜ¬ Rune 7 : Le Verrou">⏏</button>
+            <button class="rune-btn" data-index="7" data-symbol="⏐" onclick="onRuneClick(7)" aria-label="Rune 8" title="­ƒÜ¬ Rune 8 : Le Verrou">⏐</button>
+            <button class="rune-btn" data-index="8" data-symbol="⏑" onclick="onRuneClick(8)" aria-label="Rune 9" title="­ƒô£ Rune 9 : L'Atelier">⏑</button>
+            <button class="rune-btn" data-index="9" data-symbol="⏒" onclick="onRuneClick(9)" aria-label="Rune 10" title="­ƒô£ Rune 10 : L'Atelier">⏒</button>
+            <button class="rune-btn" data-index="10" data-symbol="⏓" onclick="onRuneClick(10)" aria-label="Rune 11" title="­ƒì║ Rune 11 : La Taverne">⏓</button>
+            <button class="rune-btn" data-index="11" data-symbol="⏔" onclick="onRuneClick(11)" aria-label="Rune 12" title="­ƒæü´©Å Rune 12 : L'Oracle">⏔</button>
         </div>
     </div>
     <!-- ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ -->
@@ -3488,11 +3484,11 @@
                 console.log('%cÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù', 'color:#d4af37; font-weight:bold;');
                 console.log('%cÔòæ      ­ƒîƒ QU├èTE ACTIVE : LE PREMIER FRAGMENT       Ôòæ', 'color:#d4af37; font-weight:bold; font-size:1.1em;');
                 console.log('%cÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ', 'color:#d4af37; font-weight:bold;');
-                console.log('%c\nÔ£¿ La Rune n┬░1 (ÔÅÇ) clignote doucement en dor├®...', 'color:#d4af37; font-weight:bold;');
+                console.log('%c\nÔ£¿ La Rune n┬░1 (⏀) clignote doucement en dor├®...', 'color:#d4af37; font-weight:bold;');
                 console.log('%c­ƒÆí Cliquez sur cette rune pour d├®couvrir le premier secret !', 'color:#49cafa; font-size:1.05em;');
                 console.log('%c\n­ƒöì Indices :', 'color:#888; font-weight:bold;');
                 console.log('%c   ÔåÆ La rune se trouve dans la colonne de gauche', 'color:#888;');
-                console.log('%c   ÔåÆ Symbole : ÔÅÇ (premi├¿re rune en haut)', 'color:#888;');
+                console.log('%c   ÔåÆ Symbole : ⏀ (premi├¿re rune en haut)', 'color:#888;');
                 console.log('%c   ÔåÆ Un papyrus ancien vous attend...', 'color:#888;');
                 console.log('%c\n­ƒÄü R├®compense : Papyrus Ancien avec texte russe mystique', 'color:#00ff88;');
                 console.log(' ');
@@ -5223,7 +5219,7 @@
         initialiserQueteRune1();
         
         console.log('%cÔ£¿ La Rune n┬░1 clignote doucement en dor├®', 'color:#d4af37;');
-        console.log('%c­ƒÆí Cliquez sur la premi├¿re rune (ÔÅÇ) pour d├®couvrir le papyrus !', 'color:#49cafa; font-weight:bold;');
+        console.log('%c­ƒÆí Cliquez sur la premi├¿re rune (⏀) pour d├®couvrir le papyrus !', 'color:#49cafa; font-weight:bold;');
         console.log('%c   ÔåÆ Vibration de 200ms sur mobile', 'color:#888;');
         console.log('%c   ÔåÆ Animation de d├®roulement automatique', 'color:#888;');
         console.log('%c   ÔåÆ Texte russe : "ðƒðÁÐÇð▓Ðïð╣ Ðêð░ð│ ðÀð░ð╝ðÁÐÇðÀ ð▓ Ðüð¢ðÁð│Ðâ"', 'color:#888;');
