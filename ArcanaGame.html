@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <!--
 ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
@@ -117,7 +117,7 @@
             background: rgba(15, 12, 8, 0.88);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            border: 2px solid rgba(212, 175, 55, 0.5);
+            border: 0.5px solid rgba(212, 175, 55, 0.5);
             border-radius: 18px;
             box-shadow: 
                 0 0 60px rgba(0, 0, 0, 0.9),
@@ -311,10 +311,7 @@
             transform: scale(0.8);
             transform-origin: center;
         }
-        /* Gate-connect-wrap masqué : seul le bouton CONNECT WALLET du header (droite) reste visible */
-        #gate-connect-wrap {
-            display: none !important;
-        }
+        /* gate-connect-wrap supprimé : seul le bouton CONNECT WALLET du header (droite) reste visible */
         /* Responsive Header */
         @media (max-width: 1024px) {
             header {
@@ -440,7 +437,7 @@
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            border: 2px solid var(--gold);
+            border: 0.5px solid var(--gold);
             margin: 20px auto;
             display: flex;
             justify-content: center;
@@ -515,7 +512,7 @@
             font-family: 'Cinzel', serif;
             width: 100%;
             background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(212, 175, 55, 0.5);
+            border: 0.5px solid rgba(212, 175, 55, 0.5);
             color: var(--gold);
             padding: 12px;
             border-radius: 10px;
@@ -537,7 +534,7 @@
         .class-card {
             cursor: pointer;
             padding: 15px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 0.5px solid rgba(212, 175, 55, 0.2);
             border-radius: 15px;
             transition: 0.3s;
             width: 80px;
@@ -977,11 +974,6 @@
             border: none !important;
             box-shadow: none !important;
         }
-        #arcana-connect-gate .gate-connect-wrap {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
         /* Ancien bouton retour - D├®sormais int├®gr├® dans le header */
         .btn-back-accueil {
             display: none;
@@ -1010,7 +1002,7 @@
             position: fixed; top: 12px; right: 12px; z-index: 600;
             font-size: 0.7rem; font-family: 'Cinzel', serif; color: var(--gold);
             background: rgba(0,0,0,0.6); padding: 7px 14px; border-radius: 8px;
-            border: 1px solid rgba(212, 175, 55, 0.4); letter-spacing: 0.08em;
+            border: 0.5px solid rgba(212, 175, 55, 0.4); letter-spacing: 0.08em;
             font-weight: 400;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -1055,7 +1047,7 @@
             background: rgba(20, 15, 10, 0.95);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 2px solid rgba(212, 175, 55, 0.6);
+            border: 0.5px solid rgba(212, 175, 55, 0.6);
             border-radius: 16px; padding: 28px; max-width: 380px; text-align: center;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 80px rgba(212, 175, 55, 0.2);
         }
@@ -1069,10 +1061,8 @@
         .oracle-network-alert .btn-connect { margin-top: 12px; }
         /* Transition connexion : fade-out message / fade-in Sanctuaire */
         #arcana-connect-gate.fade-out { opacity: 0; pointer-events: none; }
-        #arcana-connect-gate.fade-out .gate-message,
-        #arcana-connect-gate.fade-out .gate-connect-wrap { opacity: 0; transform: scale(0.95); }
-        #arcana-connect-gate .gate-message,
-        #arcana-connect-gate .gate-connect-wrap { transition: opacity 0.6s ease, transform 0.6s ease; }
+        #arcana-connect-gate.fade-out .gate-message { opacity: 0; transform: scale(0.95); }
+        #arcana-connect-gate .gate-message { transition: opacity 0.6s ease, transform 0.6s ease; }
         @media (max-width: 480px) {
             #arcana-connect-gate .gate-message { font-size: 0.95em; }
         }
@@ -1144,7 +1134,7 @@
             font-family: 'Cinzel', serif;
             min-width: 100px; padding: 16px 24px; margin: 8px;
             font-size: 0.9em; cursor: pointer; border-radius: 12px;
-            border: 2px solid rgba(212, 175, 55, 0.3);
+            border: 0.5px solid rgba(212, 175, 55, 0.3);
             background: rgba(0,0,0,0.6); color: var(--gold);
             transition: all 0.3s;
             font-weight: 400;
@@ -1198,7 +1188,7 @@
             display: none; /* Cach├® par d├®faut pour ├®puration */
             width: 56px; height: 56px; border-radius: 12px;
             background: linear-gradient(145deg, #2a2520, #1a1612);
-            border: 2px solid rgba(212,175,55,0.6);
+            border: 0.5px solid rgba(212,175,55,0.6);
             box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,175,55,0.2);
             cursor: pointer; font-size: 1.8em; display: flex; align-items: center; justify-content: center;
             transition: transform 0.3s, box-shadow 0.3s;
@@ -1816,13 +1806,13 @@
             padding: 10px;
             background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 0.5px solid rgba(212, 175, 55, 0.2);
         }
         .sac-slot {
             aspect-ratio: 1;
             min-height: 60px;
             background: rgba(0, 0, 0, 0.6);
-            border: 2px solid rgba(212, 175, 55, 0.4);
+            border: 0.5px solid rgba(212, 175, 55, 0.4);
             border-radius: 8px;
             display: flex;
             flex-direction: column;
@@ -1881,7 +1871,7 @@
             padding: 10px;
             background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 0.5px solid rgba(212, 175, 55, 0.2);
             min-height: 100px;
         }
         .objet-quete {
@@ -2230,11 +2220,6 @@
     <div id="frost-particles" aria-hidden="true"></div>
     <div id="arcana-connect-gate">
         <p class="gate-message">Le Sanctuaire attend.<br>Connectez votre wallet pour entrer.</p>
-        <div id="gate-connect-wrap" class="gate-connect-wrap" style="display:flex; justify-content:center;">
-            <div class="wallet-button-wrap" style="position:relative; z-index:99999 !important; pointer-events:auto !important;">
-                <w3m-button></w3m-button>
-            </div>
-        </div>
     </div>
     <div id="arcane-dark-fog" style="opacity:0; pointer-events:none;"></div>
     <div id="arcane-darkness-overlay" style="opacity:0;"></div>
@@ -2483,7 +2468,7 @@
             </div>
         </div>
     </div>
-</body>
+
 <script type="module">
     (async function() {
       let wagmiConfig = null
@@ -2733,9 +2718,7 @@
           if (arcaneLitRooms[1]) btnSeal.classList.remove('locked'); else btnSeal.classList.add('locked');
       }
   }
-</script>
 
-}
 document.addEventListener('mousemove', function(e) {
     var overlay = document.getElementById('arcane-darkness-overlay');
     if (!overlay) return;
@@ -3249,13 +3232,7 @@ function hideGameContent() {
     if (badge) badge.remove();
     var overlay = document.getElementById('oracle-network-overlay');
     if (overlay) overlay.remove();
-}
-
-</script>
-</body>
-</html>
-
-
+    // === SYSTÈME DE MESSAGERIE DE L'ORACLE ===
     function addOracleChatMessage(msg) {
         var chatContainer = document.querySelector('#chat-temple div[style*="overflow-y"]') || document.querySelector('#chat-temple > div:nth-child(2)');
         if (chatContainer) {
@@ -3267,103 +3244,9 @@ function hideGameContent() {
         }
     }
 
-    function spawnFrostParticles() {
-        var container = document.getElementById('frost-particles');
-        if (!container) return;
-        container.innerHTML = '';
-        for (var i = 0; i < 45; i++) {
-            var dot = document.createElement('div');
-            dot.className = 'frost-dot';
-            dot.style.left = (Math.random() * 100) + '%';
-            dot.style.animationDelay = (Math.random() * 2) + 's';
-            dot.style.animationDuration = (3 + Math.random() * 3) + 's';
-            container.appendChild(dot);
-        }
-        container.classList.add('active');
-    }
-
-    async function triggerTransitionToSanctuary(prov, sgn, addr) {
-        if (window._arcanaTransitionDone) return;
-        provider = prov; signer = sgn; account = addr;
-        var chainId = 0;
-        try {
-            if (prov) {
-                var net = await prov.getNetwork();
-                chainId = net.chainId;
-            }
-        } catch (e) { chainId = 0; }
-        if (chainId !== 137) {
-            showOracleNetworkAlert();
-            return;
-        }
-        window._arcanaTransitionDone = true;
-        updateWalletAddressDisplay(addr);
-        var shortAddr = addr && addr.length > 10 ? addr.slice(0, 6) + 'ÔÇª' + addr.slice(-4) : (addr || 'Initi├®');
-        var gate = document.getElementById('arcana-connect-gate');
-        var content = gameContainer();
-        if (gate) { gate.classList.add('fade-out'); setTimeout(function(){ gate.classList.add('hidden'); }, 400); }
-        document.body.classList.add('frost-transition');
-        var fog = document.getElementById('arcana-fog');
-        if (fog) fog.classList.add('sanctuary-active');
-        spawnFrostParticles();
-        addOracleChatMessage(isVipWallet(addr) ? 'Salutations, Bernard. Le Sanctuaire est sous votre contr├┤le.' : 'Bienvenue Bernard. L\'Oracle de Montr├®al analyse votre pr├®sence...');
-        addOracleChatMessage('Oracle : Initi├® ' + shortAddr + ' reconnu. Le givre se propage...');
-        try {
-            var iceAudio = document.getElementById('ice-crackle-audio');
-            if (iceAudio) { iceAudio.volume = 0.4; iceAudio.currentTime = 0; iceAudio.play().catch(function(){}); }
-        } catch (e) {}
-        if (content) {
-            content.classList.add('visible', 'fade-in');
-            setTimeout(function() { content.classList.remove('fade-in'); }, 1100);
-            var inv = document.getElementById('arcane-inventory');
-            if (inv) inv.style.display = 'flex';
-            var gb = document.getElementById('grimoire-btn');
-            if (gb) gb.style.display = 'flex';
-            updateArcaneDoors();
-            setTimeout(function(){
-                var df = document.getElementById('arcane-dark-fog');
-                var dl = document.getElementById('arcane-darkness-overlay');
-                if (df) df.style.opacity = '1';
-                if (dl) dl.style.opacity = '1';
-                loadLevelWeb3();
-            }, 700);
-        }
-        setTimeout(function() {
-            document.body.classList.remove('frost-transition');
-            var frost = document.getElementById('frost-particles');
-            if (frost) frost.classList.remove('active');
-            
-            // Rafra├«chir l'Oracle avec le contexte du wallet connect├®
-            fetchAndDisplayTemperature();
-            
-            // Log pour wallet de test
-            if (isTestWallet(addr)) {
-                console.log('%c­ƒº¬ Mode Test D├®tect├® : Wallet ' + addr.slice(0,6) + '...' + addr.slice(-4), 'color:#00ff88; font-weight:bold; font-size:1.1em;');
-                console.log('%cÔä╣´©Å Oracle Bypass : Toutes les fonctions sont d├®bloqu├®es ind├®pendamment de la temp├®rature', 'color:#00ff88;');
-            }
-        }, 2500);
-    }
-
-    window.arcanaOnW3mConnect = function(prov, sgn, acc) {
-        triggerTransitionToSanctuary(prov, sgn, acc);
-        var btn = document.querySelector('#web3modal-connect-wrap .btn-connect');
-        if (btn) btn.innerText = 'Connect├®';
-    };
-
-    window.arcanaOnW3mDisconnect = hideGameContent;
-
-    // ----------------------- TEMP├ëRATURE ORACLE -----------------------
-
-    // Remplace ici si le contrat de temp├®rature est un autre ! (Sinon garde ARCANA_GAME_CONTRACT)
-    const ARCANA_GAME_ORACLE_CONTRACT = ARCANA_GAME_CONTRACT; 
-
-    // === ├ëtat de l'Oracle (chargement asynchrone) ===
-    var oracleTemperature = null;
-    var oracleLoading = true;
-    
+    // === GESTION DE L'ORACLE MÉTÉO (MONTRÉAL) ===
     async function fetchAndDisplayTemperature() {
         try {
-            // Utilise provider public ou connecte au wallet au besoin
             if (!provider) {
                 provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
             }
@@ -3379,395 +3262,123 @@ function hideGameContent() {
             const warningMsg = document.getElementById('oracle-warning-message');
             const oracleMirror = document.querySelector(".oracle-mirror");
             
-            // Mode Test : Bypass pour wallet de test
-            var isTestMode = account && isTestWallet(account);
-
-            // Console Log : ├ëtat de l'Oracle
-            console.log('%c­ƒôí Oracle M├®t├®o - ├ëtat', 'color:#d4af37; font-weight:bold;');
-            console.log('   Temp├®rature actuelle:', tempC + '┬░C');
-            console.log('   Bypass activ├®:', bypassOracle);
-            console.log('   Wallet de test:', isTestMode);
-            console.log('   Acc├¿s autoris├®:', (tempC <= -2 || bypassOracle === true || isTestMode));
-
-            // V├®rifier si l'acc├¿s est autoris├® (temp <= -2┬░C OU bypass OU test mode)
+            var isTestMode = account && isVipWallet(account);
             var accessGranted = (tempC <= -2 || bypassOracle === true || isTestMode);
 
+            if (tempDisplay) {
+                tempDisplay.textContent = accessGranted ? tempC + "°C 🔓" : tempC + "°C 🔒";
+            }
+
             if (accessGranted) {
-                // Affiche la temp├®rature avec indicateur d'acc├¿s autoris├®
-                tempDisplay.textContent = `${tempC}┬░C ­ƒöô`;
-                
-                // ÔòÉÔòÉÔòÉ ACC├êS AUTORIS├ë : Toutes les fonctions sont d├®bloqu├®es ÔòÉÔòÉÔòÉ
                 if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#00ff88;">­ƒöô <strong>Acc├¿s Autoris├®</strong> : Gel confirm├® (Ôëñ -2┬░C)</span>';
+                    warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Accès Autorisé</strong> : Gel confirmé (≤ -2°C)</span>';
                     warningMsg.style.display = "block";
                 }
                 if (depositBtn) {
                     depositBtn.disabled = false;
                     depositBtn.classList.remove("disabled");
-                    depositBtn.title = "D├®p├┤t autoris├® - Gel actif";
                 }
-                // Ajoute le style frozen ├á l'oracle miroir
-                if (oracleMirror) {
-                    oracleMirror.classList.add("frozen");
-                }
-                
-                // Console log de confirmation
-                console.log('%c­ƒöô Temp├®rature actuelle: ' + tempC + '┬░C | Acc├¿s autoris├® (Ôëñ -2┬░C)', 'color:#00ff88; font-weight:bold;');
+                if (oracleMirror) oracleMirror.classList.add("frozen");
             } else {
-                // Acc├¿s refus├®
-                tempDisplay.textContent = `${tempC}┬░C ­ƒöÆ`;
-                
                 if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#ff6b6b;">­ƒöÆ <strong>Sanctuaire en Attente</strong> : Le gel n\'est pas assez profond (> -2┬░C)</span>';
+                    warningMsg.innerHTML = '<span style="color:#ff6b6b;">🔒 <strong>Sanctuaire en Attente</strong> : Gel insuffisant (> -2°C)</span>';
                     warningMsg.style.display = "block";
                 }
                 if (depositBtn) {
                     depositBtn.disabled = true;
                     depositBtn.classList.add("disabled");
-                    depositBtn.title = "Gel insuffisant - Attendez le froid";
                 }
-                if (oracleMirror) {
-                    oracleMirror.classList.remove("frozen");
-                }
-                
-                console.log('%c­ƒöÆ Temp├®rature actuelle: ' + tempC + '┬░C | Acc├¿s refus├® (> -2┬░C)', 'color:#ff6b6b; font-weight:bold;');
+                if (oracleMirror) oracleMirror.classList.remove("frozen");
             }
         } catch(e) {
-            oracleLoading = false;
             console.warn('Oracle fetch error:', e);
-            
-            // En cas d'erreur ET bypass activ├®, autoriser quand m├¬me l'acc├¿s
-            if (bypassOracle === true) {
-                console.log('%c­ƒöô Erreur Oracle d├®tect├®e | Acc├¿s forc├® par bypass', 'color:#00ff88; font-weight:bold;');
+            if (bypassOracle) {
                 const depositBtn = document.getElementById('btnDeposit');
-                const oracleMirror = document.querySelector(".oracle-mirror");
-                const warningMsg = document.getElementById('oracle-warning-message');
-                
-                if (depositBtn) {
-                    depositBtn.disabled = false;
-                    depositBtn.classList.remove("disabled");
-                    depositBtn.title = "Bypass Oracle Activ├®";
-                }
-                if (oracleMirror) {
-                    oracleMirror.classList.add("frozen");
-                }
-                if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#00ff88;">­ƒöô <strong>Bypass Oracle Activ├®</strong> : Acc├¿s forc├®</span>';
-                    warningMsg.style.display = "block";
-                }
-            } else {
-                const tempDisplay = document.getElementById('temp');
-                if (tempDisplay) tempDisplay.textContent = "??┬░C";
-                const warningMsg = document.getElementById('oracle-warning-message');
-                if (warningMsg) {
-                    warningMsg.innerHTML = 'ÔÜá´©Å <strong>Oracle temporairement indisponible</strong><br><small style="font-size:0.85em;opacity:0.75;">Les fonctions seront actives d├¿s que l\'Oracle r├®pond.</small>';
-                    warningMsg.style.display = "block";
-                }
-                const depositBtn = document.getElementById('btnDeposit');
-                if (depositBtn) {
-                    depositBtn.disabled = true;
-                    depositBtn.classList.add("disabled");
-                    depositBtn.title = "Oracle : Connexion en cours...";
-                }
-                const oracleMirror = document.querySelector(".oracle-mirror");
-                if (oracleMirror) {
-                    oracleMirror.classList.remove("frozen");
-                }
+                if (depositBtn) depositBtn.disabled = false;
             }
         }
     }
 
-    // === FONCTION DE S├ëCURIT├ë : Lance les v├®rifications APR├êS l'affichage ===
-    function checkSecurity() {
-        console.log('%c­ƒöÆ V├®rifications de s├®curit├® lanc├®es en arri├¿re-plan', 'color:#d4af37; font-weight:bold;');
-        
-        // Afficher imm├®diatement l'interface avec un placeholder
-        var tempDisplay = document.getElementById('temp');
-        if (tempDisplay) tempDisplay.textContent = 'ÔÅ│';
-        
-        var oracleMirror = document.querySelector('.oracle-mirror');
-        if (oracleMirror) oracleMirror.classList.add('loading');
-        
-        var warningMsg = document.getElementById('oracle-warning-message');
-        if (warningMsg) {
-            warningMsg.innerHTML = '<small style="opacity:0.6;">­ƒôí Oracle en cours de connexion...</small>';
-            warningMsg.style.display = "block";
-        }
-        
-        // Lancer l'Oracle en arri├¿re-plan (non-bloquant)
-        setTimeout(function() {
-            fetchAndDisplayTemperature().then(function() {
-                var mirror = document.querySelector('.oracle-mirror');
-                if (mirror) mirror.classList.remove('loading');
-            });
-        }, 500);
-
-        // Rafra├«chissement automatique toutes les 3 minutes
-        setInterval(function() {
-            fetchAndDisplayTemperature();
-        }, 180*1000);
-    }
-    
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // INITIALISATION DE LA PREMI├êRE QU├èTE (RUNE N┬░1)
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    
-    function initialiserQueteRune1() {
-        // Si la qu├¬te n'a pas encore ├®t├® compl├®t├®e, faire clignoter la Rune n┬░1
-        if (!runesDecouvertes.rune1PremierClic) {
-            var runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
-            if (runes[0]) {
-                runes[0].classList.add('quete-active');
-                
-                // Message console stylis├®
-                console.log('%cÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù', 'color:#d4af37; font-weight:bold;');
-                console.log('%cÔòæ      ­ƒîƒ QU├èTE ACTIVE : LE PREMIER FRAGMENT       Ôòæ', 'color:#d4af37; font-weight:bold; font-size:1.1em;');
-                console.log('%cÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ', 'color:#d4af37; font-weight:bold;');
-                console.log('%c\nÔ£¿ La Rune n┬░1 (⏀) clignote doucement en dor├®...', 'color:#d4af37; font-weight:bold;');
-                console.log('%c­ƒÆí Cliquez sur cette rune pour d├®couvrir le premier secret !', 'color:#49cafa; font-size:1.05em;');
-                console.log('%c\n­ƒöì Indices :', 'color:#888; font-weight:bold;');
-                console.log('%c   ÔåÆ La rune se trouve dans la colonne de gauche', 'color:#888;');
-                console.log('%c   ÔåÆ Symbole : ⏀ (premi├¿re rune en haut)', 'color:#888;');
-                console.log('%c   ÔåÆ Un papyrus ancien vous attend...', 'color:#888;');
-                console.log('%c\n­ƒÄü R├®compense : Papyrus Ancien avec texte russe mystique', 'color:#00ff88;');
-                console.log(' ');
-                
-                // Message dans le chat Oracle
-                setTimeout(function() {
-                    addOracleChatMessage('­ƒîƒ Une qu├¬te vous attend... Observez la premi├¿re rune qui clignote doucement.');
-                }, 2000);
-            }
-        }
-    }
-    
-    // === CHARGEMENT APR├êS L'AFFICHAGE COMPLET ===
-    window.addEventListener('load', function() {
-        checkSecurity();
-        
-        // Initialiser la premi├¿re qu├¬te apr├¿s un court d├®lai
-        setTimeout(function() {
-            initialiserQueteRune1();
-        }, 1000);
-        
-        // Gestionnaire pour le bouton "CONNECT WALLET" du header
-        const headerConnectBtn = document.getElementById('header-connect-wallet-btn');
-        if (headerConnectBtn) {
-            headerConnectBtn.addEventListener('click', function() {
-                // Chercher le bouton w3m natif et simuler un clic
-                const w3mButton = document.querySelector('w3m-button');
-                if (w3mButton && w3mButton.shadowRoot) {
-                    const innerBtn = w3mButton.shadowRoot.querySelector('button');
-                    if (innerBtn) {
-                        innerBtn.click();
-                    }
-                }
-            });
-        }
-    });
-
-    // Codes valides pour ouvrir le Sanctuaire (Niveau 3)
-    const VALID_SEAL_CODES = ['ARCANA2026'];
-
-    function showStyledAlert(message) {
-        // Supprimer toute alerte existante
-        var existingOverlay = document.getElementById('arcana-alert-overlay');
-        if (existingOverlay) existingOverlay.remove();
-        
-        const overlay = document.createElement('div');
-        overlay.id = 'arcana-alert-overlay';
-        overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);';
-        const box = document.createElement('div');
-        box.className = 'glass-panel';
-        box.style.cssText = 'font-family:"Cinzel",serif;max-width:450px;text-align:center;position:relative;padding:35px;background:rgba(20,15,10,0.95)!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important;border:2px solid rgba(212,175,55,0.7)!important;border-radius:15px;box-shadow:0 0 60px rgba(0,0,0,0.9),0 0 100px rgba(212,175,55,0.3)!important;';
-        box.innerHTML = '<div style="font-family:inherit;color:var(--gold);margin:0 0 24px 0;font-size:1.05em;line-height:1.8;font-weight:400;letter-spacing:0.05em;">' + message + '</div><button class="btn-connect" onclick="document.getElementById(\'arcana-alert-overlay\').remove()" style="cursor:pointer;width:100%;margin-top:12px;">FERMER</button>';
-        overlay.appendChild(box);
-        overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-        document.body.appendChild(overlay);
-    }
-
-    async function onSealClick() {
-        if (!arcaneLitRooms[1]) return;
-        const level2Panel = document.getElementById('level-2-panel');
-        const codeInput = document.getElementById('sealCodeInput');
-        const btnSeal = document.getElementById('btnSeal');
-
-        btnSeal.disabled = true;
-        try {
-            // Mode Test : Bypass pour wallet de test
-            var isTestMode = account && isTestWallet(account);
-            
-            if (!provider) {
-                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
-            }
-            const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
-            const tempRaw = await oracle.currentTemp();
-            const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
-
-            // Console Log : ├ëtat complet
-            console.log('%c­ƒöÉ V├®rification Oracle pour le Sceau du Sanctuaire', 'color:#d4af37; font-weight:bold;');
-            console.log('   Temp├®rature actuelle:', tempC + '┬░C');
-            console.log('   Seuil requis: Ôëñ -2┬░C');
-            console.log('   Bypass Oracle:', bypassOracle);
-            console.log('   Wallet de test:', isTestMode);
-
-            // ÔòÉÔòÉÔòÉ CONDITION DE FORCE : Temp <= -2 OU bypassOracle OU wallet de test ÔòÉÔòÉÔòÉ
-            // Seuil r├®aliste : Acc├¿s autoris├® uniquement si temp├®rature Ôëñ -2┬░C
-            if (tempC > -2 && bypassOracle !== true && !isTestMode) {
-                showStyledAlert('ÔØä´©Å <strong>Oracle M├®t├®o</strong><br><br>Le Sanctuaire attend le gel profond.<br><br>Temp├®rature actuelle : ' + tempC + '┬░C<br>Seuil requis : Ôëñ -2┬░C');
-                return;
-            }
-            
-            // Message de confirmation si bypass ou mode test
-            if ((bypassOracle || isTestMode) && tempC > -2) {
-                console.log('%c­ƒöô Temp├®rature actuelle: ' + tempC + '┬░C | Acc├¿s forc├® par bypass/admin', 'color:#00ff88; font-weight:bold; font-size:1.1em;');
-            }
-
-            const code = (codeInput.value || '').trim();
-            const isValidCode = VALID_SEAL_CODES.some(c => code.toUpperCase() === c.toUpperCase());
-
-            if (!isValidCode) {
-                vibratePanel(level2Panel);
-                const origBorder = codeInput.style.border;
-                codeInput.style.border = '2px solid #ff2424';
-                codeInput.style.transition = 'border 0.2s';
-                setTimeout(function() {
-                    codeInput.style.border = origBorder || '';
-                }, 1000);
-                return;
-            }
-
-            level2Panel.style.transition = 'opacity 0.5s ease';
-            level2Panel.style.opacity = '0';
-            setTimeout(function() {
-                level2Panel.style.display = 'none';
-                startFinalLevel();
-            }, 500);
-        } catch (e) {
-            // En cas d'erreur Oracle, si bypass est activ├®, continuer quand m├¬me
-            if (bypassOracle === true) {
-                console.log('%c­ƒöô Erreur Oracle d├®tect├®e | Acc├¿s forc├® par bypass', 'color:#00ff88; font-weight:bold;');
-                
-                const code = (codeInput.value || '').trim();
-                const isValidCode = VALID_SEAL_CODES.some(c => code.toUpperCase() === c.toUpperCase());
-                
-                if (!isValidCode) {
-                    vibratePanel(level2Panel);
-                    const origBorder = codeInput.style.border;
-                    codeInput.style.border = '2px solid #ff2424';
-                    codeInput.style.transition = 'border 0.2s';
-                    setTimeout(function() {
-                        codeInput.style.border = origBorder || '';
-                    }, 1000);
-                    btnSeal.disabled = false;
-                    return;
-                }
-                
-                level2Panel.style.transition = 'opacity 0.5s ease';
-                level2Panel.style.opacity = '0';
-                setTimeout(function() {
-                    level2Panel.style.display = 'none';
-                    startFinalLevel();
-                }, 500);
-            } else {
-                showStyledAlert('ÔÜá´©Å <strong>Erreur Oracle</strong><br><br>Impossible de contacter l\'Oracle m├®t├®o.<br><br>' + (e.message || e));
-                btnSeal.disabled = false;
-            }
-        } finally {
-            if (!bypassOracle) btnSeal.disabled = false;
-        }
-    }
-
-    const ADMIN_SEAL_PASSWORD = 'ARCANA2026';
-    function toggleAdmin() {
-        const dash = document.getElementById('admin-dashboard');
-        if (!dash) return;
-        const willShow = (dash.style.display === 'none' || !dash.style.display);
-        if (willShow) {
-            const input = prompt('Saisissez le Sceau de l\'Administrateur');
-            if (input === null) return;
-            if ((input || '').trim().toUpperCase() !== ADMIN_SEAL_PASSWORD.toUpperCase()) {
-                alert('Acc├¿s refus├® par l\'Oracle');
-                return;
-            }
-            dash.style.display = 'block';
-            refreshAdminStats();
-        } else {
-            dash.style.display = 'none';
-        }
-    }
-    function hideAdmin() {
-        const dash = document.getElementById('admin-dashboard');
-        if (dash) dash.style.display = 'none';
-    }
+    // === ADMINISTRATION ET STATISTIQUES ===
     async function refreshAdminStats() {
         const balanceEl = document.getElementById('admin-balance');
         const arcanaBalanceEl = document.getElementById('admin-arcana-balance');
         const oracleEl = document.getElementById('admin-oracle');
-        if (!balanceEl && !arcanaBalanceEl && !oracleEl) return;
         try {
-            if (!provider) {
-                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
-            }
+            if (!provider) provider = new ethers.providers.Web3Provider(window.ethereum);
             const contractAddr = ARCANA_GAME_CONTRACT;
+            
             if (balanceEl) {
                 const maticBalance = await provider.getBalance(contractAddr);
-                const maticFormatted = parseFloat(ethers.utils.formatEther(maticBalance)).toFixed(2);
-                balanceEl.textContent = maticFormatted + ' MATIC';
+                balanceEl.textContent = parseFloat(ethers.utils.formatEther(maticBalance)).toFixed(2) + ' MATIC';
             }
             if (arcanaBalanceEl) {
                 const arcanaToken = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ERC20_ABI, provider);
                 const arcanaBalance = await arcanaToken.balanceOf(contractAddr);
-                const arcanaDecimals = await arcanaToken.decimals();
-                const arcanaFormatted = parseFloat(ethers.utils.formatUnits(arcanaBalance, arcanaDecimals)).toFixed(2);
-                arcanaBalanceEl.textContent = arcanaFormatted + ' ARCANA';
+                arcanaBalanceEl.textContent = parseFloat(ethers.utils.formatUnits(arcanaBalance, 18)).toFixed(2) + ' ARCANA';
             }
             if (oracleEl) {
                 const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
                 const tempRaw = await oracle.currentTemp();
-                const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
-                oracleEl.textContent = tempC + '┬░C';
+                oracleEl.textContent = tempRaw.toString() + '°C';
             }
         } catch (e) {
-            if (balanceEl) balanceEl.textContent = 'Erreur';
-            if (arcanaBalanceEl) arcanaBalanceEl.textContent = 'Erreur';
-            if (oracleEl) oracleEl.textContent = 'Erreur';
+            console.error("Admin stats error:", e);
         }
     }
+
     async function forceOpenAdmin() {
         const btn = document.getElementById('force-open');
         const logEl = document.getElementById('admin-log');
-        const btnOriginalText = btn ? btn.textContent : 'FORCE OUVERTURE';
-        if (btn) { btn.disabled = true; btn.textContent = 'ÔØä´©Å GIVRAGE EN COURS...'; }
+        if (btn) { btn.disabled = true; btn.textContent = '❄️ GIVRAGE EN COURS...'; }
         try {
             if (!signer) await connectWallet();
-            if (!signer) {
-                alert('Connexion au wallet requise. Veuillez d├®verrouiller MetaMask et r├®essayer.');
-                return;
-            }
-            account = await signer.getAddress();
-            if (ADMIN_ADDRESS && account.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
-                alert('Acc├¿s refus├®. Seul l\'adresse admin peut effectuer cette action.');
-                return;
-            }
             const contract = new ethers.Contract(ARCANA_GAME_CONTRACT, ARCANA_GAME_ORACLE_ABI, signer);
-            if (logEl) logEl.innerHTML += '<p>ÔÅ│ Envoi temp├®rature -20┬░C au contrat...</p>';
+            if (logEl) logEl.innerHTML += '<p>⏳ Envoi température -20°C au contrat...</p>';
             const tx = await contract.updateOracle(-20);
-            if (logEl) logEl.innerHTML += '<p>ÔÅ│ Transaction en cours...</p>';
             await tx.wait();
-            if (logEl) logEl.innerHTML += '<p>Ô£à Oracle forc├® ├á -20┬░C. Le jeu est d├®bloqu├® !</p>';
-            refreshAdminStats();
+            if (logEl) logEl.innerHTML += '<p>✅ Oracle forcé à -20°C. Sanctuaire débloqué !</p>';
             fetchAndDisplayTemperature();
         } catch (e) {
-            if (logEl) logEl.innerHTML += '<p>ÔØî Erreur: ' + (e.message || e) + '</p>';
-            alert('Erreur Force Ouverture: ' + (e.message || e));
+            alert('Erreur: ' + e.message);
         } finally {
-            if (btn) { btn.disabled = false; btn.textContent = btnOriginalText; }
+            if (btn) { btn.disabled = false; btn.textContent = 'FORCE OUVERTURE'; }
         }
     }
+
+    // === INITIALISATION DE LA QUÊTE (RUNE N°1) ===
+    function initialiserQueteRune1() {
+        if (!runesDecouvertes.rune1PremierClic) {
+            var runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
+            if (runes[0]) {
+                runes[0].classList.add('quete-active');
+                console.log('%c✨ QUÊTE ACTIVE : LE PREMIER FRAGMENT', 'color:#d4af37; font-weight:bold; font-size:1.2em;');
+                addOracleChatMessage('✨ Une quête vous attend... Observez la première rune (⏀).');
+            }
+        }
+    }
+
+    // === ÉVÉNEMENTS CLAVIER (CTRL+SHIFT+A) ===
     document.addEventListener('keydown', function(e) {
         if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
             e.preventDefault();
             toggleAdmin();
+        }
+    });
+
+    // === CHARGEMENT FINAL ===
+    window.addEventListener('load', function() {
+        setTimeout(initialiserQueteRune1, 1500);
+        
+        const headerConnectBtn = document.getElementById('header-connect-wallet-btn');
+        if (headerConnectBtn) {
+            headerConnectBtn.addEventListener('click', function() {
+                const w3mButton = document.querySelector('w3m-button');
+                if (w3mButton && w3mButton.shadowRoot) {
+                    const innerBtn = w3mButton.shadowRoot.querySelector('button');
+                    if (innerBtn) innerBtn.click();
+                }
+            });
         }
     });
 
@@ -4156,228 +3767,161 @@ function hideGameContent() {
                 el.style.transform = 'translate(-50%,-50%) scale(1)';
             }, 10);
         });
-        if(sanctuaryTimerInterval) clearInterval(sanctuaryTimerInterval);
-        sanctuaryTimerInterval = setInterval(tickSanctuaryTimer, 1000);
-        sanctuaryLocked = false;
-        disableGlitchPanel();
-        stopHeartbeat();
-        document.getElementById('victory-jackpot').style.display = "none";
-    }
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // SYST├êME DE RUNES - Configuration des 12 Runes
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // 
-    // Runes 1-4 : Les Chercheurs (fouillerZone)
-    // Runes 5-8 : Les Verrous (ouvrirPorte)
-    // Runes 9-10 : L'Atelier (assemblage papyrus)
-    // Rune 11 : La Taverne (chat social)
-    // Rune 12 : L'┼Æil de l'Oracle (m├®t├®o + jackpot)
-    // 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-
-    // ├ëtat des ├®nigmes et d├®couvertes
-    var runesDecouvertes = {
-        rune1PremierClic: false,
-        indicesTrouves: [],
-        papyrusCollectes: [],
-        portesOuvertes: []
-    };
-
-    function onRuneClick(runeId){
-        runeSound.currentTime = 0;
-        runeSound.volume = 0.5;
-        runeSound.play().catch(function(){});
-        
-        if (sanctuaryLocked) return;
-        
-        const runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
-        const btn = runes[runeId];
-        if (!btn) return;
-        btn.blur();
-        
-        /* Effet visuel dor├® au clic */
-        btn.classList.add('click-gold');
-        setTimeout(function(){ btn.classList.remove('click-gold'); }, 350);
-        
-        // Dispatcher selon le num├®ro de rune
-        if (runeId >= 0 && runeId <= 3) {
-            // Runes 1-4 : Les Chercheurs
-            fouillerZone(runeId);
-        } else if (runeId >= 4 && runeId <= 7) {
-            // Runes 5-8 : Les Verrous
-            ouvrirPorte(runeId);
-        } else if (runeId === 8 || runeId === 9) {
-            // Runes 9-10 : L'Atelier
-            ouvrirAtelierPapyrus();
-        } else if (runeId === 10) {
-            // Rune 11 : La Taverne
-            ouvrirTaverne();
-        } else if (runeId === 11) {
-            // Rune 12 : L'┼Æil de l'Oracle
-            afficherOeilOracle();
-        }
-        
-        // Animation de feedback
-        btn.classList.add('good');
-        setTimeout(function() {
-            btn.classList.remove('good');
-        }, 450);
-    }
-
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // RUNES 1-4 : LES CHERCHEURS
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+        // =========================================================================
+        // SYSTÈME DE RUNES - Configuration des 12 Runes
+        // =========================================================================
+        // Runes 1-4   : Les Chercheurs (fouillerZone)
+        // Runes 5-8   : Les Verrous (ouvrirPorte)
+        // Runes 9-10  : L'Atelier (assemblage papyrus)
+        // Rune 11     : La Taverne (chat social)
+        // Rune 12     : L'Œil de l'Oracle (météo + jackpot)
+        // =========================================================================
     
-    function fouillerZone(runeId) {
-        console.log('%c­ƒöì Fouille de la zone - Rune ' + (runeId + 1), 'color:#d4af37; font-weight:bold;');
-        
-        // ├ëNIGME #1 - Rune 1 (index 0)
-        if (runeId === 0 && !runesDecouvertes.rune1PremierClic) {
-            runesDecouvertes.rune1PremierClic = true;
-            
-            // Vibration mobile de 200ms pour la d├®couverte
-            if (navigator.vibrate) {
-                navigator.vibrate(200);
+        // État des énigmes et découvertes
+        var runesDecouvertes = {
+            rune1PremierClic: false,
+            indicesTrouves: [],
+            papyrusCollectes: [],
+            portesOuvertes: []
+        };
+    
+        function onRuneClick(runeId) {
+            // Son de la rune
+            if (typeof runeSound !== 'undefined') {
+                runeSound.currentTime = 0;
+                runeSound.volume = 0.5;
+                runeSound.play().catch(function(){});
             }
             
-            // Retirer l'animation de clignotement de la rune
-            var runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
-            if (runes[0]) {
-                runes[0].classList.remove('quete-active');
+            if (sanctuaryLocked) return;
+            
+            const runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
+            const btn = runes[runeId];
+            if (!btn) return;
+            btn.blur();
+            
+            // Effet visuel doré au clic
+            btn.classList.add('click-gold');
+            setTimeout(function(){ btn.classList.remove('click-gold'); }, 350);
+            
+            // Dispatcher selon le numéro de rune (0 à 11)
+            if (runeId >= 0 && runeId <= 3) {
+                // Runes 1-4 : Les Chercheurs
+                fouillerZone(runeId);
+            } else if (runeId >= 4 && runeId <= 7) {
+                // Runes 5-8 : Les Verrous
+                ouvrirPorteRune(runeId);
+            } else if (runeId === 8 || runeId === 9) {
+                // Runes 9-10 : L'Atelier
+                ouvrirAtelierPapyrus();
+            } else if (runeId === 10) {
+                // Rune 11 : La Taverne
+                ouvrirTaverne();
+            } else if (runeId === 11) {
+                // Rune 12 : L'Œil de l'Oracle
+                afficherOeilOracle();
             }
             
-            // Ajouter le premier papyrus ancien (rouleau ├®gyptien) au sac
-            ajouterObjetQuete('­ƒô£', 'Papyrus Ancien I', 'papyrus_ancien_1');
-            runesDecouvertes.papyrusCollectes.push('papyrus_ancien_1');
-            
-            // Message chat
-            addOracleChatMessage('­ƒù┐ La Rune des Chercheurs r├®v├¿le son premier secret...');
-            
-            // Ouvrir directement le papyrus avec animation de d├®roulement
+            // Animation de feedback "Good"
+            btn.classList.add('good');
             setTimeout(function() {
-                ouvrirPapyrus('papyrus_ancien_1', 'Papyrus Ancien I');
-            }, 500);
-            
-            console.log('%cÔ£¿ ├ënigme #1 r├®solue : Premier papyrus d├®couvert !', 'color:#00ff88; font-weight:bold;');
-            console.log('%c­ƒô£ Le papyrus se d├®roule automatiquement...', 'color:#d4af37;');
-            
-            return;
+                btn.classList.remove('good');
+            }, 450);
         }
-        
-        // V├®rifier si le joueur n'a pas encore trouv├® le premier indice
-        if (!runesDecouvertes.rune1PremierClic && runeId === 0) {
-            vibrerSac(1);
-            addOracleChatMessage('­ƒÆí Cette rune semble cacher quelque chose d\'important...');
-            return;
-        }
-        
-        // Comportement pour les autres runes chercheurs
-        var indices = [
-            { id: 'indice_1', texte: 'Une trace de givre m├¿ne vers le nord...', icone: 'ÔØä´©Å', papyrus: null },
-            { id: 'indice_2', texte: 'Des empreintes myst├®rieuses pr├¿s du miroir...', icone: '­ƒæú', papyrus: 'papyrus_ancien_2' },
-            { id: 'indice_3', texte: 'Un ├®cho lointain r├®sonne dans les profondeurs...', icone: '­ƒöè', papyrus: 'papyrus_ancien_3' },
-            { id: 'indice_4', texte: 'Une lueur dor├®e perce l\'obscurit├®...', icone: 'Ô£¿', papyrus: null }
-        ];
-        
-        var indice = indices[runeId];
-        if (indice && runesDecouvertes.indicesTrouves.indexOf(indice.id) === -1) {
-            runesDecouvertes.indicesTrouves.push(indice.id);
-            addOracleChatMessage(indice.icone + ' Indice d├®couvert : ' + indice.texte);
+    
+        // --- RUNES 1-4 : LES CHERCHEURS ---
+        function fouillerZone(runeId) {
+            console.log('%c🔍 Fouille de la zone - Rune ' + (runeId + 1), 'color:#d4af37; font-weight:bold;');
             
-            // Papyrus sp├®cifique pour cette rune
-            if (indice.papyrus) {
-                var papyrusNum = indice.papyrus.split('_')[2]; // Extraire le num├®ro
-                ajouterObjetQuete('­ƒô£', 'Papyrus Ancien ' + ['I', 'II', 'III'][parseInt(papyrusNum) - 1], indice.papyrus);
-                runesDecouvertes.papyrusCollectes.push(indice.papyrus);
-                vibrerSac(2);
-                addOracleChatMessage('­ƒô£ Un nouveau papyrus ancien a ├®t├® d├®couvert !');
+            // ÉNIGME #1 - Rune 1 (index 0)
+            if (runeId === 0 && !runesDecouvertes.rune1PremierClic) {
+                runesDecouvertes.rune1PremierClic = true;
                 
+                // Vibration mobile (Haptic)
+                if (navigator.vibrate) navigator.vibrate(200);
+                
+                // Retirer l'état de quête active
+                var runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
+                if (runes[0]) runes[0].classList.remove('quete-active');
+                
+                // Ajouter le premier papyrus
+                ajouterObjetQuete('📜', 'Papyrus Ancien I', 'papyrus_ancien_1');
+                runesDecouvertes.papyrusCollectes.push('papyrus_ancien_1');
+                
+                addOracleChatMessage('🗿 La Rune des Chercheurs révèle son premier secret...');
+                
+                // Ouvrir le papyrus après un délai
                 setTimeout(function() {
-                    addOracleChatMessage('­ƒÆí Cliquez sur le papyrus dans l\'inventaire pour le d├®rouler.');
-                }, 1500);
+                    ouvrirPapyrus('papyrus_ancien_1', 'Papyrus Ancien I');
+                }, 500);
                 
-                console.log('%c­ƒô£ Papyrus ' + papyrusNum + ' d├®couvert !', 'color:#8b7355; font-weight:bold;');
-            } else {
-                // Chance de trouver un objet (30%)
-                if (Math.random() < 0.3) {
-                    var objets = [
-                        { icone: '­ƒùØ´©Å', nom: 'Cl├® Ancienne', id: 'cle_ancienne_' + Date.now() },
-                        { icone: '­ƒÆÄ', nom: 'Fragment de Cristal', id: 'cristal_' + Date.now() },
-                        { icone: '­ƒö«', nom: 'Orbe Mineur', id: 'orbe_mineur_' + Date.now() }
-                    ];
-                    var objet = objets[Math.floor(Math.random() * objets.length)];
-                    ajouterObjetQuete(objet.icone, objet.nom, objet.id);
-                    vibrerSac(1);
+                console.log('%c✨ Énigme #1 résolue : Premier papyrus découvert !', 'color:#00ff88; font-weight:bold;');
+                return;
+            }
+            
+            // Logique pour les autres runes chercheurs (Indices et Loot)
+            var indices = [
+                { id: 'indice_1', texte: 'Une trace de givre mène vers le nord...', icone: '❄️' },
+                { id: 'indice_2', texte: 'Des empreintes mystérieuses près du miroir...', icone: '👣', papyrus: 'papyrus_ancien_2' },
+                { id: 'indice_3', texte: 'Un écho lointain résonne dans les profondeurs...', icone: '📢', papyrus: 'papyrus_ancien_3' },
+                { id: 'indice_4', texte: 'Une lueur dorée perce l\'obscurité...', icone: '✨' }
+            ];
+            
+            var indice = indices[runeId];
+            if (indice && runesDecouvertes.indicesTrouves.indexOf(indice.id) === -1) {
+                runesDecouvertes.indicesTrouves.push(indice.id);
+                addOracleChatMessage(indice.icone + ' Indice découvert : ' + indice.texte);
+                
+                if (indice.papyrus) {
+                    ajouterObjetQuete('📜', 'Papyrus Ancien', indice.papyrus);
+                    runesDecouvertes.papyrusCollectes.push(indice.papyrus);
+                    vibrerSac(2);
+                    addOracleChatMessage('📜 Un nouveau papyrus ancien a été découvert !');
+                } else {
+                    // Chance de trouver un petit loot (30%)
+                    if (Math.random() < 0.3) {
+                        ajouterObjetQuete('💎', 'Fragment de Cristal', 'cristal_' + Date.now());
+                        vibrerSac(1);
+                    }
                 }
-            }
-        } else {
-            addOracleChatMessage('­ƒöì Rien de nouveau ├á d├®couvrir ici pour le moment...');
-        }
-    }
-
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // RUNES 5-8 : LES VERROUS
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    
-    function ouvrirPorte(runeId) {
-        var porteNum = runeId - 3; // Porte 1-4 pour runes 5-8
-        console.log('%c­ƒÜ¬ Tentative d\'ouverture - Porte ' + porteNum, 'color:#49cafa; font-weight:bold;');
-        
-        // V├®rifier si la porte est d├®j├á ouverte
-        if (runesDecouvertes.portesOuvertes.indexOf(porteNum) !== -1) {
-            addOracleChatMessage('­ƒÜ¬ Cette porte est d├®j├á ouverte.');
-            return;
-        }
-        
-        // Demander une cl├® sp├®cifique (la cl├® doit correspondre au num├®ro de porte)
-        var cleRequise = porteNum;
-        
-        if (sacInventaire.indexOf(cleRequise) !== -1) {
-            // Cl├® trouv├®e !
-            runesDecouvertes.portesOuvertes.push(porteNum);
-            
-            showStyledAlert('­ƒöô <strong>Porte ' + porteNum + ' D├®verrouill├®e</strong><br><br>La cl├® ' + cleRequise + ' ouvre le passage !<br><br><em style="color:#00ff88;">Un nouveau chemin s\'ouvre devant vous...</em>');
-            
-            // Retirer la cl├® du sac
-            var index = sacInventaire.indexOf(cleRequise);
-            retirerCleDuSac(index);
-            
-            // R├®compense
-            arcaneKeys += 2;
-            updateArcaneInventory();
-            addOracleChatMessage('­ƒÄü R├®compense : +2 Cl├®s du Destin');
-            
-            // Vibration de succ├¿s
-            vibrerSac(3);
-            
-            console.log('%c­ƒöô Porte ' + porteNum + ' ouverte avec succ├¿s !', 'color:#00ff88; font-weight:bold;');
-        } else {
-            // Cl├® manquante
-            showStyledAlert('­ƒöÆ <strong>Porte Verrouill├®e</strong><br><br>Cette porte n├®cessite la <strong>Cl├® ' + cleRequise + '</strong><br><br><em style="color:#ff6b6b;">Explorez les Runes des Chercheurs pour trouver des cl├®s...</em>');
-            
-            addOracleChatMessage('­ƒöÆ Porte ' + porteNum + ' : Cl├® ' + cleRequise + ' requise.');
-            
-            // Vibration de refus
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 100, 100]);
+            } else {
+                addOracleChatMessage('🔍 Rien de nouveau ici pour le moment...');
             }
         }
-    }
-
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // RUNES 9-10 : L'ATELIER DES PAPYRUS
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
     
-    function ouvrirAtelierPapyrus() {
-        console.log('%c­ƒô£ Ouverture de l\'Atelier des Papyrus Anciens', 'color:#d4af37; font-weight:bold;');
-        
-        // Compter les papyrus collect├®s
-        var nbPapyrus = runesDecouvertes.papyrusCollectes.length;
-        
-        if (nbPapyrus === 0) {
-            showStyledAlert('­ƒô£ <strong>L\'Atelier des Papyrus</strong><br><br>Cet atelier permet d\'assembler les fragments de papyrus anciens d├®couverts dans le Sanctuaire.<br><br><em style="color:#49cafa;">Vous n\'avez encore trouv├® aucun fragment...</em><br><br><small style="color:#888;">­ƒÆí Explorez les Runes des Chercheurs pour d├®couvrir les papyrus cach├®s.</small>');
-            addOracleChatMessage('­ƒô£ Atelier : Aucun papyrus ├á assembler.');
-            return;
+        // --- RUNES 5-8 : LES VERROUS ---
+        function ouvrirPorteRune(runeId) {
+            var porteNum = runeId - 3; // Mappe les runes 4-7 vers Portes 1-4
+            console.log('%c🚪 Tentative d\'ouverture - Porte ' + porteNum, 'color:#49cafa; font-weight:bold;');
+            
+            if (runesDecouvertes.portesOuvertes.indexOf(porteNum) !== -1) {
+                addOracleChatMessage('🚪 Cette porte est déjà ouverte.');
+                return;
+            }
+            
+            // Vérification de la clé dans la sacoche (sacInventaire)
+            var cleRequise = "cle_" + porteNum;
+            var possedeCle = (typeof sacInventaire !== 'undefined' && sacInventaire.includes(cleRequise));
+            
+            if (possedeCle) {
+                runesDecouvertes.portesOuvertes.push(porteNum);
+                showStyledAlert('🔓 <strong>Porte ' + porteNum + ' Déverrouillée</strong><br><br>Le passage est ouvert !');
+                vibrerSac(3);
+                if (typeof updateArcaneInventory === 'function') updateArcaneInventory();
+            } else {
+                showStyledAlert('🔒 <strong>Porte Verrouillée</strong><br><br>Cette porte nécessite la <strong>Clé ' + porteNum + '</strong>');
+                if (navigator.vibrate) navigator.vibrate([100, 100, 100]);
+            }
+        }
+    
+        function ouvrirAtelierPapyrus() {
+            console.log('%c📜 Ouverture de l\'Atelier des Papyrus', 'color:#d4af37; font-weight:bold;');
+            var nb = runesDecouvertes.papyrusCollectes.length;
+            if (nb === 0) {
+                showStyledAlert('📜 <strong>L\'Atelier</strong><br><br>Vous n\'avez encore aucun fragment...');
+            } else {
+                showStyledAlert('📜 <strong>L\'Atelier</strong><br><br>Vous avez ' + nb + ' fragment(s). Prêt pour l\'assemblage ?');
+            }
         }
         
         // Afficher l'interface d'assemblage
@@ -4446,149 +3990,65 @@ function hideGameContent() {
         } else {
             showStyledAlert('­ƒì║ <strong>La Taverne</strong><br><br>Un lieu de rencontre pour les Initi├®s.<br><br><em>Le chat sera bient├┤t disponible...</em>');
         }
-    }
-
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // RUNE 12 : L'┼ÆIL DE L'ORACLE
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    
+    }// =========================================================================
+    // RUNE 12 : L'ŒIL DE L'ORACLE (STATISTIQUES & JACKPOT)
+    // =========================================================================
     function afficherOeilOracle() {
-        console.log('%c­ƒæü´©Å L\'┼Æil de l\'Oracle s\'ouvre', 'color:#d4af37; font-weight:bold;');
+        console.log('%c👁️ L\'Œil de l\'Oracle s\'ouvre', 'color:#d4af37; font-weight:bold;');
         
-        // R├®cup├®rer la temp├®rature actuelle
-        var tempActuelle = oracleTemperature !== null ? oracleTemperature + '┬░C' : 'En chargement...';
+        var tempActuelle = (typeof oracleTemperature !== 'undefined' && oracleTemperature !== null) 
+            ? oracleTemperature + '°C' 
+            : 'En chargement...';
         
-        var message = '­ƒæü´©Å <strong>L\'┼Æil de l\'Oracle</strong><br><br>';
-        message += '­ƒîí´©Å <strong>Temp├®rature ├á Montr├®al :</strong> ' + tempActuelle + '<br>';
-        message += 'ÔØä´©Å <strong>Seuil d\'activation :</strong> Ôëñ -2┬░C<br><br>';
-        
-        // Calculer le jackpot potentiel (exemple)
+        // Calcul du jackpot (Base 1000 + bonus par progression)
         var jackpotBase = 1000;
         var portesOuvertes = runesDecouvertes.portesOuvertes.length;
         var papyrusCollectes = runesDecouvertes.papyrusCollectes.length;
         var jackpot = jackpotBase + (portesOuvertes * 250) + (papyrusCollectes * 100);
         
-        message += '­ƒÆ░ <strong>Jackpot Actuel :</strong><br>';
+        var message = '👁️ <strong>L\'Œil de l\'Oracle</strong><br><br>';
+        message += '🌡️ <strong>Température à Montréal :</strong> ' + tempActuelle + '<br>';
+        message += '❄️ <strong>Seuil d\'activation :</strong> ≤ -2°C<br><br>';
+        message += '💰 <strong>Jackpot Actuel :</strong><br>';
         message += '<span style="font-size:1.5em; color:#d4af37;">' + jackpot + ' ARCANA</span><br><br>';
-        
-        message += '­ƒôè <strong>Progression :</strong><br>';
-        message += '­ƒÜ¬ Portes ouvertes : ' + portesOuvertes + '/4<br>';
-        message += '­ƒô£ Papyrus collect├®s : ' + papyrusCollectes + '<br>';
-        message += '­ƒöì Indices trouv├®s : ' + runesDecouvertes.indicesTrouves.length + '<br>';
+        message += '📊 <strong>Progression :</strong><br>';
+        message += '🚪 Portes ouvertes : ' + portesOuvertes + '/4<br>';
+        message += '📜 Papyrus collectés : ' + papyrusCollectes + '<br>';
+        message += '🔍 Indices trouvés : ' + runesDecouvertes.indicesTrouves.length + '<br>';
         
         showStyledAlert(message);
-        
-        addOracleChatMessage('­ƒæü´©Å L\'Oracle r├®v├¿le l\'├®tat du Sanctuaire...');
-        
-        // Vibration mystique
+        addOracleChatMessage('👁️ L\'Oracle révèle l\'état du Sanctuaire...');
         vibrerSac(2);
     }
 
-    function vibratePanel(panel){
-        panel.style.animation = 'border-shake 0.22s linear 2';
-        panel.style.boxShadow = "0 0 28px #ff2424,0 0 9px #ffe7e5 inset";
-        setTimeout(()=>{
-            panel.style.animation = '';
-            panel.style.boxShadow = "";
-        }, 410);
-    }
+    // --- ANIMATIONS VISUELLES ---
     function makeGoldRainParticles() {
         const container = document.querySelector('#victory-jackpot .gold-rain');
         if (!container) return;
         container.innerHTML = '';
-        const GoldN = 35+Math.floor(Math.random()*8);
-        for(let i=0;i<GoldN;++i){
+        const GoldN = 35 + Math.floor(Math.random() * 8);
+        for(let i=0; i < GoldN; ++i) {
             let span = document.createElement('span');
             span.className = 'gold-drop';
-            span.style.left = (5+Math.random()*90)+'vw';
-            span.style.top = (-10-Math.random()*40)+'px';
-            let delay = Math.random()*1.25;
-            span.style.animationDelay = delay + 's';
-            span.style.opacity = 0.8 + Math.random()*0.2;
-            span.style.width = (7+Math.random()*5)+'px';
-            span.style.height = (21+Math.random()*18)+'px';
-            span.style.transform += " rotate("+(Math.random()*12-6)+"deg)";
+            span.style.left = (5 + Math.random() * 90) + 'vw';
+            span.style.animationDelay = Math.random() * 1.25 + 's';
+            span.style.width = (7 + Math.random() * 5) + 'px';
+            span.style.height = (21 + Math.random() * 18) + 'px';
             container.appendChild(span);
         }
-        setTimeout(()=>{container.innerHTML='';}, 4300);
-    }
-    document.addEventListener('DOMContentLoaded', ()=>{
-        document.getElementById('heartbeat-audio').play().then(()=>{document.getElementById('heartbeat-audio').pause();}).catch(()=>{});
-    });
-    function stopHeartbeat(){
-        if(window.arcanaHeartbeatTimer) clearTimeout(window.arcanaHeartbeatTimer);
-        window.arcanaHeartbeatTimer = null;
-        let a = document.getElementById('heartbeat-audio');
-        if(a && !a.paused){ a.pause(); a.currentTime=0;}
+        setTimeout(() => { container.innerHTML = ''; }, 4300);
     }
 
-
-    async function updateOracleFromAdmin() {
-        try {
-            // 1. On r├®cup├¿re la temp├®rature r├®elle de Montr├®al via une API
-            const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=45.5088&longitude=-73.5878&current_weather=true');
-            const data = await response.json();
-            const temp = Math.round(data.current_weather.temperature);
-            
-            alert("Oracle : Temp├®rature d├®tect├®e ├á Montr├®al : " + temp + "┬░C");
-
-            // 2. On envoie cette temp├®rature ├á ton contrat Arcana Game
-            if (!signer) await connectWallet();
-            const contract = new ethers.Contract(ARCANA_GAME_CONTRACT, ["function updateOracle(int256 _temp) external"], signer);
-
-            const tx = await contract.updateOracle(temp);
-            document.getElementById('admin-log').innerHTML += `<p>ÔÅ│ Oracle : Envoi blockchain (${temp}┬░C)...</p>`;
-            
-            await tx.wait();
-            alert("L'Oracle est synchronis├® ! La temp├®rature est scell├®e dans Polygon.");
-            document.getElementById('admin-log').innerHTML += `<p>Ô£à Oracle ├á jour : ${temp}┬░C</p>`;
-            
-            // MAJ miroir de glace imm├®diatement
-            fetchAndDisplayTemperature();
-            
-        } catch (error) {
-            console.error("Erreur Oracle:", error);
-            alert("Erreur de synchronisation : " + error.message);
-        }
-    }
-
-    // === SCRIPT DE S├ëCURIT├ë : D├ëSACTIV├ë - Les runes s'affichent imm├®diatement ===
-    // Tout le code de v├®rification Web3 est maintenant dans checkSecurity() qui se lance apr├¿s le chargement
-    console.log('%cÔ£à Mode Affichage Imm├®diat : Les runes sont visibles sans v├®rification pr├®alable', 'color:#00ff88; font-weight:bold;');
-
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // SAC ├Ç DOS INVENTAIRE - Gestion des Cl├®s et Objets
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+    // =========================================================================
+    // SACOCHE INVENTAIRE - GESTION DES CLÉS ET OBJETS
+    // =========================================================================
     var sacInventaire = [];
     var sacObjetsQuete = [];
-    var sacAlerteTimeout = null;
     var sacIsOpen = false;
 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // INTERACTION INVENTAIRE Ôåö SANCTUAIRE
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // 
-    // Quand l'inventaire s'ouvre :
-    // 1. Le drawer monte depuis le bas de l'├®cran (transition 0.5s)
-    // 2. Le sanctuaire se d├®place vers le haut (-20%) et se r├®duit (85%)
-    // 3. L'overlay s'affiche avec transparence (40%) pour voir le sanctuaire
-    // 4. Les runes restent CLIQUABLES gr├óce au z-index ├®lev├®
-    // 5. Le fond du drawer est semi-transparent (85-95%) avec blur
-    // 
-    // Quand l'inventaire se ferme :
-    // 1. Le drawer redescend (transition fluide)
-    // 2. Le sanctuaire reprend sa position centrale (transition 0.6s)
-    // 3. L'overlay dispara├«t en fondu
-    // 4. Toutes les animations sont coordonn├®es pour un effet harmonieux
-    // 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    
     function toggleSacInventaire() {
-        if (sacIsOpen) {
-            fermerSacInventaire();
-        } else {
-            ouvrirSacInventaire();
-        }
+        if (sacIsOpen) fermerSacInventaire();
+        else ouvrirSacInventaire();
     }
 
     function ouvrirSacInventaire() {
@@ -4596,33 +4056,17 @@ function hideGameContent() {
         var overlay = document.getElementById('sac-overlay');
         var sanctuaire = document.getElementById('level-3-sanctuary');
         
-        drawer.classList.add('open');
-        overlay.classList.add('active');
+        if (drawer) drawer.classList.add('open');
+        if (overlay) overlay.classList.add('active');
         sacIsOpen = true;
         
-        // D├®placer le sanctuaire vers le haut avec animation fluide
+        // Effet de repositionnement du sanctuaire vers le haut
         if (sanctuaire) {
             sanctuaire.classList.add('sac-ouvert');
-            
-            // Petit effet de pulse pour indiquer que c'est toujours interactif
-            sanctuaire.style.animation = 'none';
-            setTimeout(function() {
-                sanctuaire.style.animation = '';
-            }, 50);
-            
-            // Message subtil la premi├¿re fois (localStorage)
-            if (!localStorage.getItem('arcana_sac_hint_shown')) {
-                setTimeout(function() {
-                    addOracleChatMessage('­ƒÆí Les runes du Sanctuaire restent cliquables m├¬me quand l\'inventaire est ouvert.');
-                    localStorage.setItem('arcana_sac_hint_shown', 'true');
-                }, 800);
-            }
         }
         
-        // Emp├¬cher le scroll du body
         document.body.style.overflow = 'hidden';
-        
-        console.log('%c­ƒôª Inventaire ouvert - Sanctuaire repositionn├® (reste cliquable)', 'color:#d4af37; font-weight:bold;');
+        console.log('%c👜 Inventaire ouvert - Sanctuaire repositionné', 'color:#d4af37; font-weight:bold;');
     }
 
     function fermerSacInventaire() {
@@ -4630,293 +4074,57 @@ function hideGameContent() {
         var overlay = document.getElementById('sac-overlay');
         var sanctuaire = document.getElementById('level-3-sanctuary');
         
-        drawer.classList.remove('open');
-        overlay.classList.remove('active');
+        if (drawer) drawer.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
         sacIsOpen = false;
         
-        // Restaurer la position du sanctuaire
-        if (sanctuaire) {
-            sanctuaire.classList.remove('sac-ouvert');
-        }
-        
-        // R├®activer le scroll du body
+        if (sanctuaire) sanctuaire.classList.remove('sac-ouvert');
         document.body.style.overflow = 'auto';
-        
-        console.log('%c­ƒôª Inventaire ferm├® - Sanctuaire restaur├®', 'color:#888;');
     }
 
     function updateSacBadge() {
         var badge = document.getElementById('btn-sacoche-badge');
-        var total = sacInventaire.length;
+        var total = sacInventaire.length + sacObjetsQuete.length;
         if (badge) {
             badge.textContent = total;
             badge.style.display = total > 0 ? 'flex' : 'none';
         }
     }
 
-    function ajouterCleDansSac(numero) {
-        var slots = document.querySelectorAll('.sac-slot');
-        var alerte = document.getElementById('sac-alerte-surcharge');
-        
-        // V├®rifier si le sac est plein (10 cl├®s maximum)
-        if (sacInventaire.length >= 10) {
-            // Afficher l'alerte de surcharge
-            alerte.classList.add('active');
-            
-            // Faire vibrer le sac
-            var sacContainer = document.getElementById('sac-inventaire');
-            sacContainer.style.animation = 'border-shake 0.3s linear 2';
-            
-            // Log pour debug
-            console.log('%cÔÜá´©Å SAC PLEIN : Impossible d\'ajouter la cl├® ' + numero, 'color:#ff4444; font-weight:bold;');
-            
-            // Masquer l'alerte apr├¿s 3 secondes
-            if (sacAlerteTimeout) clearTimeout(sacAlerteTimeout);
-            sacAlerteTimeout = setTimeout(function() {
-                alerte.classList.remove('active');
-                sacContainer.style.animation = '';
-            }, 3000);
-            
-            return false;
-        }
-        
-        // Ajouter la cl├® dans le premier slot vide
-        sacInventaire.push(numero);
-        var slotIndex = sacInventaire.length - 1;
-        var slot = slots[slotIndex];
-        
-        if (slot) {
-            slot.textContent = numero;
-            slot.classList.add('filled');
-            
-            // Animation d'ajout
-            slot.style.transform = 'scale(1.2)';
-            slot.style.boxShadow = '0 0 20px rgba(212, 175, 55, 0.8)';
-            setTimeout(function() {
-                slot.style.transform = '';
-                slot.style.boxShadow = '';
-            }, 300);
-            
-            // Log de confirmation
-            console.log('%c­ƒùØ´©Å Cl├® ' + numero + ' ajout├®e au sac (slot ' + (slotIndex + 1) + '/10)', 'color:#d4af37; font-weight:bold;');
-            
-            // Message dans le chat Oracle
-            addOracleChatMessage('Cl├® ' + numero + ' rang├®e dans le sac (' + sacInventaire.length + '/10)');
-            
-            // Mettre ├á jour le badge
-            updateSacBadge();
-        }
-        
-        return true;
-    }
-
-    function retirerCleDuSac(slotIndex) {
-        var slots = document.querySelectorAll('.sac-slot');
-        
-        if (slotIndex < 0 || slotIndex >= sacInventaire.length) {
-            console.warn('Slot invalide:', slotIndex);
-            return null;
-        }
-        
-        var cleRetiree = sacInventaire[slotIndex];
-        sacInventaire.splice(slotIndex, 1);
-        
-        // R├®organiser l'affichage
-        slots.forEach(function(slot, idx) {
-            if (idx < sacInventaire.length) {
-                slot.textContent = sacInventaire[idx];
-                slot.classList.add('filled');
-            } else {
-                slot.textContent = '';
-                slot.classList.remove('filled');
-            }
-        });
-        
-        console.log('%c­ƒùØ´©Å Cl├® ' + cleRetiree + ' retir├®e du sac', 'color:#888; font-weight:bold;');
-        addOracleChatMessage('Cl├® ' + cleRetiree + ' utilis├®e (' + sacInventaire.length + '/10 restantes)');
-        
-        // Mettre ├á jour le badge
-        updateSacBadge();
-        
-        return cleRetiree;
-    }
-
-    function viderSac() {
-        sacInventaire = [];
-        var slots = document.querySelectorAll('.sac-slot');
-        slots.forEach(function(slot) {
-            slot.textContent = '';
-            slot.classList.remove('filled');
-        });
-        updateSacBadge();
-        console.log('%c­ƒùØ´©Å Sac vid├®', 'color:#888;');
-    }
-
-    function obtenirNombreClesDansSac() {
-        return sacInventaire.length;
-    }
-
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // OBJETS DE QU├èTE - Gestion
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    
-    function ajouterObjetQuete(icone, nom, id) {
-        // V├®rifier si l'objet existe d├®j├á
-        if (sacObjetsQuete.find(function(obj) { return obj.id === id; })) {
-            console.warn('Objet de qu├¬te d├®j├á pr├®sent:', nom);
-            return false;
-        }
-        
-        var objet = {
-            id: id || 'objet_' + Date.now(),
-            icone: icone,
-            nom: nom
-        };
-        
-        sacObjetsQuete.push(objet);
-        afficherObjetsQuete();
-        updateSacBadge();
-        
-        console.log('%cÔ£¿ Objet de qu├¬te ajout├®:', 'color:#49cafa; font-weight:bold;', nom);
-        addOracleChatMessage('Objet de qu├¬te obtenu : ' + nom);
-        
-        return true;
-    }
-
-    function retirerObjetQuete(id) {
-        var index = sacObjetsQuete.findIndex(function(obj) { return obj.id === id; });
-        if (index === -1) return null;
-        
-        var objet = sacObjetsQuete[index];
-        sacObjetsQuete.splice(index, 1);
-        afficherObjetsQuete();
-        updateSacBadge();
-        
-        console.log('%cÔ£¿ Objet de qu├¬te retir├®:', 'color:#888;', objet.nom);
-        addOracleChatMessage('Objet de qu├¬te utilis├® : ' + objet.nom);
-        
-        return objet;
-    }
-
-    function afficherObjetsQuete() {
-        var container = document.getElementById('sac-objets-quete');
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        if (sacObjetsQuete.length === 0) {
-            var vide = document.createElement('div');
-            vide.id = 'sac-objets-quete-vide';
-            vide.textContent = 'Aucun objet de qu├¬te';
-            container.appendChild(vide);
-            return;
-        }
-        
-        sacObjetsQuete.forEach(function(objet) {
-            var div = document.createElement('div');
-            div.className = 'objet-quete';
-            div.dataset.id = objet.id;
-            
-            // Ajouter classe sp├®ciale pour les papyrus anciens
-            if (objet.id && objet.id.startsWith('papyrus_ancien_')) {
-                div.classList.add('papyrus-ancien');
-            }
-            
-            div.innerHTML = objet.icone + '<span class="objet-quete-nom">' + objet.nom + '</span>';
-            
-            // Action au clic selon le type d'objet
-            div.onclick = function() {
-                console.log('Objet de qu├¬te cliqu├®:', objet.nom);
-                
-                // Si c'est un papyrus ancien, afficher la modal de d├®roulement
-                if (objet.id && objet.id.startsWith('papyrus_ancien_')) {
-                    ouvrirPapyrus(objet.id, objet.nom);
-                } else {
-                    // Pour les autres objets, afficher une info simple
-                    showStyledAlert('Ô£¿ <strong>' + objet.nom + '</strong><br><br>Un objet myst├®rieux de votre qu├¬te.<br><br><em style="color:#49cafa;">Gardez-le pr├®cieusement...</em>');
-                }
-            };
-            
-            container.appendChild(div);
-        });
-    }
-
-    function viderObjetsQuete() {
-        sacObjetsQuete = [];
-        afficherObjetsQuete();
-        updateSacBadge();
-    }
-
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // R├ëSONANCE MAGIQUE - Effets Visuels et Haptiques
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    // 
-    // GUIDE D'UTILISATION RAPIDE :
-    // 
-    // 1. Vibrer le bouton sacoche uniquement :
-    //    vibrerSac(intensite);  // intensite: 1=doux, 2=moyen, 3=fort
-    // 
-    // 2. Activer la r├®sonance d'un objet dans l'inventaire :
-    //    activerResonanceObjet(objetId, 'quete');  // ou 'cle' pour une cl├®
-    // 
-    // 3. D├®clencher une r├®sonance compl├¿te (bouton + objet + vibration) :
-    //    declencherResonanceMagique(objetId, 'quete', intensite);
-    // 
-    // 4. V├®rifier si le joueur a l'objet requis et d├®clencher la r├®sonance :
-    //    verifierResonanceZone('nom_zone', 'id_objet_requis');
-    // 
-    // 5. Arr├¬ter toute r├®sonance :
-    //    arreterResonanceMagique();
-    // 
-    // EXEMPLE D'INT├ëGRATION AVEC UNE PORTE :
-    // 
-    //    function onRuneClick(runeId) {
-    //        // V├®rifier si le joueur s'approche de la bonne rune
-    //        if (runeId === SANCTUARY_SEQUENCE[sanctuaryProgress]) {
-    //            // D├®clencher une r├®sonance si une cl├® sp├®ciale est dans l'inventaire
-    //            if (sacInventaire.indexOf(7) !== -1) {
-    //                declencherResonanceMagique(7, 'cle', 2);
-    //            }
-    //        }
-    //    }
-    // 
-    // ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
-    var sacResonanceActive = false;
-    var sacResonanceObjetActif = null;
-
+    // --- RÉSONANCE HAPTIQUE (VIBRATION) ---
     function vibrerSac(intensite) {
-        intensite = intensite || 1; // Intensit├® par d├®faut : 1
+        intensite = intensite || 1;
         var btnSacoche = document.getElementById('btn-sacoche');
+        if (btnSacoche) btnSacoche.classList.add('resonance');
         
-        // Ajouter la classe de r├®sonance
-        btnSacoche.classList.add('resonance');
-        
-        // Vibration haptique si support├®e
         if (navigator.vibrate) {
-            // Pattern de vibration selon l'intensit├®
-            var pattern;
-            switch(Math.floor(intensite)) {
-                case 1:
-                    pattern = [100, 50, 100]; // Doux
-                    break;
-                case 2:
-                    pattern = [150, 50, 150, 50, 150]; // Moyen
-                    break;
-                case 3:
-                    pattern = [200, 50, 200, 50, 200, 50, 200]; // Fort
-                    break;
-                default:
-                    pattern = [100, 50, 100];
-            }
+            var pattern = (intensite === 3) ? [200, 50, 200] : (intensite === 2) ? [150, 50, 150] : [100, 50, 100];
             navigator.vibrate(pattern);
-            console.log('%c­ƒô│ Vibration haptique d├®clench├®e (intensit├®: ' + intensite + ')', 'color:#d4af37;');
-        } else {
-            console.log('%c­ƒô│ Vibration haptique non support├®e sur cet appareil', 'color:#888;');
         }
         
-        sacResonanceActive = true;
-        
-        console.log('%cÔ£¿ R├®sonance magique activ├®e (intensit├®: ' + intensite + ')', 'color:#d4af37; font-weight:bold;');
+        setTimeout(() => { 
+            if (btnSacoche) btnSacoche.classList.remove('resonance');
+        }, 1000);
+    }
+
+    // --- SYNC ORACLE DEPUIS ADMIN ---
+    async function updateOracleFromAdmin() {
+        try {
+            const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=45.5088&longitude=-73.5878&current_weather=true');
+            const data = await response.json();
+            const temp = Math.round(data.current_weather.temperature);
+            
+            if (!signer) await connectWallet();
+            const contract = new ethers.Contract(ARCANA_GAME_CONTRACT, ["function updateOracle(int256 _temp) external"], signer);
+            const tx = await contract.updateOracle(temp);
+            
+            addOracleChatMessage('⏳ Synchronisation Oracle : ' + temp + '°C...');
+            await tx.wait();
+            addOracleChatMessage('✅ Oracle scellé dans la Blockchain.');
+            fetchAndDisplayTemperature();
+        } catch (error) {
+            console.error("Erreur Oracle:", error);
+        }
     }
 
     function arreterVibrationSac() {
