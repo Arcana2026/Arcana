@@ -300,18 +300,12 @@
             text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
             transform: translateY(-1px);
         }
-        /* Masquer les boutons w3m sauf dans le header - pas de chevauchement avec le titre */
+        /* Masquer le bouton flottant bleu w3m - seul CONNECT WALLET du header reste */
         w3m-button {
             display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
-        .wallet-button-wrap w3m-button {
-            display: block !important;
-        }
-        .wallet-button-wrap {
-            transform: scale(0.8);
-            transform-origin: center;
-        }
-        /* gate-connect-wrap supprimé : seul le bouton CONNECT WALLET du header (droite) reste visible */
         /* Responsive Header */
         @media (max-width: 1024px) {
             header {
@@ -3139,6 +3133,19 @@ function showGameContent() {
     if (gate) gate.classList.add('hidden');
     if (content) content.classList.add('visible');
 }
+
+function triggerTransitionToSanctuary(prov, sgn, acc) {
+    provider = prov; signer = sgn; account = acc;
+    showGameContent();
+    if (typeof updateWalletAddressDisplay === 'function') updateWalletAddressDisplay(acc);
+}
+
+window.arcanaOnW3mConnect = function(prov, sgn, acc) {
+    provider = prov; signer = sgn; account = (typeof acc === 'string' ? acc : (acc && acc.address ? acc.address : acc));
+    showGameContent();
+    if (typeof updateWalletAddressDisplay === 'function') updateWalletAddressDisplay(account);
+};
+window.arcanaOnW3mDisconnect = hideGameContent;
 
 function showOracleNetworkAlert() {
     if (document.getElementById('oracle-network-overlay')) return;
