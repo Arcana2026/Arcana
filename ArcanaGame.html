@@ -3322,98 +3322,67 @@ function updateWalletAddressDisplay(addr) {
     }
 }
 
-function hideGameContent() {
-    provider = null; signer = null; account = null;
-    window._arcanaTransitionDone = false;
-    var gate = document.getElementById('arcana-connect-gate');
-    var content = gameContainer();
-    if (gate) { gate.classList.remove('hidden', 'fade-out'); }
-    if (content) { content.classList.remove('visible', 'fade-in'); }
-    var frost = document.getElementById('frost-particles');
-    if (frost) { frost.classList.remove('active'); frost.innerHTML = ''; }
-    document.body.classList.remove('frost-transition');
-    var inv = document.getElementById('arcane-inventory');
-    if (inv) inv.style.display = 'none';
-    var gb = document.getElementById('grimoire-btn');
-    if (gb) gb.style.display = 'none';
-    var df = document.getElementById('arcane-dark-fog');
-    var dl = document.getElementById('arcane-darkness-overlay');
-    if (df) df.style.opacity = '0';
-    if (dl) dl.style.opacity = '0';
-    var ej = document.getElementById('arcane-echo-journal');
-    if (ej) ej.style.display = 'none';
-    var pm = document.getElementById('arcane-pyramid-map');
-    if (pm) pm.style.display = 'none';
-    var fog = document.getElementById('arcana-fog');
-    if (fog) fog.classList.remove('sanctuary-active');
-    var badge = document.getElementById('wallet-address-badge');
-    if (badge) badge.remove();
-    var overlay = document.getElementById('oracle-network-overlay');
-    if (overlay) overlay.remove();
-    // === SYSTÈME DE MESSAGERIE DE L'ORACLE ===
-    function addOracleChatMessage(msg) {
-        var chatContainer = document.querySelector('#chat-temple div[style*="overflow-y"]') || document.querySelector('#chat-temple > div:nth-child(2)');
-        if (chatContainer) {
-            var p = document.createElement('p');
-            p.style.cssText = 'margin:5px 0; color:var(--gold); font-weight:bold;';
-            p.textContent = msg;
-            chatContainer.appendChild(p);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+function addOracleChatMessage(msg) {
+    var chatContainer = document.querySelector('#chat-temple div[style*="overflow-y"]') || document.querySelector('#chat-temple > div:nth-child(2)');
+    if (chatContainer) {
+        var p = document.createElement('p');
+        p.style.cssText = 'margin:5px 0; color:var(--gold); font-weight:bold;';
+        p.textContent = msg;
+        chatContainer.appendChild(p);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
     }
+}
 
-    // === GESTION DE L'ORACLE MÉTÉO (MONTRÉAL) ===
-    async function fetchAndDisplayTemperature() {
-        try {
-            if (!provider) {
-                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
+async function fetchAndDisplayTemperature() {
+    try {
+        if (!provider) {
+            provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
+        }
+        const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
+
+        let tempRaw = await oracle.currentTemp();
+        let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
+        oracleTemperature = tempC;
+        oracleLoading = false;
+
+        const tempDisplay = document.getElementById('temp');
+        const depositBtn = document.getElementById('btnDeposit');
+        const warningMsg = document.getElementById('oracle-warning-message');
+        const oracleMirror = document.querySelector(".oracle-mirror");
+        
+        var isTestMode = account && isVipWallet(account);
+        var accessGranted = (tempC <= -2 || bypassOracle === true || isTestMode);
+
+        if (tempDisplay) {
+            tempDisplay.textContent = accessGranted ? tempC + "°C 🔓" : tempC + "°C 🔒";
+        }
+
+        if (accessGranted) {
+            if (warningMsg) {
+                warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Accès Autorisé</strong> : Gel confirmé (≤ -2°C)</span>';
+                warningMsg.style.display = "block";
             }
-            const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
-
-            let tempRaw = await oracle.currentTemp();
-            let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
-            oracleTemperature = tempC;
-            oracleLoading = false;
-
-            const tempDisplay = document.getElementById('temp');
+            if (depositBtn) {
+                depositBtn.disabled = false;
+                depositBtn.classList.remove("disabled");
+            }
+            if (oracleMirror) oracleMirror.classList.add("frozen");
+        } else {
+            if (warningMsg) {
+                warningMsg.innerHTML = '<span style="color:#ff6b6b;">🔒 <strong>Sanctuaire en Attente</strong> : Gel insuffisant (> -2°C)</span>';
+                warningMsg.style.display = "block";
+            }
+            if (depositBtn) {
+                depositBtn.disabled = true;
+                depositBtn.classList.add("disabled");
+            }
+            if (oracleMirror) oracleMirror.classList.remove("frozen");
+        }
+    } catch(e) {
+        console.warn('Oracle fetch error:', e);
+        if (bypassOracle) {
             const depositBtn = document.getElementById('btnDeposit');
-            const warningMsg = document.getElementById('oracle-warning-message');
-            const oracleMirror = document.querySelector(".oracle-mirror");
-            
-            var isTestMode = account && isVipWallet(account);
-            var accessGranted = (tempC <= -2 || bypassOracle === true || isTestMode);
-
-            if (tempDisplay) {
-                tempDisplay.textContent = accessGranted ? tempC + "°C 🔓" : tempC + "°C 🔒";
-            }
-
-            if (accessGranted) {
-                if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Accès Autorisé</strong> : Gel confirmé (≤ -2°C)</span>';
-                    warningMsg.style.display = "block";
-                }
-                if (depositBtn) {
-                    depositBtn.disabled = false;
-                    depositBtn.classList.remove("disabled");
-                }
-                if (oracleMirror) oracleMirror.classList.add("frozen");
-            } else {
-                if (warningMsg) {
-                    warningMsg.innerHTML = '<span style="color:#ff6b6b;">🔒 <strong>Sanctuaire en Attente</strong> : Gel insuffisant (> -2°C)</span>';
-                    warningMsg.style.display = "block";
-                }
-                if (depositBtn) {
-                    depositBtn.disabled = true;
-                    depositBtn.classList.add("disabled");
-                }
-                if (oracleMirror) oracleMirror.classList.remove("frozen");
-            }
-        } catch(e) {
-            console.warn('Oracle fetch error:', e);
-            if (bypassOracle) {
-                const depositBtn = document.getElementById('btnDeposit');
-                if (depositBtn) depositBtn.disabled = false;
-            }
+            if (depositBtn) depositBtn.disabled = false;
         }
     }
 
