@@ -4480,36 +4480,7 @@ function hideGameContent() {
     // ═══════════════════════════════════════════════════════
     // FONCTIONS DE TEST - Console
     // ═══════════════════════════════════════════════════════
-    // 
-    // GUIDE DE TEST DANS LA CONSOLE :
-    // 
-    // testQueteRune1()             - Test de la première quête (Rune n°1) (NEW!)
-    // testSac()                    - Test complet du sac (clés + objets + alerte surcharge)
-    // testObjetsQuete()            - Test des objets de quête uniquement
-    // testPapyrus()                - Test papyrus anciens avec déroulement
-    // testResonance()              - Test des effets de résonance magique
-    // testZoneInteractive()        - Test de détection de zone avec objet requis
-    // testInteractionSanctuaire()  - Test interaction inventaire ↔ sanctuaire
-    // testRunesSysteme()           - Test système des 12 runes
-    // testScenarioComplet()        - Scénario complet de quête avec résonances
-    // 
-    // FONCTIONS RAPIDES :
-    // 
-    // resonner('cristal_1', 'quete', 2)  - Déclencher résonance rapide
-    // vibrerSac(3)                        - Vibrer le bouton (intensité 1-3)
-    // ouvrirSacInventaire()              - Ouvrir le drawer
-    // fermerSacInventaire()              - Fermer le drawer
-    // toggleSacInventaire()              - Ouvrir/fermer le drawer
-    // 
-    // FONCTIONS RUNES :
-    // 
-    // fouillerZone(0)                    - Fouiller avec rune 1 (énigme)
-    // ouvrirPorte(4)                     - Tenter d'ouvrir porte 1
-    // ouvrirAtelierPapyrus()             - Ouvrir l'atelier
-    // ouvrirTaverne()                    - Ouvrir le chat
-    // afficherOeilOracle()               - Afficher météo + jackpot
-    // 
-    // ═══════════════════════════════════════════════════════
+    
     window.testSac = function() {
         console.log('%c=== TEST DU SAC À DOS ===', 'color:#d4af37; font-size:1.2em; font-weight:bold;');
         viderSac();
@@ -4895,20 +4866,6 @@ function hideGameContent() {
         }
         return result;
     }
-
-    // Exemple d'utilisation avec les runes :
-    // Ajoutez ceci dans onRuneClick pour activer la résonance au survol
-    /*
-    function onRuneClick(runeId) {
-        // Code existant...
-        
-        // Ajouter détection de résonance
-        if (verifierResonanceRune(runeId)) {
-            addOracleChatMessage('✨ Votre clé vibre en présence de cette rune !');
-
-        }
-        
-        // Reste du code...
-    }
-    */
-</script></body></html>
+</script>
+</body>
+</html>
