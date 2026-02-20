@@ -3099,6 +3099,17 @@ function enterLevelMode() {
     }
 }
 
+function gameContainer() {
+    return document.getElementById('game-container') || document.getElementById('arcana-game-content');
+}
+
+function hideGameContent() {
+    var gate = document.getElementById('arcana-connect-gate');
+    var content = gameContainer();
+    if (content) content.classList.remove('visible');
+    if (gate) gate.classList.remove('hidden');
+}
+
 function showGameContent() {
     var gate = document.getElementById('arcana-connect-gate');
     var content = gameContainer();
@@ -3779,6 +3790,8 @@ async function fetchAndDisplayTemperature() {
                 btn.classList.remove('good');
             }, 450);
         }
+
+        window.onRuneClick = onRuneClick;
     
         // --- RUNES 1-4 : LES CHERCHEURS ---
         function fouillerZone(runeId) {
