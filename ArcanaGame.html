@@ -3885,6 +3885,8 @@ function hideGameContent() {
                 el.style.transform = 'translate(-50%,-50%) scale(1)';
             }, 10);
         });
+    }
+
         // =========================================================================
         // SYSTÈME DE RUNES - Configuration des 12 Runes
         // =========================================================================
@@ -3894,14 +3896,15 @@ function hideGameContent() {
         // Rune 11     : La Taverne (chat social)
         // Rune 12     : L'Œil de l'Oracle (météo + jackpot)
         // =========================================================================
-    
+
         // État des énigmes et découvertes
-        var runesDecouvertes = {
+        window.runesDecouvertes = window.runesDecouvertes || {
             rune1PremierClic: false,
             indicesTrouves: [],
             papyrusCollectes: [],
             portesOuvertes: []
         };
+        var runesDecouvertes = window.runesDecouvertes;
     
         function onRuneClick(runeId) {
             // Son de la rune
@@ -4034,40 +4037,38 @@ function hideGameContent() {
     
         function ouvrirAtelierPapyrus() {
             console.log('%c📜 Ouverture de l\'Atelier des Papyrus', 'color:#d4af37; font-weight:bold;');
-            var nb = runesDecouvertes.papyrusCollectes.length;
-            if (nb === 0) {
-                showStyledAlert('📜 <strong>L\'Atelier</strong><br><br>Vous n\'avez encore aucun fragment...');
-            } else {
-                showStyledAlert('📜 <strong>L\'Atelier</strong><br><br>Vous avez ' + nb + ' fragment(s). Prêt pour l\'assemblage ?');
-            }
-        }
-        
-        // Afficher l'interface d'assemblage
-        var message = '📜 <strong>Atelier d\'Assemblage Égyptien</strong><br><br>';
-        message += '<div style="font-size:1.5em; margin: 15px 0;">⏀ ⏃ ⏇</div>';
-        message += 'Papyrus anciens collectés : <strong>' + nbPapyrus + '</strong>/3<br><br>';
-        
-        if (nbPapyrus >= 3) {
-            message += '<em style="color:#00ff88;">✨ Les trois fragments s\'assemblent dans une lumière dorée !</em><br><br>';
-            message += '<div style="font-size:1.3em; margin: 15px 0; color:#d4af37;">❶ ❷ ❸</div>';
-            message += '🎯 <strong>Message Révélé :</strong><br><span style="font-size:1.1em; color:#8b4513; font-weight:bold;">"Le trésor se cache là où le givre rencontre l\'or éternel"</span>';
+            var nbPapyrus = runesDecouvertes.papyrusCollectes.length;
             
-            // Récompense pour assemblage (éviter les doublons)
-            if (!sacObjetsQuete.find(function(obj) { return obj.id === 'livre_secrets'; })) {
-                ajouterObjetQuete('📖', 'Livre des Secrets', 'livre_secrets');
-                vibrerSac(3);
-                addOracleChatMessage('📖 Assemblage réussi : Livre des Secrets obtenu !');
+            if (nbPapyrus === 0) {
+                showStyledAlert('📜 <strong>L\'Atelier</strong><br><br>Vous n\'avez encore aucun fragment...');
+                return;
             }
-        } else {
-            message += '<em style="color:#ff6b6b;">Il vous faut les 3 fragments pour reconstituer le message complet...</em><br><br>';
-            message += '<div style="margin: 10px 0;">│ Fragments manquants : <strong>' + (3 - nbPapyrus) + '</strong></div>';
-            message += '<small style="color:#888;">💡 Continuez à explorer avec les Runes des Chercheurs.</small>';
+
+            // Afficher l'interface d'assemblage
+            var message = '📜 <strong>Atelier d\'Assemblage Égyptien</strong><br><br>';
+            message += '<div style="font-size:1.5em; margin: 15px 0;">⏀ ⏃ ⏇</div>';
+            message += 'Papyrus anciens collectés : <strong>' + nbPapyrus + '</strong>/3<br><br>';
+            
+            if (nbPapyrus >= 3) {
+                message += '<em style="color:#00ff88;">✨ Les trois fragments s\'assemblent dans une lumière dorée !</em><br><br>';
+                message += '<div style="font-size:1.3em; margin: 15px 0; color:#d4af37;">❶ ❷ ❸</div>';
+                message += '🎯 <strong>Message Révélé :</strong><br><span style="font-size:1.1em; color:#8b4513; font-weight:bold;">"Le trésor se cache là où le givre rencontre l\'or éternel"</span>';
+                
+                // Récompense pour assemblage (éviter les doublons)
+                if (!sacObjetsQuete.find(function(obj) { return obj.id === 'livre_secrets'; })) {
+                    ajouterObjetQuete('📖', 'Livre des Secrets', 'livre_secrets');
+                    vibrerSac(3);
+                    addOracleChatMessage('📖 Assemblage réussi : Livre des Secrets obtenu !');
+                }
+            } else {
+                message += '<em style="color:#ff6b6b;">Il vous faut les 3 fragments pour reconstituer le message complet...</em><br><br>';
+                message += '<div style="margin: 10px 0;">│ Fragments manquants : <strong>' + (3 - nbPapyrus) + '</strong></div>';
+                message += '<small style="color:#888;">💡 Continuez à explorer avec les Runes des Chercheurs.</small>';
+            }
+            
+            showStyledAlert(message);
+            addOracleChatMessage('📜 Atelier ouvert : ' + nbPapyrus + '/3 papyrus disponibles.');
         }
-        
-        showStyledAlert(message);
-        
-        addOracleChatMessage('📜 Atelier ouvert : ' + nbPapyrus + '/3 papyrus disponibles.');
-    }
 
     // ═══════════════════════════════════════════════════════
     // RUNE 11 : LA TAVERNE (Chat Social)
@@ -4163,6 +4164,8 @@ function hideGameContent() {
     var sacInventaire = [];
     var sacObjetsQuete = [];
     var sacIsOpen = false;
+    var sacResonanceActive = false;
+    var sacResonanceObjetActif = null;
 
     function toggleSacInventaire() {
         if (sacIsOpen) fermerSacInventaire();
@@ -4673,12 +4676,13 @@ function hideGameContent() {
         // Préparer le terrain
         viderSac();
         viderObjetsQuete();
-        runesDecouvertes = {
+        window.runesDecouvertes = {
             rune1PremierClic: false,
             indicesTrouves: [],
             papyrusCollectes: [],
             portesOuvertes: []
         };
+        var runesDecouvertes = window.runesDecouvertes;
         
         console.log('%c\n📖 GUIDE DES RUNES :', 'color:#49cafa; font-size:1.1em; font-weight:bold;');
         console.log('%c  Runes 1-4  : Les Chercheurs (fouillerZone)', 'color:#888;');
