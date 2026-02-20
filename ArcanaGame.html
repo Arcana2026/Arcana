@@ -4709,4 +4709,82 @@ async function fetchAndDisplayTemperature() {
         }
         return result;
     }
-</script></body></html>
+<script>
+    // --- LOGIQUE DE L'ORACLE & TEMPÉRATURE ---
+    const ARCANA_GAME_ORACLE_CONTRACT = ARCANA_GAME_CONTRACT; 
+
+    async function fetchAndDisplayTemperature() {
+        try {
+            if (!provider) {
+                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
+            }
+            const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
+
+            let tempRaw = await oracle.currentTemp();
+            let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
+
+            const tempDisplay = document.getElementById('temp');
+            const depositBtn = document.getElementById('btnDeposit');
+            const warningMsg = document.getElementById('oracle-warning-message');
+            const oracleMirror = document.querySelector(".oracle-mirror");
+
+            if (tempC <= -10) {
+                if (tempDisplay) tempDisplay.textContent = tempC + "°C";
+                if (warningMsg) warningMsg.style.display = "none";
+                if (depositBtn) {
+                    depositBtn.disabled = false;
+                    depositBtn.classList.remove("disabled");
+                }
+                if (oracleMirror) oracleMirror.classList.add("frozen");
+            } else {
+                if (tempDisplay) tempDisplay.textContent = tempC + "°C";
+                if (warningMsg) {
+                    warningMsg.textContent = "Le givre ne s'est pas encore formé. Revenez quand Montréal gèlera.";
+                    warningMsg.style.display = "block";
+                }
+                if (depositBtn) {
+                    depositBtn.disabled = true;
+                    depositBtn.classList.add("disabled");
+                }
+                if (oracleMirror) oracleMirror.classList.remove("frozen");
+            }
+        } catch(e) {
+            console.error("Erreur Oracle:", e);
+        }
+    }
+
+    // --- CORRECTION CONNEXION WEB3 ---
+    window.arcanaOnW3mConnect = function(prov, sgn, acc) {
+        provider = prov; signer = sgn; account = acc;
+        var btn = document.querySelector(".btn-connect");
+        if (btn) btn.innerText = "Connecté";
+        
+        // Révèle le contenu du jeu
+        const gameContent = document.getElementById('game-container'); 
+        if (gameContent) gameContent.classList.add('visible');
+        
+        fetchAndDisplayTemperature();
+    };
+
+    // --- SYNC INITIALE ---
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchAndDisplayTemperature();
+        setInterval(fetchAndDisplayTemperature, 180000); // 3 minutes
+    });
+
+    // --- FONCTION ADMIN POUR FORCER L'OUVERTURE ---
+    async function forceOpenAdmin() {
+        try {
+            if (!signer) await connectWallet();
+            const contract = new ethers.Contract(ARCANA_GAME_CONTRACT, ["function updateOracle(int256 _temp) external"], signer);
+            const tx = await contract.updateOracle(-20);
+            await tx.wait();
+            fetchAndDisplayTemperature();
+            alert("Oracle forcé à -20°C !");
+        } catch (e) {
+            alert("Erreur: " + e.message);
+        }
+    }
+</script>
+</body>
+</html>
