@@ -107,7 +107,7 @@
         #brick-wall-overlay {
             position: fixed;
             inset: 0;
-            z-index: 10000;
+            z-index: 100;
             display: block;
             overflow: hidden;
             pointer-events: auto;
@@ -139,6 +139,30 @@
             box-shadow:
                 inset 0 0 120px rgba(0,0,0,0.75),
                 inset 0 0 30px rgba(212,175,55,0.08);
+        }
+
+        body.corridor-entrance-bg {
+            background-image:
+                url('couloir-coffre.webp'),
+                linear-gradient(90deg,
+                    rgba(20, 15, 10, 1) 0%,
+                    rgba(30, 25, 20, 0.9) 10%,
+                    transparent 25%,
+                    transparent 75%,
+                    rgba(30, 25, 20, 0.9) 90%,
+                    rgba(20, 15, 10, 1) 100%),
+                linear-gradient(180deg,
+                    transparent 0%,
+                    transparent 50%,
+                    rgba(25, 20, 15, 0.8) 70%,
+                    rgba(20, 15, 10, 1) 100%),
+                radial-gradient(ellipse at 50% 50%,
+                    rgba(40, 35, 30, 1) 0%,
+                    rgba(25, 20, 15, 1) 50%,
+                    rgba(15, 10, 5, 1) 100%);
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
         }
 
         .brick-panel.left {
@@ -1787,9 +1811,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: 2400;
             opacity: 0;
             pointer-events: none;
@@ -1823,25 +1847,33 @@
         #sac-inventaire {
             font-family: 'Cinzel', serif;
             position: fixed !important;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            top: 50%;
+            left: 50%;
             z-index: 10000;
-            max-height: 70vh;
-            background: rgba(0, 0, 0, 0.6) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(212, 175, 55, 0.2) !important;
-            padding: 24px 20px 25px;
+            width: min(920px, calc(100vw - 28px));
+            max-height: min(78vh, 720px);
+            background: rgba(255, 255, 255, 0.10) !important;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 2px solid rgba(0, 242, 255, 0.65);
+            border-radius: 18px;
+            box-shadow:
+                0 0 0 1px rgba(0, 242, 255, 0.18) inset,
+                0 0 26px rgba(0, 242, 255, 0.38),
+                0 0 70px rgba(0, 242, 255, 0.16),
+                0 30px 80px rgba(0, 0, 0, 0.85);
+            padding: 16px 16px 14px;
             overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            color: rgba(255, 255, 255, 0.95);
+            transform: translate(-50%, -50%) scale(0.98);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 220ms ease, transform 220ms ease;
+            color: rgba(245, 252, 255, 0.96);
         }
         #sac-inventaire.open {
-            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
         }
         /* Scrollbar stylisée pour l'inventaire */
         #sac-inventaire::-webkit-scrollbar {
@@ -1868,42 +1900,43 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
         }
         #sac-inventaire-titre {
             font-family: 'Cinzel', serif;
-            color: var(--gold);
-            font-size: 1.1em;
-            letter-spacing: 0.15em;
+            color: rgba(245, 252, 255, 0.92);
+            font-size: 0.95em;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            font-weight: 600;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            font-weight: 300;
+            text-shadow: 0 0 16px rgba(0, 242, 255, 0.18);
         }
 
         .sac-balances {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 18px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
         .sac-balance-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 14px;
-            padding: 12px 12px;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 10px 10px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: inset 0 0 18px rgba(255,255,255,0.04);
         }
 
         .sac-balance-label {
-            font-size: 0.72em;
-            letter-spacing: 0.14em;
+            font-size: 0.70em;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.78);
+            font-weight: 200;
         }
 
         .sac-balance-value {
@@ -1913,6 +1946,32 @@
             color: rgba(245, 252, 255, 0.98);
             text-shadow: 0 0 18px rgba(73, 202, 250, 0.22);
             font-weight: 700;
+        }
+
+        .sac-body {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 12px;
+        }
+
+        .sac-panel {
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+            padding: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .sac-panel-title {
+            font-family: 'Cinzel', serif;
+            color: rgba(245, 252, 255, 0.92);
+            font-size: 0.86em;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            font-weight: 300;
+            margin-bottom: 10px;
+            opacity: 0.95;
         }
         #sac-btn-fermer {
             width: 32px;
@@ -1962,47 +2021,62 @@
             background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.3));
         }
         #sac-slots-container {
+            --hex: 78px;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.03);
+            grid-template-columns: repeat(4, var(--hex));
+            justify-content: center;
+            gap: 10px 12px;
+            padding: 8px;
+            background: transparent;
             border-radius: 12px;
-            border: 0.5px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
         .sac-slot {
-            aspect-ratio: 1;
-            min-height: 60px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 0.5px solid rgba(212, 175, 55, 0.4);
-            border-radius: 8px;
+            width: var(--hex);
+            height: calc(var(--hex) * 0.92);
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid rgba(245, 252, 255, 0.48);
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             font-family: 'Orbitron', monospace;
             font-size: 0.9em;
-            color: var(--gold);
+            color: rgba(245, 252, 255, 0.94);
             font-weight: bold;
             transition: all 0.25s ease;
             position: relative;
             box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
             cursor: pointer;
+            clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%);
+            --slot-x: 0px;
+            transform: translateX(var(--slot-x));
+        }
+
+        #sac-slots-container .sac-slot:nth-child(4n+1),
+        #sac-slots-container .sac-slot:nth-child(4n+2) {
+            --slot-x: calc(var(--hex) * 0.24);
+        }
+
+        #sac-slots-container .sac-slot:nth-child(8n+1),
+        #sac-slots-container .sac-slot:nth-child(8n+2) {
+            --slot-x: 0px;
         }
         .sac-slot:hover {
             border-color: rgba(212, 175, 55, 0.7);
             background: rgba(212, 175, 55, 0.08);
-            transform: translateY(-2px);
+            transform: translateX(var(--slot-x)) translateY(-2px);
         }
         .sac-slot:empty::after {
             content: '—';
-            color: rgba(212, 175, 55, 0.2);
+            color: rgba(245, 252, 255, 0.35);
             font-size: 1.2em;
         }
         .sac-slot.filled {
-            background: rgba(212, 175, 55, 0.15);
-            border-color: var(--gold);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            background: rgba(0, 242, 255, 0.10);
+            border-color: rgba(0, 242, 255, 0.75);
+            box-shadow: 0 0 22px rgba(0, 242, 255, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         .sac-slot.filled::before {
             content: '🔑';
@@ -2037,6 +2111,55 @@
             border-radius: 14px;
             border: 1px solid rgba(201, 185, 147, 0.18);
             min-height: 120px;
+        }
+
+        .sac-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .sac-action-btn {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.22);
+            background: rgba(0, 0, 0, 0.25);
+            color: rgba(245, 252, 255, 0.96);
+            transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+        }
+
+        .sac-action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .sac-action-withdraw {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.92), rgba(184, 134, 11, 0.92));
+            color: rgba(0,0,0,0.92);
+            border-color: rgba(255,255,255,0.22);
+            box-shadow: 0 0 18px rgba(212,175,55,0.22);
+        }
+
+        .sac-action-disconnect {
+            background: linear-gradient(135deg, rgba(255, 66, 66, 0.9), rgba(160, 22, 22, 0.92));
+            color: rgba(255,255,255,0.96);
+            border-color: rgba(255,255,255,0.22);
+            box-shadow: 0 0 18px rgba(255,66,66,0.18);
+        }
+
+        @media (max-width: 820px) {
+            .sac-body {
+                grid-template-columns: 1fr;
+            }
+            #sac-slots-container {
+                --hex: 70px;
+            }
         }
         .objet-quete {
             background: rgba(0, 0, 0, 0.28);
@@ -2369,16 +2492,41 @@
             const STORAGE_KEY = 'arcana_brick_wall_open';
             const overlay = document.getElementById('brick-wall-overlay');
             const chest = document.getElementById('entrance-chest');
+            const leftPanel = overlay ? overlay.querySelector('.brick-panel.left') : null;
+            const rightPanel = overlay ? overlay.querySelector('.brick-panel.right') : null;
 
             if (!overlay || !chest) return;
 
             const setOpen = (open) => {
                 if (open) {
+                    try { document.body.classList.add('corridor-entrance-bg'); } catch (e) {}
                     overlay.classList.add('open');
-                    window.setTimeout(() => {
-                        overlay.classList.add('hidden');
-                        overlay.setAttribute('aria-hidden', 'true');
-                    }, 950);
+                    var done = 0;
+                    var finish = function() {
+                        done++;
+                        if (done < 2) return;
+                        try {
+                            overlay.classList.add('hidden');
+                            overlay.setAttribute('aria-hidden', 'true');
+                        } catch (e) {}
+                        try { if (leftPanel) leftPanel.remove(); } catch (e) {}
+                        try { if (rightPanel) rightPanel.remove(); } catch (e) {}
+                        try { overlay.remove(); } catch (e) {}
+                    };
+
+                    if (leftPanel) leftPanel.addEventListener('transitionend', function(e) {
+                        if (e && e.propertyName !== 'transform') return;
+                        finish();
+                    }, { once: true });
+                    if (rightPanel) rightPanel.addEventListener('transitionend', function(e) {
+                        if (e && e.propertyName !== 'transform') return;
+                        finish();
+                    }, { once: true });
+
+                    window.setTimeout(function() {
+                        finish();
+                        finish();
+                    }, 1400);
                 } else {
                     overlay.classList.remove('hidden');
                     overlay.classList.remove('open');
@@ -2684,29 +2832,34 @@
             </div>
         </div>
 
-        <!-- Section Clés -->
-        <div class="sac-section">
-            <div class="sac-section-titre">🗝️ Clés du Destin</div>
-            <div id="sac-slots-container">
-                <div class="sac-slot" data-slot="0"></div>
-                <div class="sac-slot" data-slot="1"></div>
-                <div class="sac-slot" data-slot="2"></div>
-                <div class="sac-slot" data-slot="3"></div>
-                <div class="sac-slot" data-slot="4"></div>
-                <div class="sac-slot" data-slot="5"></div>
-                <div class="sac-slot" data-slot="6"></div>
-                <div class="sac-slot" data-slot="7"></div>
-                <div class="sac-slot" data-slot="8"></div>
-                <div class="sac-slot" data-slot="9"></div>
+        <div class="sac-body">
+            <div class="sac-panel">
+                <div class="sac-panel-title">Clés</div>
+                <div id="sac-slots-container">
+                    <div class="sac-slot" data-slot="0"></div>
+                    <div class="sac-slot" data-slot="1"></div>
+                    <div class="sac-slot" data-slot="2"></div>
+                    <div class="sac-slot" data-slot="3"></div>
+                    <div class="sac-slot" data-slot="4"></div>
+                    <div class="sac-slot" data-slot="5"></div>
+                    <div class="sac-slot" data-slot="6"></div>
+                    <div class="sac-slot" data-slot="7"></div>
+                    <div class="sac-slot" data-slot="8"></div>
+                    <div class="sac-slot" data-slot="9"></div>
+                </div>
+            </div>
+
+            <div class="sac-panel">
+                <div class="sac-panel-title">Quêtes</div>
+                <div id="sac-objets-quete">
+                    <div id="sac-objets-quete-vide">Aucun objet de quête</div>
+                </div>
             </div>
         </div>
 
-        <!-- Section Objets de Quête -->
-        <div class="sac-section">
-            <div class="sac-section-titre">✨ Objets de Quête</div>
-            <div id="sac-objets-quete">
-                <div id="sac-objets-quete-vide">Aucun objet de quête</div>
-            </div>
+        <div class="sac-actions">
+            <button type="button" class="sac-action-btn sac-action-withdraw" onclick="arcanaWithdrawUI()">FONCTION RETRAIT</button>
+            <button type="button" class="sac-action-btn sac-action-disconnect" onclick="arcanaDisconnectUI()">DISCONNECT</button>
         </div>
     </div>
 
@@ -4549,6 +4702,33 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (sanctuaire) sanctuaire.classList.remove('sac-ouvert');
         document.body.style.overflow = 'auto';
+    }
+
+    function arcanaWithdrawUI() {
+        try {
+            if (!account) {
+                if (typeof connectWallet === 'function') return connectWallet();
+            }
+        } catch (e) {}
+        try {
+            if (typeof showStyledAlert === 'function') {
+                showStyledAlert('🟡 <strong>Fonction Retrait</strong><br><span style="opacity:0.9;">Interface en cours d\'activation. Si votre contrat de retrait est prêt, indique-moi la fonction à appeler (withdraw/claim) et l\'adresse du vault.</span>');
+                return;
+            }
+        } catch (e) {}
+        alert('Fonction Retrait: en cours d\'activation.');
+    }
+
+    function arcanaDisconnectUI() {
+        try {
+            provider = null; signer = null; account = null;
+        } catch (e) {}
+        try { if (typeof window.arcanaOnW3mDisconnect === 'function') window.arcanaOnW3mDisconnect(); } catch (e) {}
+        try {
+            var b = document.getElementById('btnConnect') || document.querySelector('.btn-connect');
+            if (b) b.textContent = 'CONNECT WALLET';
+        } catch (e) {}
+        try { fermerSacInventaire(); } catch (e) {}
     }
 
     function updateSacBadge() {
