@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCANA - Écosystème Web3</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --arcana-blue: #00f2ff;
+            --arcana-dark: #050a10;
+            --glass: rgba(0, 242, 255, 0.05);
+            --border: rgba(0, 242, 255, 0.3);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--arcana-dark) url('arcana-corridor.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Effet de lueur sur le couloir */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+        }
+
+        /* Header Moderne */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 3px;
+            color: var(--arcana-blue);
+        }
+
+        /* Boutons Ghost Style */
+        .btn-arcana {
+            background: transparent;
+            border: 1px solid var(--arcana-blue);
+            color: var(--arcana-blue);
+            padding: 10px 25px;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-arcana:hover {
+            background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 15px var(--arcana-blue);
+        }
+
+        /* Zone de dialogue (Style IA) */
+        #dialogue-box {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            background: rgba(5, 10, 16, 0.85);
+            border-left: 4px solid var(--arcana-blue);
+            padding: 20px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            z-index: 50;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* La Valise (Point Central) */
+        #main-chest-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+        }
+
+        #chest-image {
+            width: 300px;
+            cursor: pointer;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.4));
+        }
+
+        #chest-image:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 40px rgba(0, 242, 255, 0.8));
+        }
+
+        /* Inventaire / Sacoche */
+        #sacoche-trigger {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 1px solid var(--arcana-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: var(--arcana-dark);
+            z-index: 1000;
+        }
+
+        .key-icon {
+            width: 30px;
+            height: 30px;
+            background: url('a-key-icon.png') no-repeat center;
+            background-size: contain;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="logo.png" alt="Arcana" style="height: 40px;">
+        <span>ARCANA</span>
+    </div>
+    <div class="nav-actions">
+        <button class="btn-arcana" id="connect-wallet">Initialiser Connexion</button>
+    </div>
+</header>
+
+<div id="main-chest-container">
+    <img src="v-arcana-c.png" id="chest-image" alt="Valise Arcana">
+    <p style="margin-top: 20px; font-family: 'Orbitron'; color: var(--arcana-blue); letter-spacing: 2px;">VAULT SÉCURISÉ</p>
+</div>
+
+<div id="dialogue-box">
+    <span id="dialogue-text">Initialisation des protocoles...</span>
+</div>
+
+<div id="sacoche-trigger" onclick="toggleInventory()">
+    <div class="key-icon"></div>
+</div>
+
+<script>
+    const dialogueText = document.getElementById('dialogue-text');
+    const chest = document.getElementById('chest-image');
+    let hasKey = false; // Simule la possession de a-key-icon.png
+
+    // Mélange des textes 2 et 3
+    const welcomeMessage = "Connexion établie. Vous pénétrez dans le couloir de données d'Arcana. Ici, le silence du réseau cache le bourdonnement des serveurs et chaque porte est un code. Utilisez vos Data-Keys pour déverrouiller les coffres du Vault. La sécurité Web3 veille sur vos actifs, Bernard.";
+
+    const errorNoKey = "[ALERTE SÉCURITÉ ARCANA] ERREUR : Clé de décryptage absente ou corrompue. Action : Accès au Vault verrouillé via arcana-safe.nft.";
+
+    const successOpen = "Déchiffrement réussi. Accès au contenu du Vault autorisé. Type d'actif : Fragment d'écosystème Arcana sécurisé sur arcana-safe.nft.";
+
+    // Effet machine à écrire
+    function typeWriter(text, i = 0) {
+        if (i < text.length) {
+            dialogueText.innerHTML = text.substring(0, i + 1);
+            setTimeout(() => typeWriter(text, i + 1), 30);
+        }
+    }
+
+    // Au démarrage
+    window.onload = () => {
+        typeWriter(welcomeMessage);
+    };
+
+    // Interaction Valise
+    chest.onclick = () => {
+        if (!hasKey) {
+            typeWriter(errorNoKey);
+            // Flash rouge subtil
+            document.body.style.backgroundColor = "rgba(255,0,0,0.1)";
+            setTimeout(() => document.body.style.backgroundColor = "transparent", 200);
+        } else {
+            chest.src = "v-arcana.png"; // Change vers l'image ouverte
+            typeWriter(successOpen);
+        }
+    };
+
+    // Simulation de ramassage de clé (pour le test)
+    document.addEventListener('keydown', (e) => {
+        if(e.key === "k") {
+            hasKey = true;
+            typeWriter("Data-Key détectée dans le système.");
+        }
+    });
+
+    function toggleInventory() {
+        // Logique de votre sacoche ici
+        alert("Accès à l'inventaire arcana-safe.nft...");
+    }
+</script>
+
+</body>
+</html>
