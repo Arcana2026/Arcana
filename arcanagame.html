@@ -60,12 +60,14 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
             touch-action: manipulation;
+            overscroll-behavior-y: none;
         }
 
         html {
             background-color: #000 !important;
             background: #000 var(--corridor-image-url) no-repeat center center fixed !important;
             background-size: cover !important;
+            overscroll-behavior-y: none;
         }
 
         #app,
@@ -134,6 +136,8 @@
             background: #000 var(--corridor-image-url) no-repeat fixed;
             background-size: cover;
             background-position: center;
+            transform-origin: center;
+            will-change: transform;
         }
 
         #corridor-chest-btn {
@@ -2765,8 +2769,15 @@
                                     var t = clamp(sc / max, 0, 1);
                                     if (document.body.classList.contains('corridor-walk-enabled')) {
                                         try {
-                                            var s = 1 + (1.5 - 1) * t;
+                                            var s = 1 + (1.1 - 1) * t;
                                             if (corridorLayer) corridorLayer.style.transform = 'scale(' + s.toFixed(4) + ')';
+                                        } catch (e) {}
+                                        try {
+                                            var ry = -(22 * t);
+                                            var cols = document.querySelectorAll('#level-3-sanctuary .runes-column');
+                                            cols.forEach(function(el) {
+                                                try { el.style.transform = 'translate3d(0,' + ry.toFixed(1) + 'px,0)'; } catch (e) {}
+                                            });
                                         } catch (e) {}
                                         try {
                                             var out = 220 * t;
