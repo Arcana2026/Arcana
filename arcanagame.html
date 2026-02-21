@@ -44,7 +44,8 @@
         body {
             perspective: 1000px;
             --corridor-bg-size: cover;
-            background: #000 url('couloir-coffre.webp') no-repeat fixed !important;
+            --corridor-image-url: url('sanctuaire-fond.jpg');
+            background: #000 var(--corridor-image-url) no-repeat fixed !important;
             background-size: var(--corridor-bg-size) !important;
             background-position: calc(50% + var(--corridor-parallax-x, 0px)) calc(50% + var(--corridor-parallax-y, 0px)) !important;
             color: white;
@@ -63,7 +64,7 @@
 
         html {
             background-color: #000 !important;
-            background: #000 url('couloir-coffre.webp') no-repeat center center fixed !important;
+            background: #000 var(--corridor-image-url) no-repeat center center fixed !important;
             background-size: cover !important;
         }
 
@@ -114,7 +115,7 @@
         #brick-wall-overlay {
             position: fixed;
             inset: 0;
-            z-index: 10;
+            z-index: 100;
             display: block;
             overflow: hidden;
             pointer-events: auto;
@@ -129,7 +130,10 @@
             inset: 0;
             z-index: -1;
             pointer-events: none;
-            display: none;
+            display: block;
+            background: #000 var(--corridor-image-url) no-repeat fixed;
+            background-size: cover;
+            background-position: center;
         }
 
         #corridor-chest-btn {
@@ -143,7 +147,7 @@
             background: transparent;
             cursor: pointer;
             padding: 0;
-            z-index: 100;
+            z-index: 110;
             -webkit-tap-highlight-color: transparent;
             touch-action: pan-y;
             will-change: transform, filter;
@@ -239,6 +243,9 @@
             --corridor-bg-size: 105% 105%;
             --corridor-parallax-x: 0px;
             --corridor-parallax-y: 0px;
+            background: #000 var(--corridor-image-url) no-repeat fixed !important;
+            background-size: var(--corridor-bg-size) !important;
+            background-position: calc(50% + var(--corridor-parallax-x, 0px)) calc(50% + var(--corridor-parallax-y, 0px)) !important;
             will-change: background-position, background-size;
             transition: background-size 3s ease;
         }
@@ -1026,7 +1033,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 210;
+            z-index: 100;
             display: grid;
             grid-template-columns: 120px 1fr 120px;
             padding: 100px 20px;
@@ -1265,7 +1272,7 @@
             position: fixed;
             top: 72px; left: 0; right: 0; bottom: 0;
             background: transparent !important;
-            display: flex;
+            display: none !important;
             align-items: center;
             justify-content: center;
             z-index: 99;
@@ -1274,8 +1281,8 @@
             overflow: hidden;
         }
         #arcana-connect-gate.hidden { display: none !important; pointer-events: none !important; visibility: hidden !important; }
-        #arcana-connect-gate:not(.hidden) { display: flex !important; }
-        body:has(#arcana-connect-gate:not(.hidden)) { overflow: hidden; height: 100vh; }
+        #arcana-connect-gate:not(.hidden) { display: none !important; }
+        body:has(#arcana-connect-gate:not(.hidden)) { overflow: auto; height: auto; }
         #arcana-connect-gate .gate-message {
             font-family: 'Cinzel', serif;
             color: var(--gold);
