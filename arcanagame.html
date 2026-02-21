@@ -18,11 +18,55 @@
         body {
             margin: 0;
             padding: 0;
-            background: var(--arcana-dark) url('arcana-corridor.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background: var(--arcana-dark);
             color: white;
             font-family: 'Inter', sans-serif;
             overflow: hidden;
+        }
+
+        #corridor-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: var(--arcana-dark) url('arcana-corridor.jpg') no-repeat center center;
+            background-size: cover;
+            transform: scale(1);
+            opacity: 1;
+            transition: transform 300ms ease, opacity 300ms ease;
+            will-change: transform, opacity;
+        }
+
+        #corridor-layer.dive {
+            transform: scale(1.08);
+            opacity: 0.86;
+        }
+
+        .data-fragment {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.85), rgba(0, 242, 255, 0.35) 35%, rgba(0, 242, 255, 0.08) 60%, rgba(0,0,0,0) 70%);
+            border: 1px solid rgba(0, 242, 255, 0.65);
+            box-shadow: 0 0 18px rgba(0, 242, 255, 0.65), 0 0 34px rgba(0, 242, 255, 0.22);
+            cursor: pointer;
+            z-index: 20;
+            transform: translate(-50%, -50%) scale(1);
+            animation: fragmentPulse 1.8s ease-in-out infinite;
+        }
+
+        .data-fragment.implode {
+            animation: fragmentImplode 220ms ease forwards;
+        }
+
+        @keyframes fragmentPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.95; }
+            50% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+        }
+
+        @keyframes fragmentImplode {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.1); opacity: 0; }
         }
 
         body.oracle-frost::after {
@@ -40,67 +84,6 @@
             transition: opacity 300ms ease;
         }
 
-        #oracle-inline-answer {
-            position: fixed;
-            left: 50%;
-            bottom: 190px;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 800px;
-            z-index: 80;
-            display: none;
-        }
-
-        #oracle-inline-answer .oracle-inline-panel {
-            background: rgba(5, 10, 16, 0.88);
-            border: 1px solid rgba(0, 242, 255, 0.35);
-            box-shadow: 0 0 22px rgba(0, 242, 255, 0.16);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        #oracleInlineInput {
-            flex: 1;
-            background: rgba(0,0,0,0.55);
-            border: 1px solid rgba(0, 242, 255, 0.35);
-            color: white;
-            padding: 12px 12px;
-            border-radius: 8px;
-            outline: none;
-            font-family: 'Inter', sans-serif;
-        }
-
-        #oracleInlineSubmit {
-            padding: 12px 14px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 255, 140, 0.75);
-            background: rgba(0, 255, 140, 0.08);
-            color: rgba(0, 255, 140, 0.95);
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.25s ease;
-            white-space: nowrap;
-        }
-
-        #oracleInlineSubmit:hover {
-            background: rgba(0, 255, 140, 0.14);
-            box-shadow: 0 0 18px rgba(0, 255, 140, 0.20);
-        }
-
-        /* Effet de lueur sur le couloir */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
-            pointer-events: none;
-        }
-
         /* Header Moderne */
         header {
             position: fixed;
@@ -113,6 +96,27 @@
             z-index: 100;
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .keys-counter {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            color: rgba(0, 242, 255, 0.95);
+            border: 1px solid rgba(0, 242, 255, 0.45);
+            background: rgba(0, 242, 255, 0.06);
+            padding: 8px 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 16px rgba(0, 242, 255, 0.14);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            user-select: none;
         }
 
         .logo-area {
@@ -238,12 +242,15 @@
 </head>
 <body>
 
+<div id="corridor-layer" aria-hidden="true"></div>
+
 <header>
     <div class="logo-area">
         <img src="logo.png" alt="Arcana" style="height: 40px;">
         <span>ARCANA</span>
     </div>
     <div class="nav-actions">
+        <div id="keysCounter" class="keys-counter">[ KEYS : 0 / 3 ]</div>
         <button class="btn-arcana" id="connect-wallet">Initialiser Connexion</button>
     </div>
 </header>
