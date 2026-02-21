@@ -250,6 +250,7 @@
         <span>ARCANA</span>
     </div>
     <div class="nav-actions">
+        <div id="levelCounter" class="keys-counter">[ SECTEUR : 1 / 100 ]</div>
         <div id="keysCounter" class="keys-counter">[ KEYS : 0 / 3 ]</div>
         <button class="btn-arcana" id="connect-wallet">Initialiser Connexion</button>
     </div>
@@ -273,6 +274,32 @@
     <span id="dialogue-text">Initialisation des protocoles...</span>
 </div>
 
+<div id="matrixOverlay" style="display:none; position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.92);">
+    <pre id="matrixCode" style="margin:0; height:100%; padding:20px; overflow:hidden; color:rgba(0,242,255,0.8); font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size:12px; line-height:1.2;"></pre>
+</div>
+
+<div id="chatPanel" style="position:fixed; left:20px; bottom:20px; width:360px; max-width:92vw; z-index:140; border:1px solid rgba(0,242,255,0.25); background:rgba(5,10,16,0.72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius:12px; overflow:hidden;">
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid rgba(0,242,255,0.18);">
+        <div style="font-family:'Orbitron',sans-serif; letter-spacing:2px; font-size:0.72rem; color:rgba(0,242,255,0.95);">MARCHÉ SOCIAL</div>
+        <button id="toggleChat" class="btn-arcana" style="padding:6px 10px; font-size:0.7rem;">CHAT</button>
+    </div>
+    <div id="chatBody" style="display:none;">
+        <div id="chatMessages" style="height:210px; overflow:auto; padding:10px 12px; font-size:0.84rem;"></div>
+        <div id="auctionList" style="max-height:160px; overflow:auto; padding:0 12px 10px;"></div>
+        <div id="shopPanel" style="padding:0 12px 10px;">
+            <div style="margin-top:10px; padding:10px; border:1px solid rgba(0,242,255,0.18); border-radius:10px; background:rgba(0,242,255,0.04);">
+                <div style="font-family:Orbitron,sans-serif; letter-spacing:1px; font-size:0.72rem; color:rgba(0,242,255,0.95);">BOUTIQUE</div>
+                <div style="margin-top:6px; font-size:0.78rem; color:rgba(255,255,255,0.75);">Guide de l'Initié — 50 USDC</div>
+                <button id="buyGuideBtn" class="btn-arcana" style="margin-top:8px; width:100%; padding:10px 12px;">ACHETER LE GUIDE</button>
+            </div>
+        </div>
+        <div style="display:flex; gap:8px; padding:10px 12px; border-top:1px solid rgba(0,242,255,0.18);">
+            <input id="chatInput" type="text" placeholder="Message... /enchere Fragment 12 USDC" style="flex:1; padding:10px 10px; border-radius:8px; border:1px solid rgba(0,242,255,0.25); background:rgba(0,0,0,0.25); color:#fff; outline:none;" />
+            <button id="chatSend" class="btn-arcana" style="padding:10px 14px;">ENVOYER</button>
+        </div>
+    </div>
+</div>
+
 <div id="sacoche-trigger" onclick="toggleInventory()">
     <div class="key-icon"></div>
 </div>
@@ -281,6 +308,13 @@
     const dialogueText = document.getElementById('dialogue-text');
     const chest = document.getElementById('chest-image');
     let hasKey = false; // Simule la possession de a-key-icon.png
+
+    let currentLevel = 1;
+    let dataKeys = 0;
+    let chestState = { opened: false, contents: [] };
+    let corridorState = { sector: 1, x: 0.5, y: 0.5 };
+    let hasGuide = false;
+    let hasSocialTrade = false;
 
     let provider;
     let signer;
@@ -299,6 +333,566 @@
             dialogueText.innerHTML = text.substring(0, i + 1);
             setTimeout(() => typeWriter(text, i + 1), 30);
         }
+    }
+
+    function getArcanaCloudKey() {
+        if (!account) return null;
+        return `arcana-cloud:${String(account).toLowerCase()}`;
+    }
+
+    function getProgressSnapshot() {
+        return {
+            level: currentLevel,
+            keys: dataKeys,
+            chest: {
+                opened: !!chestState.opened,
+                contents: Array.isArray(chestState.contents) ? chestState.contents : []
+            },
+            guide: !!hasGuide,
+            socialTrade: !!hasSocialTrade,
+            corridor: {
+                sector: corridorState && typeof corridorState.sector === 'number' ? corridorState.sector : currentLevel,
+                x: corridorState && typeof corridorState.x === 'number' ? corridorState.x : 0.5,
+                y: corridorState && typeof corridorState.y === 'number' ? corridorState.y : 0.5
+            },
+            updatedAt: Date.now()
+        };
+    }
+
+    function applyProgressSnapshot(snapshot) {
+        if (!snapshot || typeof snapshot !== 'object') return;
+
+        if (typeof snapshot.level === 'number' && snapshot.level >= 1) {
+            currentLevel = snapshot.level;
+        }
+        if (typeof snapshot.keys === 'number' && snapshot.keys >= 0) {
+            dataKeys = snapshot.keys;
+        }
+        if (snapshot.chest && typeof snapshot.chest === 'object') {
+            chestState = {
+                opened: !!snapshot.chest.opened,
+                contents: Array.isArray(snapshot.chest.contents) ? snapshot.chest.contents : []
+            };
+        }
+        hasGuide = !!snapshot.guide;
+        hasSocialTrade = !!snapshot.socialTrade;
+
+        if (snapshot.corridor && typeof snapshot.corridor === 'object') {
+            corridorState = {
+                sector: (typeof snapshot.corridor.sector === 'number' && snapshot.corridor.sector >= 1) ? snapshot.corridor.sector : currentLevel,
+                x: (typeof snapshot.corridor.x === 'number') ? snapshot.corridor.x : 0.5,
+                y: (typeof snapshot.corridor.y === 'number') ? snapshot.corridor.y : 0.5
+            };
+        }
+
+        const keysCounterEl = document.getElementById('keysCounter');
+        if (keysCounterEl) keysCounterEl.textContent = `[ KEYS : ${dataKeys} / 3 ]`;
+
+        const levelCounterEl = document.getElementById('levelCounter');
+        if (levelCounterEl) levelCounterEl.textContent = `[ SECTEUR : ${currentLevel} / 100 ]`;
+
+        hasKey = dataKeys > 0;
+
+        if (chest && chestState && chestState.opened) {
+            chest.src = 'v-arcana.png';
+        }
+
+        const buyBtn = document.getElementById('buyGuideBtn');
+        if (buyBtn) {
+            buyBtn.disabled = !!hasGuide;
+            buyBtn.textContent = hasGuide ? 'GUIDE ACTIF' : 'ACHETER LE GUIDE';
+        }
+    }
+
+    function saveProgress() {
+        try {
+            const storageKey = getArcanaCloudKey();
+            if (!storageKey) return;
+            const snapshot = getProgressSnapshot();
+            localStorage.setItem(storageKey, JSON.stringify(snapshot));
+        } catch (e) {
+            return;
+        }
+    }
+
+    function loadProgress() {
+        try {
+            const storageKey = getArcanaCloudKey();
+            if (!storageKey) return null;
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) return null;
+            const snapshot = JSON.parse(raw);
+            applyProgressSnapshot(snapshot);
+            return snapshot;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function initLevel1() {
+        currentLevel = 1;
+        dataKeys = 0;
+        chestState = { opened: false, contents: [] };
+        corridorState = { sector: 1, x: 0.5, y: 0.5 };
+        hasGuide = false;
+        hasSocialTrade = false;
+        if (chest) chest.src = 'v-arcana-c.png';
+        const keysCounterEl = document.getElementById('keysCounter');
+        if (keysCounterEl) keysCounterEl.textContent = '[ KEYS : 0 / 3 ]';
+        const levelCounterEl = document.getElementById('levelCounter');
+        if (levelCounterEl) levelCounterEl.textContent = '[ SECTEUR : 1 / 100 ]';
+        hasKey = false;
+        saveProgress();
+    }
+
+    const ADMIN_ADDRESS = '0x1990fd46a1ad0344751be45d6779b8c1f827076d';
+    const ARCANA_TOKEN_ADDRESS = '0x1990fd46a1ad0344751be45d6779b8c1f827076d';
+    const USDC_TOKEN_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+    const ARCANA_API_BASE = window.ARCANA_API_BASE || window.location.origin;
+
+    const ARCANA_USDC_RATE = 0.10;
+    const GUIDE_PRICE_USDC = 50;
+
+    const TOKEN_DECIMALS = { ARCANA: 18, USDC: 6 };
+    const ERC20_ABI = [
+        'function transfer(address to, uint256 amount) returns (bool)'
+    ];
+
+    const MYSTERY_OBJECTS = [
+        { id: 'ANOMALIE', label: 'Anomalie', utility: 'Altère une porte (réduit les exigences).', estimate: '0.2 ARCANA' },
+        { id: 'ECLAT', label: 'Éclat', utility: 'Stabilise un passage (ouvre un palier).', estimate: '1.6 USDC' },
+        { id: 'FRAGMENT', label: 'Fragment', utility: 'Clé sociale (nécessaire pour progresser).', estimate: '3.2 USDC' },
+        { id: 'LARME', label: 'Larme', utility: 'Double la récompense d’un niveau.', estimate: '0.008 POL' },
+        { id: 'CODE_DORE', label: 'Code Doré', utility: 'Accès direct à un secteur (+5 niveaux).', estimate: '0.9 ARCANA' }
+    ];
+
+    function renderCounters() {
+        const keysCounterEl = document.getElementById('keysCounter');
+        if (keysCounterEl) keysCounterEl.textContent = `[ KEYS : ${dataKeys} / 3 ]`;
+        const levelCounterEl = document.getElementById('levelCounter');
+        if (levelCounterEl) levelCounterEl.textContent = `[ SECTEUR : ${currentLevel} / 100 ]`;
+    }
+
+    function countItem(label) {
+        const list = Array.isArray(chestState.contents) ? chestState.contents : [];
+        return list.filter(x => String(x).toLowerCase() === String(label).toLowerCase()).length;
+    }
+
+    function removeItem(label, qty) {
+        const q = Math.max(0, Number(qty) || 0);
+        if (q <= 0) return;
+        const list = Array.isArray(chestState.contents) ? chestState.contents.slice() : [];
+        let left = q;
+        const next = [];
+        for (const it of list) {
+            if (left > 0 && String(it).toLowerCase() === String(label).toLowerCase()) {
+                left -= 1;
+            } else {
+                next.push(it);
+            }
+        }
+        chestState.contents = next;
+    }
+
+    function getDoorRequirement(level) {
+        const l = Math.max(1, Math.min(100, Number(level) || 1));
+        if (l <= 2) return { items: {}, requiresSocial: false };
+        if (l === 3) return { items: { Fragment: 1 }, requiresSocial: true };
+        if (l === 5) return { items: { 'Éclat': 1 }, requiresSocial: true };
+        if (l % 10 === 0) return { items: { Fragment: 2 }, requiresSocial: true };
+        if (l % 7 === 0) return { items: { Anomalie: 1 }, requiresSocial: true };
+        return { items: { Fragment: 1 }, requiresSocial: true };
+    }
+
+    function canOpenDoor(level) {
+        const req = getDoorRequirement(level);
+        if (req.requiresSocial && !hasSocialTrade && level >= 3) return { ok: false, reason: 'social' };
+        const items = req.items || {};
+        for (const k of Object.keys(items)) {
+            const need = Number(items[k]) || 0;
+            if (need > 0 && countItem(k) < need) return { ok: false, reason: 'items', missing: k, need };
+        }
+        return { ok: true };
+    }
+
+    function consumeDoorRequirement(level) {
+        const req = getDoorRequirement(level);
+        const items = req.items || {};
+        for (const k of Object.keys(items)) {
+            removeItem(k, Number(items[k]) || 0);
+        }
+    }
+
+    function rewardForLevel(level) {
+        const l = Math.max(1, Math.min(100, Number(level) || 1));
+        const roll = Math.random();
+        if (roll < 0.7) {
+            const idx = Math.floor(Math.random() * MYSTERY_OBJECTS.length);
+            return { type: 'object', item: MYSTERY_OBJECTS[idx].label };
+        }
+        const arc = Math.max(0.01, Math.floor((l * 0.03) * 1000) / 1000);
+        return { type: 'crypto', currency: 'ARCANA', amount: arc };
+    }
+
+    function showDoorStatus(msg) {
+        typeWriter(msg);
+    }
+
+    function openNextDoor() {
+        if (currentLevel >= 100) {
+            showDoorStatus('Fin de protocole atteinte. Niveau 100 sécurisé.');
+            return;
+        }
+
+        const check = canOpenDoor(currentLevel + 1);
+        if (!check.ok) {
+            if (check.reason === 'social') {
+                showDoorStatus('Verrou social actif. Impossible de finir seul. Utilisez le chat : achetez ou échangez des Fragments.');
+                return;
+            }
+            if (check.reason === 'items') {
+                showDoorStatus(`Porte verrouillée. Exigence : ${check.need} x ${check.missing}. Demandez-le dans le chat.`);
+                return;
+            }
+            showDoorStatus('Porte verrouillée.');
+            return;
+        }
+
+        consumeDoorRequirement(currentLevel + 1);
+        currentLevel = Math.min(100, currentLevel + 1);
+        corridorState.sector = currentLevel;
+
+        const reward = rewardForLevel(currentLevel);
+        if (reward.type === 'object') {
+            chestState.contents = Array.isArray(chestState.contents) ? chestState.contents : [];
+            chestState.contents.push(reward.item);
+            showDoorStatus(`Porte ouverte. Prix généré : ${reward.item}.`);
+        } else {
+            showDoorStatus(`Porte ouverte. Gain cryptographique détecté : ${reward.amount} ${reward.currency}.`);
+        }
+
+        renderCounters();
+        saveProgress();
+    }
+
+    function ensureWalletReady() {
+        if (!signer || !account) {
+            typeWriter('Connexion wallet requise.');
+            return false;
+        }
+        return true;
+    }
+
+    async function ensurePolygon137() {
+        try {
+            if (!provider) return false;
+            const net = await provider.getNetwork();
+            return net && Number(net.chainId) === 137;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function getTaxRate(currency) {
+        const c = String(currency || '').toUpperCase();
+        if (c === 'ARCANA') return 0.01;
+        if (c === 'POL' || c === 'USDC') return 0.02;
+        return 0;
+    }
+
+    async function buyGuide() {
+        if (hasGuide) {
+            typeWriter("Le Guide de l'Initié est déjà actif.");
+            return;
+        }
+        if (!ensureWalletReady()) return;
+
+        const okNet = await ensurePolygon137();
+        if (!okNet) {
+            typeWriter('Réseau requis: Polygon (137).');
+            return;
+        }
+
+        const btn = document.getElementById('buyGuideBtn');
+        const prev = btn ? btn.textContent : '';
+        try {
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'PAIEMENT USDC...';
+            }
+
+            const token = new ethers.Contract(USDC_TOKEN_ADDRESS, ERC20_ABI, signer);
+            const dec = TOKEN_DECIMALS.USDC;
+            const tx = await token.transfer(ADMIN_ADDRESS, ethers.utils.parseUnits(String(GUIDE_PRICE_USDC), dec));
+            await tx.wait();
+
+            hasGuide = true;
+            saveProgress();
+
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'GUIDE ACTIF';
+            }
+
+            typeWriter("Félicitations Bernard. Le Guide de l'Initié est activé. Les secrets du code source vous sont révélés.");
+        } catch (e) {
+            typeWriter('Transaction échouée.');
+        } finally {
+            if (btn && !hasGuide) {
+                btn.disabled = false;
+                btn.textContent = prev || 'ACHETER LE GUIDE';
+            }
+        }
+    }
+
+    async function payAuction(auction) {
+        if (!ensureWalletReady()) return null;
+        const okNet = await ensurePolygon137();
+        if (!okNet) {
+            typeWriter('Réseau requis: Polygon (137).');
+            return null;
+        }
+
+        const currency = String(auction.currency || '').toUpperCase();
+        const price = Number(auction.price);
+        if (!Number.isFinite(price) || price <= 0) return null;
+        const seller = auction.seller;
+        if (!seller || !ethers.utils.isAddress(seller)) {
+            typeWriter('Enchère invalide (vendeur).');
+            return null;
+        }
+
+        const taxRate = getTaxRate(currency);
+        const tax = Math.max(0, price * taxRate);
+        const sellerAmount = Math.max(0, price - tax);
+
+        if (currency === 'POL') {
+            const tx1 = await signer.sendTransaction({ to: seller, value: ethers.utils.parseEther(String(sellerAmount)) });
+            await tx1.wait();
+            const tx2 = await signer.sendTransaction({ to: ADMIN_ADDRESS, value: ethers.utils.parseEther(String(tax)) });
+            await tx2.wait();
+            return { txHash: tx2.hash, taxCurrency: 'POL', tax };
+        }
+
+        if (currency === 'ARCANA') {
+            const token = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ERC20_ABI, signer);
+            const dec = TOKEN_DECIMALS.ARCANA;
+            const tx1 = await token.transfer(seller, ethers.utils.parseUnits(String(sellerAmount), dec));
+            await tx1.wait();
+            const tx2 = await token.transfer(ADMIN_ADDRESS, ethers.utils.parseUnits(String(tax), dec));
+            await tx2.wait();
+            return { txHash: tx2.hash, taxCurrency: 'ARCANA', tax };
+        }
+
+        if (currency === 'USDC') {
+            const token = new ethers.Contract(USDC_TOKEN_ADDRESS, ERC20_ABI, signer);
+            const dec = TOKEN_DECIMALS.USDC;
+            const tx1 = await token.transfer(seller, ethers.utils.parseUnits(String(sellerAmount), dec));
+            await tx1.wait();
+            const tx2 = await token.transfer(ADMIN_ADDRESS, ethers.utils.parseUnits(String(tax), dec));
+            await tx2.wait();
+            return { txHash: tx2.hash, taxCurrency: 'USDC', tax };
+        }
+
+        typeWriter('Monnaie non supportée.');
+        return null;
+    }
+
+    let chatOpen = false;
+    let chatSince = 0;
+    let chatTimer = null;
+    let auctionsTimer = null;
+
+    function formatAddr(a) {
+        if (!a) return '—';
+        const s = String(a);
+        return s.length > 10 ? `${s.slice(0, 6)}…${s.slice(-4)}` : s;
+    }
+
+    function appendChatLine(line) {
+        const box = document.getElementById('chatMessages');
+        if (!box) return;
+        const p = document.createElement('div');
+        p.style.margin = '6px 0';
+        if (line.type === 'auction') {
+            p.style.color = 'rgba(0, 242, 255, 0.95)';
+            p.style.fontWeight = '600';
+            p.textContent = line.message;
+        } else if (line.type === 'system') {
+            p.style.color = 'rgba(0, 255, 140, 0.9)';
+            p.textContent = line.message;
+        } else {
+            const who = line.address ? formatAddr(line.address) : 'ORACLE';
+            p.textContent = `${who}: ${line.message}`;
+        }
+        box.appendChild(p);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function refreshChat() {
+        if (!chatOpen) return;
+        try {
+            const r = await fetch(`${ARCANA_API_BASE}/api/chat/messages?since=${encodeURIComponent(String(chatSince || 0))}`, { cache: 'no-store' });
+            const data = await r.json();
+            const list = data && Array.isArray(data.messages) ? data.messages : [];
+            for (const m of list) {
+                chatSince = Math.max(chatSince, Number(m.ts) || 0);
+                appendChatLine(m);
+            }
+        } catch (_) {}
+    }
+
+    function renderAuctions(list) {
+        const box = document.getElementById('auctionList');
+        if (!box) return;
+        box.innerHTML = '';
+        for (const a of list) {
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'margin-top:8px; padding:10px; border:1px solid rgba(0,242,255,0.18); border-radius:10px; background:rgba(0,242,255,0.04);';
+            const title = document.createElement('div');
+            title.style.cssText = 'font-family:Orbitron,sans-serif; letter-spacing:1px; font-size:0.72rem; color:rgba(0,242,255,0.95);';
+            title.textContent = `${a.item} — ${a.price} ${a.currency}`;
+            const meta = document.createElement('div');
+            meta.style.cssText = 'margin-top:6px; font-size:0.78rem; color:rgba(255,255,255,0.75);';
+            meta.textContent = `Vendeur: ${formatAddr(a.seller)}`;
+            const btn = document.createElement('button');
+            btn.className = 'btn-arcana';
+            btn.style.cssText = 'margin-top:8px; width:100%; padding:10px 12px;';
+            btn.textContent = 'ACHETER';
+            btn.addEventListener('click', async () => {
+                try {
+                    btn.disabled = true;
+                    btn.textContent = 'TRANSACTION...';
+                    const pay = await payAuction(a);
+                    if (!pay) {
+                        btn.textContent = 'ERREUR';
+                        return;
+                    }
+                    await fetch(`${ARCANA_API_BASE}/api/auctions/${encodeURIComponent(a.id)}/mark-sold`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ buyer: account, txHash: pay.txHash, taxCurrency: pay.taxCurrency, tax: pay.tax })
+                    });
+
+                    hasSocialTrade = true;
+                    chestState.contents = Array.isArray(chestState.contents) ? chestState.contents : [];
+                    chestState.contents.push(a.item);
+                    saveProgress();
+                    typeWriter('Achat validé. Objet réinjecté dans la valise.');
+                } catch (e) {
+                    typeWriter('Transaction échouée.');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'ACHETER';
+                }
+            });
+            wrap.appendChild(title);
+            wrap.appendChild(meta);
+            wrap.appendChild(btn);
+            box.appendChild(wrap);
+        }
+    }
+
+    async function refreshAuctions() {
+        if (!chatOpen) return;
+        try {
+            const r = await fetch(`${ARCANA_API_BASE}/api/auctions`, { cache: 'no-store' });
+            const data = await r.json();
+            const list = data && Array.isArray(data.auctions) ? data.auctions : [];
+            renderAuctions(list);
+        } catch (_) {}
+    }
+
+    function startChatPolling() {
+        if (chatTimer) window.clearInterval(chatTimer);
+        if (auctionsTimer) window.clearInterval(auctionsTimer);
+        refreshChat();
+        refreshAuctions();
+        chatTimer = window.setInterval(refreshChat, 2500);
+        auctionsTimer = window.setInterval(refreshAuctions, 3500);
+    }
+
+    function stopChatPolling() {
+        if (chatTimer) window.clearInterval(chatTimer);
+        if (auctionsTimer) window.clearInterval(auctionsTimer);
+        chatTimer = null;
+        auctionsTimer = null;
+    }
+
+    async function sendChat() {
+        const input = document.getElementById('chatInput');
+        if (!input) return;
+        const message = String(input.value || '').trim();
+        if (!message) return;
+        input.value = '';
+        try {
+            await fetch(`${ARCANA_API_BASE}/api/chat/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: account || null, message })
+            });
+            refreshChat();
+            refreshAuctions();
+        } catch (_) {}
+    }
+
+    function matrixLine() {
+        const alphabet = '01ARCANA$#@%*';
+        let s = '';
+        const len = 110;
+        for (let i = 0; i < len; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)];
+        return s;
+    }
+
+    async function showMatrixReport() {
+        const overlay = document.getElementById('matrixOverlay');
+        const codeEl = document.getElementById('matrixCode');
+        if (!overlay || !codeEl) return;
+        overlay.style.display = 'block';
+        let lines = [];
+        const push = (t) => {
+            lines.push(t);
+            if (lines.length > 55) lines = lines.slice(lines.length - 55);
+            codeEl.textContent = lines.join('\n');
+        };
+
+        const startedAt = Date.now();
+        const timer = window.setInterval(() => push(matrixLine()), 55);
+
+        let report = null;
+        try {
+            const r = await fetch(`${ARCANA_API_BASE}/api/matrix-report`, { cache: 'no-store' });
+            report = await r.json();
+        } catch (_) { report = null; }
+
+        let tempC = null;
+        try {
+            tempC = await fetchMontrealTemperatureC();
+        } catch (_) { tempC = null; }
+
+        while (Date.now() - startedAt < 1200) {
+            await new Promise(res => setTimeout(res, 50));
+        }
+
+        window.clearInterval(timer);
+        push('');
+        push(`RAPPORT MATRIX — ${formatAddr(account)}`);
+        push(`SECTEUR: ${currentLevel}/100`);
+        push(`VALISE: ${Array.isArray(chestState.contents) ? chestState.contents.length : 0} objet(s)`);
+        push(`GUIDE: ${hasGuide ? 'ACTIF' : 'INACTIF'}`);
+        push(`MONTREAL: ${tempC === null ? '??' : String(tempC) + '°C'}`);
+        if (report && report.taxes) {
+            push(`TAXES PROJET — ARCANA: ${Number(report.taxes.ARCANA || 0)} / POL: ${Number(report.taxes.POL || 0)} / USDC: ${Number(report.taxes.USDC || 0)}`);
+        }
+        if (report && Array.isArray(report.sold)) {
+            push('VENTES RÉCENTES:');
+            for (const s of report.sold.slice(-8)) {
+                push(`- ${s.item} — ${s.price} ${s.currency}`);
+            }
+        }
+
+        await new Promise(res => setTimeout(res, 1500));
+        overlay.style.display = 'none';
     }
 
     function playArcanaSound(type) {
@@ -346,38 +940,13 @@
         }
     }
 
-    // Au démarrage
-    window.onload = () => {
-        typeWriter(welcomeMessage);
-    };
-
-    // Interaction Valise
-    chest.onclick = () => {
-        if (!hasKey) {
-            typeWriter(errorNoKey);
-            // Flash rouge subtil
-            document.body.style.backgroundColor = "rgba(255,0,0,0.1)";
-            setTimeout(() => document.body.style.backgroundColor = "transparent", 200);
-        } else {
-            chest.src = "v-arcana.png"; // Change vers l'image ouverte
-            typeWriter(successOpen);
-        }
-    };
-
-    // Simulation de ramassage de clé (pour le test)
-    document.addEventListener('keydown', (e) => {
-        if(e.key === "k") {
-            hasKey = true;
-            typeWriter("Data-Key détectée dans le système.");
-        }
-    });
-
     function toggleInventory() {
         // Logique de votre sacoche ici
         alert("Accès à l'inventaire arcana-safe.nft...");
     }
 
     async function connectWallet() {
+
         const btn = document.getElementById('connect-wallet');
         if (!btn) return;
 
@@ -398,7 +967,37 @@
             btn.style.color = 'rgba(0, 255, 140, 0.95)';
             btn.style.boxShadow = '0 0 18px rgba(0, 255, 140, 0.35), 0 0 34px rgba(0, 255, 140, 0.18)';
 
-            typeWriter("Connexion authentifiée, Bernard. Signature du protocole détectée sur le réseau Polygon. Le couloir de données est désormais sous votre contrôle.");
+            const progress = loadProgress();
+            if (progress) {
+                const sector = (progress.corridor && typeof progress.corridor.sector === 'number') ? progress.corridor.sector : currentLevel;
+                typeWriter(`Bernard, synchronisation réussie. Réinsertion au Secteur [${sector}]. Vos actifs sont sécurisés dans la valise.`);
+                await showMatrixReport();
+            } else {
+                initLevel1();
+                typeWriter('Initiation confirmée. Démarrage au Niveau 1.');
+                await showMatrixReport();
+            }
+
+            const toggle = document.getElementById('toggleChat');
+            const body = document.getElementById('chatBody');
+            const sendBtn = document.getElementById('chatSend');
+            const input = document.getElementById('chatInput');
+            const guideBtn = document.getElementById('buyGuideBtn');
+
+            if (toggle && body) {
+                toggle.addEventListener('click', () => {
+                    chatOpen = !chatOpen;
+                    body.style.display = chatOpen ? 'block' : 'none';
+                    if (chatOpen) startChatPolling(); else stopChatPolling();
+                });
+            }
+            if (sendBtn) sendBtn.addEventListener('click', sendChat);
+            if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat(); });
+            if (guideBtn) {
+                guideBtn.disabled = !!hasGuide;
+                guideBtn.textContent = hasGuide ? 'GUIDE ACTIF' : 'ACHETER LE GUIDE';
+                guideBtn.addEventListener('click', buyGuide);
+            }
         } catch (e) {
             typeWriter("Connexion refusée. Autorisation Web3 non accordée.");
         }
@@ -408,7 +1007,7 @@
     if (connectBtn) connectBtn.addEventListener('click', connectWallet);
 
     const ARCANA_ORACLE_THRESHOLD = -2;
-    const ADMIN_ADDRESS = "";
+    const ORACLE_ADMIN_ADDRESS = "";
     let oracleResolved = false;
     let oracleTempC = null;
     let oraclePlayerCity = "";
@@ -417,9 +1016,9 @@
     let oracleCapitalFirstWord = "";
 
     function isAdmin() {
-        if (!ADMIN_ADDRESS) return false;
+        if (!ORACLE_ADMIN_ADDRESS) return false;
         if (!account) return false;
-        return account.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
+        return account.toLowerCase() === ORACLE_ADMIN_ADDRESS.toLowerCase();
     }
 
     function normalizeAnswer(s) {
@@ -571,10 +1170,14 @@
 
             oracleResolved = true;
             hasKey = true;
+            dataKeys = Math.max(1, dataKeys + 1);
+            const keysCounterEl = document.getElementById('keysCounter');
+            if (keysCounterEl) keysCounterEl.textContent = `[ KEYS : ${dataKeys} / 3 ]`;
             playArcanaSound('VALIDATION');
             setFrost(false);
             hideOracleInlineInput();
             typeWriter(`Validation réussie depuis ${oraclePlayerCity}. Protocole validé, Bernard. Accès au réseau Arcana-Safe ouvert depuis votre position actuelle.`);
+            saveProgress();
         };
 
         const onKeyDown = (e) => {
@@ -623,6 +1226,28 @@
             }, 700);
         });
     }
+
+    const corridorLayer = document.getElementById('corridor-layer');
+    if (corridorLayer) {
+        corridorLayer.addEventListener('click', function(e) {
+            if (e && e.target && (e.target.closest && e.target.closest('#chatPanel'))) return;
+            const r = corridorLayer.getBoundingClientRect();
+            const x = r.width ? (e.clientX - r.left) / r.width : 0.5;
+            const y = r.height ? (e.clientY - r.top) / r.height : 0.5;
+            corridorState.x = Math.min(1, Math.max(0, x));
+            corridorState.y = Math.min(1, Math.max(0, y));
+            corridorState.sector = currentLevel;
+            saveProgress();
+
+            corridorLayer.classList.add('dive');
+            window.setTimeout(() => corridorLayer.classList.remove('dive'), 300);
+            openNextDoor();
+        });
+    }
+
+    window.addEventListener('beforeunload', function() {
+        saveProgress();
+    });
 </script>
 
 </body>

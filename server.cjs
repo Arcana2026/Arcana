@@ -56,6 +56,174 @@ app.use('/api', (req, res, next) => {
     next();
 });
 
+const MAX_CHAT_MESSAGES = 250;
+const MAX_AUCTIONS = 250;
+
+let chatMessages = [];
+let auctions = [];
+let matrixStats = {
+    taxes: { ARCANA: 0, POL: 0, USDC: 0 },
+    sold: []
+};
+
+function safeStr(s, maxLen) {
+    const v = (s === undefined || s === null) ? '' : String(s);
+    return v.length > maxLen ? v.slice(0, maxLen) : v;
+}
+
+function normalizeCurrency(s) {
+    const v = String(s || '').trim().toUpperCase();
+    if (v === 'ARCANA' || v === 'POL' || v === 'USDC') return v;
+    return '';
+}
+
+function parseAuctionCommand(message) {
+    const text = String(message || '').trim();
+    const m = text.match(/^\/enchere\s+(.+?)\s+(\d+(?:[\.,]\d+)?)\s+(ARCANA|POL|USDC)\s*$/i);
+    if (!m) return null;
+    const item = safeStr(m[1], 80).trim();
+    const price = Number(String(m[2]).replace(',', '.'));
+    const currency = normalizeCurrency(m[3]);
+    if (!item || !currency || !Number.isFinite(price) || price <= 0) return null;
+    return { item, price, currency };
+}
+
+function pushChatMessage(msg) {
+    chatMessages.push(msg);
+    if (chatMessages.length > MAX_CHAT_MESSAGES) {
+        chatMessages = chatMessages.slice(chatMessages.length - MAX_CHAT_MESSAGES);
+    }
+}
+
+function pushAuction(a) {
+    auctions.push(a);
+    if (auctions.length > MAX_AUCTIONS) {
+        auctions = auctions.slice(auctions.length - MAX_AUCTIONS);
+    }
+}
+
+app.get('/api/chat/messages', (req, res) => {
+    const since = Number(req.query.since || 0);
+    const list = Number.isFinite(since) && since > 0
+        ? chatMessages.filter(m => (Number(m.ts) || 0) > since)
+        : chatMessages;
+    res.json({ messages: list });
+});
+
+app.post('/api/chat/send', (req, res) => {
+    try {
+        const address = safeStr(req.body && req.body.address, 64).toLowerCase();
+        const message = safeStr(req.body && req.body.message, 240);
+        if (!message.trim()) return res.status(400).json({ success: false, error: 'Message vide' });
+
+        const msgObj = {
+            id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            ts: Date.now(),
+            address: address && ethers.utils.isAddress(address) ? address : null,
+            ip: getClientIp(req),
+            type: 'chat',
+            message
+        };
+        pushChatMessage(msgObj);
+
+        const parsed = parseAuctionCommand(message);
+        if (parsed) {
+            const auction = {
+                id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                createdAt: Date.now(),
+                status: 'OPEN',
+                seller: msgObj.address,
+                item: parsed.item,
+                price: parsed.price,
+                currency: parsed.currency,
+                buyer: null,
+                txHash: null,
+                tax: 0
+            };
+            pushAuction(auction);
+            pushChatMessage({
+                id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                ts: Date.now(),
+                address: null,
+                ip: getClientIp(req),
+                type: 'auction',
+                auctionId: auction.id,
+                message: `ENCHÈRE OUVERTE: ${auction.item} — ${auction.price} ${auction.currency}`
+            });
+            return res.json({ success: true, message: msgObj, createdAuction: auction });
+        }
+
+        res.json({ success: true, message: msgObj });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
+app.get('/api/auctions', (req, res) => {
+    const open = auctions.filter(a => a && a.status === 'OPEN');
+    res.json({ auctions: open });
+});
+
+app.post('/api/auctions/:id/mark-sold', (req, res) => {
+    try {
+        const id = safeStr(req.params && req.params.id, 128);
+        const buyer = safeStr(req.body && req.body.buyer, 64).toLowerCase();
+        const txHash = safeStr(req.body && req.body.txHash, 128);
+        const taxCurrency = normalizeCurrency(req.body && req.body.taxCurrency);
+        const tax = Number(req.body && req.body.tax);
+
+        const idx = auctions.findIndex(a => a && a.id === id);
+        if (idx < 0) return res.status(404).json({ success: false, error: 'Enchère introuvable' });
+        const a = auctions[idx];
+        if (a.status !== 'OPEN') return res.status(400).json({ success: false, error: 'Enchère déjà traitée' });
+
+        a.status = 'SOLD';
+        a.buyer = buyer && ethers.utils.isAddress(buyer) ? buyer : null;
+        a.txHash = txHash || null;
+        a.tax = Number.isFinite(tax) && tax >= 0 ? tax : 0;
+
+        if (taxCurrency && Number.isFinite(a.tax) && a.tax > 0) {
+            matrixStats.taxes[taxCurrency] = (Number(matrixStats.taxes[taxCurrency]) || 0) + a.tax;
+        }
+
+        matrixStats.sold.push({
+            auctionId: a.id,
+            item: a.item,
+            price: a.price,
+            currency: a.currency,
+            seller: a.seller,
+            buyer: a.buyer,
+            tax: a.tax,
+            taxCurrency: taxCurrency || null,
+            txHash: a.txHash,
+            ts: Date.now()
+        });
+        if (matrixStats.sold.length > 500) {
+            matrixStats.sold = matrixStats.sold.slice(matrixStats.sold.length - 500);
+        }
+
+        pushChatMessage({
+            id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            ts: Date.now(),
+            address: null,
+            ip: getClientIp(req),
+            type: 'system',
+            message: `ENCHÈRE VENDUE: ${a.item} — ${a.price} ${a.currency}`
+        });
+
+        res.json({ success: true, auction: a });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
+app.get('/api/matrix-report', (req, res) => {
+    res.json({
+        taxes: matrixStats.taxes,
+        sold: matrixStats.sold.slice(-50)
+    });
+});
+
 // --- 1. DONNÉES DE LA PRÉVENTE (sync avec objectif 100 000 $) ---
 const TARGET_USD = 100000;
 const STATE_PENDING = 'PENDING';
