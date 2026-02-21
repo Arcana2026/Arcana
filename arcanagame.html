@@ -77,6 +77,23 @@
             display: block;
         }
 
+        body.corridor-global #arcane-darkness-overlay,
+        body.corridor-entrance-bg #arcane-darkness-overlay,
+        body.corridor-global #arcane-dark-fog,
+        body.corridor-entrance-bg #arcane-dark-fog {
+            display: none !important;
+            opacity: 0 !important;
+        }
+
+        body.corridor-global #game-container,
+        body.corridor-entrance-bg #game-container,
+        body.corridor-global #arcana-game-content,
+        body.corridor-entrance-bg #arcana-game-content {
+            background: transparent !important;
+            background-image: none !important;
+            box-shadow: none !important;
+        }
+
         #brick-wall-overlay {
             position: fixed;
             inset: 0;
