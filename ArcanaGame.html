@@ -3206,57 +3206,98 @@ function addOracleChatMessage(msg) {
 }
 
 async function fetchAndDisplayTemperature() {
-    try {
-        if (!provider) {
-            provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
-        }
-        const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
+    var fallback = { city: 'Montréal', latitude: 45.5017, longitude: -73.5673 };
 
-        let tempRaw = await oracle.currentTemp();
-        let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
-        oracleTemperature = tempC;
-        oracleLoading = false;
+    function getPosition() {
+        return new Promise(function(resolve, reject) {
+            if (!navigator.geolocation) return reject(new Error('geolocation_unavailable'));
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout: 8000,
+                maximumAge: 60000
+            });
+        });
+    }
+
+    function roundTemp(n) {
+        return (typeof n === 'number' && isFinite(n)) ? Math.round(n) : n;
+    }
+
+    try {
+        var lat = fallback.latitude;
+        var lon = fallback.longitude;
+        var city = fallback.city;
+
+        try {
+            var pos = await getPosition();
+            if (pos && pos.coords) {
+                lat = pos.coords.latitude;
+                lon = pos.coords.longitude;
+            }
+        } catch (geoErr) {
+            lat = fallback.latitude;
+            lon = fallback.longitude;
+            city = fallback.city;
+        }
+
+        try {
+            var reverseUrl = 'https://geocoding-api.open-meteo.com/v1/reverse?latitude=' + encodeURIComponent(lat) + '&longitude=' + encodeURIComponent(lon) + '&language=fr&limit=1';
+            var reverseResp = await fetch(reverseUrl);
+            var reverseData = await reverseResp.json();
+            if (reverseData && reverseData.results && reverseData.results[0] && reverseData.results[0].name) {
+                city = reverseData.results[0].name;
+            }
+        } catch (e) {
+            city = city || fallback.city;
+        }
+
+        var weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=' + encodeURIComponent(lat) + '&longitude=' + encodeURIComponent(lon) + '&current=temperature_2m&temperature_unit=celsius';
+        var weatherResp = await fetch(weatherUrl);
+        var weatherData = await weatherResp.json();
+        var tempC = weatherData && weatherData.current ? weatherData.current.temperature_2m : null;
+        tempC = (typeof tempC === 'number') ? tempC : (tempC !== null ? Number(tempC) : null);
+        var displayTemp = roundTemp(tempC);
 
         const tempDisplay = document.getElementById('temp');
         const depositBtn = document.getElementById('btnDeposit');
         const warningMsg = document.getElementById('oracle-warning-message');
-        const oracleMirror = document.querySelector(".oracle-mirror");
-        
-        var isTestMode = account && isVipWallet(account);
-        var accessGranted = (tempC <= -2 || bypassOracle === true || isTestMode);
+        const oracleMirror = document.querySelector('.oracle-mirror');
 
         if (tempDisplay) {
-            tempDisplay.textContent = accessGranted ? tempC + "°C 🔓" : tempC + "°C 🔒";
+            tempDisplay.textContent = (displayTemp !== null && isFinite(displayTemp)) ? (displayTemp + '°C') : '—';
         }
 
-        if (accessGranted) {
-            if (warningMsg) {
-                warningMsg.innerHTML = '<span style="color:#00ff88;">🔓 <strong>Accès Autorisé</strong> : Gel confirmé (≤ -2°C)</span>';
-                warningMsg.style.display = "block";
+        if (warningMsg) {
+            if (displayTemp !== null && isFinite(displayTemp)) {
+                warningMsg.textContent = 'Ah, je vois... Il fait actuellement ' + displayTemp + '°C à ' + city + '.';
+            } else {
+                warningMsg.textContent = 'Ah, je vois... Je ne parviens pas à lire la température pour le moment.';
             }
-            if (depositBtn) {
-                depositBtn.disabled = false;
-                depositBtn.classList.remove("disabled");
-            }
-            if (oracleMirror) oracleMirror.classList.add("frozen");
-        } else {
-            if (warningMsg) {
-                warningMsg.innerHTML = '<span style="color:#ff6b6b;">🔒 <strong>Sanctuaire en Attente</strong> : Gel insuffisant (> -2°C)</span>';
-                warningMsg.style.display = "block";
-            }
-            if (depositBtn) {
-                depositBtn.disabled = true;
-                depositBtn.classList.add("disabled");
-            }
-            if (oracleMirror) oracleMirror.classList.remove("frozen");
+            warningMsg.style.display = 'block';
         }
-    } catch(e) {
-        console.warn('Oracle fetch error:', e);
-        if (bypassOracle) {
-            const depositBtn = document.getElementById('btnDeposit');
-            if (depositBtn) depositBtn.disabled = false;
+
+        if (oracleMirror) {
+            if (displayTemp !== null && isFinite(displayTemp) && displayTemp <= -10) oracleMirror.classList.add('frozen');
+            else oracleMirror.classList.remove('frozen');
+        }
+
+        if (depositBtn) {
+            depositBtn.disabled = false;
+            depositBtn.classList.remove('disabled');
+        }
+    } catch (e) {
+        const warningMsg = document.getElementById('oracle-warning-message');
+        const depositBtn = document.getElementById('btnDeposit');
+        if (warningMsg) {
+            warningMsg.textContent = 'Ah, je vois... Je ne parviens pas à lire la température pour le moment.';
+            warningMsg.style.display = 'block';
+        }
+        if (depositBtn) {
+            depositBtn.disabled = false;
+            depositBtn.classList.remove('disabled');
         }
     }
+}
 
     // === ADMINISTRATION ET STATISTIQUES ===
     async function refreshAdminStats() {
@@ -4709,82 +4750,4 @@ async function fetchAndDisplayTemperature() {
         }
         return result;
     }
-<script>
-    // --- LOGIQUE DE L'ORACLE & TEMPÉRATURE ---
-    const ARCANA_GAME_ORACLE_CONTRACT = ARCANA_GAME_CONTRACT; 
-
-    async function fetchAndDisplayTemperature() {
-        try {
-            if (!provider) {
-                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
-            }
-            const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
-
-            let tempRaw = await oracle.currentTemp();
-            let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
-
-            const tempDisplay = document.getElementById('temp');
-            const depositBtn = document.getElementById('btnDeposit');
-            const warningMsg = document.getElementById('oracle-warning-message');
-            const oracleMirror = document.querySelector(".oracle-mirror");
-
-            if (tempC <= -10) {
-                if (tempDisplay) tempDisplay.textContent = tempC + "°C";
-                if (warningMsg) warningMsg.style.display = "none";
-                if (depositBtn) {
-                    depositBtn.disabled = false;
-                    depositBtn.classList.remove("disabled");
-                }
-                if (oracleMirror) oracleMirror.classList.add("frozen");
-            } else {
-                if (tempDisplay) tempDisplay.textContent = tempC + "°C";
-                if (warningMsg) {
-                    warningMsg.textContent = "Le givre ne s'est pas encore formé. Revenez quand Montréal gèlera.";
-                    warningMsg.style.display = "block";
-                }
-                if (depositBtn) {
-                    depositBtn.disabled = true;
-                    depositBtn.classList.add("disabled");
-                }
-                if (oracleMirror) oracleMirror.classList.remove("frozen");
-            }
-        } catch(e) {
-            console.error("Erreur Oracle:", e);
-        }
-    }
-
-    // --- CORRECTION CONNEXION WEB3 ---
-    window.arcanaOnW3mConnect = function(prov, sgn, acc) {
-        provider = prov; signer = sgn; account = acc;
-        var btn = document.querySelector(".btn-connect");
-        if (btn) btn.innerText = "Connecté";
-        
-        // Révèle le contenu du jeu
-        const gameContent = document.getElementById('game-container'); 
-        if (gameContent) gameContent.classList.add('visible');
-        
-        fetchAndDisplayTemperature();
-    };
-
-    // --- SYNC INITIALE ---
-    document.addEventListener("DOMContentLoaded", function () {
-        fetchAndDisplayTemperature();
-        setInterval(fetchAndDisplayTemperature, 180000); // 3 minutes
-    });
-
-    // --- FONCTION ADMIN POUR FORCER L'OUVERTURE ---
-    async function forceOpenAdmin() {
-        try {
-            if (!signer) await connectWallet();
-            const contract = new ethers.Contract(ARCANA_GAME_CONTRACT, ["function updateOracle(int256 _temp) external"], signer);
-            const tx = await contract.updateOracle(-20);
-            await tx.wait();
-            fetchAndDisplayTemperature();
-            alert("Oracle forcé à -20°C !");
-        } catch (e) {
-            alert("Erreur: " + e.message);
-        }
-    }
-</script>
-</body>
-</html>
+</script></body></html>
