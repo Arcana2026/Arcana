@@ -705,7 +705,7 @@
             display: none !important;
         }
         #chat-temple {
-            display: none; /* Caché par défaut - s'affiche via la Taverne */
+            display: block;
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -713,6 +713,95 @@
             max-height: 200px;
             font-size: 0.9em;
             font-family: 'Cinzel', serif;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 220ms ease, transform 220ms ease;
+            z-index: 2200;
+        }
+        #chat-temple.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        #chat-rune-btn {
+            position: fixed;
+            bottom: 22px;
+            right: 22px;
+            z-index: 2300;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 242, 255, 0.55);
+            background:
+                radial-gradient(120% 130% at 30% 20%, rgba(255,255,255,0.16), rgba(255,255,255,0) 55%),
+                linear-gradient(145deg, rgba(12, 18, 26, 0.88), rgba(0, 0, 0, 0.65));
+            box-shadow:
+                0 0 0 1px rgba(0, 242, 255, 0.18) inset,
+                0 0 18px rgba(0, 242, 255, 0.22),
+                0 14px 34px rgba(0, 0, 0, 0.65);
+            color: rgba(245, 252, 255, 0.94);
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform, box-shadow;
+            animation: chatRuneBreath 2.8s ease-in-out infinite;
+        }
+        #chat-rune-btn::after {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 18px;
+            background: radial-gradient(circle, rgba(0, 242, 255, 0.18), transparent 65%);
+            opacity: 0.7;
+            filter: blur(6px);
+            pointer-events: none;
+        }
+        #chat-rune-btn.active {
+            border-color: rgba(0, 242, 255, 0.9);
+            box-shadow:
+                0 0 0 1px rgba(0, 242, 255, 0.22) inset,
+                0 0 34px rgba(0, 242, 255, 0.52),
+                0 0 80px rgba(0, 242, 255, 0.18),
+                0 16px 38px rgba(0, 0, 0, 0.7);
+        }
+        @keyframes chatRuneBreath {
+            0%, 100% {
+                transform: translate3d(0, 0, 0) scale(1);
+                box-shadow:
+                    0 0 0 1px rgba(0, 242, 255, 0.18) inset,
+                    0 0 16px rgba(0, 242, 255, 0.18),
+                    0 14px 34px rgba(0, 0, 0, 0.65);
+            }
+            50% {
+                transform: translate3d(0, -1px, 0) scale(1.03);
+                box-shadow:
+                    0 0 0 1px rgba(0, 242, 255, 0.22) inset,
+                    0 0 26px rgba(0, 242, 255, 0.32),
+                    0 14px 36px rgba(0, 0, 0, 0.65);
+            }
+        }
+        @media (max-width: 768px) {
+            #chat-rune-btn {
+                bottom: 18px;
+                right: 18px;
+                width: 52px;
+                height: 52px;
+                font-size: 26px;
+            }
+            #chat-temple {
+                right: 14px;
+                bottom: 84px;
+                width: min(360px, calc(100vw - 28px));
+                max-height: 40vh;
+            }
         }
         .input-arcana {
             font-family: 'Cinzel', serif;
@@ -2532,6 +2621,7 @@
 </head>
 <body class="corridor-global">
     <div id="corridor-bg-layer" aria-hidden="true"></div>
+    <button id="chat-rune-btn" type="button" aria-label="Ouvrir le Chat" title="Rune du Chat">⎈</button>
     <div id="brick-wall-overlay" aria-hidden="false">
         <div class="brick-panel left"></div>
         <div class="brick-panel right"></div>
@@ -4647,41 +4737,106 @@ document.addEventListener('DOMContentLoaded', function() {
     // RUNE 11 : LA TAVERNE (Chat Social)
     // ═══════════════════════════════════════════════════════
     
-    function ouvrirTaverne() {
-        console.log('%c🍺 Ouverture de la Taverne', 'color:#d4af37; font-weight:bold;');
-        
-        var chatPanel = document.getElementById('chat-temple');
-        if (chatPanel) {
-            chatPanel.style.display = 'block';
-            chatPanel.style.position = 'fixed';
-            chatPanel.style.top = '50%';
-            chatPanel.style.left = '50%';
-            chatPanel.style.transform = 'translate(-50%, -50%)';
-            chatPanel.style.zIndex = '2000';
-            chatPanel.style.maxWidth = '500px';
-            chatPanel.style.width = '90vw';
-            
-            addOracleChatMessage('🍺 Bienvenue à la Taverne ! Partagez vos découvertes avec les autres Initiés...');
-            
-            // Ajouter un bouton de fermeture
-            if (!document.getElementById('btn-fermer-taverne')) {
-                var btnFermer = document.createElement('button');
-                btnFermer.id = 'btn-fermer-taverne';
-                btnFermer.className = 'btn-connect';
-                btnFermer.textContent = '✓ Fermer';
-                btnFermer.style.marginTop = '10px';
-                btnFermer.style.width = '100%';
-                btnFermer.onclick = function() {
-                    chatPanel.style.display = 'none';
-                    chatPanel.style.position = '';
-                    chatPanel.style.transform = '';
-                    chatPanel.style.zIndex = '';
-                };
-                chatPanel.appendChild(btnFermer);
+    var chatTempleOpen = false;
+
+    function playChatRuneChime() {
+        try {
+            var Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return;
+            var ctx = window._arcanaChatRuneAudioCtx;
+            if (!ctx) {
+                ctx = new Ctx();
+                window._arcanaChatRuneAudioCtx = ctx;
             }
+            if (ctx.state === 'suspended') {
+                ctx.resume().catch(function() {});
+            }
+
+            var now = ctx.currentTime;
+
+            var o1 = ctx.createOscillator();
+            var g1 = ctx.createGain();
+            o1.type = 'sine';
+            o1.frequency.setValueAtTime(880, now);
+            o1.frequency.exponentialRampToValueAtTime(1320, now + 0.05);
+            g1.gain.setValueAtTime(0.0001, now);
+            g1.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+            g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+            o1.connect(g1);
+            g1.connect(ctx.destination);
+            o1.start(now);
+            o1.stop(now + 0.16);
+
+            var o2 = ctx.createOscillator();
+            var g2 = ctx.createGain();
+            o2.type = 'triangle';
+            o2.frequency.setValueAtTime(660, now + 0.02);
+            o2.frequency.exponentialRampToValueAtTime(990, now + 0.09);
+            g2.gain.setValueAtTime(0.0001, now + 0.02);
+            g2.gain.exponentialRampToValueAtTime(0.07, now + 0.03);
+            g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+            o2.connect(g2);
+            g2.connect(ctx.destination);
+            o2.start(now + 0.02);
+            o2.stop(now + 0.2);
+        } catch (e) {}
+    }
+
+    function toggleChatTemple(forceOpen) {
+        var panel = document.getElementById('chat-temple');
+        var btn = document.getElementById('chat-rune-btn');
+        if (!panel || !btn) return;
+
+        var shouldOpen = (typeof forceOpen === 'boolean') ? forceOpen : !chatTempleOpen;
+        chatTempleOpen = shouldOpen;
+
+        if (shouldOpen) {
+            panel.classList.add('open');
+            btn.classList.add('active');
+            playChatRuneChime();
+            try {
+                addOracleChatMessage('🍺 Bienvenue à la Taverne ! Partagez vos découvertes avec les autres Initiés...');
+            } catch (e) {}
         } else {
-            showStyledAlert('🍺 <strong>La Taverne</strong><br><br>Un lieu de rencontre pour les Initiés.<br><br><em>Le chat sera bientôt disponible...</em>');
+            panel.classList.remove('open');
+            btn.classList.remove('active');
         }
+    }
+
+    (function initChatRune() {
+        var panel = document.getElementById('chat-temple');
+        var btn = document.getElementById('chat-rune-btn');
+        if (!panel || !btn) return;
+        if (btn.dataset && btn.dataset.bound === '1') return;
+        try { if (btn.dataset) btn.dataset.bound = '1'; } catch (e) {}
+
+        var onToggle = function(e) {
+            try { if (e && typeof e.stopPropagation === 'function') e.stopPropagation(); } catch (err) {}
+            try { toggleChatTemple(); } catch (err) {}
+        };
+
+        btn.addEventListener('click', onToggle, { passive: true });
+        btn.addEventListener('touchstart', onToggle, { passive: true });
+
+        document.addEventListener('click', function(e) {
+            if (!chatTempleOpen) return;
+            if (!e || !e.target) return;
+            if (e.target === btn) return;
+            if (panel.contains(e.target)) return;
+            try { toggleChatTemple(false); } catch (err) {}
+        }, { passive: true });
+
+        document.addEventListener('touchstart', function(e) {
+            if (!chatTempleOpen) return;
+            if (!e || !e.target) return;
+            if (e.target === btn) return;
+            if (panel.contains(e.target)) return;
+            try { toggleChatTemple(false); } catch (err) {}
+        }, { passive: true });
+    })();
+
+    function ouvrirTaverne() {
+        try { toggleChatTemple(); } catch (e) {}
     }// =========================================================================
     // RUNE 12 : L'ŒIL DE L'ORACLE (STATISTIQUES & JACKPOT)
     // =========================================================================
