@@ -206,6 +206,34 @@
             background: url('a-key-icon.png') no-repeat center;
             background-size: contain;
         }
+
+        #back-to-hub {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 120;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 255, 0.75);
+            background: rgba(0, 242, 255, 0.08);
+            color: rgba(0, 242, 255, 0.95);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 16px rgba(0, 242, 255, 0.18);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            white-space: nowrap;
+            max-width: 70vw;
+        }
+
+        #back-to-hub:hover {
+            background: rgba(0, 242, 255, 0.14);
+            box-shadow: 0 0 22px rgba(0, 242, 255, 0.28);
+        }
     </style>
 </head>
 <body>
@@ -219,6 +247,8 @@
         <button class="btn-arcana" id="connect-wallet">Initialiser Connexion</button>
     </div>
 </header>
+
+<button id="back-to-hub" type="button">[ RETOUR AU HUB ]</button>
 
 <div id="main-chest-container">
     <img src="v-arcana-c.png" id="chest-image" alt="Valise Arcana">
@@ -261,6 +291,51 @@
         if (i < text.length) {
             dialogueText.innerHTML = text.substring(0, i + 1);
             setTimeout(() => typeWriter(text, i + 1), 30);
+        }
+    }
+
+    function playArcanaSound(type) {
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+
+            const ctx = playArcanaSound._ctx || (playArcanaSound._ctx = new AudioCtx());
+            if (ctx.state === 'suspended') {
+                ctx.resume().catch(() => {});
+            }
+
+            const now = ctx.currentTime;
+            const master = ctx.createGain();
+            master.gain.setValueAtTime(0.0001, now);
+            master.connect(ctx.destination);
+
+            const beep = (start, duration, f0, f1, gain, wave) => {
+                const osc = ctx.createOscillator();
+                const g = ctx.createGain();
+                osc.type = wave || 'sine';
+                osc.frequency.setValueAtTime(f0, start);
+                if (typeof f1 === 'number') osc.frequency.exponentialRampToValueAtTime(Math.max(1, f1), start + duration);
+                g.gain.setValueAtTime(0.0001, start);
+                g.gain.exponentialRampToValueAtTime(Math.max(0.0001, gain), start + 0.01);
+                g.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+                osc.connect(g);
+                g.connect(master);
+                osc.start(start);
+                osc.stop(start + duration + 0.02);
+            };
+
+            if (String(type).toUpperCase() === 'VALIDATION') {
+                master.gain.exponentialRampToValueAtTime(0.16, now + 0.02);
+                beep(now + 0.00, 0.11, 880, 1320, 0.18, 'triangle');
+                beep(now + 0.14, 0.14, 990, 1760, 0.20, 'triangle');
+                master.gain.exponentialRampToValueAtTime(0.0001, now + 0.40);
+            } else if (String(type).toUpperCase() === 'REFUS') {
+                master.gain.exponentialRampToValueAtTime(0.20, now + 0.01);
+                beep(now + 0.00, 0.10, 180, 120, 0.22, 'sawtooth');
+                master.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+            }
+        } catch (e) {
+            return;
         }
     }
 
@@ -331,7 +406,7 @@
     let oracleTempC = null;
     let oraclePlayerCity = "";
     let oracleExpectedAnswer = "";
-    let oracleCurrentQuestion = "";
+    let oracleAnswerValidator = null;
     let oracleCapitalFirstWord = "";
 
     function isAdmin() {
@@ -344,57 +419,143 @@
         return (s || '').trim().toLowerCase();
     }
 
+    function setFrost(active) {
+        if (active) document.body.classList.add('oracle-frost');
+        else document.body.classList.remove('oracle-frost');
+    }
+
+    function showOracleInlineInput() {
+        const box = document.getElementById('oracle-inline-answer');
+        const input = document.getElementById('oracleInlineInput');
+        if (!box || !input) return;
+        box.style.display = 'block';
+        box.setAttribute('aria-hidden', 'false');
+        window.setTimeout(() => input.focus(), 0);
+    }
+
+    function hideOracleInlineInput() {
+        const box = document.getElementById('oracle-inline-answer');
+        const input = document.getElementById('oracleInlineInput');
+        if (!box || !input) return;
+        input.value = '';
+        box.style.display = 'none';
+        box.setAttribute('aria-hidden', 'true');
+    }
+
+    async function getGeolocationCoords() {
+        if (!navigator.geolocation) return null;
+        return await new Promise((resolve) => {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+                () => resolve(null),
+                { enableHighAccuracy: false, timeout: 7000, maximumAge: 5 * 60 * 1000 }
+            );
+        });
+    }
+
+    async function reverseGeocode(lat, lon) {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`;
+        const r = await fetch(url, {
+            cache: 'no-store',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!r.ok) throw new Error('oracle-geocode');
+        const data = await r.json();
+        const addr = data && data.address ? data.address : {};
+        const city = addr.city || addr.town || addr.village || addr.municipality || addr.state || addr.county || addr.country || '';
+        const country = addr.country || '';
+        const countryCode = addr.country_code ? String(addr.country_code).toUpperCase() : '';
+        return { city, country, countryCode };
+    }
+
+    async function getCountryCapital(countryCode) {
+        if (!countryCode) return '';
+        const url = `https://restcountries.com/v3.1/alpha/${encodeURIComponent(countryCode)}`;
+        const r = await fetch(url, { cache: 'no-store' });
+        if (!r.ok) return '';
+        const data = await r.json();
+        const item = Array.isArray(data) ? data[0] : null;
+        const cap = item && Array.isArray(item.capital) ? item.capital[0] : '';
+        return cap ? String(cap) : '';
+    }
+
+    async function getPlayerGeoProfile() {
+        try {
+            const coords = await getGeolocationCoords();
+            if (!coords) return { city: '', country: '', countryCode: '' };
+            return await reverseGeocode(coords.lat, coords.lon);
+        } catch (e) {
+            return { city: '', country: '', countryCode: '' };
+        }
+    }
+
+    async function fetchMontrealTemperatureC() {
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=45.5017&longitude=-73.5673&current_weather=true';
+        const r = await fetch(url, { cache: 'no-store' });
+        if (!r.ok) throw new Error('oracle-weather');
+        const data = await r.json();
+        const t = data && data.current_weather ? data.current_weather.temperature : null;
+        const n = Number(t);
+        if (Number.isNaN(n)) throw new Error('oracle-weather');
+        return n;
+    }
+
     function askLocalQuestion(city, country) {
         const safeCity = (city || '').trim();
         const safeCountry = (country || '').trim();
 
         const candidates = [];
 
+        candidates.push({
+            q: "Complétez le domaine : arcana-safe.____",
+            validate: (val) => normalizeAnswer(val) === 'nft'
+        });
+
         if (safeCity) {
             candidates.push({
                 q: `Écrivez le nom de la ville détectée en MAJUSCULES : ${safeCity}`,
-                a: safeCity.toUpperCase()
+                validate: (val) => (val || '').trim() === safeCity.toUpperCase()
             });
         }
 
         if (oracleCapitalFirstWord) {
             candidates.push({
                 q: `Donnez le premier mot de la capitale de ${safeCountry || 'votre pays'} :`,
-                a: oracleCapitalFirstWord
+                validate: (val) => normalizeAnswer(val) === normalizeAnswer(oracleCapitalFirstWord)
             });
         }
 
-        candidates.push({
-            q: "Complétez le domaine : arcana-safe.____",
-            a: "nft"
-        });
-
-        const pick = candidates[Math.floor(Math.random() * candidates.length)];
-        return pick;
+        return candidates[Math.floor(Math.random() * candidates.length)];
     }
 
     async function requireOracleProof() {
         oracleResolved = false;
         hasKey = false;
         setFrost(true);
-        const profile = await getPlayerGeoProfile();
-        oraclePlayerCity = (profile && profile.city) ? profile.city : "votre secteur";
-        typeWriter(`Je détecte votre présence à ${oraclePlayerCity}. Pour forcer le déverrouillage du Vault de Montréal, répondez à ceci...`);
 
-        const question = askLocalQuestion(profile.city, profile.country);
-        oracleCurrentQuestion = question.q;
-        oracleExpectedAnswer = question.a;
+        const profile = await getPlayerGeoProfile();
+        oraclePlayerCity = (profile && profile.city) ? profile.city : 'votre secteur';
+
+        oracleCapitalFirstWord = '';
+        if (profile && profile.countryCode) {
+            const cap = await getCountryCapital(profile.countryCode);
+            oracleCapitalFirstWord = cap ? String(cap).trim().split(/\s+/)[0] : '';
+        }
+
+        const q = askLocalQuestion(oraclePlayerCity, profile ? profile.country : '');
+        oracleAnswerValidator = q.validate;
 
         showOracleInlineInput();
-        typeWriter(oracleCurrentQuestion);
+        typeWriter(`Accès Géo-Verrouillé. Prouvez votre présence à ${oraclePlayerCity}. ${q.q}`);
 
         const submitBtn = document.getElementById('oracleInlineSubmit');
         const answerEl = document.getElementById('oracleInlineInput');
         if (!submitBtn || !answerEl) return;
 
         const handler = () => {
-            const ok = normalizeAnswer(answerEl.value) === normalizeAnswer(oracleExpectedAnswer);
+            const ok = oracleAnswerValidator ? oracleAnswerValidator(answerEl.value) : false;
             if (!ok) {
+                playArcanaSound('REFUS');
                 typeWriter("Réponse invalide. L'Oracle maintient le givre.");
                 answerEl.value = '';
                 answerEl.focus();
@@ -403,12 +564,10 @@
 
             oracleResolved = true;
             hasKey = true;
+            playArcanaSound('VALIDATION');
             setFrost(false);
             hideOracleInlineInput();
-            typeWriter(`Identité géo-confirmée. Accès au Vault de Montréal forcé depuis ${oraclePlayerCity}.`);
-
-            submitBtn.removeEventListener('click', handler);
-            answerEl.removeEventListener('keydown', onKeyDown);
+            typeWriter(`Validation réussie depuis ${oraclePlayerCity}. Protocole validé, Bernard. Accès au réseau Arcana-Safe ouvert depuis votre position actuelle.`);
         };
 
         const onKeyDown = (e) => {
@@ -428,7 +587,9 @@
 
         if (isAdmin()) {
             oracleResolved = true;
+            hasKey = true;
             setFrost(false);
+            hideOracleInlineInput();
             return;
         }
 
@@ -438,12 +599,23 @@
             oracleResolved = true;
             hasKey = true;
             setFrost(false);
+            hideOracleInlineInput();
         }
     }
 
     window.addEventListener('load', function() {
         initOracleChallenge();
     });
+
+    const backBtn = document.getElementById('back-to-hub');
+    if (backBtn) {
+        backBtn.addEventListener('click', function() {
+            typeWriter('Déconnexion du secteur sécurisé... Redirection vers le hub Arcana-Safe.');
+            window.setTimeout(function() {
+                window.location.href = 'index.html';
+            }, 700);
+        });
+    }
 </script>
 
 </body>
