@@ -57,6 +57,16 @@
             -webkit-touch-callout: none;
             touch-action: manipulation;
         }
+
+        html,
+        body,
+        #app,
+        #game-container,
+        #arcana-game-content,
+        #level-3-sanctuary {
+            background: none !important;
+            background-image: none !important;
+        }
         /* Texture de pierre sur le body */
         body::before {
             content: '';
@@ -1088,15 +1098,23 @@
             gap: 6px;
             min-height: 85vh;
             background: transparent !important;
-            border: 0.5px solid rgba(212, 175, 55, 0.2) !important;
+            border: none !important;
             box-shadow: none !important;
-            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+            filter: none !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
             z-index: 10;
             position: relative;
             padding: 40px 0;
             padding-top: 130px !important;
+        }
+
+        .runes-column.left,
+        .runes-column.right {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            filter: none !important;
         }
         .runes-column.left {
             grid-column: 1;
