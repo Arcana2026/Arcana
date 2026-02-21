@@ -62,19 +62,12 @@
             content: '';
             position: fixed;
             inset: 0;
-            background-image: url('couloir-coffre.webp');
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            background-attachment: fixed !important;
-            opacity: 1;
-            pointer-events: none;
-            z-index: 1;
+            display: none;
         }
 
         body.corridor-global::before,
         body.corridor-entrance-bg::before {
-            display: block;
+            display: none;
         }
 
         body.corridor-global #arcane-darkness-overlay,
@@ -94,6 +87,14 @@
             box-shadow: none !important;
         }
 
+        body.corridor-global #level-3-sanctuary,
+        body.corridor-entrance-bg #level-3-sanctuary {
+            background: transparent !important;
+            background-image: none !important;
+            box-shadow: none !important;
+            filter: none !important;
+        }
+
         #brick-wall-overlay {
             position: fixed;
             inset: 0;
@@ -110,9 +111,14 @@
         #corridor-bg-layer {
             position: fixed;
             inset: 0;
-            z-index: 0;
+            z-index: -1;
             pointer-events: none;
-            display: none;
+            display: block;
+            background-image: url('couloir-coffre.webp');
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
         }
 
         #corridor-chest-btn {
@@ -2041,9 +2047,9 @@
             z-index: 300;
             width: min(920px, calc(100vw - 28px));
             max-height: min(78vh, 720px);
-            background: rgba(255, 255, 255, 0.10) !important;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.4) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 2px solid rgba(0, 242, 255, 0.65);
             border-radius: 18px;
             box-shadow:
