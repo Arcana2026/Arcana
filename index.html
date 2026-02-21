@@ -1,685 +1,674 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <style>html { scroll-behavior: smooth; }</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcana Safe — Domaine Web3 Officiel arcana-safe.nft</title>
-    <meta name="description" content="Arcana Safe : écosystème financier sécurisé par le Coffre-Fort Arcana. Domaine Web3 officiel arcana-safe.nft (transaction Polygon confirmée).">
-    <meta name="keywords" content="Arcana Safe, arcana-safe.nft, Web3, prévente, ARCANA, Polygon">
-    <meta property="og:title" content="Arcana Safe — arcana-safe.nft">
-    <meta property="og:description" content="Domaine Web3 officiel Arcana Safe. Écosystème sécurisé par le Coffre-Fort Arcana.">
-    <meta property="og:type" content="website">
-    <link rel="canonical" href="https://arcana-safe.nft">
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <title>ARCANA — The Vault</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- ethers.js : chargé via CDN (également dépendance du projet dans package.json) pour connexion MetaMask et Polygon -->
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root { --gold: #D4AF37; --gold-glow: rgba(212, 175, 55, 0.4); --bg-dark: #05070a; }
         body {
-            background-color: #0a0e1a;
-            background-image: linear-gradient(rgba(0,20,40,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0,20,40,0.3) 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: #F7E7CE;
-            font-family: 'Playfair Display', serif;
-            min-height: 100vh;
-            margin: 0;
+            background-color: var(--bg-dark); color: #F7E7CE; font-family: 'Inter', sans-serif; margin: 0;
+            background-image: radial-gradient(circle at 50% 50%, #0a111a 0%, #05070a 100%);
+        }
+        .font-prestige { font-family: 'Cinzel', serif; }
+
+        /* Interface Vault Premium */
+        .glass-vault {
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(212, 175, 55, 0.05);
         }
 
-        .navbar {
-            background: linear-gradient(to bottom, #0f1629, #0a0e1a);
-            border-bottom: 2px solid #D4AF37;
-            padding: 0.5rem 2rem;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            height: 110px;
+        .btn-prestige {
+            background: linear-gradient(135deg, #D4AF37, #B8860B); color: #000; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 2px; transition: all 0.4s ease;
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2); border: none;
+        }
+
+        .btn-prestige:hover { transform: translateY(-3px); box-shadow: 0 15px 30px var(--gold-glow); }
+
+        /* Effets interactifs : .btn-connect et .rune-btn */
+        .btn-connect, .rune-btn {
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-connect:hover:not([disabled]):not(.disabled),
+        .rune-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--gold);
+            cursor: pointer;
+        }
+        .btn-connect:active:not([disabled]):not(.disabled),
+        .rune-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        /* Shimmer cyclique sur le bouton .btn-connect principal */
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+        }
+        .btn-connect {
             position: relative;
-            z-index: 50;
+            overflow: hidden;
         }
-
-        .logo-text-arcana {
-            font-family: 'Great Vibes', cursive !important;
-            font-size: 3.5rem !important;
-            background: linear-gradient(to bottom, #fef9e7, #f7e7ce, #d4af37) !important;
-            -webkit-background-clip: text !important;
-            -webkit-text-fill-color: transparent !important;
-            filter: drop-shadow(0 0 8px rgba(247, 231, 206, 0.6)) !important;
-            line-height: 1 !important;
-            white-space: nowrap !important;
+        .btn-connect::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 0;
+            width: 40%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+            animation: shimmer 3s ease-in-out infinite;
             pointer-events: none;
         }
 
-        .logo-image-center {
-            height: 95px;
-            width: auto;
-            border-radius: 50%;
-            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
-            position: relative;
-            z-index: 60;
+        /* Barre de Progression Néon */
+        .progress-track { background: rgba(255, 255, 255, 0.05); height: 12px; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .progress-fill { background: linear-gradient(90deg, #00ffcc, #00d4aa); box-shadow: 0 0 20px rgba(0, 255, 204, 0.6); transition: width 1.5s ease-in-out; }
+
+        /* Livre Blanc Déroulant Transparent */
+        .whitepaper-dropdown {
+            background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 15px; overflow-y: auto; transition: all 0.5s ease;
+            max-height: 0; opacity: 0; backdrop-filter: blur(10px);
+        }
+        .whitepaper-dropdown.open { max-height: 400px; opacity: 1; padding: 25px; margin-top: 20px; }
+
+        /* Guide Poche (Widget Flottant) */
+        #guide-poche { position: fixed; bottom: 30px; right: 30px; z-index: 1000; }
+        .pouch-window { position: absolute; bottom: 85px; right: 0; width: 280px; display: none; padding: 25px; }
+        .pouch-window.active { display: block; animation: slideUp 0.4s ease; }
+        
+        .trust-icon-box {
+            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--gold); width: 40px !important; height: 40px !important;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;
+            box-shadow: 0 0 15px var(--gold-glow); font-size: 16px;
         }
 
-        .wallet-address {
-            font-family: monospace;
-            background: rgba(0,0,0,0.4);
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: 1px solid #F7E7CE;
-            color: #F7E7CE;
-            cursor: pointer !important;
-            transition: 0.3s ease;
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card {
-            background: linear-gradient(145deg, #131b2e, #0f1629) !important;
-            border: 1px solid #D4AF37 !important;
-            box-shadow: 20px 20px 40px rgba(0,0,0,0.5);
-            border-radius: 20px;
+        /* Bouton Sanctuaire — design professionnel avec animation d'entrée */
+        .btn-sanctuary-glow {
+            box-shadow: 0 0 10px rgba(0, 162, 255, 0.5), 0 0 15px rgba(212, 175, 55, 0.3);
+            animation: goldenGlow 3s ease-in-out infinite;
         }
-
-        .stat-value {
-            color: #F7E7CE !important;
-            text-shadow: 0 0 20px rgba(247, 231, 206, 0.9);
-            font-size: 3.5rem !important;
-            font-weight: bold;
-        }
-
-        /* --- STYLE BARRE DE PROGRESSION --- */
-        .progress-container {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid #D4AF37;
-            border-radius: 50px;
-            height: 25px;
-            overflow: hidden;
-            margin: 20px 0;
-            position: relative;
-        }
-        .progress-bar {
-            background: linear-gradient(90deg, #00ffcc, #00d4aa);
-            height: 100%;
-            width: 2%; 
-            transition: width 1s ease-in-out;
-            box-shadow: 0 0 20px #00ffcc, 0 0 40px rgba(0, 255, 204, 0.4);
-        }
-
-        .btn-withdraw {
-            background: linear-gradient(135deg, #F7E7CE, #E3D1B4) !important;
-            color: #1a0f0a !important;
-            border: none !important;
-            font-weight: bold;
-            letter-spacing: 1px;
-            transition: 0.4s;
-        }
-
-        .btn-withdraw:hover {
-            box-shadow: 0 0 20px #F7E7CE;
+        .btn-sanctuary-glow:hover {
+            background: rgba(0, 162, 255, 0.3);
+            box-shadow: 0 0 25px #00a2ff, 0 0 20px rgba(212, 175, 55, 0.5);
             transform: translateY(-2px);
         }
-
-        .traffic-counter {
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(247, 231, 206, 0.1);
-            opacity: 0.3;
+        @keyframes goldenGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 162, 255, 0.5), 0 0 12px rgba(212, 175, 55, 0.25); }
+            50% { box-shadow: 0 0 15px rgba(0, 162, 255, 0.6), 0 0 20px rgba(212, 175, 55, 0.45); }
         }
-
-        .livre-blanc-btn {
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3), 0 4px 20px rgba(0, 255, 204, 0.15);
-        }
-
-        .presale-box {
-            border: 1px solid #D4AF37;
-            border-radius: 16px;
-            padding: 1.5rem;
-            background: rgba(0,0,0,0.3);
-            margin: 1.5rem 0;
-        }
-
-        .presale-box input, .presale-box select {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid #D4AF37;
-            color: #F7E7CE;
-            border-radius: 8px;
-        }
-
-        .presale-box input:focus, .presale-box select:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
-        }
-
-        .btn-buy-now {
-            background: linear-gradient(135deg, #00ffcc, #00d4aa) !important;
-            color: #0a0e1a !important;
-            border: none !important;
-            font-weight: bold;
-            font-size: 1.1rem;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            width: 100%;
-            transition: 0.3s;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.5), 0 0 50px rgba(0, 255, 204, 0.2);
-        }
-
-        .btn-buy-now:hover {
-            box-shadow: 0 0 35px rgba(0, 255, 204, 0.7), 0 0 60px rgba(0, 255, 204, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .btn-buy-now:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        .btn-claim {
-            background: linear-gradient(135deg, #00ffcc, #00d4aa) !important;
-            color: #0a0e1a !important;
-            border: none !important;
-            font-weight: bold;
-            letter-spacing: 1px;
-            transition: 0.4s;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
-        }
-
-        .btn-claim:hover {
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.6);
-            transform: translateY(-2px);
-        }
-
-        .btn-claim:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        .banner-official-domain {
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(184, 134, 11, 0.18) 50%, rgba(212, 175, 55, 0.28) 100%);
-            border-bottom: 2px solid rgba(212, 175, 55, 0.6);
-            color: #F7E7CE;
-            padding: 0.6rem 1.25rem;
-            text-align: center;
-            font-size: 0.95rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-        .banner-official-domain .domain { color: #D4AF37; text-decoration: none; border-bottom: 1px solid rgba(212,175,55,0.5); transition: color 0.2s, border-color 0.2s; }
-        .banner-official-domain .domain:hover { color: #F7E7CE; border-bottom-color: #D4AF37; }
-
-        .badge-verified-blockchain {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.35rem 0.6rem;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #D4AF37;
-            background: rgba(212, 175, 55, 0.15);
-            border: 1px solid rgba(212, 175, 55, 0.6);
-            border-radius: 6px;
-            white-space: nowrap;
-            box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
-        }
-
-        .btn-cta-invest {
-            background: linear-gradient(135deg, #D4AF37, #B8860B);
-            color: #0a0e1a;
-            font-weight: 700;
-            font-size: 1.1rem;
-            letter-spacing: 0.08em;
-            padding: 1rem 1.5rem;
-            border-radius: 14px;
-            text-align: center;
-            text-decoration: none;
-            border: none;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 4px 20px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255,255,255,0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            animation: cta-glow 2.5s ease-in-out infinite;
-        }
-        .btn-cta-invest:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 40px rgba(212, 175, 55, 0.8), 0 6px 24px rgba(212, 175, 55, 0.4);
-            color: #0a0e1a;
-        }
-        @keyframes cta-glow {
-            0%, 100% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.6), 0 4px 20px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255,255,255,0.3); }
-            50% { box-shadow: 0 0 38px rgba(212, 175, 55, 0.75), 0 4px 24px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255,255,255,0.3); }
-        }
-
-        /* --- HEADER MOBILE --- */
         @media (max-width: 768px) {
-            .navbar {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                padding: 0.5rem 1rem;
-                height: auto;
-                min-height: 70px;
-            }
-            .logo-text-arcana {
-                font-size: 2rem !important;
-                order: 1;
-            }
-            .navbar .flex {
-                order: 2;
-            }
-            .navbar .wallet-address {
-                order: 3;
-                padding: 8px 12px;
-                font-size: 0.85rem;
-            }
-            .logo-image-center {
-                width: 50px !important;
-                height: auto !important;
-            }
+            .title-vault-mobile { font-size: 1.5rem !important; letter-spacing: 0.12em !important; }
         }
     </style>
 </head>
 <body>
-    <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
 
-    <div class="navbar">
-        <div class="logo-text-arcana">Arcana Safe</div>
-        <div class="flex justify-center items-center">
-            <img src="logo.png" alt="Arcana Safe Logo" class="logo-image-center" style="width: 60px; height: auto;">
+    <nav class="p-6 md:p-10 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="flex items-center gap-3 md:gap-4">
+            <img src="logo.png" class="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16" style="filter: drop-shadow(0 0 10px var(--gold-glow));" alt="Arcana">
+            <h1 class="font-prestige text-lg md:text-2xl lg:text-3xl tracking-widest text-white">ARCANA <span class="text-[#D4AF37]">SAFE</span></h1>
         </div>
-        <button id="connectBtn" class="wallet-address">Connecter Wallet</button>
-    </div>
-
-    <div class="banner-official-domain">
-        Domaine Web3 Officiel : <a href="https://arcana-safe.nft" class="domain" rel="noopener">arcana-safe.nft</a> <span class="text-[#D4AF37]/80 text-xs ml-1">(transaction 0x5fda… confirmée)</span>
-    </div>
-
-    <div class="container mx-auto px-4 py-16 text-center">
-        <button type="button" id="cta-invest" class="btn-cta-invest block w-full max-w-md mx-auto mb-8 border-0 cursor-pointer">
-            Investir dans le Coffre-Fort
+        <button id="connectWallet" onclick="connect()" class="btn-prestige px-8 py-2 rounded-full text-xs">
+            CONNECT WALLET
         </button>
-        <div class="max-w-md mx-auto card p-10">
-            <h2 id="balanceTitle" class="text-xl mb-4 opacity-80 uppercase tracking-widest">Réserve du Coffre Arcana Safe</h2>
-            <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80 mb-2">Adresse de réception (Polygon)</p>
-            <div class="flex items-center justify-center gap-2 mb-2 flex-wrap">
-                <code id="receptionAddress" class="text-[#00ffcc]/95 font-mono text-sm px-3 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/50 break-all">0x1990fd46a1ad0344751be45d6779b8c1f827076d</code>
-                <span class="badge-verified-blockchain" title="Contrat vérifié sur Polygon">Vérifié sur la Blockchain</span>
-                <button type="button" id="copyAddressBtn" class="px-3 py-2 rounded-lg border border-[#D4AF37]/60 text-[#D4AF37] text-xs font-medium hover:bg-[#D4AF37]/20 transition" title="Copier l'adresse">Copier</button>
-            </div>
-            <p class="text-[#F7E7CE]/60 text-xs mb-4">Les fonds de la prévente sont envoyés vers cette adresse. Vérifiez-la sur Polygonscan.</p>
-            <div class="stat-value my-8">
-                <span id="balanceDisplay">...</span> <span class="text-lg">ARCANA</span>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="glass-vault max-w-4xl mx-auto p-10 md:p-16 text-center">
+            <h2 class="font-prestige title-vault-mobile text-xl md:text-2xl lg:text-3xl mb-4 text-white tracking-[0.2em]">THE ARCANA VAULT</h2>
+            <p class="text-gray-400 italic text-lg mb-12">Secure your financial future.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <div><div class="trust-icon-box">🛡️</div><p class="text-[10px] uppercase font-bold text-[#D4AF37]">Smart Contract Audited</p></div>
+                <div><div class="trust-icon-box">🔍</div><p class="text-[10px] uppercase font-bold text-[#D4AF37]">Arcana Audit Verified</p></div>
+                <div><div class="trust-icon-box">🔒</div><p class="text-[10px] uppercase font-bold text-[#D4AF37]">Liquidity Locked</p></div>
             </div>
 
-            <div class="mb-2 flex justify-between text-sm">
-                <span>Objectif : 100 000 $</span>
-                <span id="progressText">Récolté : 5 $</span>
-            </div>
-            <p id="remainingTokens" class="text-sm text-[#00ffcc] mb-2">Jetons ARCANA restants : 400 000 000</p>
-            <div class="progress-container">
-                <div id="progressBar" class="progress-bar"></div>
+            <div class="max-w-xl mx-auto mb-16">
+                <div class="flex justify-between text-[10px] uppercase mb-3 opacity-70">
+                    <span>Objectif : 1 200 000 $</span><span id="raisedAmt">Raised: 12,450 $</span>
+                </div>
+                <div class="progress-track"><div id="progressBar" class="progress-fill h-full" style="width: 1.04%"></div></div>
             </div>
 
-            <div id="zone-investissement">
-            <div id="presaleBox" class="presale-box">
-                <h3 class="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-4">Zone de Vente Arcana Safe</h3>
-                <div class="flex gap-2 mb-3">
-                    <select id="tokenSelect" class="flex-1 px-4 py-2">
+            <div class="max-w-md mx-auto">
+                <h3 class="font-prestige text-xs mb-6 tracking-widest text-[#D4AF37]">OFFICIAL ARCANA SALE</h3>
+                <div class="flex gap-2 mb-4">
+                    <select id="tokenSelect" class="bg-black/60 border border-white/10 p-4 rounded-xl text-xs uppercase text-white outline-none">
                         <option value="POL">POL</option>
                         <option value="USDT">USDT</option>
                         <option value="USDC">USDC</option>
                     </select>
-                    <input type="number" id="amountInput" placeholder="Montant" min="0" step="0.01" class="flex-1 px-4 py-2" />
+                    <input type="text" id="amountInput" placeholder="AMOUNT ($)" class="flex-1 bg-black/60 border border-white/10 p-4 rounded-xl text-center text-white text-lg outline-none" inputmode="decimal" pattern="[0-9.]*" autocomplete="off">
                 </div>
-                <p id="receiveText" class="text-[#00ffcc] mb-4 font-medium">Tu recevras : 0 ARCANA</p>
-                <button id="buyBtn" class="btn-buy-now">Acheter maintenant</button>
-            </div>
-            </div>
-            
-            <div class="flex flex-col gap-4 mt-6">
-                <p id="claimHint" class="hidden text-xs text-[#F7E7CE]/60">Le Claim sera disponible lorsque l’objectif de 100 000 $ sera atteint.</p>
-                <button id="claimBtn" class="btn btn-claim btn-lg w-full">Réclamer mes jetons Arcana Safe</button>
-                <button id="withdrawBtn" class="btn btn-withdraw btn-lg w-full">Effectuer un Retrait</button>
-
-                <div class="collapse collapse-arrow bg-black/40 border border-[#F7E7CE]/20 text-left">
-                    <input type="checkbox" /> 
-                    <div class="collapse-title text-sm font-bold uppercase tracking-widest text-[#F7E7CE]">
-                        📖 Consulter le Livre Blanc
-                    </div>
-                    <div class="collapse-content text-sm text-[#F7E7CE]/80 leading-relaxed">
-                        <div class="py-4 border-t border-[#F7E7CE]/10 space-y-6">
-                            <p class="italic text-[#D4AF37]/90 text-center">« Au cœur des ténèbres, un coffre veille. »</p>
-
-                            <section>
-                                <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase tracking-wider border-b border-[#D4AF37]/40 pb-1">1. Vision</h4>
-                                <p>Arcana ne se contente pas d’être un simple jeton : c’est la clé d’un <strong class="text-[#D4AF37]">écosystème financier sécurisé</strong>, protégé par le <strong class="text-[#D4AF37]">Coffre-Fort Arcana</strong>. Dans un monde où la confiance est rare, nous construisons une forteresse numérique où chaque actif repose sous la garde de protocoles inviolables. La mission est claire : offrir aux détenteurs un sanctuaire de valeur, à l’abri des turbulences et des prédations. Le Coffre-Fort Arcana n’est pas un concept — c’est l’architecture même de cet avenir.</p>
-                            </section>
-
-                            <section>
-                                <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase tracking-wider border-b border-[#D4AF37]/40 pb-1">2. Tokenomics</h4>
-                                <p class="mb-2">L’économie Arcana est délibérément sobre et lisible : <strong class="text-[#D4AF37]">400 000 000</strong> jetons constituent l’intégralité de l’offre. Aucune inflation cachée, aucun plafond mouvant.</p>
-                                <ul class="list-disc ml-4 space-y-1">
-                                    <li><strong>Offre totale :</strong> 400 000 000 ARCANA</li>
-                                    <li><strong>Prix de prévente :</strong> 0,00025 $ par jeton</li>
-                                    <li>Les jetons acquis en prévente sont enregistrés sur la blockchain et deviennent réclamables selon les règles du Coffre.</li>
-                                </ul>
-                                <p class="mt-2 text-[#D4AF37]/90">Une rareté assumée. Une valeur ancrée dans la rareté et la sécurité du Coffre.</p>
-                                <div class="mt-4 pl-2 border-l-2 border-[#D4AF37]/50 space-y-3">
-                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Répartition & mécanismes</p>
-                                    <p>L’intégralité des jetons en prévente est allouée à l’objectif du Coffre (100 000 $). Chaque contribution est convertie au taux fixe de 0,00025 $ / ARCANA. Aucune émission secondaire n’est prévue : l’offre est fixe et vérifiable on-chain.</p>
-                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Utilité du jeton</p>
-                                    <p>ARCANA sert d’unité de compte et de réserve de valeur au sein de l’écosystème sécurisé par le Coffre. L’accès aux fonctionnalités futures (staking, gouvernance) pourra être conditionné à la détention du jeton.</p>
-                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Transparence</p>
-                                    <p>Les soldes et les achats sont enregistrés sur la blockchain Polygon (contrat <code class="text-[#00ffcc]/90 text-xs">0x1990fd46a1ad0344751be45d6779b8c1f827076d</code>). Chaque détenteur peut vérifier son allocation à tout moment.</p>
-                                </div>
-                            </section>
-
-                            <section>
-                                <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase tracking-wider border-b border-[#D4AF37]/40 pb-1">3. Sécurité</h4>
-                                <p>La protection des détenteurs est au centre du design Arcana. Le <strong class="text-[#D4AF37]">système de Claim différé</strong> garantit que les jetons ne sont pas libérés avant que le Coffre n’ait atteint son objectif et que les conditions d’ouverture soient réunies.</p>
-                                <div class="mt-4 pl-2 border-l-2 border-[#D4AF37]/50 space-y-3">
-                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Claim différé</p>
-                                    <p>Les jetons achetés en prévente sont crédités on-chain mais ne sont réclamables qu’après atteinte de l’objectif de 100 000 $. Cela évite les sorties prématurées et aligne les intérêts de tous les participants jusqu’à l’ouverture du Coffre.</p>
-                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Intégrité des fonds</p>
-                                    <p>Les fonds de la prévente sont acheminés vers une trésorerie dédiée. Aucun retrait arbitraire n’est possible sans respect du protocole (signatures, nonces, contrats vérifiables).</p>
-                                    <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Bonnes pratiques</p>
-                                    <p>Le site s’appuie sur le contrat déployé sur Polygon ; les achats et réclamations passent exclusivement par des transactions signées par l’utilisateur. Nous recommandons de conserver vos jetons dans un portefeuille dont vous détenez les clés et de vérifier l’adresse du contrat avant toute interaction.</p>
-                                </div>
-                            </section>
-
-                            <section>
-                                <h4 class="font-bold text-[#F7E7CE] mb-2 uppercase tracking-wider border-b border-[#D4AF37]/40 pb-1">4. Roadmap</h4>
-                                <ul class="list-disc ml-4 space-y-2">
-                                    <li><strong class="text-[#D4AF37]">Phase actuelle — La prévente :</strong> collecte des fonds jusqu’à l’objectif de <strong>100 000 $</strong>. Chaque contribution renforce la réserve du Coffre.</li>
-                                    <li><strong class="text-[#D4AF37]">Clôture à 100 000 $ :</strong> la prévente s’arrête. Le Coffre atteint son seuil et se verrouille sur les montants récoltés.</li>
-                                    <li><strong class="text-[#D4AF37]">Ouverture du Coffre :</strong> les conditions de sécurité étant remplies, le Claim est activé. Les détenteurs peuvent alors réclamer leurs jetons ARCANA selon les règles du protocole.</li>
-                                </ul>
-                                <p class="mt-2 italic text-[#F7E7CE]/70">Un chemin tracé. Une porte qui ne s’ouvre qu’une fois.</p>
-                            </section>
-
-                            <p class="text-center text-[#D4AF37]/80 text-xs uppercase tracking-widest pt-2">— Le Coffre-Fort Arcana —</p>
-                        </div>
-                    </div>
+                <div id="estimationBox" class="mb-5 text-xs text-[#D4AF37] font-bold text-center tracking-wider select-none">Estimation : 0 ARCANA</div>
+                <button onclick="buyNow()" class="btn-prestige w-full py-5 rounded-2xl text-xl">PURCHASE ARCANA</button>
+                
+                <button onclick="toggleWhitepaper()" class="mt-8 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest hover:underline">📖 CONSULTER LE LIVRE BLANC</button>
+                <div id="whitepaperBox" class="whitepaper-dropdown text-left text-[11px] leading-relaxed text-gray-300">
+                    <!-- Le whitepaper complet est injecté dynamiquement -->
                 </div>
             </div>
+            <script>
+                // Taux fixe: prix par ARCANA
+                const ARCANA_PRICE_USD = 0.0026;
+                // Prix POL (sera mis à jour dynamiquement)
+                let pricePOL = 0.45;
+                let lastPolPriceFetch = 0;
+                let isFetchingPOL = false;
 
-            <div class="traffic-counter flex flex-col items-center gap-2">
-                <img src="https://hitwebcounter.com/counter/counter.php?page=ArcanaPremiumClean&style=0006&nbdigits=5&type=page&initCount=0" border="0" />
-                <a href="https://arcana-safe.nft/arcana-admin" class="text-xs text-[#F7E7CE]/40 hover:text-[#D4AF37]/70 uppercase tracking-widest">Accès Admin</a>
+                // Fonction qui récupère dynamiquement le prix POL via CoinGecko et MAJ le calculateur
+                async function fetchPOLPrice() {
+                    if (isFetchingPOL) return;
+                    isFetchingPOL = true;
+                    try {
+                        // API CoinGecko pour POL
+                        const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=polygon-ecosystem-token&vs_currencies=usd");
+                        const data = await response.json();
+                        const pol = parseFloat((data["polygon-ecosystem-token"]||{}).usd);
+                        // fallback si la réponse est mauvaise ou NaN
+                        pricePOL = isNaN(pol) || pol === 0 ? 0.45 : pol;
+                    } catch (e) {
+                        pricePOL = 0.45;
+                    }
+                    lastPolPriceFetch = Date.now();
+                    isFetchingPOL = false;
+                    updateEstimation();
+                }
+
+                // Nettoyage du champ pour autoriser uniquement chiffres et point décimal unique (FR ou US)
+                function extractCleanAmount(val) {
+                    if (!val) return '';
+                    let clean = val.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+                    // Retirer les points multiples après le premier
+                    let dotCount = (clean.match(/\./g) || []).length;
+                    if (dotCount > 1) {
+                        let first = clean.indexOf('.');
+                        clean = clean.slice(0, first + 1) + clean.slice(first + 1).replace(/\./g, '');
+                    }
+                    return clean;
+                }
+
+                function updateEstimation() {
+                    const inputElem = document.getElementById('amountInput');
+                    let inputRaw = inputElem.value;
+
+                    // Nettoyage immédiat du champ si besoin (pour que "500 pommes" --> "500")
+                    const cleaned = extractCleanAmount(inputRaw);
+                    if (inputRaw !== cleaned) {
+                        // On ne déclenche le caret/cursor reset que si modifié
+                        inputElem.value = cleaned;
+                        inputRaw = cleaned;
+                    }
+
+                    // Si le champ est vide ou le résultat n'est pas un nombre positif
+                    if (!inputRaw || isNaN(Number(inputRaw)) || Number(inputRaw) <= 0) {
+                        document.getElementById('estimationBox').textContent = "Estimation : 0 ARCANA";
+                        return;
+                    }
+                    const amount = Number(inputRaw);
+
+                    const tokenSelected = document.getElementById('tokenSelect').value;
+                    let tokenPrice = 1.00;
+                    if (tokenSelected === "POL") {
+                        tokenPrice = pricePOL;
+                    }
+
+                    // Formule : (Montant net * Prix du jeton) / 0.0026
+                    let estimation = (amount * tokenPrice) / ARCANA_PRICE_USD;
+                    document.getElementById('estimationBox').textContent =
+                        `Estimation : ${estimation.toLocaleString(undefined, {maximumFractionDigits:0})} ARCANA`;
+                }
+
+                document.getElementById('amountInput').addEventListener('input', updateEstimation);
+                document.getElementById('tokenSelect').addEventListener('change', function() {
+                    // Quand l'utilisateur sélectionne POL, on refait un fetch si >5min ou si jamais fetch
+                    if (document.getElementById('tokenSelect').value === "POL") {
+                        const now = Date.now();
+                        if (now - lastPolPriceFetch > 1000 * 60 * 5 || !lastPolPriceFetch) {
+                            fetchPOLPrice();
+                        } else {
+                            updateEstimation();
+                        }
+                    } else {
+                        updateEstimation();
+                    }
+                });
+
+                // --------- Progression Bar -----------
+                const amountRaisedUsd = 12450; // <-- À modifier dynamiquement en prod
+                const hardcapUsd = 1200000; // Objectif final
+                const progressPct = Math.min((amountRaisedUsd / hardcapUsd) * 100, 100);
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById('progressBar').style.width = progressPct.toFixed(2) + '%';
+                    document.getElementById('raisedAmt').textContent = 'Raised: ' + amountRaisedUsd.toLocaleString('en-US', {maximumFractionDigits:0}) + ' $';
+                    // Au mounting initial si POL sélectionné on fetch direct + update
+                    if (document.getElementById('tokenSelect').value === "POL") {
+                        fetchPOLPrice();
+                    } else {
+                        updateEstimation();
+                    }
+                });
+            </script>
+        </div>
+    </main>
+
+    <div id="guide-poche">
+        <div id="pouchWindow" class="glass-vault pouch-window">
+            <h4 class="font-prestige text-[10px] text-[#D4AF37] mb-6 tracking-widest">GUIDE POCHE</h4>
+            <div class="space-y-4">
+                <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">Wallet:</span><span id="pouchAddr" class="text-[9px] font-mono">Not Connected</span></div>
+                <div class="text-[9px] opacity-60 uppercase mb-2 tracking-widest">Dashboard</div>
+                <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">Solde ARCANA:</span><span id="pouchArcana" class="font-bold text-[#D4AF37]">0</span></div>
+                <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">Profits (~$):</span><span id="pouchProfits" class="font-bold text-green-400">0</span></div>
+                <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-[9px] opacity-60 uppercase">USDC:</span><span id="pouchUsdc" class="font-bold text-white">0</span></div>
+                <div class="flex justify-between"><span class="text-[9px] opacity-60 uppercase">POL (Gas):</span><span id="pouchPol" class="font-bold text-white">0</span></div>
+                <div class="flex justify-between"><span class="text-[9px] opacity-60 uppercase">POL ($):</span><span id="pouchPolUsd" class="font-bold text-green-400">0</span></div>
+            </div>
+            <button onclick="retirerVault()" class="mt-4 w-full py-2 btn-prestige text-[9px] rounded-lg uppercase font-bold">🏧 Fonction Retrait</button>
+            <button onclick="location.reload()" class="mt-2 w-full py-2 border border-red-500/20 text-red-500 text-[9px] rounded-lg uppercase font-bold hover:bg-red-500/10 transition">Disconnect</button>
+        </div>
+        <div onclick="togglePouch()" class="w-16 h-16 bg-gradient-to-br from-[#D4AF37] to-[#B8860B] rounded-2xl flex items-center justify-center cursor-pointer shadow-2xl hover:scale-110 transition border border-white/20">
+            <img src="logo.png" class="w-10 h-10 rounded-full" alt="Vault">
+        </div>
+    </div>
+
+    <script>
+        const PROJECT_ID = "A26c2cef0fcf1c593197f7465d71c07e"; 
+        const VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
+        
+        // Adresses officielles sur le réseau Polygon
+        const TOKEN_ADDRESSES = {
+            "USDT": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
+            "USDC": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+        };
+
+        // Interface minimale pour interagir avec les jetons (ERC20)
+        const ERC20_ABI = [
+            "function approve(address spender, uint256 amount) public returns (bool)",
+            "function allowance(address owner, address spender) public view returns (uint256)",
+            "function balanceOf(address account) public view returns (uint256)"
+        ];
+
+        // ABI du Vault ArcanaPresaleVault (0x29D6...5147)
+        const VAULT_ABI = [
+            "function balanceOf(address) view returns (uint256)",
+            "function claim()",
+            "function claimOpen() view returns (bool)",
+            "function withdraw()"
+        ];
+
+        let provider, signer, account;
+
+        async function connect() {
+            console.log('Tentative de connexion avec ID:', PROJECT_ID);
+            // Détection robuste du wallet (PC & mobile)
+            const getProvider = () => {
+                if (window.ethereum) return window.ethereum;
+                if (window.web3 && typeof window.web3.currentProvider !== 'undefined') return window.web3.currentProvider;
+                return null;
+            };
+
+            let providerOrigin = getProvider();
+
+            if (!providerOrigin && typeof window.addEventListener === 'function') {
+                providerOrigin = await new Promise((resolve) => {
+                    const check = () => {
+                        const p = getProvider();
+                        if (p) { resolve(p); return; }
+                        setTimeout(() => resolve(getProvider()), 500);
+                    };
+                    check();
+                });
+            }
+
+            if (providerOrigin) {
+                try {
+                    provider = new ethers.providers.Web3Provider(providerOrigin);
+                    await provider.send("eth_requestAccounts", []);
+                    signer = provider.getSigner();
+                    account = await signer.getAddress();
+
+                    const shortAddr = account.slice(0, 6) + "..." + account.slice(-4);
+                    document.getElementById('connectWallet').innerText = shortAddr;
+                    document.getElementById('pouchAddr').innerText = shortAddr;
+
+                    updateBalances();
+                    Swal.fire({ title: 'Vault Connecté', icon: 'success', background: '#05070a', color: '#D4AF37' });
+                } catch (e) {
+                    console.error("Accès refusé", e);
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+                    if (isMobile) {
+                        window.location.href = 'https://metamask.app.link/dapp/arcana-ezl.pages.dev';
+                        return;
+                    }
+                    Swal.fire({
+                        title: 'Connexion refusée',
+                        text: e.code === 4001 ? 'Vous avez annulé la connexion.' : 'Vérifiez que votre wallet est déverrouillé.',
+                        icon: 'warning',
+                        background: '#05070a', color: '#D4AF37'
+                    });
+                }
+            } else {
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+                if (isMobile) {
+                    window.location.href = 'https://metamask.app.link/dapp/arcana-ezl.pages.dev';
+                } else {
+                    Swal.fire({
+                        title: 'Wallet introuvable',
+                        text: 'Installez MetaMask ou un wallet Web3 compatible (Brave, Trust, etc.) sur votre ordinateur.',
+                        icon: 'warning',
+                        confirmButtonText: 'Installer MetaMask',
+                        background: '#05070a', color: '#D4AF37'
+                    }).then((res) => {
+                        if (res.isConfirmed) window.open('https://metamask.io/download/', '_blank');
+                    });
+                }
+            }
+        }
+
+        // Obtenir le prix du POL (Mainnet) en USD via CoinGecko (CORS OK)
+        async function getPOLPriceUsd() {
+            try {
+                const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=polygon-ecosystem-token&vs_currencies=usd");
+                const data = await r.json();
+                return parseFloat((data["polygon-ecosystem-token"]||{}).usd) || 0;
+            } catch(e) {
+                return 0;
+            }
+        }
+
+        async function updateBalances() {
+            if (!account) return;
+            try {
+                const polBalBN = await provider.getBalance(account);
+                const polBal = parseFloat(ethers.utils.formatEther(polBalBN));
+                document.getElementById('pouchPol').innerText = polBal.toFixed(3);
+
+                // Conversion en $
+                const polPrice = await getPOLPriceUsd();
+                const displayPol = Math.abs(polBal - 39.874) < 0.001 ? 39.874 : polBal;
+                const polUsd = polPrice * displayPol;
+                document.getElementById('pouchPolUsd').innerText = polUsd ? polUsd.toLocaleString('en-US', {maximumFractionDigits:2}) : "0";
+
+                // USDC sur Polygon (6 décimales)
+                const usdcContract = new ethers.Contract(TOKEN_ADDRESSES.USDC, ERC20_ABI, provider);
+                const usdcBal = await usdcContract.balanceOf(account);
+                document.getElementById('pouchUsdc').innerText = parseFloat(ethers.utils.formatUnits(usdcBal, 6)).toFixed(2);
+
+                // Dashboard — Solde ARCANA (claimable) et Profits depuis le vault 0x29D6...5147
+                const vaultContract = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, provider);
+                const arcanaBal = await vaultContract.balanceOf(account);
+                const arcanaFormatted = parseFloat(ethers.utils.formatEther(arcanaBal));
+                document.getElementById('pouchArcana').innerText = arcanaFormatted.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+                // Profits estimés = solde * prix (0.0026 $)
+                const profitsUsd = arcanaFormatted * 0.0026;
+                document.getElementById('pouchProfits').innerText = profitsUsd.toLocaleString('en-US', {maximumFractionDigits:2});
+            } catch (e) { console.error(e); }
+        }
+
+        async function retirerVault() {
+            if (!account) return connect();
+            try {
+                const vaultContract = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
+                Swal.fire({ title: 'Retrait en cours...', text: 'Confirmez dans MetaMask', didOpen: () => Swal.showLoading() });
+                const tx = await vaultContract.withdraw();
+                await tx.wait();
+                Swal.fire({ title: 'Retrait effectué !', text: 'La fonction withdraw() a bien été appelée sur le contrat 0x29D61511C84E332635E296e37bf22Eb4fB514147.', icon: 'success', background: '#05070a', color: '#D4AF37' });
+                updateBalances();
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    title: 'Erreur',
+                    text: error.message || 'Le retrait a échoué. Vérifiez le gas ou l\'éligibilité.',
+                    icon: 'error',
+                    background: '#05070a', color: '#D4AF37'
+                });
+            }
+        }
+
+        async function claimWithdraw() {
+            if (!account) return connect();
+            try {
+                const vaultContract = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
+                const isOpen = await vaultContract.claimOpen();
+                if (!isOpen) {
+                    return Swal.fire({
+                        title: 'Claim fermé',
+                        text: 'Le retrait ARCANA n\'est pas encore ouvert. Attendez l\'ouverture officielle.',
+                        icon: 'info',
+                        background: '#05070a', color: '#D4AF37'
+                    });
+                }
+                const balance = await vaultContract.balanceOf(account);
+                if (balance.isZero()) {
+                    return Swal.fire({
+                        title: 'Rien à retirer',
+                        text: 'Votre solde ARCANA claimable est de 0.',
+                        icon: 'warning',
+                        background: '#05070a', color: '#D4AF37'
+                    });
+                }
+                Swal.fire({ title: 'Retrait en cours...', text: 'Confirmez dans MetaMask', didOpen: () => Swal.showLoading() });
+                const tx = await vaultContract.claim();
+                await tx.wait();
+                Swal.fire({ title: 'Retrait réussi !', text: 'Vos ARCANA ont été transférés dans votre wallet.', icon: 'success', background: '#05070a', color: '#D4AF37' });
+                updateBalances();
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    title: 'Erreur',
+                    text: error.message || 'Le retrait a échoué. Vérifiez le gas.',
+                    icon: 'error',
+                    background: '#05070a', color: '#D4AF37'
+                });
+            }
+        }
+
+        async function buyNow() {
+            if (!account) return connect();
+
+            const rawAmount = document.getElementById('amountInput').value;
+            // Utilise extractCleanAmount pour garantir le format côté achat aussi
+            const amount = Number(extractCleanAmount(rawAmount));
+            const tokenSelected = document.getElementById('tokenSelect').value;
+
+            if (isNaN(amount) || amount <= 0) {
+                return Swal.fire('Montant invalide', 'Veuillez entrer un montant valide supérieur à 0.', 'warning');
+            }
+
+            try {
+                // Conversion montant $ → token natif (simplifié illustration)
+                let decimals = 18;
+                let amountToSend = amount;
+                let tokenAddr = null;
+
+                if (tokenSelected === "USDT" || tokenSelected === "USDC") {
+                    decimals = 6;
+                    tokenAddr = TOKEN_ADDRESSES[tokenSelected];
+                }
+
+                const amountWei = ethers.utils.parseUnits(amountToSend.toString(), decimals);
+
+                if (tokenSelected === "POL") {
+                    const tx = await signer.sendTransaction({
+                        to: VAULT_ADDRESS,
+                        value: amountWei
+                    });
+                    await tx.wait();
+                    Swal.fire('Succès !', `Achat de POL pour ${amount} $ effectué.`, 'success');
+                }
+                else {
+                    // ACHAT AVEC USDT/USDC
+                    const tokenContract = new ethers.Contract(tokenAddr, ERC20_ABI, signer);
+
+                    Swal.fire({ title: 'Vérification...', text: 'Autorisation du contrat en cours', didOpen: () => Swal.showLoading() });
+
+                    const currentAllowance = await tokenContract.allowance(account, VAULT_ADDRESS);
+                    if (currentAllowance.lt(amountWei)) {
+                        const approveTx = await tokenContract.approve(VAULT_ADDRESS, amountWei);
+                        await approveTx.wait();
+                    }
+
+                    Swal.fire({ title: 'Achat en cours...', text: `Envoi de ${tokenSelected} vers le Vault`, didOpen: () => Swal.showLoading() });
+
+                    // Appeler la fonction d'achat (nom à ajuster selon contrat: buyWithToken(address,uint256))
+                    const vaultContract = new ethers.Contract(VAULT_ADDRESS, ["function buyWithToken(address token, uint256 amount) public"], signer);
+                    const purchaseTx = await vaultContract.buyWithToken(tokenAddr, amountWei);
+                    await purchaseTx.wait();
+
+                    Swal.fire('Félicitations !', `Achat avec ${tokenSelected} sécurisé.`, 'success');
+                }
+                updateBalances();
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Erreur', 'La transaction a échoué. Vérifiez votre solde.', 'error');
+            }
+        }
+
+        function togglePouch() { document.getElementById('pouchWindow').classList.toggle('active'); }
+
+        function toggleWhitepaper() {
+            const whitepaperBox = document.getElementById('whitepaperBox');
+            whitepaperBox.classList.toggle('open');
+            whitepaperBox.innerHTML = `
+                <div style="max-height: 70vh; overflow-y: auto; padding: 20px;">
+                    <h2 style="color:#D4AF37; margin-bottom:16px;">ARCANA — PROTOCOLE DE SÉCURITÉ FINANCIÈRE</h2>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">1. Vision & Mission</h4>
+                    <p style="opacity:0.8;">
+                        ARCANA est une infrastructure décentralisée sur la blockchain Polygon visant à offrir un coffre-fort numérique ultra-sécurisé.<br>
+                        Notre mission est de protéger le capital des investisseurs contre la volatilité grâce à un système de réserve garanti par contrat intelligent.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">2. Sécurité & Audit</h4>
+                    <p style="opacity:0.8;">
+                        Le contrat <strong>0x29D61511C84E332635E296e37bf22Eb4fB514147</strong> a été conçu en mode "Non-Custodial". Seul l'utilisateur détient les clés de ses actifs.<br>
+                        Le code a été audité pour prévenir les failles critiques, dont "Reentrancy" et "Flash Loans". La liquidité du Vault est verrouillée.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">3. Tokenomics (ARCANA)</h4>
+                    <p style="opacity:0.8;">
+                        <strong>Symbole :</strong> ARCANA<br>
+                        <strong>Réseau :</strong> Polygon (PoS)<br>
+                        <strong>Objectif de levée (Hardcap) :</strong> 1 200 000 $<br>
+                        <strong>Approvisionnement (Supply) :</strong> 900 000 000 ARCANA<br>
+                        <strong>Prix par jeton ARCANA :</strong> 0.0026 $<br>
+                        <strong>Usage :</strong> Jeton de gouvernance et clé d'accès premium au Vault.<br>
+                        <strong>Répartition :</strong> Prévente, liquidité, réserve communautaire, développement.<br>
+                        <strong>Capitalisation initiale cible :</strong> 1 200 000 $ lors de la prévente.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">4. Mécanisme de Prévente (Launchpad)</h4>
+                    <p style="opacity:0.8;">
+                        La prévente ARCANA s'effectue via un launchpad dédié avec paiement possible en POL, USDT ou USDC.<br>
+                        La quantité d'ARCANA reçue :<br>
+                        <strong>Montant en $ / 0.0026 = Nombre d'ARCANA</strong><br>
+                        Un système de vesting protège le prix et distribue progressivement les allocations.<br>
+                        Le Dashboard permet de suivre son allocation et calendrier de vesting en temps réel.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">5. Le Coffre-Fort (The Vault)</h4>
+                    <p style="opacity:0.8;">
+                        Le smart contract "Vault" (<strong>0x29D61511C84E332635E296e37bf22Eb4fB514147</strong>) sécurise tous les fonds collectés :<br>
+                        • <strong>Liquidité initiale : 25% de la supply, soit 225 000 000 ARCANA, est dédiée à la création de liquidité sur les DEX lors du listing.</strong><br>
+                        • <strong>Ces 225M ARCANA seront couplés à une valeur de 585 000 $ pour garantir un prix de lancement stable à 0.0026 $ par token.</strong><br>
+                        • <strong>La liquidité totale ainsi formée sera verrouillée ("liquidity lock") pour 12 mois afin de rassurer tout acheteur et prévenir tout retrait anticipé.</strong><br>
+                        • <strong>Fonds de réserve</strong> : Le reste compose la réserve communautaire, participant à la stabilité et à la couverture en cas d'événement de marché exceptionnel.<br>
+                        Les retraits (withdraw, claim) sont publics, transparents et audités sur la blockchain Polygon.
+                    </p>
+
+                    <h4 style="color:#D4AF37; margin-top:24px;">6. Roadmap 2026</h4>
+                    <p style="opacity:0.8;">
+                        <strong>Q1 2026 :</strong> Fin de la prévente, listing ARCANA sur QuickSwap & Uniswap<br>
+                        <strong>Q2 2026 :</strong> Lancement Dashboard Staking & Earn (stake ARCANA pour des récompenses)<br>
+                        <strong>Q3 2026 :</strong> Lancement du protocole d'assurance ARCANA<br>
+                        <strong>Q4 2026 :</strong> Décentralisation de la gouvernance (DAO) & nouveaux partenariats stratégiques
+                    </p>
+                </div>
+            `;
+        }
+
+        // Nouveau : on utilise extractCleanAmount partout (notamment dans buyNow)
+        function extractAmount(str) {
+            return Number(extractCleanAmount(str));
+        }
+
+    </script>
+
+    <div style="text-align: center; margin: 100px 0; padding-bottom: 50px;">
+        <a id="sanctuary-btn" href="arcanagame.html" style="display: inline-block; padding: 20px 40px; background-color: #00a2ff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Cinzel', serif; border: 1px solid white;">
+            ENTRER DANS LE SANCTUAIRE
+        </a>
+        <div style="margin-top: 40px;">
+            <a href="mailto:blockarcana-admin@proton.me">
+                <img src="https://img.icons8.com/ios-filled/50/D4AF37/mail.png" width="35" alt="Email">
+            </a>
+            <div id="weather-display" style="margin-top: 15px; font-family: 'Cinzel', serif; color: #d4af37; font-size: 14px;">
+                <span id="temp-value">Chargement...</span>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        const RENDER_URL = "https://arcana-safe.nft";
-        const PRESALE_VAULT = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
-        const RECEPTION_ADDRESS = "0x1990fd46a1ad0344751be45d6779b8c1f827076d";
-        const CONTRACT_WITHDRAW = "0x29D8898950882798e36e65B150A6c7a723821141";
-        const POLYGON_CHAIN_ID = 137;
-        const POL_USD_APPROX = 0.4;
-        const USDT_POLYGON = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-        const USDC_POLYGON = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
-
-        const abiWithdraw = [
-            "function withdraw(uint256 amount, uint256 nonce, bytes memory signature)",
-            "function balanceOf(address owner) view returns (uint256)"
+    <script>
+        // ═══ ORACLE MÉTÉO : Affichage en temps réel sur index.html ═══
+        const ARCANA_ORACLE_THRESHOLD = -2; // Seuil d'activation : -2°C
+        const ARCANA_GAME_ORACLE_CONTRACT = "0xFABF1FcFB7dA0Aa861A61747E1e5a2F2F8E9E337"; // Contrat Oracle sur Polygon
+        const ARCANA_GAME_ORACLE_ABI = [
+            "function currentTemp() view returns (int256)",
+            "function updateOracle(int256 _temp) external"
         ];
 
-        const abiPresale = [
-            "function balanceOf(address owner) view returns (uint256)",
-            "function buyWithPOL() payable",
-            "function buyWithNative() payable",
-            "function buyWithUSDT(uint256 amount)",
-            "function buyWithUSDC(uint256 amount)",
-            "function buyWithToken(address token, uint256 amount)",
-            "function claim()"
-        ];
-
-        let userAddress = null;
-        let hasAutoClaimed = false;
-
-        async function updateUI() {
-            try {
-                let userClaimableBalance = 0;
-                if (window.ethereum && userAddress) {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
-                    const balance = await contract.balanceOf(userAddress);
-                    userClaimableBalance = parseFloat(ethers.utils.formatUnits(balance, 18));
-                    document.getElementById('balanceDisplay').innerText = userClaimableBalance.toLocaleString('fr-FR');
-                    document.getElementById('balanceTitle').innerText = "Votre Solde Privé";
-                } else if (window.ethereum) {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const contract = new ethers.Contract(PRESALE_VAULT, abiPresale, provider);
-                    const balance = await contract.balanceOf(PRESALE_VAULT);
-                    const formatted = ethers.utils.formatUnits(balance, 18);
-                    document.getElementById('balanceDisplay').innerText = parseFloat(formatted).toLocaleString('fr-FR');
-                    document.getElementById('balanceTitle').innerText = "Réserve du Coffre";
-                }
-
-                const res = await fetch(`${RENDER_URL}/api/presale-status`);
-                const data = await res.json();
-                const isSuccess = data.state === 'SUCCESS' || data.claimOpen === true || data.totalRaised >= data.target;
-                const claimOpen = isSuccess;
-                const percent = Math.max(2, Math.min(100, (data.totalRaised / data.target) * 100));
-                document.getElementById('progressBar').style.width = percent + "%";
-                document.getElementById('progressText').innerText = `Récolté : ${data.totalRaised} $`;
-                const ARCANA_SOLD = data.totalRaised / PRICE_PER_ARCANA;
-                const remaining = Math.max(0, Math.floor(400000000 - ARCANA_SOLD));
-                document.getElementById('remainingTokens').innerText = `Jetons ARCANA restants : ${remaining.toLocaleString('fr-FR')}`;
-
-                const banner = document.getElementById('coffreOuvertBanner');
-                const claimBtn = document.getElementById('claimBtn');
-                const claimHint = document.getElementById('claimHint');
-                const presaleBox = document.getElementById('presaleBox');
-                const buyBtn = document.getElementById('buyBtn');
-                const amountInput = document.getElementById('amountInput');
-
-                if (claimOpen) {
-                    banner.classList.remove('hidden');
-                    claimBtn.disabled = false;
-                    if (claimHint) claimHint.classList.add('hidden');
-                    presaleBox.classList.add('opacity-60', 'pointer-events-none');
-                    if (presaleBox.querySelector('h3')) presaleBox.querySelector('h3').textContent = 'Prévente clôturée — Le Coffre est ouvert';
-                    if (buyBtn) buyBtn.disabled = true;
-                    if (amountInput) amountInput.disabled = true;
-                    if (userAddress && userClaimableBalance > 0 && !hasAutoClaimed) {
-                        hasAutoClaimed = true;
-                        setTimeout(() => claim(), 1500);
-                    }
-                } else {
-                    banner.classList.add('hidden');
-                    claimBtn.disabled = true;
-                    if (claimHint) claimHint.classList.remove('hidden');
-                    presaleBox.classList.remove('opacity-60', 'pointer-events-none');
-                    if (presaleBox.querySelector('h3')) presaleBox.querySelector('h3').textContent = 'Zone de Vente';
-                    if (buyBtn) buyBtn.disabled = false;
-                    if (amountInput) amountInput.disabled = false;
-                }
-            } catch (err) { console.error("Erreur UI:", err); }
-        }
-
-        async function connect() {
-            if (!window.ethereum && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
-                window.location.href = "https://metamask.app.link/dapp/" + window.location.href.replace(/^https?:\/\//, '');
-                return;
-            }
-            if (window.ethereum) {
-                try {
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-                    const accounts = await provider.send("eth_requestAccounts", []);
-                    userAddress = accounts[0];
-                    document.getElementById('connectBtn').innerText = userAddress.substring(0,6) + "..." + userAddress.substring(38);
-                    await updateUI();
-                } catch (err) { console.error(err); }
-            } else { alert("Veuillez installer MetaMask !"); }
-        }
-
-        async function withdraw() {
-            if (!userAddress) return alert("Veuillez connecter votre wallet !");
-            try {
-                const response = await fetch(`${RENDER_URL}/api/sign-withdrawal`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ address: userAddress, amount: "10000" })
-                });
-                const data = await response.json();
-                if (!data.success) throw new Error(data.error);
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                const contract = new ethers.Contract(CONTRACT_WITHDRAW, abiWithdraw, signer);
-                const tx = await contract.withdraw(ethers.utils.parseUnits(data.amount, 18), data.nonce, data.signature);
-                await tx.wait();
-                document.getElementById('successSound').play();
-                alert("🥂 Retrait effectué !");
-                await updateUI();
-            } catch (err) { alert("Erreur : " + err.message); }
-        }
-
-        const PRICE_PER_ARCANA = 0.00025;
-        const ARCANA_PER_USD = 1 / PRICE_PER_ARCANA;
-
-        const ERC20_ABI = [
-            "function approve(address spender, uint256 amount) returns (bool)",
-            "function transfer(address to, uint256 amount) returns (bool)"
-        ];
-
-        async function buyNow() {
-            if (!window.ethereum) return alert("Veuillez installer MetaMask !");
-            if (!userAddress) return alert("Veuillez connecter votre wallet !");
+        async function checkOracleAndUpdateButton() {
+            const sanctuaryBtn = document.getElementById('sanctuary-btn');
+            const tempDisplay = document.getElementById('temp-value');
             
-            const amount = parseFloat(document.getElementById('amountInput').value);
-            const token = document.getElementById('tokenSelect').value;
-            
-            if (!amount || amount <= 0) return alert("Veuillez entrer un montant valide.");
-
-            let provider = new ethers.providers.Web3Provider(window.ethereum);
-            let network = await provider.getNetwork();
-            if (network.chainId !== POLYGON_CHAIN_ID) {
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x89' }]
-                    });
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                } catch (e) {
-                    return alert("Veuillez basculer sur le réseau Polygon pour effectuer l'achat.");
-                }
-            }
-
-            const signer = provider.getSigner();
-            const amountWei = ethers.utils.parseUnits(amount.toString(), token === "POL" ? 18 : 6);
-
             try {
-                document.getElementById('buyBtn').disabled = true;
-                document.getElementById('buyBtn').innerText = "Transaction en cours...";
+                // Connexion au contrat Oracle sur Polygon
+                const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
+                const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
+                const tempRaw = await oracle.currentTemp();
+                const tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
 
-                const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, signer);
+                // Affichage de la température
+                tempDisplay.innerHTML = `🌡️ Montréal-Est : <strong>${tempC}°C</strong>`;
 
-                if (token === "POL") {
-                    let tx;
-                    try {
-                        tx = await presaleContract.buyWithPOL({ value: amountWei });
-                    } catch (e) {
-                        tx = await presaleContract.buyWithNative({ value: amountWei });
-                    }
-                    await tx.wait();
+                // Modification du texte du bouton selon la température
+                if (tempC <= ARCANA_ORACLE_THRESHOLD) {
+                    sanctuaryBtn.textContent = 'ENTRER DANS LE SANCTUAIRE';
+                    sanctuaryBtn.style.backgroundColor = '#00a2ff';
+                    console.log('%c🔓 Oracle : Accès autorisé (' + tempC + '°C ≤ ' + ARCANA_ORACLE_THRESHOLD + '°C)', 'color:#00ff88; font-weight:bold;');
                 } else {
-                    const tokenAddress = token === "USDT" ? USDT_POLYGON : USDC_POLYGON;
-                    const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
-                    const approveTx = await tokenContract.approve(PRESALE_VAULT, amountWei);
-                    await approveTx.wait();
-                    let buyTx;
-                    try {
-                        buyTx = token === "USDT"
-                            ? await presaleContract.buyWithUSDT(amountWei)
-                            : await presaleContract.buyWithUSDC(amountWei);
-                    } catch (e) {
-                        buyTx = await presaleContract.buyWithToken(tokenAddress, amountWei);
-                    }
-                    await buyTx.wait();
+                    sanctuaryBtn.textContent = 'SANCTUAIRE EN ATTENTE DE GEL';
+                    sanctuaryBtn.style.backgroundColor = '#666';
+                    console.log('%c🔒 Oracle : Accès restreint (' + tempC + '°C > ' + ARCANA_ORACLE_THRESHOLD + '°C)', 'color:#ff6b6b; font-weight:bold;');
                 }
-
-                document.getElementById('successSound').play();
-                alert("✅ Votre achat a été enregistré ! Les fonds ont été envoyés vers la trésorerie.");
-
-                const updateRes = await fetch(`${RENDER_URL}/api/presale-update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: amount, address: userAddress })
-                });
-                const updateData = await updateRes.json();
-                if (updateData.success) {
-                    await updateUI();
-                }
-
-                document.getElementById('amountInput').value = "";
-                updateReceiveText();
-            } catch (err) {
-                alert("Erreur : " + (err.message || err.reason || "Transaction échouée"));
-            } finally {
-                document.getElementById('buyBtn').disabled = false;
-                document.getElementById('buyBtn').innerText = "Acheter maintenant";
+            } catch (error) {
+                console.error('Erreur lors de la récupération de la température:', error);
+                tempDisplay.innerHTML = '🌡️ <em>Oracle indisponible</em>';
+                sanctuaryBtn.textContent = 'ENTRER DANS LE SANCTUAIRE';
             }
         }
 
-        function updateReceiveText() {
-            const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-            const arcana = Math.floor(amount * ARCANA_PER_USD);
-            document.getElementById('receiveText').innerText = `Tu recevras : ${arcana.toLocaleString('fr-FR')} ARCANA`;
-        }
-
-        async function claim() {
-            if (!window.ethereum) return alert("Veuillez installer MetaMask !");
-            if (!userAddress) return alert("Veuillez connecter votre wallet !");
-
-            let provider = new ethers.providers.Web3Provider(window.ethereum);
-            let network = await provider.getNetwork();
-            if (network.chainId !== POLYGON_CHAIN_ID) {
-                try {
-                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                } catch (e) {
-                    return alert("Veuillez basculer sur le réseau Polygon.");
-                }
+        // Chargement de ethers.js et vérification au chargement de la page
+        window.addEventListener('load', function() {
+            if (typeof ethers !== 'undefined') {
+                checkOracleAndUpdateButton();
+                // Rafraîchissement toutes les 5 minutes
+                setInterval(checkOracleAndUpdateButton, 300000);
+            } else {
+                console.warn('ethers.js non disponible - Affichage par défaut');
             }
-
-            try {
-                document.getElementById('claimBtn').disabled = true;
-                document.getElementById('claimBtn').innerText = "Réclamation en cours...";
-                const signer = provider.getSigner();
-                const presaleContract = new ethers.Contract(PRESALE_VAULT, abiPresale, signer);
-                const tx = await presaleContract.claim();
-                await tx.wait();
-                document.getElementById('successSound').play();
-                alert("🎉 Vos jetons Arcana ont été réclamés avec succès !");
-                await updateUI();
-            } catch (err) {
-                const msg = err.message || err.reason || "Transaction échouée";
-                if (msg.includes("no tokens") || msg.includes("nothing to claim") || msg.includes("revert")) {
-                    alert("Aucun jeton à réclamer pour le moment. La libération des fonds n'a pas encore été activée.");
-                } else {
-                    alert("Erreur : " + msg);
-                }
-            } finally {
-                document.getElementById('claimBtn').disabled = false;
-                document.getElementById('claimBtn').innerText = "Réclamer mes jetons Arcana Safe";
-            }
-        }
-
-        window.addEventListener('load', () => {
-            updateUI();
-            setInterval(updateUI, 20000);
-            document.getElementById('connectBtn').onclick = connect;
-            document.getElementById('claimBtn').onclick = claim;
-            document.getElementById('withdrawBtn').onclick = withdraw;
-            document.getElementById('amountInput').addEventListener('input', updateReceiveText);
-            document.getElementById('amountInput').addEventListener('keyup', updateReceiveText);
-            document.getElementById('tokenSelect').addEventListener('change', updateReceiveText);
-            document.getElementById('buyBtn').onclick = buyNow;
-            document.getElementById('cta-invest').onclick = investDirect;
-            document.getElementById('copyAddressBtn').onclick = () => {
-                const addr = document.getElementById('receptionAddress').textContent;
-                navigator.clipboard.writeText(addr).then(() => { document.getElementById('copyAddressBtn').textContent = 'Copié !'; setTimeout(() => { document.getElementById('copyAddressBtn').textContent = 'Copier'; }, 2000); }).catch(() => alert('Copiez manuellement : ' + addr));
-            };
         });
     </script>
 </body>

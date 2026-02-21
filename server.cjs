@@ -19,12 +19,19 @@ function getClientIp(req) {
         || '';
 }
 
-// Domaine Web3 officiel Arcana Safe (transaction Polygon 0x5fda... confirmée)
-const OFFICIAL_DOMAIN = process.env.OFFICIAL_DOMAIN || 'https://arcana-safe.nft';
+// ========== CONFIGURATION ADMIN & VAULT (UNIQUE) ==========
+// Seule cette adresse est ADMIN et VAULT : elle perçoit tous les profits et gère les fonds.
+// Aucune autre adresse ne peut recevoir les pertes Arcade ni gérer le coffre.
+const ADMIN_VAULT_ADDRESS = (process.env.ARCANA_ADMIN_VAULT || '0x29D61511C84E332635E296e37bf22Eb4fB514147').toLowerCase();
 
-// Configuration CORS : autoriser explicitement arcana-safe.nft pour les requêtes du site
+// Domaine Web3 officiel Arcana Safe (transaction Polygon 0x5fda... confirmée)
+const OFFICIAL_DOMAIN = process.env.OFFICIAL_DOMAIN || 'https://arcana-ezl.pages.dev';
+
+// Configuration CORS : autoriser le site Cloudflare Pages et arcana-safe.nft
 const ALLOWED_ORIGINS = [
     OFFICIAL_DOMAIN,
+    'https://arcana-ezl.pages.dev',
+    'https://arcana-safe.nft',
     'https://www.arcana-safe.nft',
     'http://localhost:3000',
     'http://localhost:8080',
@@ -132,6 +139,103 @@ app.get('/api/admin/stats', (req, res) => {
         state: presaleData.state,
         percent: Math.min(100, (presaleData.totalRaised / presaleData.target) * 100)
     });
+});
+
+// --- 2c2. ARCADE : plus gros gains du jour (leaderboard) ---
+let arcadeWins = [];
+const LEADERBOARD_MAX = 20;
+
+function isToday(ts) {
+    const d = new Date(ts);
+    const now = new Date();
+    return d.getUTCDate() === now.getUTCDate() && d.getUTCMonth() === now.getUTCMonth() && d.getUTCFullYear() === now.getUTCFullYear();
+}
+
+app.post('/api/arcade-win', (req, res) => {
+    try {
+        const { address, amount, game } = req.body;
+        const amt = parseFloat(amount);
+        if (!address || typeof address !== 'string' || isNaN(amt) || amt <= 0) {
+            return res.status(400).json({ success: false, error: 'Données invalides' });
+        }
+        arcadeWins.push({
+            address: address.toLowerCase(),
+            amount: amt,
+            game: (game && typeof game === 'string') ? game.slice(0, 50) : 'Arcade',
+            timestamp: new Date().toISOString()
+        });
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
+
+app.get('/api/arcade-leaderboard', (req, res) => {
+    const today = arcadeWins.filter(w => isToday(w.timestamp));
+    today.sort((a, b) => b.amount - a.amount);
+    res.json({ leaderboard: today.slice(0, LEADERBOARD_MAX) });
+});
+
+// --- Réserve du coffre Arcade (même adresse ADMIN/VAULT) : Max Bet = 5% réserve, 0 = Maintenance ---
+const VAULT_ADDRESS = ADMIN_VAULT_ADDRESS;
+const ARCANA_TOKEN_ABI = ['function balanceOf(address owner) view returns (uint256)'];
+const ARCANA_TOKEN_ADDRESS = process.env.ARCANA_TOKEN_ADDRESS || VAULT_ADDRESS;
+const MAX_BET_PERCENT = 0.05; // Limite 5% de la réserve pour protéger le capital
+// Réserve de départ (311 POL + 10 000 ARC) : active les jeux même si la chaîne renvoie 0 en attendant le transfert des 5M
+const FALLBACK_RESERVE_ARCANA = parseFloat(process.env.ARCANA_ARCADE_FALLBACK_RESERVE || '10000');
+let arcadeTokenContract = null;
+try {
+    arcadeTokenContract = new ethers.Contract(ARCANA_TOKEN_ADDRESS, ARCANA_TOKEN_ABI, provider);
+} catch (e) {
+    console.warn('Arcade: contrat token non initialisé, utilisation réserve de départ:', e.message);
+}
+
+app.get('/api/arcade-vault-reserve', async (req, res) => {
+    try {
+        let reserve = 0;
+        if (arcadeTokenContract) {
+            try {
+                const raw = await arcadeTokenContract.balanceOf(VAULT_ADDRESS);
+                reserve = parseFloat(ethers.utils.formatUnits(raw, 18));
+            } catch (_) {}
+        }
+        if (reserve <= 0) reserve = FALLBACK_RESERVE_ARCANA;
+        const maxBet = Math.floor(reserve * MAX_BET_PERCENT * 1000) / 1000;
+        const maintenance = false;
+        res.json({ reserve, maxBet, maintenance });
+    } catch (e) {
+        console.error('Erreur réserve arcade:', e.message);
+        res.json({ reserve: FALLBACK_RESERVE_ARCANA, maxBet: Math.floor(FALLBACK_RESERVE_ARCANA * MAX_BET_PERCENT * 1000) / 1000, maintenance: false });
+    }
+});
+
+// --- Settlement Arcade : AUTOMATISATION — gains du coffre vers joueur, pertes verrouillées dans le coffre (ADMIN_VAULT) ---
+app.post('/api/arcade-settle', async (req, res) => {
+    try {
+        const { address, bet, winAmount, game } = req.body;
+        const betNum = parseFloat(bet);
+        const winNum = parseFloat(winAmount);
+        if (!address || typeof address !== 'string' || !ethers.utils.isAddress(address)) {
+            return res.status(400).json({ success: false, error: 'Adresse invalide' });
+        }
+        if (isNaN(betNum) || betNum < 0) {
+            return res.status(400).json({ success: false, error: 'Mise invalide' });
+        }
+        const netWin = winNum - betNum;
+        if (netWin > 0) {
+            arcadeWins.push({
+                address: address.toLowerCase(),
+                amount: netWin,
+                game: (game && typeof game === 'string') ? game.slice(0, 50) : 'Arcade',
+                timestamp: new Date().toISOString()
+            });
+        }
+        // Gains = transfert depuis ADMIN_VAULT vers address ; pertes = restent dans ADMIN_VAULT. Pour l’instant enregistrement côté serveur uniquement.
+        res.json({ success: true, recorded: true });
+    } catch (e) {
+        console.error('Erreur arcade-settle:', e);
+        res.status(500).json({ success: false, error: e.message });
+    }
 });
 
 // --- 2d. API ADMIN : liste des transactions ---

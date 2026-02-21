@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade — Arcana Safe</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        body { background: #0a0e1a; color: #F7E7CE; font-family: 'Playfair Display', serif; min-height: 100vh; margin: 0; }
+        .card { background: linear-gradient(145deg, #131b2e, #0f1629); border: 1px solid #D4AF37; border-radius: 16px; }
+        .game-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .game-card:hover { transform: translateY(-4px); box-shadow: 0 0 24px rgba(212,175,55,0.4); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+        .modal.open { display: flex; }
+        .wheel-segment { fill: var(--c); }
+        .reel { display: inline-block; width: 60px; height: 80px; border: 2px solid #D4AF37; border-radius: 8px; margin: 0 4px; font-size: 2rem; line-height: 80px; text-align: center; }
+        /* Toast Sync Error (discret, non bloquant) */
+        #syncErrorToast { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%) translateY(120%); z-index: 200; padding: 0.6rem 1.2rem; background: rgba(180,60,60,0.95); color: #fff; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: transform 0.3s ease; pointer-events: none; }
+        #syncErrorToast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+            <div>
+                <a href="https://arcana-ezl.pages.dev/" class="text-[#D4AF37] hover:underline">← Arcana Safe</a>
+                <h1 class="text-2xl md:text-3xl font-bold text-[#D4AF37] mt-2">Arcade</h1>
+            </div>
+            <div class="flex items-center gap-4 flex-wrap">
+                <span class="px-4 py-2 rounded-lg bg-black/40 border border-[#D4AF37]">Solde ARCANA : <strong id="arcadeBalance">0</strong></span>
+                <span class="px-4 py-2 rounded-lg bg-black/40 border border-[#D4AF37]/70 text-sm">Max mise : <strong id="arcadeMaxBet">—</strong></span>
+                <button id="arcadeConnect" class="px-4 py-2 rounded-lg bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37] hover:bg-[#D4AF37]/30">Connecter Wallet</button>
+            </div>
+        </div>
+
+        <!-- Welcome Bonus -->
+        <div class="card p-6 mb-8 border-2 border-[#D4AF37] bg-gradient-to-r from-[#D4AF37]/15 to-transparent">
+            <h2 class="text-xl font-bold text-[#D4AF37] mb-2">🎁 Welcome Bonus</h2>
+            <p class="text-[#F7E7CE]/90 mb-2">• <strong>100%</strong> sur votre premier dépôt vers l'adresse officielle du Coffre :</p>
+            <code class="block text-[#00ffcc] text-sm mb-2 break-all bg-black/40 px-2 py-1 rounded">0x29D61511C84E332635E296e37bf22Eb4fB514147</code>
+            <p class="text-[#F7E7CE]/90">• <strong>5 spins gratuits</strong> sur la Roue de la Fortune (crédités après connexion wallet).</p>
+            <p class="text-xs text-[#D4AF37]/80 mt-2">Déposez sur Polygon pour participer. Les spins s'affichent dans le jeu Roue.</p>
+        </div>
+
+        <!-- Bannière Maintenance (coffre vide) -->
+        <div id="maintenanceBanner" class="card p-4 mb-6 border-2 border-amber-500/80 bg-amber-500/10 text-amber-200" style="display: none;">
+            <strong>Maintenance</strong> — Le coffre est vide. Les jeux sont temporairement indisponibles.
+        </div>
+
+        <!-- 10 jeux -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="game-card card p-4 text-center" data-game="blackjack">🃏 Blackjack</div>
+            <div class="game-card card p-4 text-center" data-game="roulette">🎡 Roulette</div>
+            <div class="game-card card p-4 text-center" data-game="slots">🎰 Slots</div>
+            <div class="game-card card p-4 text-center" data-game="dice">🎲 Dice</div>
+            <div class="game-card card p-4 text-center" data-game="plinko">🔵 Plinko</div>
+            <div class="game-card card p-4 text-center" data-game="poker">♠️ Poker</div>
+            <div class="game-card card p-4 text-center" data-game="crash">📈 Crash</div>
+            <div class="game-card card p-4 text-center" data-game="baccarat">🂡 Baccarat</div>
+            <div class="game-card card p-4 text-center" data-game="mines">💣 Mines</div>
+            <div class="game-card card p-4 text-center" data-game="wheel">🎡 Roue de la Fortune</div>
+        </div>
+    </div>
+
+    <!-- Toast Sync Error (discret) -->
+    <div id="syncErrorToast" aria-live="polite">Sync Error — Vérifiez votre connexion.</div>
+
+    <!-- Modal jeu -->
+    <div id="gameModal" class="modal">
+        <div class="card max-w-lg w-full max-h-[90vh] overflow-auto p-6 relative">
+            <button id="closeModal" class="absolute top-4 right-4 text-[#F7E7CE]/70 hover:text-[#D4AF37] text-2xl">&times;</button>
+            <h3 id="gameTitle" class="text-xl font-bold text-[#D4AF37] mb-4"></h3>
+            <div id="gameContent"></div>
+            <p class="text-xs text-[#F7E7CE]/50 mt-4">Les gains sont en ARCANA. Connectez votre wallet pour jouer avec votre solde.</p>
+        </div>
+    </div>
+
+    <script>
+        const PRESALE_VAULT = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
+        const abiPresale = ["function balanceOf(address owner) view returns (uint256)"];
+        const POLYGON_CHAIN_ID = 137;
+        const WELCOME_FREE_SPINS = 5;
+        const STORAGE_FREE_SPINS = "arcana_wheel_freespins";
+        const STORAGE_ARCADE_STATE = "arcana_arcade_state";
+        // RPC silencieux (lecture seule, pas de popup). Pour Alchemy: window.ARCANA_RPC_URL = "https://polygon-mainnet.g.alchemy.com/v2/VOTRE_CLE";
+        const SILENT_RPC = window.ARCANA_RPC_URL || "https://polygon-rpc.com";
+        const SILENT_REFRESH_INTERVAL_MS = 25000;
+        const SYNC_ERROR_TOAST_DURATION_MS = 4000;
+        const API_BASE = window.ARCANA_API_BASE || window.location.origin;
+        const RTP = 0.97;
+        const VAULT_ADDRESS = "0x29D61511C84E332635E296e37bf22Eb4fB514147";
+
+        let userAddress = null;
+        let vaultReserve = 0;
+        let maxBet = 0;
+        let maintenance = true;
+        let chainBalance = 0;
+        let localDelta = 0;
+        let silentRefreshFailCount = 0;
+        let silentProvider = null;
+        let silentContract = null;
+
+        function getDisplayBalance() { return Math.max(0, chainBalance + localDelta); }
+        function getChainBalance() { return chainBalance; }
+        function getLocalDelta() { return localDelta; }
+
+        /** Optimistic UI : applique immédiatement le gain/perte et met à jour l'affichage sans attendre la chaîne. */
+        function applyGameDelta(amount) {
+            localDelta += amount;
+            persistArcadeState();
+            renderDisplayBalance();
+        }
+
+        function renderDisplayBalance() {
+            const el = document.getElementById('arcadeBalance');
+            if (el) el.textContent = getDisplayBalance().toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+        }
+
+        /** LocalStorage : persister l'état pour garder le solde correct après rafraîchissement. */
+        function persistArcadeState() {
+            if (!userAddress) return;
+            try {
+                const state = { address: userAddress, chainBalance, localDelta, updatedAt: Date.now() };
+                localStorage.setItem(STORAGE_ARCADE_STATE, JSON.stringify(state));
+            } catch (_) {}
+        }
+
+        function loadArcadeState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_ARCADE_STATE);
+                if (!raw) return;
+                const state = JSON.parse(raw);
+                if (state.address && state.address.toLowerCase() === (userAddress || '').toLowerCase()) {
+                    chainBalance = Number(state.chainBalance) || 0;
+                    localDelta = Number(state.localDelta) || 0;
+                    renderDisplayBalance();
+                }
+            } catch (_) {}
+        }
+
+        /** Silent RPC : mise à jour de la balance en arrière-plan sans popup. */
+        function ensureSilentProvider() {
+            if (silentContract && silentProvider) return true;
+            try {
+                silentProvider = new ethers.providers.JsonRpcProvider(SILENT_RPC);
+                silentContract = new ethers.Contract(PRESALE_VAULT, abiPresale, silentProvider);
+                return true;
+            } catch (_) { return false; }
+        }
+
+        async function refreshChainBalanceSilent() {
+            if (!userAddress || !ensureSilentProvider()) return;
+            try {
+                const balance = await silentContract.balanceOf(userAddress);
+                const next = parseFloat(ethers.utils.formatUnits(balance, 18));
+                chainBalance = next;
+                silentRefreshFailCount = 0;
+                persistArcadeState();
+                renderDisplayBalance();
+            } catch (e) {
+                silentRefreshFailCount++;
+                if (silentRefreshFailCount >= 2) showSyncError();
+            }
+        }
+
+        let silentRefreshTimer = null;
+        function startSilentRefresh() {
+            if (silentRefreshTimer) clearInterval(silentRefreshTimer);
+            refreshChainBalanceSilent();
+            silentRefreshTimer = setInterval(refreshChainBalanceSilent, SILENT_REFRESH_INTERVAL_MS);
+        }
+
+        /** Message discret "Sync Error" sans bloquer le jeu. */
+        function showSyncError() {
+            const toast = document.getElementById('syncErrorToast');
+            if (!toast) return;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), SYNC_ERROR_TOAST_DURATION_MS);
+        }
+
+        /** Rétrocompatibilité : les jeux utilisent playBalance pour les vérifications (solde affiché). */
+        function updateArcadeBalance() {
+            renderDisplayBalance();
+        }
+
+        async function fetchVaultState() {
+            try {
+                const r = await fetch(API_BASE + '/api/arcade-vault-reserve', { cache: 'no-store' });
+                const text = await r.text();
+                if (!text || !text.trim()) { maintenance = true; updateMaintenanceUI(); return; }
+                let data;
+                try { data = JSON.parse(text); } catch (e) { maintenance = true; updateMaintenanceUI(); return; }
+                vaultReserve = Number(data.reserve) || 0;
+                maxBet = Number(data.maxBet) || 0;
+                maintenance = data.maintenance !== false && vaultReserve <= 0;
+                updateMaintenanceUI();
+            } catch (e) {
+                maintenance = true;
+                updateMaintenanceUI();
+            }
+        }
+
+        function updateMaintenanceUI() {
+            const cards = document.querySelectorAll('.game-card');
+            const banner = document.getElementById('maintenanceBanner');
+            cards.forEach(c => {
+                if (maintenance) c.classList.add('opacity-60', 'pointer-events-none'); else c.classList.remove('opacity-60', 'pointer-events-none');
+            });
+            if (banner) banner.style.display = maintenance ? 'block' : 'none';
+            const maxBetEl = document.getElementById('arcadeMaxBet');
+            if (maxBetEl) maxBetEl.textContent = maintenance ? '—' : maxBet.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+        }
+
+        function getEffectiveMaxBet() { return maintenance ? 0 : maxBet; }
+        function isMaintenance() { return maintenance; }
+
+        function applyRTP(netProfit) {
+            if (netProfit <= 0) return netProfit;
+            return Math.floor(netProfit * RTP * 1000) / 1000;
+        }
+
+        function notifySettle(bet, winAmount, gameName) {
+            if (!userAddress) return;
+            fetch(API_BASE + '/api/arcade-settle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: userAddress, bet, winAmount, game: gameName })
+            }).catch(() => {});
+        }
+
+        function getFreeSpins() {
+            let n = parseInt(localStorage.getItem(STORAGE_FREE_SPINS) || "0", 10);
+            if (userAddress && n === 0) {
+                n = WELCOME_FREE_SPINS;
+                localStorage.setItem(STORAGE_FREE_SPINS, String(n));
+            }
+            return n;
+        }
+        function useFreeSpin() {
+            let n = getFreeSpins();
+            if (n > 0) { n--; localStorage.setItem(STORAGE_FREE_SPINS, String(n)); return true; }
+            return false;
+        }
+
+        const games = {
+            blackjack: { name: "Blackjack", run: (container) => runBlackjack(container) },
+            roulette: { name: "Roulette", run: (container) => runRoulette(container) },
+            slots: { name: "Slots", run: (container) => runSlots(container) },
+            dice: { name: "Dice", run: (container) => runDice(container) },
+            plinko: { name: "Plinko", run: (container) => runPlinko(container) },
+            poker: { name: "Poker", run: (container) => runPoker(container) },
+            crash: { name: "Crash", run: (container) => runCrash(container) },
+            baccarat: { name: "Baccarat", run: (container) => runBaccarat(container) },
+            mines: { name: "Mines", run: (container) => runMines(container) },
+            wheel: { name: "Roue de la Fortune", run: (container) => runWheel(container) }
+        };
+
+        function runDice(container) {
+            container.innerHTML = '<p class="mb-2">Mise (ARCANA): <input type="number" id="diceBet" value="10" min="1" max="' + getEffectiveMaxBet() + '" class="w-24 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><p class="mb-2">Choisir: <label><input type="radio" name="diceChoice" value="over" checked> Over 50</label> <label class="ml-2"><input type="radio" name="diceChoice" value="under"> Under 50</label></p><button id="diceRoll" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Lancer</button><p id="diceResult" class="mt-2 text-[#00ffcc]"></p>';
+            document.getElementById('diceRoll').onclick = () => {
+                if (isMaintenance()) { document.getElementById('diceResult').textContent = "Maintenance."; return; }
+                let bet = parseFloat(document.getElementById('diceBet').value) || 0;
+                bet = Math.min(bet, getEffectiveMaxBet());
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('diceResult').textContent = "Connectez le wallet."; return; }
+                const choice = document.querySelector('input[name="diceChoice"]:checked').value;
+                const roll = Math.floor(Math.random() * 100) + 1;
+                const win = (choice === 'over' && roll > 50) || (choice === 'under' && roll < 50);
+                const delta = win ? applyRTP(bet * 0.95) : -bet;
+                const winAmount = win ? bet + delta : 0;
+                applyGameDelta(delta);
+                notifySettle(bet, winAmount, 'Dice');
+                document.getElementById('diceResult').textContent = `Résultat: ${roll}. ${win ? "Gagné +" + delta.toFixed(2) + " ARCANA (RTP 97%)" : "Perdu -" + bet + " ARCANA"}`;
+            };
+        }
+
+        function runSlots(container) {
+            const syms = ["🍒","🍋","⭐","7","🔔"];
+            container.innerHTML = '<div class="flex justify-center gap-2 my-4"><span id="r1" class="reel">?</span><span id="r2" class="reel">?</span><span id="r3" class="reel">?</span></div><p class="mb-2">Mise: <input type="number" id="slotsBet" value="5" min="1" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><button id="slotsSpin" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Tourner</button><p id="slotsResult" class="mt-2 text-[#00ffcc]"></p>';
+            document.getElementById('slotsSpin').onclick = () => {
+                if (isMaintenance()) { document.getElementById('slotsResult').textContent = "Maintenance."; return; }
+                let bet = Math.min(parseFloat(document.getElementById('slotsBet').value) || 0, getEffectiveMaxBet());
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('slotsResult').textContent = "Connectez le wallet."; return; }
+                const r1 = syms[Math.floor(Math.random()*syms.length)], r2 = syms[Math.floor(Math.random()*syms.length)], r3 = syms[Math.floor(Math.random()*syms.length)];
+                document.getElementById('r1').textContent = r1; document.getElementById('r2').textContent = r2; document.getElementById('r3').textContent = r3;
+                let rawWin = 0;
+                if (r1===r2&&r2===r3) rawWin = bet * 10; else if (r1===r2||r2===r3||r1===r3) rawWin = bet * 2;
+                const rawProfit = rawWin - bet;
+                const delta = rawProfit > 0 ? applyRTP(rawProfit) : rawProfit;
+                const winAmount = rawWin > 0 ? bet + delta : 0;
+                applyGameDelta(delta);
+                notifySettle(bet, winAmount, 'Slots');
+                document.getElementById('slotsResult').textContent = rawWin >= bet*10 ? "Jackpot! +" + delta.toFixed(2) + " ARCANA (RTP 97%)" : rawWin > 0 ? "+" + delta.toFixed(2) + " ARCANA" : "Perdu -" + bet + " ARCANA";
+            };
+        }
+
+        function runWheel(container) {
+            const freeSpins = getFreeSpins();
+            container.innerHTML = '<p class="mb-2 text-[#D4AF37]">Spins gratuits: <strong id="wheelSpins">' + freeSpins + '</strong></p><svg id="wheelSvg" width="200" height="200" viewBox="0 0 200 200" class="mx-auto my-4"></svg><p class="mb-2">Mise (si pas de spin gratuit): <input type="number" id="wheelBet" value="5" min="1" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><button id="wheelSpinBtn" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Tourner la roue</button><p id="wheelResult" class="mt-2 text-[#00ffcc]"></p>';
+            const segments = [1,2,5,10,0,1,2,0,5,1];
+            const colors = ["#D4AF37","#1a0e2e","#D4AF37","#0a0e1a","#00ffcc","#D4AF37","#1a0e2e","#0a0e1a","#00ffcc","#D4AF37"];
+            let angle = 0;
+            const svg = document.getElementById('wheelSvg');
+            svg.innerHTML = segments.map((s, i) => {
+                const a = (i / segments.length) * 360;
+                const path = `M 100 100 L ${100+80*Math.cos(a*Math.PI/180)} ${100+80*Math.sin(a*Math.PI/180)} A 80 80 0 0 1 ${100+80*Math.cos((a+36)*Math.PI/180)} ${100+80*Math.sin((a+36)*Math.PI/180)} Z`;
+                return `<path class="wheel-segment" fill="${colors[i]}" stroke="#333" d="${path}"/><text x="${100+50*Math.cos((a+18)*Math.PI/180)}" y="${100+50*Math.sin((a+18)*Math.PI/180)}" fill="#fff" text-anchor="middle" font-size="12">${s}x</text>`;
+            }).join('');
+            document.getElementById('wheelSpinBtn').onclick = () => {
+                const useFree = useFreeSpin();
+                document.getElementById('wheelSpins').textContent = getFreeSpins();
+                if (!useFree && isMaintenance()) { document.getElementById('wheelResult').textContent = "Maintenance."; return; }
+                let bet = useFree ? 0 : Math.min(parseFloat(document.getElementById('wheelBet').value) || 0, getEffectiveMaxBet());
+                if (!useFree && bet > getDisplayBalance()) { document.getElementById('wheelResult').textContent = "Solde insuffisant ou connectez le wallet."; return; }
+                const idx = Math.floor(Math.random() * segments.length);
+                const mult = segments[idx];
+                angle += 360 * 3 + idx * 36;
+                svg.style.transform = `rotate(${angle}deg)`; svg.style.transition = 'transform 4s cubic-bezier(0.2,0.8,0.2,1)';
+                setTimeout(() => {
+                    const stake = useFree ? 5 : bet;
+                    const rawWin = stake * mult;
+                    const rawProfit = rawWin - (useFree ? 0 : bet);
+                    const delta = rawProfit > 0 ? applyRTP(rawProfit) : (useFree ? 0 : -bet);
+                    const winAmount = rawProfit > 0 ? (useFree ? 0 : bet) + delta : 0;
+                    applyGameDelta(delta);
+                    notifySettle(useFree ? 0 : bet, useFree ? rawWin : winAmount, 'Wheel');
+                    document.getElementById('wheelResult').textContent = (useFree ? "Spin gratuit! " : "") + "Multiplicateur " + mult + "x. Gain: +" + (delta > 0 ? delta.toFixed(2) : rawWin) + " ARCANA" + (rawProfit > 0 && !useFree ? " (RTP 97%)" : "");
+                }, 4000);
+            };
+        }
+
+        function runBlackjack(container) {
+            container.innerHTML = '<p>Cartes: <span id="bjPlayer"></span> (total: <span id="bjSum">0</span>)</p><p class="mt-2">Mise: <input type="number" id="bjBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><button id="bjHit" class="px-3 py-1 rounded bg-[#D4AF37] text-[#0a0e1a] mr-2">Carte</button><button id="bjStand" class="px-3 py-1 rounded bg-[#D4AF37] text-[#0a0e1a]">Rester</button><p id="bjResult" class="mt-2 text-[#00ffcc]"></p>';
+            let hand = [], sum = () => hand.reduce((a,c)=>a+Math.min(c,10),0);
+            const deal = () => { hand = [Math.floor(Math.random()*13)+1, Math.floor(Math.random()*13)+1]; document.getElementById('bjPlayer').textContent = hand.join(', '); document.getElementById('bjSum').textContent = sum(); document.getElementById('bjResult').textContent = ''; };
+            deal();
+            document.getElementById('bjHit').onclick = () => {
+                if (isMaintenance()) return;
+                hand.push(Math.floor(Math.random()*13)+1); document.getElementById('bjPlayer').textContent = hand.join(', '); document.getElementById('bjSum').textContent = sum();
+                if (sum()>21) { const bet = Math.min(parseFloat(document.getElementById('bjBet').value)||0, getEffectiveMaxBet()); applyGameDelta(-bet); notifySettle(bet, 0, 'Blackjack'); document.getElementById('bjResult').textContent = "Bust! -"+bet; }
+            };
+            document.getElementById('bjStand').onclick = () => {
+                if (isMaintenance()) return;
+                const dealer = Math.floor(Math.random()*11)+16;
+                const bet = Math.min(parseFloat(document.getElementById('bjBet').value)||0, getEffectiveMaxBet());
+                const s = sum();
+                const rawWin = (s>dealer||dealer>21) ? bet*2 : (s===dealer ? bet : 0);
+                const profit = rawWin - bet;
+                const delta = profit > 0 ? applyRTP(profit) : (s===dealer ? 0 : -bet);
+                const winAmount = s===dealer ? bet : (profit > 0 ? bet + applyRTP(profit) : 0);
+                applyGameDelta(delta);
+                notifySettle(bet, winAmount, 'Blackjack');
+                document.getElementById('bjResult').textContent = "Dealer: "+dealer+". "+(delta>0?"Gagné +"+delta.toFixed(2):delta<0?"Perdu -"+bet:"Égalité");
+            };
+        }
+
+        function runRoulette(container) {
+            container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="rlBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><p class="mb-2"><label><input type="radio" name="rlChoice" value="red" checked> Rouge</label> <label class="ml-2"><input type="radio" name="rlChoice" value="black"> Noir</label></p><button id="rlSpin" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Tourner</button><p id="rlResult" class="mt-2 text-[#00ffcc]"></p>';
+            document.getElementById('rlSpin').onclick = () => {
+                if (isMaintenance()) { document.getElementById('rlResult').textContent = "Maintenance."; return; }
+                const bet = Math.min(parseFloat(document.getElementById('rlBet').value)||0, getEffectiveMaxBet());
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('rlResult').textContent = "Connectez le wallet."; return; }
+                const n = Math.floor(Math.random()*37); const red = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]; const isRed = red.includes(n);
+                const choice = document.querySelector('input[name="rlChoice"]:checked').value;
+                const won = (choice==='red'&&isRed)||(choice==='black'&&!isRed&&n!==0);
+                const rawProfit = won ? bet : -bet;
+                const delta = won ? applyRTP(bet) : -bet;
+                const winAmount = won ? bet + delta : 0;
+                applyGameDelta(delta);
+                notifySettle(bet, winAmount, 'Roulette');
+                document.getElementById('rlResult').textContent = "Numéro "+n+" ("+(isRed?"Rouge":"Noir")+"). "+(won?"Gagné +"+delta.toFixed(2)+" ARCANA (RTP 97%)":"Perdu -"+bet+" ARCANA");
+            };
+        }
+
+        function runPlinko(container) {
+            container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="plBet" value="5" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><button id="plDrop" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Lancer la bille</button><p id="plResult" class="mt-2 text-[#00ffcc]"></p>';
+            document.getElementById('plDrop').onclick = () => {
+                if (isMaintenance()) { document.getElementById('plResult').textContent = "Maintenance."; return; }
+                const bet = Math.min(parseFloat(document.getElementById('plBet').value)||0, getEffectiveMaxBet());
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('plResult').textContent = "Connectez le wallet."; return; }
+                const mult = [0.5,1,2,5,10,2,1,0.5][Math.floor(Math.random()*8)];
+                const rawWin = bet * mult;
+                const rawProfit = rawWin - bet;
+                const delta = rawProfit > 0 ? applyRTP(rawProfit) : rawProfit;
+                const winAmount = rawWin > 0 ? bet + delta : 0;
+                applyGameDelta(delta);
+                notifySettle(bet, winAmount, 'Plinko');
+                document.getElementById('plResult').textContent = "Multiplicateur "+mult+"x. Gain: +"+(delta>0?delta.toFixed(2):(rawWin-bet).toFixed(0))+" ARCANA"+(rawProfit>0?" (RTP 97%)":"");
+            };
+        }
+
+        function runPoker(container) {
+            container.innerHTML = '<p>Video Poker (simplifié). Mise: <input type="number" id="pkBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><button id="pkDeal" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Distribution</button><p id="pkCards" class="my-2"></p><p id="pkResult" class="text-[#00ffcc]"></p>';
+            document.getElementById('pkDeal').onclick = () => {
+                if (isMaintenance()) { document.getElementById('pkResult').textContent = "Maintenance."; return; }
+                const bet = Math.min(parseFloat(document.getElementById('pkBet').value)||0, getEffectiveMaxBet());
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('pkResult').textContent = "Connectez le wallet."; return; }
+                const cards = Array.from({length:5}, () => Math.floor(Math.random()*13)+1);
+                document.getElementById('pkCards').textContent = "Cartes: "+cards.join(", ");
+                const pair = cards.some(c=>cards.filter(x=>x===c).length>=2);
+                const rawProfit = pair ? bet : -bet;
+                const delta = pair ? applyRTP(bet) : -bet;
+                const winAmount = pair ? bet + delta : 0;
+                applyGameDelta(delta);
+                notifySettle(bet, winAmount, 'Poker');
+                document.getElementById('pkResult').textContent = pair ? "Paire! +"+delta.toFixed(2)+" ARCANA (RTP 97%)" : "Perdu -"+bet+" ARCANA";
+            };
+        }
+
+        function runCrash(container) {
+            container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="crBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><p id="crMultiplier" class="text-2xl font-bold text-[#00ffcc]">1.00x</p><button id="crPlay" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold mt-2">Jouer</button> <button id="crCash" class="px-4 py-2 rounded bg-[#00ffcc] text-[#0a0e1a] font-bold mt-2 hidden">Cash out</button><p id="crResult" class="mt-2 text-[#00ffcc]"></p>';
+            let crashId = null, mult = 1;
+            document.getElementById('crPlay').onclick = () => {
+                if (isMaintenance()) { document.getElementById('crResult').textContent = "Maintenance."; return; }
+                const bet = Math.min(parseFloat(document.getElementById('crBet').value)||0, getEffectiveMaxBet());
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('crResult').textContent = "Connectez le wallet."; return; }
+                mult = 1; document.getElementById('crCash').classList.remove('hidden'); document.getElementById('crResult').textContent = '';
+                crashId = setInterval(() => {
+                    mult += 0.1; document.getElementById('crMultiplier').textContent = mult.toFixed(2)+"x";
+                    if (Math.random() < 0.02) { clearInterval(crashId); applyGameDelta(-bet); notifySettle(bet, 0, 'Crash'); document.getElementById('crResult').textContent = "Crash! Perdu -"+bet; document.getElementById('crCash').classList.add('hidden'); }
+                }, 200);
+            };
+            document.getElementById('crCash').onclick = () => {
+                if (!crashId) return; clearInterval(crashId); crashId = null;
+                const bet = parseFloat(document.getElementById('crBet').value)||0;
+                const rawProfit = bet * mult - bet;
+                const delta = applyRTP(rawProfit);
+                const winAmount = bet + delta;
+                applyGameDelta(delta);
+                notifySettle(bet, winAmount, 'Crash');
+                document.getElementById('crResult').textContent = "Cash out! +"+delta.toFixed(2)+" ARCANA (RTP 97%)";
+                document.getElementById('crCash').classList.add('hidden');
+            };
+        }
+
+        function runBaccarat(container) {
+            container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="bcBet" value="10" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><p class="mb-2"><label><input type="radio" name="bcChoice" value="player" checked> Joueur</label> <label class="ml-2"><input type="radio" name="bcChoice" value="banker"> Banque</label></p><button id="bcDeal" class="px-4 py-2 rounded bg-[#D4AF37] text-[#0a0e1a] font-bold">Jouer</button><p id="bcResult" class="mt-2 text-[#00ffcc]"></p>';
+            document.getElementById('bcDeal').onclick = () => {
+                if (isMaintenance()) { document.getElementById('bcResult').textContent = "Maintenance."; return; }
+                const bet = Math.min(parseFloat(document.getElementById('bcBet').value)||0, getEffectiveMaxBet());
+                if (bet > getDisplayBalance() && !userAddress) { document.getElementById('bcResult').textContent = "Connectez le wallet."; return; }
+                const p = (Math.floor(Math.random()*9)+1 + Math.floor(Math.random()*9)+1) % 10;
+                const b = (Math.floor(Math.random()*9)+1 + Math.floor(Math.random()*9)+1) % 10;
+                const choice = document.querySelector('input[name="bcChoice"]:checked').value;
+                const won = (choice==='player'&&p>b)||(choice==='banker'&&b>p);
+                const rawProfit = won ? bet : (p===b ? 0 : -bet);
+                const delta = won ? applyRTP(bet) : rawProfit;
+                const winAmount = won ? bet + delta : (p===b ? bet : 0);
+                applyGameDelta(delta);
+                notifySettle(bet, winAmount, 'Baccarat');
+                document.getElementById('bcResult').textContent = "Joueur "+p+" - Banque "+b+". "+(won?"Gagné +"+delta.toFixed(2)+" ARCANA (RTP 97%)":(p===b?"Égalité":"Perdu -"+bet+" ARCANA"));
+            };
+        }
+
+        function runMines(container) {
+            container.innerHTML = '<p class="mb-2">Mise: <input type="number" id="mnBet" value="5" class="w-20 px-2 py-1 rounded bg-black/40 border border-[#D4AF37] text-[#F7E7CE]"></p><div id="mnGrid" class="grid grid-cols-5 gap-1 my-2"></div><p id="mnResult" class="text-[#00ffcc]"></p>';
+            const size = 25; let revealed = [], mines = [], started = false;
+            function render() {
+                const g = document.getElementById('mnGrid'); g.innerHTML = '';
+                for (let i = 0; i < size; i++) {
+                    const cell = document.createElement('button');
+                    cell.className = 'w-10 h-10 rounded border border-[#D4AF37]/50 ' + (revealed[i] ? 'bg-[#00ffcc]/20' : 'bg-black/40');
+                    cell.textContent = revealed[i] ? (mines[i] ? '💣' : '✅') : '?';
+                    cell.onclick = () => {
+                        const bet = Math.min(parseFloat(document.getElementById('mnBet').value) || 0, getEffectiveMaxBet());
+                        if (!started) { if (isMaintenance()) { document.getElementById('mnResult').textContent = "Maintenance."; return; } if (bet > getDisplayBalance() && !userAddress) { document.getElementById('mnResult').textContent = "Connectez le wallet."; return; } mines = Array(size).fill(0); for (let m=0; m<5; m++) mines[Math.floor(Math.random()*size)]=1; started = true; }
+                        if (revealed[i]) return; revealed[i]=1; render();
+                        if (mines[i]) { applyGameDelta(-bet); notifySettle(bet, 0, 'Mines'); document.getElementById('mnResult').textContent = "Mine! -"+bet; started=false; revealed=[]; mines=[]; setTimeout(render,500); }
+                        else { const count = revealed.filter((_,j)=>!mines[j]).length; const rawWin = bet * (1 + count * 0.2); const rawProfit = rawWin - bet; const delta = applyRTP(rawProfit); applyGameDelta(delta); notifySettle(bet, bet + delta, 'Mines'); document.getElementById('mnResult').textContent = "Sûr! +"+delta.toFixed(2)+" ARCANA (RTP 97%). Continuez ou relancez."; }
+                    };
+                    g.appendChild(cell);
+                }
+            }
+            render();
+        }
+
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.getAttribute('data-game');
+                const game = games[id];
+                if (!game) return;
+                fetchVaultState();
+                document.getElementById('gameTitle').textContent = game.name;
+                document.getElementById('gameContent').innerHTML = '';
+                game.run(document.getElementById('gameContent'));
+                document.getElementById('gameModal').classList.add('open');
+            });
+        });
+        document.getElementById('closeModal').onclick = () => document.getElementById('gameModal').classList.remove('open');
+        document.getElementById('gameModal').addEventListener('click', e => { if (e.target.id === 'gameModal') e.target.classList.remove('open'); });
+
+        document.getElementById('arcadeConnect').onclick = async () => {
+            if (!window.ethereum) { alert("Installez MetaMask."); return; }
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const network = await provider.getNetwork();
+                if (network.chainId !== POLYGON_CHAIN_ID) await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x89' }] });
+                userAddress = (await provider.listAccounts())[0];
+                loadArcadeState();
+                await refreshChainBalanceSilent();
+                startSilentRefresh();
+                renderDisplayBalance();
+            } catch (e) { console.error(e); }
+        };
+
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', () => {
+                userAddress = null;
+                if (silentRefreshTimer) clearInterval(silentRefreshTimer);
+                silentRefreshTimer = null;
+                chainBalance = 0;
+                localDelta = 0;
+                renderDisplayBalance();
+            });
+        }
+        fetchVaultState();
+        renderDisplayBalance();
+    </script>
+</body>
+</html>
