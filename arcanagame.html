@@ -104,6 +104,16 @@
             z-index: 0;
         }
 
+        body.corridor-global,
+        body.corridor-entrance-bg {
+            background: #000;
+        }
+
+        body.corridor-global::before,
+        body.corridor-entrance-bg::before {
+            display: none;
+        }
+
         #brick-wall-overlay {
             position: fixed;
             inset: 0;
@@ -115,6 +125,28 @@
 
         #brick-wall-overlay.hidden {
             display: none;
+        }
+
+        #corridor-bg-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 1;
+            background-image:
+                url('couloir-coffre.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            transform: scale(1);
+            transform-origin: 50% 50%;
+            will-change: transform;
+            transition: opacity 250ms ease;
+        }
+
+        body.corridor-walk-enabled {
+            min-height: 180vh;
         }
 
         .brick-panel {
@@ -180,6 +212,11 @@
         }
 
         .corridor-torch {
+            will-change: transform;
+        }
+
+        .corridor-torch-left,
+        .corridor-torch-right {
             will-change: transform;
         }
 
@@ -2493,7 +2530,8 @@
     <!-- Google Fonts for digital effect -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="corridor-global">
+    <div id="corridor-bg-layer" aria-hidden="true"></div>
     <div id="brick-wall-overlay" aria-hidden="false">
         <div class="brick-panel left"></div>
         <div class="brick-panel right"></div>
@@ -2512,18 +2550,25 @@
             const chest = document.getElementById('entrance-chest');
             const leftPanel = overlay ? overlay.querySelector('.brick-panel.left') : null;
             const rightPanel = overlay ? overlay.querySelector('.brick-panel.right') : null;
+            const corridorLayer = document.getElementById('corridor-bg-layer');
 
             if (!overlay || !chest) return;
 
             const setOpen = (open) => {
                 if (open) {
                     try { document.body.classList.add('corridor-entrance-bg'); } catch (e) {}
+                    try { document.body.classList.add('corridor-walk-enabled'); } catch (e) {}
                     try {
                         requestAnimationFrame(function() {
                             try { document.body.classList.add('corridor-entrance-zoom'); } catch (e) {}
                         });
                     } catch (e) {}
                     overlay.classList.add('open');
+
+                    try {
+                        if (corridorLayer) corridorLayer.style.transform = 'scale(1)';
+                    } catch (e) {}
+
                     var done = 0;
                     var finish = function() {
                         done++;
@@ -2592,7 +2637,25 @@
 
                                 var onScroll = function() {
                                     if (!document.body.classList.contains('corridor-entrance-bg')) return;
-                                    var y = clamp((window.scrollY || 0), 0, 240) / 240 * -8;
+                                    var sc = (window.scrollY || 0);
+                                    var max = Math.max(1, Math.min(900, (document.documentElement.scrollHeight - window.innerHeight) || 1));
+                                    var t = clamp(sc / max, 0, 1);
+                                    if (document.body.classList.contains('corridor-walk-enabled')) {
+                                        try {
+                                            var s = 1 + (1.5 - 1) * t;
+                                            if (corridorLayer) corridorLayer.style.transform = 'scale(' + s.toFixed(4) + ')';
+                                        } catch (e) {}
+                                        try {
+                                            var out = 220 * t;
+                                            var lefts = document.querySelectorAll('.corridor-torch-left');
+                                            var rights = document.querySelectorAll('.corridor-torch-right');
+                                            lefts.forEach(function(el) { try { el.style.transform = 'translate3d(' + (-out).toFixed(1) + 'px,0,0)'; } catch (e) {} });
+                                            rights.forEach(function(el) { try { el.style.transform = 'translate3d(' + (out).toFixed(1) + 'px,0,0)'; } catch (e) {} });
+                                        } catch (e) {}
+                                        apply(0, 0);
+                                        return;
+                                    }
+                                    var y = clamp(sc, 0, 240) / 240 * -8;
                                     apply(0, y);
                                 };
 
@@ -2605,6 +2668,8 @@
                                 try {
                                     window.addEventListener('scroll', onScroll, { passive: true });
                                 } catch (e) {}
+
+                                try { onScroll(); } catch (e) {}
                             })();
                         }
                     } catch (e) {}
