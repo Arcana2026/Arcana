@@ -25,6 +25,73 @@
             overflow: hidden;
         }
 
+        body.oracle-frost::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            pointer-events: none;
+            background:
+                radial-gradient(120% 140% at 50% 20%, rgba(255,255,255,0.10), rgba(255,255,255,0.02) 42%, rgba(0,0,0,0) 70%),
+                repeating-linear-gradient(135deg, rgba(180, 245, 255, 0.07) 0, rgba(180, 245, 255, 0.07) 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 9px);
+            backdrop-filter: blur(3px) saturate(0.9);
+            -webkit-backdrop-filter: blur(3px) saturate(0.9);
+            opacity: 1;
+            transition: opacity 300ms ease;
+        }
+
+        #oracle-inline-answer {
+            position: fixed;
+            left: 50%;
+            bottom: 190px;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            z-index: 80;
+            display: none;
+        }
+
+        #oracle-inline-answer .oracle-inline-panel {
+            background: rgba(5, 10, 16, 0.88);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            box-shadow: 0 0 22px rgba(0, 242, 255, 0.16);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #oracleInlineInput {
+            flex: 1;
+            background: rgba(0,0,0,0.55);
+            border: 1px solid rgba(0, 242, 255, 0.35);
+            color: white;
+            padding: 12px 12px;
+            border-radius: 8px;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #oracleInlineSubmit {
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 140, 0.75);
+            background: rgba(0, 255, 140, 0.08);
+            color: rgba(0, 255, 140, 0.95);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+
+        #oracleInlineSubmit:hover {
+            background: rgba(0, 255, 140, 0.14);
+            box-shadow: 0 0 18px rgba(0, 255, 140, 0.20);
+        }
+
         /* Effet de lueur sur le couloir */
         body::before {
             content: '';
@@ -158,6 +225,13 @@
     <p style="margin-top: 20px; font-family: 'Orbitron'; color: var(--arcana-blue); letter-spacing: 2px;">VAULT SÉCURISÉ</p>
 </div>
 
+<div id="oracle-inline-answer" aria-hidden="true">
+    <div class="oracle-inline-panel">
+        <input id="oracleInlineInput" type="text" autocomplete="off" placeholder="Réponse Oracle...">
+        <button id="oracleInlineSubmit" type="button">Valider</button>
+    </div>
+</div>
+
 <div id="dialogue-box">
     <span id="dialogue-text">Initialisation des protocoles...</span>
 </div>
@@ -250,6 +324,126 @@
 
     const connectBtn = document.getElementById('connect-wallet');
     if (connectBtn) connectBtn.addEventListener('click', connectWallet);
+
+    const ARCANA_ORACLE_THRESHOLD = -2;
+    const ADMIN_ADDRESS = "";
+    let oracleResolved = false;
+    let oracleTempC = null;
+    let oraclePlayerCity = "";
+    let oracleExpectedAnswer = "";
+    let oracleCurrentQuestion = "";
+    let oracleCapitalFirstWord = "";
+
+    function isAdmin() {
+        if (!ADMIN_ADDRESS) return false;
+        if (!account) return false;
+        return account.toLowerCase() === ADMIN_ADDRESS.toLowerCase();
+    }
+
+    function normalizeAnswer(s) {
+        return (s || '').trim().toLowerCase();
+    }
+
+    function askLocalQuestion(city, country) {
+        const safeCity = (city || '').trim();
+        const safeCountry = (country || '').trim();
+
+        const candidates = [];
+
+        if (safeCity) {
+            candidates.push({
+                q: `Écrivez le nom de la ville détectée en MAJUSCULES : ${safeCity}`,
+                a: safeCity.toUpperCase()
+            });
+        }
+
+        if (oracleCapitalFirstWord) {
+            candidates.push({
+                q: `Donnez le premier mot de la capitale de ${safeCountry || 'votre pays'} :`,
+                a: oracleCapitalFirstWord
+            });
+        }
+
+        candidates.push({
+            q: "Complétez le domaine : arcana-safe.____",
+            a: "nft"
+        });
+
+        const pick = candidates[Math.floor(Math.random() * candidates.length)];
+        return pick;
+    }
+
+    async function requireOracleProof() {
+        oracleResolved = false;
+        hasKey = false;
+        setFrost(true);
+        const profile = await getPlayerGeoProfile();
+        oraclePlayerCity = (profile && profile.city) ? profile.city : "votre secteur";
+        typeWriter(`Je détecte votre présence à ${oraclePlayerCity}. Pour forcer le déverrouillage du Vault de Montréal, répondez à ceci...`);
+
+        const question = askLocalQuestion(profile.city, profile.country);
+        oracleCurrentQuestion = question.q;
+        oracleExpectedAnswer = question.a;
+
+        showOracleInlineInput();
+        typeWriter(oracleCurrentQuestion);
+
+        const submitBtn = document.getElementById('oracleInlineSubmit');
+        const answerEl = document.getElementById('oracleInlineInput');
+        if (!submitBtn || !answerEl) return;
+
+        const handler = () => {
+            const ok = normalizeAnswer(answerEl.value) === normalizeAnswer(oracleExpectedAnswer);
+            if (!ok) {
+                typeWriter("Réponse invalide. L'Oracle maintient le givre.");
+                answerEl.value = '';
+                answerEl.focus();
+                return;
+            }
+
+            oracleResolved = true;
+            hasKey = true;
+            setFrost(false);
+            hideOracleInlineInput();
+            typeWriter(`Identité géo-confirmée. Accès au Vault de Montréal forcé depuis ${oraclePlayerCity}.`);
+
+            submitBtn.removeEventListener('click', handler);
+            answerEl.removeEventListener('keydown', onKeyDown);
+        };
+
+        const onKeyDown = (e) => {
+            if (e.key === 'Enter') handler();
+        };
+
+        submitBtn.addEventListener('click', handler);
+        answerEl.addEventListener('keydown', onKeyDown);
+    }
+
+    async function initOracleChallenge() {
+        try {
+            oracleTempC = await fetchMontrealTemperatureC();
+        } catch (e) {
+            oracleTempC = null;
+        }
+
+        if (isAdmin()) {
+            oracleResolved = true;
+            setFrost(false);
+            return;
+        }
+
+        if (oracleTempC !== null && oracleTempC > ARCANA_ORACLE_THRESHOLD) {
+            await requireOracleProof();
+        } else {
+            oracleResolved = true;
+            hasKey = true;
+            setFrost(false);
+        }
+    }
+
+    window.addEventListener('load', function() {
+        initOracleChallenge();
+    });
 </script>
 
 </body>
