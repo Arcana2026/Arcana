@@ -2808,6 +2808,12 @@ function echoAddMessage(msg) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+    } catch (e) {
+    }
+});
+
 function ouvrirPorte(idx) {
     var delta = arcaneDoorDeltas[idx] !== undefined ? arcaneDoorDeltas[idx] : 1;
     var newLevel = Math.max(1, Math.min(ARCANA_MAX_LEVEL, arcaneCurrentLevel + delta));
@@ -3224,6 +3230,12 @@ async function fetchAndDisplayTemperature() {
     }
 
     try {
+        var warningInit = document.getElementById('oracle-warning-message');
+        if (warningInit) {
+            warningInit.textContent = "Initialisation de l'Oracle...";
+            warningInit.style.display = 'block';
+        }
+
         var lat = fallback.latitude;
         var lon = fallback.longitude;
         var city = fallback.city;
@@ -3258,8 +3270,12 @@ async function fetchAndDisplayTemperature() {
         tempC = (typeof tempC === 'number') ? tempC : (tempC !== null ? Number(tempC) : null);
         var displayTemp = roundTemp(tempC);
 
+        window.oracleTemperature = (displayTemp !== null && isFinite(displayTemp)) ? displayTemp : null;
+
         const tempDisplay = document.getElementById('temp');
         const depositBtn = document.getElementById('btnDeposit');
+        const amountInput = document.getElementById('amountInput');
+        const tokenSelect = document.getElementById('tokenSelect');
         const warningMsg = document.getElementById('oracle-warning-message');
         const oracleMirror = document.querySelector('.oracle-mirror');
 
@@ -3285,9 +3301,14 @@ async function fetchAndDisplayTemperature() {
             depositBtn.disabled = false;
             depositBtn.classList.remove('disabled');
         }
+
+        if (amountInput) amountInput.disabled = false;
+        if (tokenSelect) tokenSelect.disabled = false;
     } catch (e) {
         const warningMsg = document.getElementById('oracle-warning-message');
         const depositBtn = document.getElementById('btnDeposit');
+        const amountInput = document.getElementById('amountInput');
+        const tokenSelect = document.getElementById('tokenSelect');
         if (warningMsg) {
             warningMsg.textContent = 'Ah, je vois... Je ne parviens pas à lire la température pour le moment.';
             warningMsg.style.display = 'block';
@@ -3296,8 +3317,19 @@ async function fetchAndDisplayTemperature() {
             depositBtn.disabled = false;
             depositBtn.classList.remove('disabled');
         }
+
+        if (amountInput) amountInput.disabled = false;
+        if (tokenSelect) tokenSelect.disabled = false;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        fetchAndDisplayTemperature();
+        setInterval(fetchAndDisplayTemperature, 180000);
+    } catch (e) {
+    }
+});
 
     // === ADMINISTRATION ET STATISTIQUES ===
     async function refreshAdminStats() {
@@ -3795,9 +3827,7 @@ async function fetchAndDisplayTemperature() {
                 runeSound.volume = 0.5;
                 runeSound.play().catch(function(){});
             }
-            
-            if (sanctuaryLocked) return;
-            
+
             const runes = Array.from(document.querySelectorAll('.runes-column .rune-btn'));
             const btn = runes[runeId];
             if (!btn) return;
@@ -4750,86 +4780,4 @@ async function fetchAndDisplayTemperature() {
         }
         return result;
     }
- HEAD:ArcanaGame.html
 </script></body></html>
-=======
-<script>
-    // --- LOGIQUE DE L'ORACLE & TEMPÉRATURE ---
-    const ARCANA_GAME_ORACLE_CONTRACT = ARCANA_GAME_CONTRACT; 
-
-    async function fetchAndDisplayTemperature() {
-        try {
-            if (!provider) {
-                provider = new ethers.providers.Web3Provider(window.ethereum || ethers.getDefaultProvider("https://polygon-rpc.com"), "any");
-            }
-            const oracle = new ethers.Contract(ARCANA_GAME_ORACLE_CONTRACT, ARCANA_GAME_ORACLE_ABI, provider);
-
-            let tempRaw = await oracle.currentTemp();
-            let tempC = (typeof tempRaw === 'number') ? tempRaw : Number(tempRaw.toString());
-
-            const tempDisplay = document.getElementById('temp');
-            const depositBtn = document.getElementById('btnDeposit');
-            const warningMsg = document.getElementById('oracle-warning-message');
-            const oracleMirror = document.querySelector(".oracle-mirror");
-
-            if (tempC <= -10) {
-                if (tempDisplay) tempDisplay.textContent = tempC + "°C";
-                if (warningMsg) warningMsg.style.display = "none";
-                if (depositBtn) {
-                    depositBtn.disabled = false;
-                    depositBtn.classList.remove("disabled");
-                }
-                if (oracleMirror) oracleMirror.classList.add("frozen");
-            } else {
-                if (tempDisplay) tempDisplay.textContent = tempC + "°C";
-                if (warningMsg) {
-                    warningMsg.textContent = "Le givre ne s'est pas encore formé. Revenez quand Montréal gèlera.";
-                    warningMsg.style.display = "block";
-                }
-                if (depositBtn) {
-                    depositBtn.disabled = true;
-                    depositBtn.classList.add("disabled");
-                }
-                if (oracleMirror) oracleMirror.classList.remove("frozen");
-            }
-        } catch(e) {
-            console.error("Erreur Oracle:", e);
-        }
-    }
-
-    // --- CORRECTION CONNEXION WEB3 ---
-    window.arcanaOnW3mConnect = function(prov, sgn, acc) {
-        provider = prov; signer = sgn; account = acc;
-        var btn = document.querySelector(".btn-connect");
-        if (btn) btn.innerText = "Connecté";
-        
-        // Révèle le contenu du jeu
-        const gameContent = document.getElementById('game-container'); 
-        if (gameContent) gameContent.classList.add('visible');
-        
-        fetchAndDisplayTemperature();
-    };
-
-    // --- SYNC INITIALE ---
-    document.addEventListener("DOMContentLoaded", function () {
-        fetchAndDisplayTemperature();
-        setInterval(fetchAndDisplayTemperature, 180000); // 3 minutes
-    });
-
-    // --- FONCTION ADMIN POUR FORCER L'OUVERTURE ---
-    async function forceOpenAdmin() {
-        try {
-            if (!signer) await connectWallet();
-            const contract = new ethers.Contract(ARCANA_GAME_CONTRACT, ["function updateOracle(int256 _temp) external"], signer);
-            const tx = await contract.updateOracle(-20);
-            await tx.wait();
-            fetchAndDisplayTemperature();
-            alert("Oracle forcé à -20°C !");
-        } catch (e) {
-            alert("Erreur: " + e.message);
-        }
-    }
-</script>
-</body>
-</html>
- b76ca867321259aa5907d4dd6f2ba96788f7a1bb:arcanagame.html
