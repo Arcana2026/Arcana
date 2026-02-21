@@ -132,6 +132,12 @@
             will-change: transform, filter;
         }
 
+        #corridor-chest-btn .holo-chest {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 14px rgba(0, 242, 255, 0.28));
+        }
+
         #corridor-chest-btn::after {
             content: '';
             position: absolute;
@@ -756,7 +762,7 @@
             pointer-events: none;
             transform: translateY(10px);
             transition: opacity 220ms ease, transform 220ms ease;
-            z-index: 220;
+            z-index: 410;
         }
         #chat-temple.open {
             opacity: 1;
@@ -768,7 +774,7 @@
             position: fixed;
             bottom: 22px;
             right: 22px;
-            z-index: 210;
+            z-index: 400;
             width: 56px;
             height: 56px;
             border-radius: 14px;
@@ -2660,7 +2666,12 @@
 </head>
 <body class="corridor-global">
     <div id="corridor-bg-layer" aria-hidden="true"></div>
-    <button id="corridor-chest-btn" type="button" aria-label="Ouvrir la Valise" title="Coffre du Sanctuaire"></button>
+    <button id="corridor-chest-btn" type="button" aria-label="Ouvrir la Valise" title="Coffre du Sanctuaire">
+        <div class="holo-chest">
+            <div class="holo-chest-subtitle">Valise — Balances</div>
+            <div class="holo-chest-title">OUVRIR LA VALISE</div>
+        </div>
+    </button>
     <button id="chat-rune-btn" type="button" aria-label="Ouvrir le Chat" title="Rune du Chat">⎈</button>
     <div id="brick-wall-overlay" aria-hidden="false">
         <div class="brick-panel left"></div>
