@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCANA — The Vault</title>
+    <title>ARCANA SAFE — Portail Montréal</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
@@ -17,6 +17,22 @@
             background-image: radial-gradient(circle at 50% 50%, #0a111a 0%, #05070a 100%);
         }
         .font-prestige { font-family: 'Cinzel', serif; }
+
+        #arcana-transition {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 280ms ease;
+            background:
+                radial-gradient(120% 140% at 50% 25%, rgba(0, 242, 255, 0.14), rgba(0, 242, 255, 0.03) 45%, rgba(0,0,0,0) 70%),
+                linear-gradient(180deg, rgba(5,7,10,0.4), rgba(5,7,10,0.92));
+        }
+        #arcana-transition.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
         /* Interface Vault Premium */
         .glass-vault {
@@ -113,10 +129,18 @@
 </head>
 <body>
 
+    <div id="arcana-transition" aria-hidden="true"></div>
+
     <nav class="p-6 md:p-10 flex justify-between items-center max-w-7xl mx-auto">
         <div class="flex items-center gap-3 md:gap-4">
             <img src="logo.png" class="w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16" style="filter: drop-shadow(0 0 10px var(--gold-glow));" alt="Arcana">
             <h1 class="font-prestige text-lg md:text-2xl lg:text-3xl tracking-widest text-white">ARCANA <span class="text-[#D4AF37]">SAFE</span></h1>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-[11px] tracking-widest uppercase opacity-80">
+            <a href="#ecosystem" class="hover:text-white transition">Écosystème</a>
+            <a href="#security" class="hover:text-white transition">Sécurité</a>
+            <a href="#whitepaper" class="hover:text-white transition">Whitepaper</a>
+            <a href="#montreal" class="hover:text-white transition">Montréal</a>
         </div>
         <button id="connectWallet" onclick="connect()" class="btn-prestige px-8 py-2 rounded-full text-xs">
             CONNECT WALLET
@@ -126,7 +150,8 @@
     <main class="container mx-auto px-4 py-8">
         <div class="glass-vault max-w-4xl mx-auto p-10 md:p-16 text-center">
             <h2 class="font-prestige title-vault-mobile text-xl md:text-2xl lg:text-3xl mb-4 text-white tracking-[0.2em]">THE ARCANA VAULT</h2>
-            <p class="text-gray-400 italic text-lg mb-12">Secure your financial future.</p>
+            <p class="text-gray-300 text-base md:text-lg mb-6">Portail officiel de l'écosystème <span class="text-[#D4AF37] font-semibold">arcana-safe.nft</span> — Montréal.</p>
+            <p class="text-gray-400 italic text-sm md:text-base mb-12">Staking. Token. Oracle. Polygon. Une structure sécurisée et vérifiable.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
                 <div><div class="trust-icon-box">🛡️</div><p class="text-[10px] uppercase font-bold text-[#D4AF37]">Smart Contract Audited</p></div>
@@ -261,6 +286,68 @@
                 });
             </script>
         </div>
+
+        <section id="ecosystem" class="max-w-6xl mx-auto mt-10 md:mt-14">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-vault p-8">
+                    <div class="font-prestige text-xs tracking-widest text-[#D4AF37] mb-3">VISION</div>
+                    <div class="text-white font-semibold mb-2">Un coffre-fort Web3 orienté sécurité</div>
+                    <div class="text-gray-300 text-sm leading-relaxed">ARCANA SAFE structure l'accès à un Vault non-custodial, des mécaniques de staking et une gouvernance transparente sur Polygon.</div>
+                </div>
+                <div class="glass-vault p-8">
+                    <div class="font-prestige text-xs tracking-widest text-[#D4AF37] mb-3">TOKEN</div>
+                    <div class="text-white font-semibold mb-2">ARCANA (Polygon)</div>
+                    <div class="text-gray-300 text-sm leading-relaxed">Jeton utilitaire & gouvernance. Allocation traçable, estimation intégrée, et routes de distribution prévues par smart contracts.</div>
+                </div>
+                <div class="glass-vault p-8">
+                    <div class="font-prestige text-xs tracking-widest text-[#D4AF37] mb-3">STAKING</div>
+                    <div class="text-white font-semibold mb-2">Rendements & accès premium</div>
+                    <div class="text-gray-300 text-sm leading-relaxed">Accès staking et modules Earn planifiés. Les règles d'émission et de claim sont conçues pour être auditées et lisibles.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="security" class="max-w-6xl mx-auto mt-8 md:mt-12">
+            <div class="glass-vault p-10 md:p-12">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <div>
+                        <div class="font-prestige text-xs tracking-widest text-[#D4AF37] mb-3">STRUCTURE SÉCURISÉE</div>
+                        <div class="text-white font-semibold text-lg mb-2">Orchestration depuis le cœur du projet</div>
+                        <div class="text-gray-300 text-sm leading-relaxed max-w-3xl">Le portail centralise la navigation, les accès wallet, et les points d'entrée vers les modules (Vault, Oracle, Sanctuaire). Les éléments sensibles (Polygon RPC, ABI, logique de claim/withdraw) restent gouvernés par des fonctions explicites et vérifiables.</div>
+                    </div>
+                    <div class="text-left text-sm">
+                        <div class="opacity-70 text-[10px] tracking-widest uppercase mb-1">Réseau</div>
+                        <div class="text-white font-semibold">Polygon (PoS)</div>
+                        <div class="opacity-70 text-[10px] tracking-widest uppercase mt-3 mb-1">Vault</div>
+                        <div class="font-mono text-xs text-gray-300 break-all">0x29D61511C84E332635E296e37bf22Eb4fB514147</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="whitepaper" class="max-w-6xl mx-auto mt-8 md:mt-12">
+            <div class="glass-vault p-10 md:p-12">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <div>
+                        <div class="font-prestige text-xs tracking-widest text-[#D4AF37] mb-3">WHITEPAPER TECHNIQUE</div>
+                        <div class="text-white font-semibold text-lg mb-2">Architecture, sécurité, tokenomics</div>
+                        <div class="text-gray-300 text-sm leading-relaxed">Le Livre Blanc est disponible via le bouton ci-dessus (version intégrée). Si tu veux un PDF séparé, ajoute un fichier (ex: <span class="font-mono">whitepaper-technique.pdf</span>) et je pointerai le lien dessus.</div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="toggleWhitepaper()" class="btn-prestige px-8 py-3 rounded-2xl text-xs">OUVRIR LE WHITEPAPER</button>
+                        <a href="#" class="text-[#D4AF37] text-[10px] uppercase tracking-widest opacity-70 pointer-events-none">Téléchargement PDF (à fournir)</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="montreal" class="max-w-6xl mx-auto mt-8 md:mt-12">
+            <div class="glass-vault p-10 md:p-12">
+                <div class="font-prestige text-xs tracking-widest text-[#D4AF37] mb-3">ARCANA À MONTRÉAL</div>
+                <div class="text-white font-semibold text-lg mb-2">Oracle local & accès au Sanctuaire</div>
+                <div class="text-gray-300 text-sm leading-relaxed max-w-4xl">Le portail expose un état Oracle (température Montréal-Est) et contrôle l'accès aux expériences (Sanctuaire / couloir bleu). Le but: garder une hiérarchie claire et une base maintenable.</div>
+            </div>
+        </section>
     </main>
 
     <div id="guide-poche">
@@ -667,7 +754,7 @@
             }
         </style>
         <div id="oracle-invite">L'Oracle vous attend...</div>
-        <a id="sanctuary-btn" href="arcanagame.html">ENTRER DANS LE SANCTUAIRE</a>
+        <button id="sanctuary-btn" type="button" onclick="goToSanctuary()">ENTRER DANS LE SANCTUAIRE</button>
         <div style="margin-top: 40px;">
             <a href="mailto:blockarcana-admin@proton.me">
                 <img src="https://img.icons8.com/ios-filled/50/D4AF37/mail.png" width="35" alt="Email">
@@ -728,6 +815,14 @@
                 console.warn('ethers.js non disponible - Affichage par défaut');
             }
         });
+
+        function goToSanctuary() {
+            var overlay = document.getElementById('arcana-transition');
+            if (overlay) overlay.classList.add('active');
+            window.setTimeout(function() {
+                window.location.href = 'arcanagame.html';
+            }, 260);
+        }
     </script>
 </body>
 </html>
