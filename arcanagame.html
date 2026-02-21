@@ -43,7 +43,12 @@
         }
         body {
             perspective: 1000px;
-            background: transparent;
+            background-color: #000 !important;
+            background-image: url('couloir-coffre.webp') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
             color: white;
             font-family: 'Cinzel', serif;
             margin: 0;
@@ -58,14 +63,18 @@
             touch-action: manipulation;
         }
 
-        html,
-        body,
+        html {
+            background-color: #000 !important;
+        }
+
         #app,
         #game-container,
         #arcana-game-content,
-        #level-3-sanctuary {
-            background: none !important;
+        #level-3-sanctuary,
+        header {
+            background: transparent !important;
             background-image: none !important;
+            box-shadow: none !important;
         }
         /* Texture de pierre sur le body */
         body::before {
@@ -123,12 +132,7 @@
             inset: 0;
             z-index: -1;
             pointer-events: none;
-            display: block;
-            background-image: url('couloir-coffre.webp');
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            background-attachment: fixed !important;
+            display: none;
         }
 
         #corridor-chest-btn {
