@@ -3148,6 +3148,49 @@ function showOracleNetworkAlert() {
     document.body.appendChild(overlay);
 }
 
+function showStyledAlert(htmlMessage) {
+    try {
+        var existing = document.getElementById('arcana-styled-alert-overlay');
+        if (existing) existing.remove();
+
+        var overlay = document.createElement('div');
+        overlay.id = 'arcana-styled-alert-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.72);z-index:10000;padding:20px;';
+
+        var box = document.createElement('div');
+        box.style.cssText = 'max-width:420px;width:100%;border-radius:16px;padding:18px 18px 14px 18px;background:linear-gradient(145deg, rgba(12,14,18,0.98), rgba(26,20,14,0.92));border:1px solid rgba(0,242,255,0.35);box-shadow:0 0 26px rgba(0,242,255,0.18), 0 0 80px rgba(0,0,0,0.85);color:rgba(255,255,255,0.92);font-family:\'Cinzel\', serif;letter-spacing:0.03em;';
+
+        var content = document.createElement('div');
+        content.style.cssText = 'font-size:14px;line-height:1.55;';
+        content.innerHTML = (htmlMessage === undefined || htmlMessage === null) ? '' : String(htmlMessage);
+
+        var actions = document.createElement('div');
+        actions.style.cssText = 'display:flex;justify-content:center;margin-top:14px;';
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'FERMER';
+        btn.style.cssText = 'padding:10px 16px;border-radius:10px;border:1px solid rgba(212,175,55,0.35);background:rgba(212,175,55,0.12);color:rgba(245,252,255,0.95);font-family:\'Cinzel\', serif;letter-spacing:0.12em;cursor:pointer;';
+        btn.onclick = function() {
+            try { overlay.remove(); } catch (e) {}
+        };
+
+        overlay.onclick = function(e) {
+            if (e && e.target === overlay) {
+                try { overlay.remove(); } catch (err) {}
+            }
+        };
+
+        actions.appendChild(btn);
+        box.appendChild(content);
+        box.appendChild(actions);
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+    } catch (e) {
+        try { alert(String(htmlMessage || '')); } catch (err) {}
+    }
+}
+
 async function switchToPolygon() {
     try {
         if (window.ethereum && provider) {
@@ -4118,10 +4161,81 @@ document.addEventListener('DOMContentLoaded', function() {
     // SACOCHE INVENTAIRE - GESTION DES CLÉS ET OBJETS
     // =========================================================================
     var sacInventaire = [];
-    var sacObjetsQuete = [];
+    var sacObjetsQuete = Array.isArray(sacObjetsQuete) ? sacObjetsQuete : [];
     var sacIsOpen = false;
     var sacResonanceActive = false;
     var sacResonanceObjetActif = null;
+
+    function renderSacObjetsQuete() {
+        var container = document.getElementById('sac-objets-quete');
+        var emptyEl = document.getElementById('sac-objets-quete-vide');
+        if (!container) return;
+
+        var items = Array.isArray(sacObjetsQuete) ? sacObjetsQuete : [];
+        if (items.length === 0) {
+            if (emptyEl) emptyEl.style.display = 'block';
+            Array.from(container.querySelectorAll('.objet-quete')).forEach(function(n) { n.remove(); });
+            return;
+        }
+
+        if (emptyEl) emptyEl.style.display = 'none';
+        Array.from(container.querySelectorAll('.objet-quete')).forEach(function(n) { n.remove(); });
+
+        items.forEach(function(obj) {
+            if (!obj || !obj.id) return;
+            var el = document.createElement('div');
+            el.className = 'objet-quete' + (String(obj.id).indexOf('papyrus_ancien_') === 0 ? ' papyrus-ancien' : '');
+            el.setAttribute('data-id', obj.id);
+
+            var icon = document.createElement('div');
+            icon.style.cssText = 'font-size:1.7em;line-height:1;';
+            icon.textContent = obj.icone || '✨';
+
+            var name = document.createElement('div');
+            name.className = 'objet-quete-nom';
+            name.textContent = obj.nom || obj.id;
+
+            el.appendChild(icon);
+            el.appendChild(name);
+
+            el.onclick = function() {
+                try {
+                    if (typeof ouvrirPapyrus === 'function' && window.papyrusTextes && window.papyrusTextes[obj.id]) {
+                        ouvrirPapyrus(obj.id, obj.nom || 'Papyrus Ancien');
+                        return;
+                    }
+                } catch (e) {}
+            };
+
+            container.appendChild(el);
+        });
+    }
+
+    function ajouterObjetQuete(icone, nom, objetId) {
+        if (!objetId) return false;
+        if (!Array.isArray(sacObjetsQuete)) sacObjetsQuete = [];
+        var exists = sacObjetsQuete.find(function(o) { return o && o.id === objetId; });
+        if (exists) return false;
+        sacObjetsQuete.push({ icone: icone, nom: nom, id: objetId });
+        try { updateSacBadge(); } catch (e) {}
+        try { renderSacObjetsQuete(); } catch (e) {}
+        return true;
+    }
+
+    function retirerObjetQuete(objetId) {
+        if (!Array.isArray(sacObjetsQuete) || !objetId) return false;
+        var before = sacObjetsQuete.length;
+        sacObjetsQuete = sacObjetsQuete.filter(function(o) { return !(o && o.id === objetId); });
+        try { updateSacBadge(); } catch (e) {}
+        try { renderSacObjetsQuete(); } catch (e) {}
+        return sacObjetsQuete.length !== before;
+    }
+
+    function viderObjetsQuete() {
+        sacObjetsQuete = [];
+        try { updateSacBadge(); } catch (e) {}
+        try { renderSacObjetsQuete(); } catch (e) {}
+    }
 
     function toggleSacInventaire() {
         if (sacIsOpen) fermerSacInventaire();
@@ -4141,6 +4255,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sanctuaire) {
             sanctuaire.classList.add('sac-ouvert');
         }
+
+        try { renderSacObjetsQuete(); } catch (e) {}
         
         document.body.style.overflow = 'hidden';
         console.log('%c👜 Inventaire ouvert - Sanctuaire repositionné', 'color:#d4af37; font-weight:bold;');
