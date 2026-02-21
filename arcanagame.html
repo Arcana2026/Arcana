@@ -171,6 +171,10 @@
     const chest = document.getElementById('chest-image');
     let hasKey = false; // Simule la possession de a-key-icon.png
 
+    let provider;
+    let signer;
+    let account;
+
     // Mélange des textes 2 et 3
     const welcomeMessage = "Connexion établie. Vous pénétrez dans le couloir de données d'Arcana. Ici, le silence du réseau cache le bourdonnement des serveurs et chaque porte est un code. Utilisez vos Data-Keys pour déverrouiller les coffres du Vault. La sécurité Web3 veille sur vos actifs, Bernard.";
 
@@ -216,6 +220,36 @@
         // Logique de votre sacoche ici
         alert("Accès à l'inventaire arcana-safe.nft...");
     }
+
+    async function connectWallet() {
+        const btn = document.getElementById('connect-wallet');
+        if (!btn) return;
+
+        if (!window.ethereum || !window.ethereum.request) {
+            typeWriter("Wallet introuvable. Installez MetaMask pour authentifier l'accès.");
+            return;
+        }
+
+        try {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
+            account = await signer.getAddress();
+
+            const shortAddr = account ? `${account.slice(0, 4)}...${account.slice(-4)}` : '';
+            btn.textContent = `STATION : ${shortAddr}`;
+            btn.style.border = '1px solid rgba(0, 255, 140, 0.95)';
+            btn.style.color = 'rgba(0, 255, 140, 0.95)';
+            btn.style.boxShadow = '0 0 18px rgba(0, 255, 140, 0.35), 0 0 34px rgba(0, 255, 140, 0.18)';
+
+            typeWriter("Connexion authentifiée, Bernard. Signature du protocole détectée sur le réseau Polygon. Le couloir de données est désormais sous votre contrôle.");
+        } catch (e) {
+            typeWriter("Connexion refusée. Autorisation Web3 non accordée.");
+        }
+    }
+
+    const connectBtn = document.getElementById('connect-wallet');
+    if (connectBtn) connectBtn.addEventListener('click', connectWallet);
 </script>
 
 </body>
