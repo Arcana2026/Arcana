@@ -142,6 +142,9 @@
         }
 
         body.corridor-entrance-bg {
+            --corridor-bg-size: 105%;
+            --corridor-parallax-x: 0px;
+            --corridor-parallax-y: 0px;
             background-image:
                 url('couloir-coffre.webp'),
                 linear-gradient(90deg,
@@ -160,9 +163,24 @@
                     rgba(40, 35, 30, 1) 0%,
                     rgba(25, 20, 15, 1) 50%,
                     rgba(15, 10, 5, 1) 100%);
-            background-size: cover;
+            background-size: var(--corridor-bg-size) var(--corridor-bg-size), cover, cover, cover;
+            background-position:
+                calc(50% + var(--corridor-parallax-x)) calc(50% + var(--corridor-parallax-y)),
+                center,
+                center,
+                center;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            will-change: background-position, background-size;
+            transition: background-size 3s ease;
+        }
+
+        body.corridor-entrance-bg.corridor-entrance-zoom {
+            --corridor-bg-size: 120%;
+        }
+
+        .corridor-torch {
+            will-change: transform;
         }
 
         .brick-panel.left {
@@ -2500,6 +2518,11 @@
             const setOpen = (open) => {
                 if (open) {
                     try { document.body.classList.add('corridor-entrance-bg'); } catch (e) {}
+                    try {
+                        requestAnimationFrame(function() {
+                            try { document.body.classList.add('corridor-entrance-zoom'); } catch (e) {}
+                        });
+                    } catch (e) {}
                     overlay.classList.add('open');
                     var done = 0;
                     var finish = function() {
@@ -2527,6 +2550,64 @@
                         finish();
                         finish();
                     }, 1400);
+
+                    try {
+                        if (!window._arcanaCorridorParallaxInit) {
+                            window._arcanaCorridorParallaxInit = true;
+                            (function initCorridorParallax() {
+                                var lastX = 0;
+                                var lastY = 0;
+                                var raf = 0;
+                                var clamp = function(v, min, max) { return Math.max(min, Math.min(max, v)); };
+                                var apply = function(x, y) {
+                                    lastX = x; lastY = y;
+                                    if (raf) return;
+                                    raf = requestAnimationFrame(function() {
+                                        raf = 0;
+                                        try {
+                                            document.body.style.setProperty('--corridor-parallax-x', lastX.toFixed(1) + 'px');
+                                            document.body.style.setProperty('--corridor-parallax-y', lastY.toFixed(1) + 'px');
+                                        } catch (e) {}
+                                        try {
+                                            var torches = document.querySelectorAll('.corridor-torch');
+                                            if (torches && torches.length) {
+                                                var tx = lastX * 1.35;
+                                                var ty = lastY * 1.35;
+                                                torches.forEach(function(el) {
+                                                    try { el.style.transform = 'translate3d(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px,0)'; } catch (e) {}
+                                                });
+                                            }
+                                        } catch (e) {}
+                                    });
+                                };
+
+                                var onOrientation = function(ev) {
+                                    if (!document.body.classList.contains('corridor-entrance-bg')) return;
+                                    var gamma = (ev && typeof ev.gamma === 'number') ? ev.gamma : 0;
+                                    var beta = (ev && typeof ev.beta === 'number') ? ev.beta : 0;
+                                    var x = clamp(gamma, -18, 18) / 18 * 10;
+                                    var y = clamp(beta, -18, 18) / 18 * 8;
+                                    apply(x, y);
+                                };
+
+                                var onScroll = function() {
+                                    if (!document.body.classList.contains('corridor-entrance-bg')) return;
+                                    var y = clamp((window.scrollY || 0), 0, 240) / 240 * -8;
+                                    apply(0, y);
+                                };
+
+                                try {
+                                    if ('DeviceOrientationEvent' in window) {
+                                        window.addEventListener('deviceorientation', onOrientation, { passive: true });
+                                    }
+                                } catch (e) {}
+
+                                try {
+                                    window.addEventListener('scroll', onScroll, { passive: true });
+                                } catch (e) {}
+                            })();
+                        }
+                    } catch (e) {}
                 } else {
                     overlay.classList.remove('hidden');
                     overlay.classList.remove('open');
